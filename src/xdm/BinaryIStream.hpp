@@ -18,59 +18,52 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.       
 //                                                                             
 //------------------------------------------------------------------------------
-#ifndef xdmComm_BinaryOStream_hpp
-#define xdmComm_BinaryOStream_hpp
+#ifndef xdm_BinaryIStream_hpp
+#define xdm_BinaryIStream_hpp
 
-#include <xdmComm/BinaryIosBase.hpp>
+#include <xdm/BinaryIosBase.hpp>
 
-#include <xdmComm/NamespaceMacro.hpp>
+#include <xdm/NamespaceMacro.hpp>
 
-XDM_COMM_NAMESPACE_BEGIN
+XDM_NAMESPACE_BEGIN
 
-class BinaryOStream : virtual public BinaryIosBase {
+class BinaryIStream : virtual public BinaryIosBase {
 public:
   
   /// Constructor takes a pointer to a stream buffer.
-  BinaryOStream( BinaryStreamBuffer* buf ); 
-  virtual ~BinaryOStream();
+  BinaryIStream( BinaryStreamBuffer* buf ); 
+  virtual ~BinaryIStream();
 
-  /// Put a single character to the stream.
-  BinaryOStream& put( char c );
-  /// Put n characters to the stream.
-  BinaryOStream& write( const char* p, size_t n );
+  /// Read and return the next character in the stream.
+  int get();
+  /// Read a single character from the stream into the parameter.
+  /// @param c Location to write the next character in the stream.
+  BinaryIStream& get( char& c );
+  /// Read a block of n characters from the stream.
+  BinaryIStream& read( char* const p, size_t n );
 
-  //-- Insertion Operators --//
+  //-- Exraction Operators --//
 
-  BinaryOStream& operator<<( short n );
-  BinaryOStream& operator<<( int n );
-  BinaryOStream& operator<<( long n );
+  BinaryIStream& operator>>( short& n );
+  BinaryIStream& operator>>( int& n );
+  BinaryIStream& operator>>( long& n );
 
-  BinaryOStream& operator<<( unsigned short n );
-  BinaryOStream& operator<<( unsigned int n );
-  BinaryOStream& operator<<( unsigned long n );
+  BinaryIStream& operator>>( unsigned short& n );
+  BinaryIStream& operator>>( unsigned int& n );
+  BinaryIStream& operator>>( unsigned long& n );
 
-  BinaryOStream& operator<<( float n );
-  BinaryOStream& operator<<( double n );
-  BinaryOStream& operator<<( long double n );
+  BinaryIStream& operator>>( float& n );
+  BinaryIStream& operator>>( double& n );
+  BinaryIStream& operator>>( long double& n );
   
-  BinaryOStream& operator<<( bool n );
+  BinaryIStream& operator>>( bool& n );
 
-  BinaryOStream& flush();
-
-  /// Insertion operator that takes a function pointer and invokes it on the
-  /// stream.  This allows the stream to support manipulators.
-  BinaryOStream& operator<<( BinaryOStream& (*f)( BinaryOStream& ) ) {
-    return f( *this );
-  }
+  BinaryIStream& sync();
 };
 
-BinaryOStream& operator<<( BinaryOStream& ostr, char c );
-BinaryOStream& operator<<( BinaryOStream& ostr, unsigned char c );
+BinaryIStream& operator>>( BinaryIStream& ostr, char& c );
 
-/// Stream manipulator that flushes the stream.
-inline BinaryOStream& flush( BinaryOStream& ostr ) { return ostr.flush(); }
+XDM_NAMESPACE_END
 
-XDM_COMM_NAMESPACE_END
-
-#endif // xdmComm_BinaryOStream_hpp
+#endif // xdm_BinaryIStream_hpp
 

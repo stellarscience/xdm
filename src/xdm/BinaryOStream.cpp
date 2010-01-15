@@ -18,91 +18,91 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.       
 //                                                                             
 //------------------------------------------------------------------------------
-#include <xdmComm/BinaryIStream.hpp>
+#include <xdm/BinaryOStream.hpp>
 
 #include <memory>
 
-XDM_COMM_NAMESPACE_BEGIN
+XDM_NAMESPACE_BEGIN
 
 namespace {
 
 // helper template to write a primitive type to a binary ostream.
 template< typename T >
-inline BinaryIStream& input( BinaryIStream& ostr, T& value ) {
-  return ostr.read( reinterpret_cast< char* >( &value ), sizeof( T ) );
+inline BinaryOStream& output( BinaryOStream& ostr, T value ) {
+  return ostr.write( reinterpret_cast< char* >( &value ), sizeof( T ) );
 }
 
 } // namespace anon
 
-BinaryIStream::BinaryIStream( BinaryStreamBuffer* buf ) :
+BinaryOStream::BinaryOStream( BinaryStreamBuffer* buf ) :
   BinaryIosBase( buf ) {
 }
 
-BinaryIStream::~BinaryIStream() {
+BinaryOStream::~BinaryOStream() {
 }
 
-int BinaryIStream::get() {
-  return rdbuf()->sgetc();
-}
-
-BinaryIStream& BinaryIStream::get( char& c ) {
-  c = rdbuf()->sgetc();
+BinaryOStream& BinaryOStream::put( char c ) {
+  rdbuf()->sputc( c );
   return *this;
 }
 
-BinaryIStream& BinaryIStream::read( char* const p, size_t n ) {
-  rdbuf()->sgetn( p, n );
+BinaryOStream& BinaryOStream::write( const char* p, size_t n ) {
+  rdbuf()->sputn( p, n );
   return *this;
 }
 
-BinaryIStream& BinaryIStream::operator>>( short& n ) {
-  return input( *this, n );
+BinaryOStream& BinaryOStream::operator<<( short n ) {
+  return output( *this, n );
 }
 
-BinaryIStream& BinaryIStream::operator>>( int& n ) {
-  return input( *this, n );
+BinaryOStream& BinaryOStream::operator<<( int n ) {
+  return output( *this, n );
 }
 
-BinaryIStream& BinaryIStream::operator>>( long& n ) {
-  return input( *this, n );
+BinaryOStream& BinaryOStream::operator<<( long n ) {
+  return output( *this, n );
 }
 
-BinaryIStream& BinaryIStream::operator>>( unsigned short& n ) {
-  return input( *this, n );
+BinaryOStream& BinaryOStream::operator<<( unsigned short n ) {
+  return output( *this, n );
 }
 
-BinaryIStream& BinaryIStream::operator>>( unsigned int& n ) {
-  return input( *this, n );
+BinaryOStream& BinaryOStream::operator<<( unsigned int n ) {
+  return output( *this, n );
 }
 
-BinaryIStream& BinaryIStream::operator>>( unsigned long& n ) {
-  return input( *this, n );
+BinaryOStream& BinaryOStream::operator<<( unsigned long n ) {
+  return output( *this, n );
 }
 
-BinaryIStream& BinaryIStream::operator>>( float& n ) {
-  return input( *this, n );
+BinaryOStream& BinaryOStream::operator<<( float n ) {
+  return output( *this, n );
 }
 
-BinaryIStream& BinaryIStream::operator>>( double& n ) {
-  return input( *this, n );
+BinaryOStream& BinaryOStream::operator<<( double n ) {
+  return output( *this, n );
 }
 
-BinaryIStream& BinaryIStream::operator>>( long double& n ) {
-  return input( *this, n );
+BinaryOStream& BinaryOStream::operator<<( long double n ) {
+  return output( *this, n );
 }
 
-BinaryIStream& BinaryIStream::operator>>( bool& n ) {
-  return input( *this, n );
+BinaryOStream& BinaryOStream::operator<<( bool n ) {
+  return output( *this, n );
 }
 
-BinaryIStream& BinaryIStream::sync() {
+BinaryOStream& BinaryOStream::flush() {
   rdbuf()->pubsync();
   return *this;
 }
 
-BinaryIStream& operator>>( BinaryIStream& ostr, char& c ) {
-  return ostr.get( c );
+BinaryOStream& operator<<( BinaryOStream& ostr, char c ) {
+  return ostr.put( c );
 }
 
-XDM_COMM_NAMESPACE_END
+BinaryOStream& operator<<( BinaryOStream& ostr, unsigned char c ) {
+  return ostr.put( c );
+}
+
+XDM_NAMESPACE_END
 

@@ -26,7 +26,7 @@ XDM_COMM_NAMESPACE_BEGIN
 CoalescingStreamBuffer::CoalescingStreamBuffer(
   size_t bufSize,
   MPI_Comm communicator ) :
-  BinaryStreamBuffer( bufSize ),
+  xdm::BinaryStreamBuffer( bufSize ),
   mCommunicator( communicator ) {
 }
 
@@ -74,7 +74,7 @@ void CoalescingStreamBuffer::sync() {
   }
 
   // call the base class sync to prepare for reading, writing.
-  BinaryStreamBuffer::sync();
+  xdm::BinaryStreamBuffer::sync();
 }
 
 XDM_COMM_NAMESPACE_END

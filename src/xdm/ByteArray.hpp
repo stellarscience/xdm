@@ -18,21 +18,22 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.       
 //                                                                             
 //------------------------------------------------------------------------------
-#ifndef xdmComm_ReceiveBufferArray_hpp
-#define xdmComm_ReceiveBufferArray_hpp
+#ifndef xdm_ByteArray_hpp
+#define xdm_ByteArray_hpp
 
 #include <xdm/VectorStructuredArray.hpp>
 
 #include <vector>
 
-#include <xdmComm/NamespaceMacro.hpp>
+#include <xdm/NamespaceMacro.hpp>
 
-XDM_COMM_NAMESPACE_BEGIN
+XDM_NAMESPACE_BEGIN
 
-/// StructuredArray for receiving off core data. The data is held internally
-/// as a byte array. The data's type is determined by the type specified via
-/// the primitiveType value stored internally within the class.
-class ReceiveBufferArray : public xdm::StructuredArray {
+/// StructuredArray that represents it's data internally as an array of bytes.
+/// The array elements are stored internally as an array of bytes, however
+/// this class provides an interface for setting the number and type of elements
+/// so that the byte array can hold the byte representation of any other type.
+class ByteArray : public xdm::StructuredArray {
   std::vector< char > mBuffer;
   xdm::primitiveType::Value mType;
   size_t mSize;
@@ -42,12 +43,12 @@ public:
   /// @post The ReceiveBufferArray is ready to receive messages up to bufferSize
   /// length in bytes.
   /// @param bufferSize The size of the buffer to use in bytes.
-  ReceiveBufferArray( size_t bufferSize ) :
+  ByteArray( size_t bufferSize ) :
     mBuffer( bufferSize ),
     mType(),
     mSize() {
   }
-  virtual ~ReceiveBufferArray() {}
+  virtual ~ByteArray() {}
 
   //-- StructuredArray Query Interface --//
 
@@ -74,6 +75,6 @@ public:
 
 };
 
-XDM_COMM_NAMESPACE_END
+XDM_NAMESPACE_END
 
-#endif // xdmComm_ReceiveBufferArray_hpp
+#endif // xdm_ByteArray_hpp

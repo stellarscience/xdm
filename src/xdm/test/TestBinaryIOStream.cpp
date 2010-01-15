@@ -21,7 +21,7 @@
 #define BOOST_TEST_MODULE BinaryIOStream 
 #include <boost/test/unit_test.hpp>
 
-#include <xdmComm/BinaryIOStream.hpp>
+#include <xdm/BinaryIOStream.hpp>
 
 #include <memory>
 
@@ -31,8 +31,8 @@ namespace {
 template< typename T >
 class Fixture {
 public:
-  xdmComm::BinaryStreamBuffer mBuf;
-  xdmComm::BinaryIOStream mIOStr;
+  xdm::BinaryStreamBuffer mBuf;
+  xdm::BinaryIOStream mIOStr;
   Fixture() : mBuf( 512 ), mIOStr( &mBuf ) {
   }
 };

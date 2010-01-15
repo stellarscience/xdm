@@ -18,7 +18,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.       
 //                                                                             
 //------------------------------------------------------------------------------
-#include <xdmComm/BinaryStreamOperations.hpp>
+#include <xdm/BinaryStreamOperations.hpp>
 
 #include <xdm/DataSelectionVisitor.hpp>
 #include <xdm/ThrowMacro.hpp>
@@ -28,7 +28,7 @@
 #include <memory>
 #include <stdexcept>
 
-XDM_COMM_NAMESPACE_BEGIN
+XDM_NAMESPACE_BEGIN
 
 namespace {
 
@@ -259,7 +259,7 @@ BinaryOStream& operator<<( BinaryOStream& ostr, const xdm::primitiveType::Value&
 }
 
 //-----------------------------------------------------------------------------
-BinaryIStream& operator>>( BinaryIStream& istr, xdmComm::ReceiveBufferArray& v ) {
+BinaryIStream& operator>>( BinaryIStream& istr, ByteArray& v ) {
   // type - shape - data
   xdm::primitiveType::Value type;
   size_t size;
@@ -333,5 +333,5 @@ BinaryOStream& operator<<( BinaryOStream& ostr, const xdm::XmlObject& v ) {
   return ostr;
 }
 
-XDM_COMM_NAMESPACE_END
+XDM_NAMESPACE_END
 

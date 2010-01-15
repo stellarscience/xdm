@@ -18,15 +18,15 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.       
 //                                                                             
 //------------------------------------------------------------------------------
-#ifndef xdmComm_BinaryIOStream_hpp
-#define xdmComm_BinaryIOStream_hpp
+#ifndef xdm_BinaryIOStream_hpp
+#define xdm_BinaryIOStream_hpp
 
-#include <xdmComm/BinaryIStream.hpp>
-#include <xdmComm/BinaryOStream.hpp>
+#include <xdm/BinaryIStream.hpp>
+#include <xdm/BinaryOStream.hpp>
 
-#include <xdmComm/NamespaceMacro.hpp>
+#include <xdm/NamespaceMacro.hpp>
 
-XDM_COMM_NAMESPACE_BEGIN
+XDM_NAMESPACE_BEGIN
 
 class BinaryIOStream : 
   public BinaryIStream,
@@ -36,7 +36,7 @@ public:
   virtual ~BinaryIOStream();
 };
 
-XDM_COMM_NAMESPACE_END
+XDM_NAMESPACE_END
 
-#endif // xdmComm_BinaryIOStream_hpp
+#endif // xdm_BinaryIOStream_hpp
 

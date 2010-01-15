@@ -20,14 +20,14 @@
 //------------------------------------------------------------------------------
 #include <xdmComm/MpiDatasetProxy.hpp>
 
-#include <xdmComm/BinaryIStream.hpp>
-#include <xdmComm/BinaryOStream.hpp>
-#include <xdmComm/BinaryStreamOperations.hpp>
 #include <xdmComm/CoalescingStreamBuffer.hpp>
 #include <xdmComm/MpiMessageTag.hpp>
-#include <xdmComm/ReceiveBufferArray.hpp>
 
 #include <xdm/AllDataSelection.hpp>
+#include <xdm/BinaryIStream.hpp>
+#include <xdm/BinaryOStream.hpp>
+#include <xdm/BinaryStreamOperations.hpp>
+#include <xdm/ByteArray.hpp>
 #include <xdm/DataSelection.hpp>
 #include <xdm/DataSelectionMap.hpp>
 #include <xdm/DataSelectionVisitor.hpp>
@@ -43,11 +43,11 @@ namespace {
 // receive and write off core data to a dataset.
 // Precondition: There must be a message available to receive.
 void receiveAndWriteProcessData( 
-  BinaryStreamBuffer* commBuf, 
+  xdm::BinaryStreamBuffer* commBuf,
   xdm::Dataset* dataset,
-  xdmComm::ReceiveBufferArray* arrayBuffer ) {
+  xdm::ByteArray* arrayBuffer ) {
 
-  BinaryIStream dataStream( commBuf );
+  xdm::BinaryIStream dataStream( commBuf );
 
   // synchronize the stream to receive from a single process.
   dataStream.sync();
@@ -70,7 +70,7 @@ MpiDatasetProxy::MpiDatasetProxy(
   mCommunicator( communicator ),
   mDataset( dataset ),
   mCommBuffer( new CoalescingStreamBuffer( bufSizeHint, communicator ) ),
-  mArrayBuffer( new xdmComm::ReceiveBufferArray( bufSizeHint ) ) {
+  mArrayBuffer( new xdm::ByteArray( bufSizeHint ) ) {
 }
 
 MpiDatasetProxy::~MpiDatasetProxy() {
@@ -112,7 +112,7 @@ void MpiDatasetProxy::serializeImplementation(
   // Rank 0 in the communicator writes local data and polls for messages from
   // other processes.
   if ( localRank != 0 ) {
-    BinaryOStream dataStream( mCommBuffer.get() );
+    xdm::BinaryOStream dataStream( mCommBuffer.get() );
     dataStream << *array;
     dataStream << selectionMap;
     dataStream.flush();

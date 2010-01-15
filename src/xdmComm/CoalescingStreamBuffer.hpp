@@ -21,7 +21,7 @@
 #ifndef xdmComm_CoalescingStreamBuffer_hpp
 #define xdmComm_CoalescingStreamBuffer_hpp
 
-#include <xdmComm/BinaryStreamBuffer.hpp>
+#include <xdm/BinaryStreamBuffer.hpp>
 
 #include <mpi.h>
 
@@ -33,7 +33,7 @@ XDM_COMM_NAMESPACE_BEGIN
 /// given communicator.  Processes with rank > 0 in the input communicator will
 /// communicate with an MPI synchronous send while rank 0 in the communicator
 /// will receive the data.
-class CoalescingStreamBuffer : public BinaryStreamBuffer {
+class CoalescingStreamBuffer : public xdm::BinaryStreamBuffer {
 private:
   MPI_Comm mCommunicator;
 

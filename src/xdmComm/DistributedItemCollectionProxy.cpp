@@ -20,8 +20,8 @@
 //------------------------------------------------------------------------------
 #include <xdmComm/DistributedItemCollectionProxy.hpp>
 
-#include <xdmComm/BinaryIOStream.hpp>
-#include <xdmComm/BinaryStreamOperations.hpp>
+#include <xdm/BinaryIOStream.hpp>
+#include <xdm/BinaryStreamOperations.hpp>
 
 #include <xdm/CollectMetadataOperation.hpp>
 
@@ -57,39 +57,8 @@ void DistributedItemCollectionProxy::update() {
 
 void DistributedItemCollectionProxy::writeMetadata(
   xdm::XmlMetadataWrapper& metadata ) {
-
   // write the metadata for the wrapped Item first
   mItem->writeMetadata( metadata );
-
-  int processCount;
-  MPI_Comm_size( mCommunicator, &processCount );
-  int rank;
-  MPI_Comm_rank( mCommunicator, &rank );
-  if ( rank == 0 ) {
-
-    int processesCompleted = 1;
-    while ( processesCompleted < processCount ) {
-      while( mCommBuffer->poll() ) {
-        BinaryIStream istr( mCommBuffer.get() );
-        istr.sync();
-        xdm::RefPtr< xdm::XmlObject > xml( new xdm::XmlObject );
-        istr >> *xml;
-        metadata.completeObject()->appendChild( xml );
-        processesCompleted++;
-      }
-    }
-
-  } else {
-
-    BinaryOStream ostr( mCommBuffer.get() );
-
-    xdm::RefPtr< xdm::XmlObject > xml( metadata.completeObject() );
-    xdm::CollectMetadataOperation collector( xml );
-    mItem->accept( collector );
-    ostr << *xml << flush;
-
-  }
-
 }
 
 XDM_COMM_NAMESPACE_END

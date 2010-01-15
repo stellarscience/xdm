@@ -18,53 +18,47 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.       
 //                                                                             
 //------------------------------------------------------------------------------
-#define BOOST_TEST_MODULE BinaryIStream 
-#include <boost/test/unit_test.hpp>
+#ifndef xdm_BinaryIosBase_hpp
+#define xdm_BinaryIosBase_hpp
 
-#include <xdmComm/BinaryIStream.hpp>
+#include <xdm/BinaryStreamBuffer.hpp>
 
-#include <memory>
+#include <xdm/NamespaceMacro.hpp>
 
-namespace {
+XDM_NAMESPACE_BEGIN
 
-// define a test parameterized on the types we care about.
-template< typename T >
-class Fixture {
+/// Base class that manages access to an underlying stream buffer for streaming
+/// input and output of binary serialized objects.
+template< typename StreamBufT >
+class BasicBinaryIosBase {
+private:
+  StreamBufT* mStreamBuffer;
+
+  // non-copyable
+  BasicBinaryIosBase( const BasicBinaryIosBase& );
+  BasicBinaryIosBase& operator=( const BasicBinaryIosBase& );
+
 public:
-  T value;
-  xdmComm::BinaryStreamBuffer mBuf;
-  xdmComm::BinaryIStream mIStr;
-  Fixture() : value(), mBuf( 512 ), mIStr( &mBuf ) {
-    mBuf.sputn( reinterpret_cast< char* >(&value), sizeof(T) );
-    mBuf.pubsync();
+
+  typedef StreamBufT stream_buffer;
+
+  /// The constructor takes a reference to the underlying stream buffer to use.
+  /// The buffer's position pointer is reset to the beginning of the buffer upon
+  /// construction.
+  BasicBinaryIosBase( StreamBufT* buffer ) :
+    mStreamBuffer( buffer ) {
+    buffer->pubseekpos( 0 );
   }
+
+  ~BasicBinaryIosBase() {}
+
+  /// Get the mutable stream buffer.
+  stream_buffer* rdbuf() { return mStreamBuffer; } 
 };
 
-template< typename T > void writeValue() {
-  Fixture< T > test;
+typedef BasicBinaryIosBase< BinaryStreamBuffer > BinaryIosBase;
 
-  T result;
-  // make sure result isn't the default object
-  result = !result;
+XDM_NAMESPACE_END
 
-  test.mIStr >> result;
-  BOOST_CHECK_EQUAL( test.value, result );
-}
-
-BOOST_AUTO_TEST_CASE( writeChar ) { writeValue< char >(); }
-BOOST_AUTO_TEST_CASE( writeShort ) { writeValue< short >(); }
-BOOST_AUTO_TEST_CASE( writeInt ) { writeValue< int >(); }
-BOOST_AUTO_TEST_CASE( writeLong ) { writeValue< long >(); }
-
-BOOST_AUTO_TEST_CASE( writeUShort ) { writeValue< unsigned short >(); }
-BOOST_AUTO_TEST_CASE( writeUInt ) { writeValue< unsigned int >(); }
-BOOST_AUTO_TEST_CASE( writeULong ) { writeValue< unsigned long >(); }
-
-BOOST_AUTO_TEST_CASE( writeFloat ) { writeValue< float >(); }
-BOOST_AUTO_TEST_CASE( writeDouble ) { writeValue< double >(); }
-BOOST_AUTO_TEST_CASE( writeLongDouble ) { writeValue< long double >(); }
-
-BOOST_AUTO_TEST_CASE( writeBool ) { writeValue< bool >(); }
-
-} // namepsace anon
+#endif // xdm_BinaryIosBase_hpp
 

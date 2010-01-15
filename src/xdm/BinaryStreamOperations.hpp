@@ -18,14 +18,13 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.       
 //                                                                             
 //------------------------------------------------------------------------------
-#ifndef xdmComm_BinaryStreamOperations_hpp
-#define xdmComm_BinaryStreamOperations_hpp
-
-#include <xdmComm/BinaryIStream.hpp>
-#include <xdmComm/BinaryOStream.hpp>
-#include <xdmComm/ReceiveBufferArray.hpp>
+#ifndef xdm_BinaryStreamOperations_hpp
+#define xdm_BinaryStreamOperations_hpp
 
 #include <xdm/AllDataSelection.hpp>
+#include <xdm/BinaryIStream.hpp>
+#include <xdm/BinaryOStream.hpp>
+#include <xdm/ByteArray.hpp>
 #include <xdm/DataSelection.hpp>
 #include <xdm/DataSelectionMap.hpp>
 #include <xdm/DataShape.hpp>
@@ -38,9 +37,9 @@
 #include <string>
 #include <utility>
 
-#include <xdmComm/NamespaceMacro.hpp>
+#include <xdm/NamespaceMacro.hpp>
 
-XDM_COMM_NAMESPACE_BEGIN
+XDM_NAMESPACE_BEGIN
 
 BinaryIStream& operator>>( BinaryIStream& istr, std::string& v );
 BinaryOStream& operator<<( BinaryOStream& ostr, const std::string& v );
@@ -78,13 +77,13 @@ BinaryOStream& operator<<( BinaryOStream& ostr, const xdm::primitiveType::Value&
 
 /// This inserter assumes that the output StructuredArray already has at least
 /// enough space allocated to hold the data.
-BinaryIStream& operator>>( BinaryIStream& istr, xdmComm::ReceiveBufferArray& v );
+BinaryIStream& operator>>( BinaryIStream& istr, ByteArray& v );
 BinaryOStream& operator<<( BinaryOStream& ostr, const xdm::StructuredArray& v );
 
 BinaryIStream& operator>>( BinaryIStream& istr, xdm::XmlObject& v );
 BinaryOStream& operator<<( BinaryOStream& ostr, const xdm::XmlObject& v );
 
-XDM_COMM_NAMESPACE_END
+XDM_NAMESPACE_END
 
-#endif // xdmComm_BinaryStreamOperations_hpp
+#endif // xdm_BinaryStreamOperations_hpp
 

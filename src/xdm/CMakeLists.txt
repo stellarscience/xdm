@@ -3,6 +3,13 @@ project( xdm )
 set( ${PROJECT_NAME}_HEADERS
     Algorithm.hpp
     AllDataSelection.hpp
+    BinaryIosBase.hpp
+    BinaryIStream.hpp
+    BinaryIOStream.hpp
+    BinaryOStream.hpp
+    BinaryStreamBuffer.hpp
+    BinaryStreamOperations.hpp
+    ByteArray.hpp
     CollectMetadataOperation.hpp
     CompositeDataItem.hpp
     CoordinateDataSelection.hpp
@@ -17,8 +24,8 @@ set( ${PROJECT_NAME}_HEADERS
     HyperslabDataSelection.hpp
     Item.hpp
     ItemVisitor.hpp
-	NamespaceMacro.hpp
-	ObjectCompositionMixin.hpp
+	  NamespaceMacro.hpp
+	  ObjectCompositionMixin.hpp
     ReferencedObject.hpp
     RefPtr.hpp
     SelectableDataMixin.hpp
@@ -37,6 +44,10 @@ set( ${PROJECT_NAME}_HEADERS
 )
 
 set( ${PROJECT_NAME}_SOURCES
+    BinaryIStream.cpp
+    BinaryIOStream.cpp
+    BinaryOStream.cpp
+    BinaryStreamOperations.cpp
     CollectMetadataOperation.cpp
     CompositeDataItem.cpp
     CoordinateDataSelection.cpp

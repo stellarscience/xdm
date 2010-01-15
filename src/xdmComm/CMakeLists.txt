@@ -3,25 +3,14 @@ project( xdmComm )
 find_package( MPI REQUIRED )
 
 set( ${PROJECT_NAME}_HEADERS 
-    BinaryIosBase.hpp
-    BinaryIStream.hpp
-    BinaryIOStream.hpp
-    BinaryOStream.hpp
-    BinaryStreamBuffer.hpp
-    BinaryStreamOperations.hpp
     CoalescingStreamBuffer.hpp
     DistributedItemCollectionProxy.hpp
     MpiDatasetProxy.hpp
     NamespaceMacro.hpp
     ParallelizeTreeVisitor.hpp
-    ReceiveBufferArray.hpp
 )
 
 set( ${PROJECT_NAME}_SOURCES
-    BinaryIStream.cpp
-    BinaryIOStream.cpp
-    BinaryOStream.cpp
-    BinaryStreamOperations.cpp
     CoalescingStreamBuffer.cpp
     DistributedItemCollectionProxy.cpp
     MpiDatasetProxy.cpp

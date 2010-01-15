@@ -30,8 +30,8 @@
 
 #include <xdmComm/NamespaceMacro.hpp>
 
-namespace xdmComm {
-  class ReceiveBufferArray;
+namespace xdm {
+  class ByteArray;
 }
 
 namespace xdm {
@@ -88,7 +88,7 @@ private:
   MPI_Comm mCommunicator;
   xdm::RefPtr< xdm::Dataset > mDataset;
   std::auto_ptr< xdmComm::CoalescingStreamBuffer > mCommBuffer;
-  xdm::RefPtr< xdmComm::ReceiveBufferArray > mArrayBuffer;
+  xdm::RefPtr< xdm::ByteArray > mArrayBuffer;
 };
 
 XDM_COMM_NAMESPACE_END

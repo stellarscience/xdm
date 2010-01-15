@@ -18,60 +18,48 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.       
 //                                                                             
 //------------------------------------------------------------------------------
-#define BOOST_TEST_MODULE 
+#define BOOST_TEST_MODULE BinaryOStream 
 #include <boost/test/unit_test.hpp>
 
-#include <xdmComm/BinaryStreamBuffer.hpp>
+#include <xdm/BinaryOStream.hpp>
+
+#include <memory>
 
 namespace {
 
-struct Fixture {
-  xdmComm::BinaryStreamBuffer testBuffer;
-  Fixture() : testBuffer( 512 ) {}
+// define a test parameterized on the types we care about.
+template< typename T >
+class Fixture {
+public:
+  T value;
+  xdm::BinaryStreamBuffer mBuf;
+  xdm::BinaryOStream mOstr;
+  Fixture() : value(), mBuf( 512 ), mOstr( &mBuf ) {}
 };
 
-BOOST_AUTO_TEST_CASE( construct ) {
-  Fixture test;
+template< typename T > void readValue() {
+  Fixture< T > test;
 
-  BOOST_CHECK_EQUAL( 512, test.testBuffer.size() );
+  test.mOstr << test.value;
+  
+  T* result = reinterpret_cast< T* >( test.mBuf.pointer() );
+  BOOST_CHECK_EQUAL( test.value, *result );
 }
 
-BOOST_AUTO_TEST_CASE( putgetc ) {
-  Fixture test;
+BOOST_AUTO_TEST_CASE( writeChar ) { readValue< char >(); }
+BOOST_AUTO_TEST_CASE( writeShort ) { readValue< short >(); }
+BOOST_AUTO_TEST_CASE( writeInt ) { readValue< int >(); }
+BOOST_AUTO_TEST_CASE( writeLong ) { readValue< long >(); }
 
-  test.testBuffer.sputc( 'a' );
-  test.testBuffer.sputc( 'b' );
-  test.testBuffer.sputc( 'c' );
+BOOST_AUTO_TEST_CASE( writeUShort ) { readValue< unsigned short >(); }
+BOOST_AUTO_TEST_CASE( writeUInt ) { readValue< unsigned int >(); }
+BOOST_AUTO_TEST_CASE( writeULong ) { readValue< unsigned long >(); }
 
-  test.testBuffer.pubsync();
+BOOST_AUTO_TEST_CASE( writeFloat ) { readValue< float >(); }
+BOOST_AUTO_TEST_CASE( writeDouble ) { readValue< double >(); }
+BOOST_AUTO_TEST_CASE( writeLongDouble ) { readValue< long double >(); }
 
-  char result;
-  result = test.testBuffer.sgetc();
-  BOOST_CHECK_EQUAL( 'a', result );
-  
-  result = test.testBuffer.sgetc();
-  BOOST_CHECK_EQUAL( 'b', result );
-  
-  result = test.testBuffer.sgetc();
-  BOOST_CHECK_EQUAL( 'c', result );
-}
-
-BOOST_AUTO_TEST_CASE( putgetn ) {
-  Fixture test;
-
-  char characters[] = {'a', 'b', 'c'};
-  
-  test.testBuffer.sputn( characters, 3 );
-
-  test.testBuffer.pubsync();
-
-  char result[3];
-  test.testBuffer.sgetn( result, 3 );
-
-  BOOST_CHECK_EQUAL( 'a', result[0] );
-  BOOST_CHECK_EQUAL( 'b', result[1] );
-  BOOST_CHECK_EQUAL( 'c', result[2] );
-}
+BOOST_AUTO_TEST_CASE( writeBool ) { readValue< bool >(); }
 
 } // namespace
 

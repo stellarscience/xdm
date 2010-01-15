@@ -18,52 +18,60 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.       
 //                                                                             
 //------------------------------------------------------------------------------
-#ifndef xdmComm_BinaryIStream_hpp
-#define xdmComm_BinaryIStream_hpp
+#define BOOST_TEST_MODULE 
+#include <boost/test/unit_test.hpp>
 
-#include <xdmComm/BinaryIosBase.hpp>
+#include <xdm/BinaryStreamBuffer.hpp>
 
-#include <xdmComm/NamespaceMacro.hpp>
+namespace {
 
-XDM_COMM_NAMESPACE_BEGIN
-
-class BinaryIStream : virtual public BinaryIosBase {
-public:
-  
-  /// Constructor takes a pointer to a stream buffer.
-  BinaryIStream( BinaryStreamBuffer* buf ); 
-  virtual ~BinaryIStream();
-
-  /// Read and return the next character in the stream.
-  int get();
-  /// Read a single character from the stream into the parameter.
-  /// @param c Location to write the next character in the stream.
-  BinaryIStream& get( char& c );
-  /// Read a block of n characters from the stream.
-  BinaryIStream& read( char* const p, size_t n );
-
-  //-- Exraction Operators --//
-
-  BinaryIStream& operator>>( short& n );
-  BinaryIStream& operator>>( int& n );
-  BinaryIStream& operator>>( long& n );
-
-  BinaryIStream& operator>>( unsigned short& n );
-  BinaryIStream& operator>>( unsigned int& n );
-  BinaryIStream& operator>>( unsigned long& n );
-
-  BinaryIStream& operator>>( float& n );
-  BinaryIStream& operator>>( double& n );
-  BinaryIStream& operator>>( long double& n );
-  
-  BinaryIStream& operator>>( bool& n );
-
-  BinaryIStream& sync();
+struct Fixture {
+  xdm::BinaryStreamBuffer testBuffer;
+  Fixture() : testBuffer( 512 ) {}
 };
 
-BinaryIStream& operator>>( BinaryIStream& ostr, char& c );
+BOOST_AUTO_TEST_CASE( construct ) {
+  Fixture test;
 
-XDM_COMM_NAMESPACE_END
+  BOOST_CHECK_EQUAL( 512, test.testBuffer.size() );
+}
 
-#endif // xdmComm_BinaryIStream_hpp
+BOOST_AUTO_TEST_CASE( putgetc ) {
+  Fixture test;
+
+  test.testBuffer.sputc( 'a' );
+  test.testBuffer.sputc( 'b' );
+  test.testBuffer.sputc( 'c' );
+
+  test.testBuffer.pubsync();
+
+  char result;
+  result = test.testBuffer.sgetc();
+  BOOST_CHECK_EQUAL( 'a', result );
+  
+  result = test.testBuffer.sgetc();
+  BOOST_CHECK_EQUAL( 'b', result );
+  
+  result = test.testBuffer.sgetc();
+  BOOST_CHECK_EQUAL( 'c', result );
+}
+
+BOOST_AUTO_TEST_CASE( putgetn ) {
+  Fixture test;
+
+  char characters[] = {'a', 'b', 'c'};
+  
+  test.testBuffer.sputn( characters, 3 );
+
+  test.testBuffer.pubsync();
+
+  char result[3];
+  test.testBuffer.sgetn( result, 3 );
+
+  BOOST_CHECK_EQUAL( 'a', result[0] );
+  BOOST_CHECK_EQUAL( 'b', result[1] );
+  BOOST_CHECK_EQUAL( 'c', result[2] );
+}
+
+} // namespace
 

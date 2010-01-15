@@ -18,13 +18,13 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.       
 //                                                                             
 //------------------------------------------------------------------------------
-#define BOOST_TEST_MODULE 
+#define BOOST_TEST_MODULE BinaryStreamOperations
 #include <boost/test/unit_test.hpp>
 
 #include <xdm/TemplateStructuredArray.hpp>
 
-#include <xdmComm/BinaryIOStream.hpp>
-#include <xdmComm/BinaryStreamOperations.hpp>
+#include <xdm/BinaryIOStream.hpp>
+#include <xdm/BinaryStreamOperations.hpp>
 
 #include <xdm/DataSelectionVisitor.hpp>
 
@@ -53,8 +53,8 @@ struct CheckDataSelectionSubclassesEqual :
 
 class Fixture {
 public:
-  xdmComm::BinaryStreamBuffer buffer;
-  xdmComm::BinaryIOStream stream;
+  xdm::BinaryStreamBuffer buffer;
+  xdm::BinaryIOStream stream;
   Fixture() :
     buffer( 1024 ),
     stream( &buffer )
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE( StdStringRoundtrip ) {
 
   std::string answer( "fred" );
 
-  test.stream << answer << xdmComm::flush;
+  test.stream << answer << xdm::flush;
 
   std::string result;
   test.stream >> result;
@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE( DataShapeRoundtrip ) {
   answer[2] = 3;
   answer[3] = 4;
 
-  test.stream << answer << xdmComm::flush;
+  test.stream << answer << xdm::flush;
 
   xdm::DataShape<> result;
   test.stream >> result;
@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE( PrimitiveTypeRoundtrip ) {
 
   xdm::primitiveType::Value answer( xdm::primitiveType::kInt );
 
-  test.stream << answer << xdmComm::flush;
+  test.stream << answer << xdm::flush;
 
   xdm::primitiveType::Value result;
   test.stream >> result;
@@ -110,10 +110,10 @@ BOOST_AUTO_TEST_CASE( StructuredArrayRoundtrip ) {
   std::generate( inData.begin(), inData.end(), rand );
   xdm::TemplateStructuredArray< int > answer( &inData[0], 10 );
 
-  test.stream << answer << xdmComm::flush;
+  test.stream << answer << xdm::flush;
 
   std::vector< int > outData( 10 );
-  xdmComm::ReceiveBufferArray result( 128 );
+  xdm::ByteArray result( 128 );
   test.stream >> result;
   
   BOOST_CHECK_EQUAL( answer.dataType(), result.dataType() );
@@ -129,7 +129,7 @@ BOOST_AUTO_TEST_CASE( HyperSlabRoundtrip ) {
 
   xdm::HyperSlab<> answer( xdm::makeShape( 3, 3, 3 ) );
 
-  test.stream << answer << xdmComm::flush;
+  test.stream << answer << xdm::flush;
 
   xdm::HyperSlab<> result;
   test.stream >> result;
@@ -148,7 +148,7 @@ BOOST_AUTO_TEST_CASE( HyperslabDataSelectionRoundtrip ) {
   xdm::HyperslabDataSelection answer(( 
     xdm::HyperSlab<>( xdm::makeShape( 3, 3, 3 ) ) ));
 
-  test.stream << answer << xdmComm::flush;
+  test.stream << answer << xdm::flush;
 
   xdm::HyperslabDataSelection result;
   test.stream >> result;
@@ -165,7 +165,7 @@ BOOST_AUTO_TEST_CASE( DataSelectionMapRoundtrip ) {
       xdm::HyperSlab<>( xdm::makeShape( 1, 2, 3 ) ) ) );
   xdm::DataSelectionMap answer( answerDomain, answerRange );
 
-  test.stream << answer << xdmComm::flush;
+  test.stream << answer << xdm::flush;
 
   xdm::DataSelectionMap result;
   test.stream >> result;
@@ -192,7 +192,7 @@ BOOST_AUTO_TEST_CASE( XmlObjectRoundtrip ) {
   answer.appendContent( "line1" );
   answer.appendContent( "line2" );
 
-  test.stream << answer << xdmComm::flush;
+  test.stream << answer << xdm::flush;
 
   xdm::XmlObject result;
   test.stream >> result;

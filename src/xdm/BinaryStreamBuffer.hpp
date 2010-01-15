@@ -18,16 +18,16 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.       
 //                                                                             
 //------------------------------------------------------------------------------
-#ifndef xdmComm_BinaryStreamBuffer_hpp
-#define xdmComm_BinaryStreamBuffer_hpp
+#ifndef xdm_BinaryStreamBuffer_hpp
+#define xdm_BinaryStreamBuffer_hpp
 
 #include <memory>
 
 #include <cassert>
 
-#include <xdmComm/NamespaceMacro.hpp>
+#include <xdm/NamespaceMacro.hpp>
 
-XDM_COMM_NAMESPACE_BEGIN
+XDM_NAMESPACE_BEGIN
 
 /// Class to handle reading and writing binary data to/from a buffer.  The I/O
 /// functions in this buffer handle the management of a buffer pointer so that
@@ -114,7 +114,7 @@ protected:
 /// BinaryStreamBuffer with a standard allocator.
 typedef BasicBinaryStreamBuffer<> BinaryStreamBuffer;
 
-XDM_COMM_NAMESPACE_END
+XDM_NAMESPACE_END
 
-#endif // xdmComm_BinaryStreamBuffer_hpp
+#endif // xdm_BinaryStreamBuffer_hpp
 
