@@ -3,7 +3,7 @@
 
 #include <xdmGrid/TensorProductGeometry.hpp>
 
-TEST( TensorProductGeometry, writeMetadata ) {
+BOOST_AUTO_TEST_CASE( writeMetadata ) {
   xdmGrid::TensorProductGeometry g(3);
   xdm::XmlMetadataWrapper xml( new xdm::XmlObject );
 

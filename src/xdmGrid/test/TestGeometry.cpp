@@ -3,7 +3,7 @@
 
 #include <xdmGrid/Geometry.hpp>
 
-TEST( Geometry, writeMetadata ) {
+BOOST_AUTO_TEST_CASE( writeMetadata ) {
   xdmGrid::Geometry g( 3 );
   xdm::XmlMetadataWrapper xml( new xdm::XmlObject );
 

@@ -29,7 +29,7 @@ public:
   }
 };
 
-TEST( Local, TestSelectionVisitorApplyHyperslab ) {
+BOOST_AUTO_TEST_CASE( TestSelectionVisitorApplyHyperslab ) {
   xdm::HyperSlab<> slab( xdm::makeShape( 3 ) );
   slab.setStart( 0, 2 );
   xdm::RefPtr< xdm::DataSelection > selection(
@@ -76,7 +76,7 @@ public:
   virtual void finalizeImplementation() {}
 };
 
-TEST( MpiDatasetProxy, mpi ) {
+BOOST_AUTO_TEST_CASE( mpi ) {
   int processes;
   MPI_Comm_size( MPI_COMM_WORLD, &processes );
   int rank;
@@ -96,7 +96,7 @@ TEST( MpiDatasetProxy, mpi ) {
   }
 }
 
-TEST( MpiDatasetProxy, coalesce ) {
+BOOST_AUTO_TEST_CASE( coalesce ) {
   // get process info
   int processes;
   MPI_Comm_size( MPI_COMM_WORLD, &processes );

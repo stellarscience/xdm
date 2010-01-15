@@ -13,7 +13,7 @@
 
 #include <algorithm>
 
-TEST( FunctionDataSerial, writeResult ) {
+BOOST_AUTO_TEST_CASE( writeResult ) {
   // get the information for the problem grid
   GridBounds problemBounds = testCaseBounds();
 

@@ -3,7 +3,7 @@
 
 #include <xdmGrid/UniformGrid.hpp>
 
-TEST( UniformGrid, writeMetadata ) {
+BOOST_AUTO_TEST_CASE( writeMetadata ) {
   xdmGrid::UniformGrid g;
 
   xdm::RefPtr< xdm::XmlObject > obj( new xdm::XmlObject );

@@ -3,7 +3,7 @@
 
 #include <xdmGrid/Time.hpp>
 
-TEST( Time, writeMetadata ) {
+BOOST_AUTO_TEST_CASE( writeMetadata ) {
   xdmGrid::Time t( 42.0 );
   xdm::XmlMetadataWrapper xml( new xdm::XmlObject );
 

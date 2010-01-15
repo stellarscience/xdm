@@ -3,7 +3,7 @@
 
 #include <xdmGrid/StructuredTopology.hpp>
 
-TEST( StructuredTopology, writeMetadata ) {
+BOOST_AUTO_TEST_CASE( writeMetadata ) {
   xdmGrid::StructuredTopology t;
   xdm::XmlMetadataWrapper xml( new xdm::XmlObject );
 

@@ -3,7 +3,7 @@
 
 #include <xdmGrid/Attribute.hpp>
 
-TEST( Attribute, writeMetadata ) {
+BOOST_AUTO_TEST_CASE( writeMetadata ) {
   xdm::RefPtr< xdmGrid::Attribute > test( 
     new xdmGrid::Attribute( xdmGrid::Attribute::kScalar, 
     xdmGrid::Attribute::kCell ) );

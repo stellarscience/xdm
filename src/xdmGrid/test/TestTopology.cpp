@@ -3,7 +3,7 @@
 
 #include <xdmGrid/Topology.hpp>
 
-TEST( Topology, writeMetadata ) {
+BOOST_AUTO_TEST_CASE( writeMetadata ) {
   xdmGrid::Topology t;
   xdm::XmlMetadataWrapper xml( new xdm::XmlObject );
 

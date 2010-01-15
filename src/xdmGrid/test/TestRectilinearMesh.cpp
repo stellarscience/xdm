@@ -3,7 +3,7 @@
 
 #include <xdmGrid/RectilinearMesh.hpp>
 
-TEST( RectilinearMesh, writeMetadata ) {
+BOOST_AUTO_TEST_CASE( writeMetadata ) {
   xdmGrid::RectilinearMesh t;
   xdm::XmlMetadataWrapper xml( new xdm::XmlObject );
 

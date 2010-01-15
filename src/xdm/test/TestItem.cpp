@@ -3,7 +3,7 @@
 
 #include <xdm/Item.hpp>
 
-TEST( Item, writeMetadataTag ) {
+BOOST_AUTO_TEST_CASE( writeMetadataTag ) {
   xdm::RefPtr< xdm::Item > i( new xdm::Item );
   i->setName( "Fred" );
 

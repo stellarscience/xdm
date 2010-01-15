@@ -3,7 +3,7 @@
 
 #include <xdm/CompositeDataItem.hpp>
 
-TEST( CompositeDataItem, writeMetadata ) {
+BOOST_AUTO_TEST_CASE( writeMetadata ) {
   xdm::CompositeDataItem i;
   xdm::RefPtr< xdm::XmlObject > obj( new xdm::XmlObject );
   xdm::XmlMetadataWrapper xml(obj);

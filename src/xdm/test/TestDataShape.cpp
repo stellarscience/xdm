@@ -8,7 +8,7 @@
 
 typedef xdm::DataShape<> TestShape;
 
-TEST( DataShape, OStreamInserter ) {
+BOOST_AUTO_TEST_CASE( OStreamInserter ) {
   TestShape test( 4 );
   for ( int i = 0; i < 4; ++i ) {
     test[i] = i+1;
@@ -20,7 +20,7 @@ TEST( DataShape, OStreamInserter ) {
   ASSERT_EQ( answer, result.str() );
 }
 
-TEST( DataShape, makeShape ) {
+BOOST_AUTO_TEST_CASE( makeShape ) {
   TestShape result = xdm::makeShape( "1 2 3 4" );
   ASSERT_EQ( 4, result.rank() );
   ASSERT_EQ( 1, result[0] );

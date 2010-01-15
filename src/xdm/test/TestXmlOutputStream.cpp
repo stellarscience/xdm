@@ -10,7 +10,7 @@ using xdm::RefPtr;
 using xdm::XmlObject;
 using xdm::XmlOutputStream;
 
-TEST( XmlOutputStream, openContext ) {
+BOOST_AUTO_TEST_CASE( openContext ) {
   RefPtr< XmlObject > obj( new XmlObject( "obj" ) );
   
   std::stringstream result;
@@ -21,7 +21,7 @@ TEST( XmlOutputStream, openContext ) {
   ASSERT_EQ( answer, result.str() );
 }
 
-TEST( XmlOutputStream, writeSingleObject ) {
+BOOST_AUTO_TEST_CASE( writeSingleObject ) {
   RefPtr< XmlObject > obj( new XmlObject( "obj" ) );
 
   std::stringstream result;
@@ -34,7 +34,7 @@ TEST( XmlOutputStream, writeSingleObject ) {
   ASSERT_EQ( answer, result.str() );
 }
 
-TEST( XmlOutputStream, writeStreamingObject ) {
+BOOST_AUTO_TEST_CASE( writeStreamingObject ) {
   RefPtr< XmlObject > obj( new XmlObject( "obj" ) );
   RefPtr< XmlObject > chi( new XmlObject( "chi" ) );
 
@@ -59,7 +59,7 @@ TEST( XmlOutputStream, writeStreamingObject ) {
   ASSERT_EQ( answer_complete, result.str() );
 }
 
-TEST( XmlOutputStream, closeCurrentContext ) {
+BOOST_AUTO_TEST_CASE( closeCurrentContext ) {
   RefPtr< XmlObject > obj( new XmlObject( "obj" ) );
 
   std::stringstream result;
@@ -73,7 +73,7 @@ TEST( XmlOutputStream, closeCurrentContext ) {
   ASSERT_EQ( answer, result.str() );
 }
 
-TEST( XmlOutputStream, closeStream ) {
+BOOST_AUTO_TEST_CASE( closeStream ) {
   RefPtr< XmlObject > obj( new XmlObject( "obj" ) );
   RefPtr< XmlObject > chi( new XmlObject( "chi" ) );
 

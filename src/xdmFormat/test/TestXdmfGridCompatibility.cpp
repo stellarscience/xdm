@@ -62,7 +62,7 @@ std::vector< float > createAttributeData(
   return result;
 }
 
-TEST( XdmfGridCompatibility, staticGrid ) {
+BOOST_AUTO_TEST_CASE( staticGrid ) {
   xdm::RefPtr< xdmGrid::Domain > domain( new xdmGrid::Domain );
 
   // build the grid for the domain
@@ -134,7 +134,7 @@ TEST( XdmfGridCompatibility, staticGrid ) {
   xdmfFile.close();
 }
 
-TEST( XdmfGridCompatibility, timeSeries ) {
+BOOST_AUTO_TEST_CASE( timeSeries ) {
   // write this as both a temporal collection and as a virtual dataset
   xdm::RefPtr< xdmFormat::TimeSeries > temporalCollection (
     new xdmFormat::TemporalCollection(

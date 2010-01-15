@@ -5,7 +5,7 @@
 
 #include <algorithm>
 
-TEST( HyperSlabBlockIterator, constructSmall ) {
+BOOST_AUTO_TEST_CASE( constructSmall ) {
   // construct a 5x5 slab
   xdm::HyperSlab<> total( xdm::makeShape( 5, 5 ) );
   std::fill( total.beginStart(), total.endStart(), 0 );
@@ -25,7 +25,7 @@ TEST( HyperSlabBlockIterator, constructSmall ) {
   ASSERT_EQ( 5, test->count(1) );
 }
 
-TEST( HyperSlabBlockIterator, iterate ) {
+BOOST_AUTO_TEST_CASE( iterate ) {
   // construct a 5x5 slab
   xdm::HyperSlab<> total( xdm::makeShape( 5, 5 ) );
   std::fill( total.beginStart(), total.endStart(), 0 );
@@ -75,7 +75,7 @@ TEST( HyperSlabBlockIterator, iterate ) {
   ASSERT_TRUE( test == xdm::HyperSlabBlockIterator<>() );
 }
 
-TEST( HyperSlabBlockIterator, iterateStride ) {
+BOOST_AUTO_TEST_CASE( iterateStride ) {
   // construct a 5x5 slab with stride 2
   xdm::HyperSlab<> total( xdm::makeShape( 5, 5 ) );
   std::fill( total.beginStart(), total.endStart(), 0 );

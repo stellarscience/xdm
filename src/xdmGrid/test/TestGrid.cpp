@@ -3,7 +3,7 @@
 
 #include <xdmGrid/Grid.hpp>
 
-TEST( Grid, writeMetadata ) {
+BOOST_AUTO_TEST_CASE( writeMetadata ) {
   xdmGrid::Grid g;
   g.setName( "Fred" );
   xdm::RefPtr< xdm::XmlObject > obj( new xdm::XmlObject );

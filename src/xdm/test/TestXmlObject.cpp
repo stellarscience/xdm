@@ -17,7 +17,7 @@ xdm::RefPtr< XmlObject > buildTree() {
   return foo;
 }
 
-TEST( XmlObject, printHeader ) {
+BOOST_AUTO_TEST_CASE( printHeader ) {
   xdm::RefPtr< XmlObject > obj( new XmlObject( "obj" ) );
 
   char const * const answer = "<obj>\n";
@@ -28,7 +28,7 @@ TEST( XmlObject, printHeader ) {
   ASSERT_EQ( answer, result.str() );
 }
 
-TEST( XmlObject, printTextContent ) {
+BOOST_AUTO_TEST_CASE( printTextContent ) {
   xdm::RefPtr< XmlObject > obj( new XmlObject( "obj" ) );
   obj->appendContent( "text content" );
   ASSERT_EQ( "text content", obj->contentLine(0) );
@@ -42,7 +42,7 @@ TEST( XmlObject, printTextContent ) {
   ASSERT_EQ( answer, result.str() );
 }
 
-TEST( XmlObject, OStreamInsertion ) {
+BOOST_AUTO_TEST_CASE( OStreamInsertion ) {
   char const * const answer = 
     "<foo bar='42'>\n"
     "  <baz>\n"

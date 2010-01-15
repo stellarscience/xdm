@@ -6,7 +6,7 @@
 
 class Derived : public xdm::ReferencedObject {};
 
-TEST( RefPtr, templateAssignmentOperator ) {
+BOOST_AUTO_TEST_CASE( templateAssignmentOperator ) {
   xdm::RefPtr< Derived > a( new Derived );
   xdm::RefPtr< xdm::ReferencedObject > b;
   b = a;
@@ -15,7 +15,7 @@ TEST( RefPtr, templateAssignmentOperator ) {
   ASSERT_EQ( 2, b->referenceCount() );
 }
 
-TEST( RefPtr, assignmentOperator ) {
+BOOST_AUTO_TEST_CASE( assignmentOperator ) {
   xdm::RefPtr< xdm::ReferencedObject > a( new xdm::ReferencedObject );
   xdm::RefPtr< xdm::ReferencedObject > b;
   b = a;
