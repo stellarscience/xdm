@@ -31,8 +31,14 @@ public:
     mPtr = 0;
   }
 
-  template< typename Other >
-  RefPtr& operator=( const RefPtr< Other >& rhs ) {
+  template< typename U >
+  RefPtr& operator=( const RefPtr< U >& rhs ) {
+    assign( rhs.mPtr );
+    return *this;
+  }
+
+  template< typename U >
+  RefPtr& operator=( U* rhs ) {
     assign( rhs );
     return *this;
   }
@@ -62,11 +68,14 @@ public:
 
 private:
   T* mPtr;
-  template< typename Other > friend class RefPtr;
-  template< typename Other > void assign( const RefPtr< Other >& p ) {
-    if ( mPtr == p.mPtr ) return;
+  template< typename U > friend class RefPtr;
+  template< typename U > void assign( U* u ) {
+    if ( mPtr == u ) return;
     T* tmp = mPtr;
-    mPtr = p.mPtr;
+    mPtr = u;
+    // the order below is important:  if u is referenced by the original mPtr
+    // then removing the original reference before adding a reference to u could
+    // cause u to be deleted.
     if ( mPtr ) mPtr->addReference();
     if ( tmp ) tmp->removeReference();
   }

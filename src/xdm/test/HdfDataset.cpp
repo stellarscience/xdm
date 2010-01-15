@@ -35,7 +35,7 @@ int main( int argc, char* argv[] ) {
   xdm::HyperSlabMap<> mapping( memorySlab, fileSlab );
 
   // create the dataset
-  xdm::RefPtr< xdm::Dataset > dataset( new xdm::HdfDataset() );
+  xdm::RefPtr< xdm::Dataset > dataset = new xdm::HdfDataset();
 
   // write the data to disk
   std::stringstream content( "HdfDataset.h5:/testdata" );

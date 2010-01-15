@@ -1,5 +1,5 @@
-#ifndef xdm_Primitive_hpp
-#define xdm_Primitive_hpp
+#ifndef xdm_PrimitiveType_hpp
+#define xdm_PrimitiveType_hpp
 
 #include <complex>
 #include <string>
@@ -24,5 +24,5 @@ typedef std::string string;
 
 XDM_NAMESPACE_END
 
-#endif // xdm_Primitive_hpp
+#endif // xdm_PrimitiveType_hpp
 

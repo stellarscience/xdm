@@ -2,6 +2,8 @@
 #define xdm_Array_hpp
 
 #include <xdm/DataShape.hpp>
+#include <xdm/ReferencedObject.hpp>
+#include <xdm/RefPtr.hpp>
 
 #include <xdm/NamespaceMacro.hpp>
 
