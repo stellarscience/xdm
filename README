@@ -1,0 +1,51 @@
+XDM: An eXtensible Data Model
+=============================
+
+Overview
+--------
+
+A library for reading and writing mesh based scientific datasets. This library
+is based on the original Xdmf library, developed by Jerry Clarke and the U.S.
+Army Research Lab.
+
+Requirements
+------------
+
+- CMake version 2.6.3 or greater.
+- If you intend to build the unit tests, you will need an installation of Boost
+  version 1.37 or greater.  Note this is *only* for the library unit tests.
+  Boost is not required when using the library.
+- If you intend to build the optional communication library for MPI enabled
+  datasets, then an MPI installation is required. This library has been tested
+  with OpenMPI and MPICH.
+
+Installation
+------------
+
+Set up a build directory for the library.  Here we assume that the build
+directory is a sibling directory of the top xdm source directory.
+
+ $ cd xdm-build
+ $ cmake ../xdm
+ $ make
+ $ make install
+
+Note that depending on your system setup you may need root permissions for the
+install step.
+
+Build Options
+-------------
+
+There are a few options that control the xdm build.  You can set these options
+by passing '-D<variable.=<value>' to the CMake command line or by using the
+CMake gui or ccmake to edit the cmake cache from an already existing build
+directory.
+
+CMAKE_INSTALL_PREFIX : (Path) choose a different install path. Default is
+                       /usr/local.
+
+BUILD_TESTING : (True/False) Enable the library unit tests. Default is True.
+
+XDM_COMMUNICATION : (True/False) Enable the communication library for MPI
+                    enabled datasets.  Default is false.
+
