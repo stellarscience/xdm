@@ -15,7 +15,9 @@ set( ${PROJECT_NAME}_HEADERS
     TemplateStructuredArray.hpp
     UniformDataItem.hpp
     XmlObject.hpp
+    XmlOutputStream.hpp
 )
+
 set( ${PROJECT_NAME}_SOURCES
     CompositeDataItem.cpp
     DataItem.cpp
@@ -25,6 +27,7 @@ set( ${PROJECT_NAME}_SOURCES
     StructuredArray.cpp
     UniformDataItem.cpp
     XmlObject.cpp
+    XmlOutputStream.cpp
 )
 
 if( HDF5_FOUND )

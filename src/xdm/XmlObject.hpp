@@ -83,6 +83,10 @@ void appendAttribute( XmlObject& obj, const std::string& name, const T& value ) 
   obj.appendAttribute( name, ss.str() );
 }
 
+/// Non-member function to write an xml object at a given indent level.
+std::ostream& writeIndent( std::ostream& ostr, const XmlObject& obj, 
+  int indentLevel );
+
 /// Stream insertion operator for an XmlObject.
 std::ostream& operator<<( std::ostream& ostr, const XmlObject& obj );
 

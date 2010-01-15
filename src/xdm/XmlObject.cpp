@@ -126,9 +126,15 @@ void XmlObject::printFooter( std::ostream& ostr, int indentLevel ) const {
   ostr << "</" << mTag << ">" << std::endl;
 }
 
-std::ostream& operator<<( std::ostream& ostr, const XmlObject& obj ) {
-  PrintXmlObjectFunctor print( ostr, 0 );
+std::ostream& writeIndent( std::ostream& ostr, const XmlObject& obj,
+  int indentLevel ) {
+  PrintXmlObjectFunctor print( ostr, indentLevel );
   print( &obj );
+  return ostr;
+}
+
+std::ostream& operator<<( std::ostream& ostr, const XmlObject& obj ) {
+  return writeIndent( ostr, obj, 0 );
 }
 
 
