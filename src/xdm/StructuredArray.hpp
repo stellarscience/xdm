@@ -5,6 +5,7 @@
 #include <xdm/PrimitiveType.hpp>
 #include <xdm/ReferencedObject.hpp>
 #include <xdm/RefPtr.hpp>
+#include <xdm/SelectableDataMixin.hpp>
 
 #include <xdm/NamespaceMacro.hpp>
 
@@ -16,7 +17,9 @@ XDM_NAMESPACE_BEGIN
 /// an associated shape and selection.  This class does not own the data, it
 /// merely holds a pointer to it.  This is to allow client applications to
 /// choose their own memory arrangements.
-class StructuredArray : public ReferencedObject {
+class StructuredArray : 
+  public ReferencedObject,
+  public SelectableDataMixin {
 public:
   /// Construct an array given a primitive type, a pointer to the data, and a
   /// shape.  Generally clients will want to use TemplateStructuredArray to

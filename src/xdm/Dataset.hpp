@@ -6,6 +6,7 @@
 #include <xdm/HyperSlab.hpp>
 #include <xdm/PrimitiveType.hpp>
 #include <xdm/ReferencedObject.hpp>
+#include <xdm/SelectableDataMixin.hpp>
 #include <xdm/XmlTextContent.hpp>
 
 #include <xdm/NamespaceMacro.hpp>
@@ -16,7 +17,9 @@ XDM_NAMESPACE_BEGIN
 /// arrays to disk.  This class should be implemented by inheritors to write an
 /// array to disk as simply as possible.  Decorators (callbacks) should be used
 /// to customize the data flow for different application environments.
-class Dataset : public ReferencedObject {
+class Dataset : 
+  public ReferencedObject,
+  public SelectableDataMixin {
 public:
   Dataset();
   virtual ~Dataset();
