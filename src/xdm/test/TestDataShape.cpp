@@ -17,16 +17,16 @@ BOOST_AUTO_TEST_CASE( OStreamInserter ) {
   char const * const answer = "1 2 3 4";
   std::stringstream result;
   result << test;
-  ASSERT_EQ( answer, result.str() );
+  BOOST_CHECK_EQUAL( answer, result.str() );
 }
 
 BOOST_AUTO_TEST_CASE( makeShape ) {
   TestShape result = xdm::makeShape( "1 2 3 4" );
-  ASSERT_EQ( 4, result.rank() );
-  ASSERT_EQ( 1, result[0] );
-  ASSERT_EQ( 2, result[1] );
-  ASSERT_EQ( 3, result[2] );
-  ASSERT_EQ( 4, result[3] );
+  BOOST_CHECK_EQUAL( 4, result.rank() );
+  BOOST_CHECK_EQUAL( 1, result[0] );
+  BOOST_CHECK_EQUAL( 2, result[1] );
+  BOOST_CHECK_EQUAL( 3, result[2] );
+  BOOST_CHECK_EQUAL( 4, result[3] );
 
   ASSERT_THROW( xdm::makeShape( "1 jeff" ), std::invalid_argument );
 }

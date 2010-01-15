@@ -9,7 +9,7 @@ BOOST_AUTO_TEST_CASE( writeMetadata ) {
 
   t.writeMetadata( xml );
 
-  ASSERT_EQ( "Topology", xml.tag() );
+  BOOST_CHECK_EQUAL( "Topology", xml.tag() );
 }
 
 int main( int argc, char* argv[] ) {

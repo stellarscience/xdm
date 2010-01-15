@@ -20,7 +20,7 @@ TYPED_TEST_P( BinaryOStreamTest, writevalue ) {
   this->mOstr << this->value;
   
   TypeParam* result = reinterpret_cast< TypeParam* >( this->mBuf.pointer() );
-  ASSERT_EQ( this->value, *result );
+  BOOST_CHECK_EQUAL( this->value, *result );
 }
 
 REGISTER_TYPED_TEST_CASE_P( BinaryOStreamTest, writevalue );

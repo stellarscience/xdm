@@ -31,14 +31,14 @@ public:
 
 BOOST_AUTO_TEST_CASE( begin ) {
 	ObjectCompositionMixin< A >::Iterator it = xdm::begin< A >( t );
-	ASSERT_EQ( a, *it );
+	BOOST_CHECK_EQUAL( a, *it );
 	ObjectCompositionMixin< B >::Iterator bit = xdm::begin< B >( t );
-	ASSERT_EQ( b, *bit );
+	BOOST_CHECK_EQUAL( b, *bit );
 }
 
 BOOST_AUTO_TEST_CASE( child ) {
-	ASSERT_EQ( a, xdm::child< A >( t, 0 ) );
-	ASSERT_EQ( b, xdm::child< B >( t, 0 ) );
+	BOOST_CHECK_EQUAL( a, xdm::child< A >( t, 0 ) );
+	BOOST_CHECK_EQUAL( b, xdm::child< B >( t, 0 ) );
 }
 
 int main( int argc, char* argv[] ) {

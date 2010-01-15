@@ -11,8 +11,8 @@ BOOST_AUTO_TEST_CASE( writeMetadata ) {
 
   g.writeMetadata( xml );
 
-  ASSERT_EQ( "Grid", xml.tag() );
-  ASSERT_EQ( "Fred", xml.attribute( "Name" ) );
+  BOOST_CHECK_EQUAL( "Grid", xml.tag() );
+  BOOST_CHECK_EQUAL( "Fred", xml.attribute( "Name" ) );
 }
 
 int main( int argc, char* argv[] ) {

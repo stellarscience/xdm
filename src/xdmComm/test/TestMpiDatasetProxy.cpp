@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_CASE( TestSelectionVisitorApplyHyperslab ) {
   TestSelectionVisitor test;
   selection->accept( test );
 
-  ASSERT_EQ( 2, test.startIndex );
+  BOOST_CHECK_EQUAL( 2, test.startIndex );
 }
 
 class TestDataset : public xdm::Dataset {
@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE( mpi ) {
     MPI_INT,
     MPI_COMM_WORLD );
   for ( int i = 0; i < processes; i++ ) {
-    ASSERT_EQ( i, result[i] );
+    BOOST_CHECK_EQUAL( i, result[i] );
   }
 }
 
@@ -134,13 +134,13 @@ BOOST_AUTO_TEST_CASE( coalesce ) {
 
   if ( rank == 0 ) {
     // check to make sure we wrote all of the data to the array
-    ASSERT_EQ( processes, testDataset->mValues.size() );
+    BOOST_CHECK_EQUAL( processes, testDataset->mValues.size() );
     for ( int i = 0; i < processes; i++ ) {
-      ASSERT_EQ( i, testDataset->mValues[i] );
+      BOOST_CHECK_EQUAL( i, testDataset->mValues[i] );
     }
   } else {
     // the dataset's array should have nothing in it
-    ASSERT_EQ( 0, testDataset->mValues.size() );
+    BOOST_CHECK_EQUAL( 0, testDataset->mValues.size() );
   }
 }
 

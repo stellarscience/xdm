@@ -10,8 +10,8 @@ BOOST_AUTO_TEST_CASE( writeMetadata ) {
 
   i.writeMetadata( xml );
 
-  ASSERT_EQ( xml.tag(), "DataItem" );
-  ASSERT_EQ( xml.attribute( "ItemType" ), "Tree" );
+  BOOST_CHECK_EQUAL( xml.tag(), "DataItem" );
+  BOOST_CHECK_EQUAL( xml.attribute( "ItemType" ), "Tree" );
 }
 
 int main( int argc, char* argv[] ) {

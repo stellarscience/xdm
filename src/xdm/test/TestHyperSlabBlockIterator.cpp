@@ -16,13 +16,13 @@ BOOST_AUTO_TEST_CASE( constructSmall ) {
   xdm::DataShape<> blockSize = xdm::makeShape( 2, 6 );
   xdm::HyperSlabBlockIterator<> test( total, blockSize );
 
-  ASSERT_EQ( 2, test->shape().rank() );
-  ASSERT_EQ( 0, test->start(0) );
-  ASSERT_EQ( 0, test->start(1) );
-  ASSERT_EQ( 1, test->stride(0) );
-  ASSERT_EQ( 1, test->stride(1) );
-  ASSERT_EQ( 2, test->count(0) );
-  ASSERT_EQ( 5, test->count(1) );
+  BOOST_CHECK_EQUAL( 2, test->shape().rank() );
+  BOOST_CHECK_EQUAL( 0, test->start(0) );
+  BOOST_CHECK_EQUAL( 0, test->start(1) );
+  BOOST_CHECK_EQUAL( 1, test->stride(0) );
+  BOOST_CHECK_EQUAL( 1, test->stride(1) );
+  BOOST_CHECK_EQUAL( 2, test->count(0) );
+  BOOST_CHECK_EQUAL( 5, test->count(1) );
 }
 
 BOOST_AUTO_TEST_CASE( iterate ) {
@@ -36,40 +36,40 @@ BOOST_AUTO_TEST_CASE( iterate ) {
   xdm::DataShape<> blockSize = xdm::makeShape( 3, 2 );
   xdm::HyperSlabBlockIterator<> test( total, blockSize );
 
-  ASSERT_EQ( 0, test->start(0) );
-  ASSERT_EQ( 0, test->start(1) );
-  ASSERT_EQ( 3, test->count(0) );
-  ASSERT_EQ( 2, test->count(1) );
+  BOOST_CHECK_EQUAL( 0, test->start(0) );
+  BOOST_CHECK_EQUAL( 0, test->start(1) );
+  BOOST_CHECK_EQUAL( 3, test->count(0) );
+  BOOST_CHECK_EQUAL( 2, test->count(1) );
 
   ++test;
-  ASSERT_EQ( 3, test->start(0) );
-  ASSERT_EQ( 0, test->start(1) );
-  ASSERT_EQ( 2, test->count(0) );
-  ASSERT_EQ( 2, test->count(1) );
+  BOOST_CHECK_EQUAL( 3, test->start(0) );
+  BOOST_CHECK_EQUAL( 0, test->start(1) );
+  BOOST_CHECK_EQUAL( 2, test->count(0) );
+  BOOST_CHECK_EQUAL( 2, test->count(1) );
   
   ++test;
-  ASSERT_EQ( 0, test->start(0) );
-  ASSERT_EQ( 2, test->start(1) );
-  ASSERT_EQ( 3, test->count(0) );
-  ASSERT_EQ( 2, test->count(1) );
+  BOOST_CHECK_EQUAL( 0, test->start(0) );
+  BOOST_CHECK_EQUAL( 2, test->start(1) );
+  BOOST_CHECK_EQUAL( 3, test->count(0) );
+  BOOST_CHECK_EQUAL( 2, test->count(1) );
   
   ++test;
-  ASSERT_EQ( 3, test->start(0) );
-  ASSERT_EQ( 2, test->start(1) );
-  ASSERT_EQ( 2, test->count(0) );
-  ASSERT_EQ( 2, test->count(1) );
+  BOOST_CHECK_EQUAL( 3, test->start(0) );
+  BOOST_CHECK_EQUAL( 2, test->start(1) );
+  BOOST_CHECK_EQUAL( 2, test->count(0) );
+  BOOST_CHECK_EQUAL( 2, test->count(1) );
 
   ++test;
-  ASSERT_EQ( 0, test->start(0) );
-  ASSERT_EQ( 4, test->start(1) );
-  ASSERT_EQ( 3, test->count(0) );
-  ASSERT_EQ( 1, test->count(1) );
+  BOOST_CHECK_EQUAL( 0, test->start(0) );
+  BOOST_CHECK_EQUAL( 4, test->start(1) );
+  BOOST_CHECK_EQUAL( 3, test->count(0) );
+  BOOST_CHECK_EQUAL( 1, test->count(1) );
   
   ++test;
-  ASSERT_EQ( 3, test->start(0) );
-  ASSERT_EQ( 4, test->start(1) );
-  ASSERT_EQ( 2, test->count(0) );
-  ASSERT_EQ( 1, test->count(1) );
+  BOOST_CHECK_EQUAL( 3, test->start(0) );
+  BOOST_CHECK_EQUAL( 4, test->start(1) );
+  BOOST_CHECK_EQUAL( 2, test->count(0) );
+  BOOST_CHECK_EQUAL( 1, test->count(1) );
 
   ++test;
   ASSERT_TRUE( test == xdm::HyperSlabBlockIterator<>() );
@@ -86,16 +86,16 @@ BOOST_AUTO_TEST_CASE( iterateStride ) {
   xdm::DataShape<> blockSize = xdm::makeShape( 3, 2 );
   xdm::HyperSlabBlockIterator<> test( total, blockSize );
 
-  ASSERT_EQ( 0, test->start(0) );
-  ASSERT_EQ( 0, test->start(1) );
-  ASSERT_EQ( 3, test->count(0) );
-  ASSERT_EQ( 2, test->count(1) );
+  BOOST_CHECK_EQUAL( 0, test->start(0) );
+  BOOST_CHECK_EQUAL( 0, test->start(1) );
+  BOOST_CHECK_EQUAL( 3, test->count(0) );
+  BOOST_CHECK_EQUAL( 2, test->count(1) );
   
   ++test;
-  ASSERT_EQ( 0, test->start(0) );
-  ASSERT_EQ( 4, test->start(1) );
-  ASSERT_EQ( 3, test->count(0) );
-  ASSERT_EQ( 1, test->count(1) );
+  BOOST_CHECK_EQUAL( 0, test->start(0) );
+  BOOST_CHECK_EQUAL( 4, test->start(1) );
+  BOOST_CHECK_EQUAL( 3, test->count(0) );
+  BOOST_CHECK_EQUAL( 1, test->count(1) );
 
   ++test;
   ASSERT_TRUE( test == xdm::HyperSlabBlockIterator<>() );

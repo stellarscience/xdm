@@ -15,18 +15,18 @@ BOOST_AUTO_TEST_CASE( writeMetadataSpatial ) {
   grid->setType( xdmGrid::CollectionGrid::kSpatial );
   grid->writeMetadata( xml );
 
-  ASSERT_EQ( "Grid", xml.tag() );
-  ASSERT_EQ( "Collection", xml.attribute( "GridType" ) );
-  ASSERT_EQ( "Spatial", xml.attribute( "CollectionType" ) );
+  BOOST_CHECK_EQUAL( "Grid", xml.tag() );
+  BOOST_CHECK_EQUAL( "Collection", xml.attribute( "GridType" ) );
+  BOOST_CHECK_EQUAL( "Spatial", xml.attribute( "CollectionType" ) );
 }
 
 BOOST_AUTO_TEST_CASE( writeMetadataTemporal ) {
   grid->setType( xdmGrid::CollectionGrid::kTemporal );
   grid->writeMetadata( xml );
 
-  ASSERT_EQ( "Grid", xml.tag() );
-  ASSERT_EQ( "Collection", xml.attribute( "GridType" ) );
-  ASSERT_EQ( "Temporal", xml.attribute( "CollectionType" ) );
+  BOOST_CHECK_EQUAL( "Grid", xml.tag() );
+  BOOST_CHECK_EQUAL( "Collection", xml.attribute( "GridType" ) );
+  BOOST_CHECK_EQUAL( "Temporal", xml.attribute( "CollectionType" ) );
 }
 
 int main( int argc, char* argv[] ) {

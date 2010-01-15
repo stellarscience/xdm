@@ -9,7 +9,7 @@ BOOST_AUTO_TEST_CASE( writeMetadata ) {
 
   g.writeMetadata( xml );
 
-  ASSERT_EQ( "Geometry", xml.tag() );
+  BOOST_CHECK_EQUAL( "Geometry", xml.tag() );
 }
 
 int main( int argc, char* argv[] ) {

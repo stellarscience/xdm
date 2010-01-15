@@ -18,7 +18,7 @@ BOOST_AUTO_TEST_CASE( openContext ) {
   test.openContext( obj );
   
   char const * const answer = "<obj>\n";
-  ASSERT_EQ( answer, result.str() );
+  BOOST_CHECK_EQUAL( answer, result.str() );
 }
 
 BOOST_AUTO_TEST_CASE( writeSingleObject ) {
@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE( writeSingleObject ) {
   char const * const answer =
     "<obj>\n"
     "</obj>\n";
-  ASSERT_EQ( answer, result.str() );
+  BOOST_CHECK_EQUAL( answer, result.str() );
 }
 
 BOOST_AUTO_TEST_CASE( writeStreamingObject ) {
@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE( writeStreamingObject ) {
     "<obj>\n"
     "  <chi>\n"
     "  </chi>\n";
-  ASSERT_EQ( answer_incomplete, result.str() );
+  BOOST_CHECK_EQUAL( answer_incomplete, result.str() );
 
   test.closeCurrentContext();
 
@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE( writeStreamingObject ) {
     "  <chi>\n"
     "  </chi>\n"
     "</obj>\n";
-  ASSERT_EQ( answer_complete, result.str() );
+  BOOST_CHECK_EQUAL( answer_complete, result.str() );
 }
 
 BOOST_AUTO_TEST_CASE( closeCurrentContext ) {
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE( closeCurrentContext ) {
   char const * const answer = 
     "<obj>\n"
     "</obj>\n";
-  ASSERT_EQ( answer, result.str() );
+  BOOST_CHECK_EQUAL( answer, result.str() );
 }
 
 BOOST_AUTO_TEST_CASE( closeStream ) {

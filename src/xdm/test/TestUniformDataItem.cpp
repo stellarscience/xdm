@@ -55,13 +55,13 @@ BOOST_AUTO_TEST_CASE( writeMetadata ) {
   xdm::XmlMetadataWrapper xml( obj );
   testItem->writeMetadata( xml );
 
-  ASSERT_EQ( xml.tag(), "DataItem" );
-  ASSERT_EQ( xml.attribute( "ItemType" ), "Uniform" );
-  ASSERT_EQ( xml.attribute( "Dimensions" ), "2 2" );
-  ASSERT_EQ( xml.attribute( "NumberType" ), "Float" );
-  ASSERT_EQ( xml.attribute( "Precision" ), "4" );
-  ASSERT_EQ( xml.attribute( "Format" ), "Dummy" );
-  ASSERT_EQ( "DummyDatasetInitializationContent", xml.contentLine( 0 ) );
+  BOOST_CHECK_EQUAL( xml.tag(), "DataItem" );
+  BOOST_CHECK_EQUAL( xml.attribute( "ItemType" ), "Uniform" );
+  BOOST_CHECK_EQUAL( xml.attribute( "Dimensions" ), "2 2" );
+  BOOST_CHECK_EQUAL( xml.attribute( "NumberType" ), "Float" );
+  BOOST_CHECK_EQUAL( xml.attribute( "Precision" ), "4" );
+  BOOST_CHECK_EQUAL( xml.attribute( "Format" ), "Dummy" );
+  BOOST_CHECK_EQUAL( "DummyDatasetInitializationContent", xml.contentLine( 0 ) );
 }
 
 int main( int argc, char* argv[] ) {

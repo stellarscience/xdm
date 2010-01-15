@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE( sync ) {
     }
 
     for ( char i = 0; i < processes; i++ ) {
-      ASSERT_EQ( i, result[i] );
+      BOOST_CHECK_EQUAL( i, result[i] );
     }
 
   }

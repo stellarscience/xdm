@@ -25,13 +25,13 @@ BOOST_AUTO_TEST_CASE( printHeader ) {
   std::stringstream result;
   obj->printHeader( result );
 
-  ASSERT_EQ( answer, result.str() );
+  BOOST_CHECK_EQUAL( answer, result.str() );
 }
 
 BOOST_AUTO_TEST_CASE( printTextContent ) {
   xdm::RefPtr< XmlObject > obj( new XmlObject( "obj" ) );
   obj->appendContent( "text content" );
-  ASSERT_EQ( "text content", obj->contentLine(0) );
+  BOOST_CHECK_EQUAL( "text content", obj->contentLine(0) );
 
   char const * const answer = "text content\n";
 
@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE( printTextContent ) {
   obj->printTextContent( result );
   obj->printChildren( result );
 
-  ASSERT_EQ( answer, result.str() );
+  BOOST_CHECK_EQUAL( answer, result.str() );
 }
 
 BOOST_AUTO_TEST_CASE( OStreamInsertion ) {
@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE( OStreamInsertion ) {
   xdm::RefPtr< XmlObject > obj = buildTree();
   std::stringstream result;
   result << *obj;
-  ASSERT_EQ( answer, result.str() );
+  BOOST_CHECK_EQUAL( answer, result.str() );
 }
 
 int main( int argc, char* argv[] ) {

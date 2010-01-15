@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE( DataShapeRoundtrip ) {
   xdm::DataShape<> result;
   stream >> result;
 
-  ASSERT_EQ( answer, result );
+  BOOST_CHECK_EQUAL( answer, result );
 }
 
 BOOST_AUTO_TEST_CASE( PrimitiveTypeRoundtrip ) {
@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE( PrimitiveTypeRoundtrip ) {
 
   xdm::primitiveType::Value result;
   stream >> result;
-  ASSERT_EQ( answer, result );
+  BOOST_CHECK_EQUAL( answer, result );
 }
 
 BOOST_AUTO_TEST_CASE( StructuredArrayRoundtrip ) {
@@ -75,8 +75,8 @@ BOOST_AUTO_TEST_CASE( StructuredArrayRoundtrip ) {
     xdm::DataShape<>() );
   stream >> result;
   
-  ASSERT_EQ( answer.dataType(), result.dataType() );
-  ASSERT_EQ( answer.shape(), result.shape() );
+  BOOST_CHECK_EQUAL( answer.dataType(), result.dataType() );
+  BOOST_CHECK_EQUAL( answer.shape(), result.shape() );
   ASSERT_TRUE( std::equal( inData.begin(), inData.end(), outData.begin() ) );
 }
 
@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_CASE( HyperSlabRoundtrip ) {
 
   xdm::HyperSlab<> result;
   stream >> result;
-  ASSERT_EQ( answer, result );
+  BOOST_CHECK_EQUAL( answer, result );
 }
 
 BOOST_AUTO_TEST_CASE( HyperslabDataSelectionRoundtrip ) {
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE( HyperslabDataSelectionRoundtrip ) {
 
   xdm::HyperslabDataSelection result;
   stream >> result;
-  ASSERT_EQ( answer.hyperslab(), result.hyperslab() );
+  BOOST_CHECK_EQUAL( answer.hyperslab(), result.hyperslab() );
 }
 
 BOOST_AUTO_TEST_CASE( DataSelectionMapRoundtrip ) {

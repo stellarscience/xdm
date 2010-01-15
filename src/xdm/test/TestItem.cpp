@@ -12,11 +12,11 @@ BOOST_AUTO_TEST_CASE( writeMetadataTag ) {
 
   char const * const tagAnswer = "Item";
   std::string tagResult = xml.tag();
-  ASSERT_EQ( tagAnswer, tagResult );
+  BOOST_CHECK_EQUAL( tagAnswer, tagResult );
 
   char const * const nameAnswer = "Fred";
   std::string nameResult = xml.attribute( "Name" );
-  ASSERT_EQ( nameAnswer, nameResult );
+  BOOST_CHECK_EQUAL( nameAnswer, nameResult );
 }
 
 int main( int argc, char* argv[] ) {

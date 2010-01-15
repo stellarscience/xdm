@@ -10,8 +10,8 @@ BOOST_AUTO_TEST_CASE( writeMetadata ) {
   xdm::XmlMetadataWrapper xml( obj );
   g.writeMetadata( xml );
 
-  ASSERT_EQ( "Grid", xml.tag() );
-  ASSERT_EQ( "Uniform", xml.attribute( "GridType" ) );
+  BOOST_CHECK_EQUAL( "Grid", xml.tag() );
+  BOOST_CHECK_EQUAL( "Uniform", xml.attribute( "GridType" ) );
 }
 
 int main( int argc, char* argv[] ) {

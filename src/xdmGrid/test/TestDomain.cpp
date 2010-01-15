@@ -9,7 +9,7 @@ BOOST_AUTO_TEST_CASE( writeMetadata ) {
 
   d.writeMetadata( xml );
 
-  ASSERT_EQ( "Domain", xml.tag() );
+  BOOST_CHECK_EQUAL( "Domain", xml.tag() );
 }
 
 int main( int argc, char* argv[] ) {

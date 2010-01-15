@@ -15,8 +15,8 @@ BOOST_AUTO_TEST_CASE( writeMetadata ) {
 
   t.writeMetadata( xml );
 
-  ASSERT_EQ( "Topology", xml.tag() );
-  ASSERT_EQ( "1 2 3", xml.attribute( "Dimensions" ) );
+  BOOST_CHECK_EQUAL( "Topology", xml.tag() );
+  BOOST_CHECK_EQUAL( "1 2 3", xml.attribute( "Dimensions" ) );
 }
 
 int main( int argc, char* argv[] ) {

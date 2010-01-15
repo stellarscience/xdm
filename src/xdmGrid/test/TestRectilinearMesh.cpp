@@ -12,9 +12,9 @@ BOOST_AUTO_TEST_CASE( writeMetadata ) {
   t.setShape( ds );
   t.writeMetadata( xml );
 
-  ASSERT_EQ( "Topology", xml.tag() );
-  ASSERT_EQ( "2DRectMesh", xml.attribute( "TopologyType" ) );
-  ASSERT_EQ( "2 2", xml.attribute( "Dimensions" ) );
+  BOOST_CHECK_EQUAL( "Topology", xml.tag() );
+  BOOST_CHECK_EQUAL( "2DRectMesh", xml.attribute( "TopologyType" ) );
+  BOOST_CHECK_EQUAL( "2 2", xml.attribute( "Dimensions" ) );
 }
 
 int main( int argc, char* argv[] ) {

@@ -9,8 +9,8 @@ BOOST_AUTO_TEST_CASE( writeMetadata ) {
 
   t.writeMetadata( xml );
 
-  ASSERT_EQ( "Time", xml.tag() );
-  ASSERT_EQ( "42", xml.attribute( "Value" ) );
+  BOOST_CHECK_EQUAL( "Time", xml.tag() );
+  BOOST_CHECK_EQUAL( "42", xml.attribute( "Value" ) );
 }
 
 int main( int argc, char* argv[] ) {

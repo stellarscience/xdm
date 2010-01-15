@@ -9,7 +9,7 @@ struct BinaryStreamBufferTest : ::testing::Test {
 };
 
 BOOST_AUTO_TEST_CASE( construct ) {
-  ASSERT_EQ( 512, testBuffer.size() );
+  BOOST_CHECK_EQUAL( 512, testBuffer.size() );
 }
 
 BOOST_AUTO_TEST_CASE( putgetc ) {
@@ -21,13 +21,13 @@ BOOST_AUTO_TEST_CASE( putgetc ) {
 
   char result;
   result = testBuffer.sgetc();
-  ASSERT_EQ( 'a', result );
+  BOOST_CHECK_EQUAL( 'a', result );
   
   result = testBuffer.sgetc();
-  ASSERT_EQ( 'b', result );
+  BOOST_CHECK_EQUAL( 'b', result );
   
   result = testBuffer.sgetc();
-  ASSERT_EQ( 'c', result );
+  BOOST_CHECK_EQUAL( 'c', result );
 }
 
 BOOST_AUTO_TEST_CASE( putgetn ) {
@@ -40,9 +40,9 @@ BOOST_AUTO_TEST_CASE( putgetn ) {
   char result[3];
   testBuffer.sgetn( result, 3 );
 
-  ASSERT_EQ( 'a', result[0] );
-  ASSERT_EQ( 'b', result[1] );
-  ASSERT_EQ( 'c', result[2] );
+  BOOST_CHECK_EQUAL( 'a', result[0] );
+  BOOST_CHECK_EQUAL( 'b', result[1] );
+  BOOST_CHECK_EQUAL( 'c', result[2] );
 }
 
 int main( int argc, char* argv[] ) {

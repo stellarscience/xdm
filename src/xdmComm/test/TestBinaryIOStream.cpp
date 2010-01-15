@@ -27,7 +27,7 @@ TYPED_TEST_P( BinaryIOStreamTest, writereadvalue ) {
   result = !result;
   this->mIOStr >> result;
 
-  ASSERT_EQ( answer, result );
+  BOOST_CHECK_EQUAL( answer, result );
 }
 
 REGISTER_TYPED_TEST_CASE_P( BinaryIOStreamTest, writereadvalue );

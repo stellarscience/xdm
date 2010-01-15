@@ -45,9 +45,9 @@ BOOST_AUTO_TEST_CASE( applyCoordinateSelection ) {
   answer[0][0] = 1;
   answer[0][1] = 1;
 
-  ASSERT_EQ( H5S_SEL_POINTS, H5Sget_select_type( dataspace ) );
-  ASSERT_EQ( answer[0][0], result[0][0] );
-  ASSERT_EQ( answer[0][1], result[0][1] );
+  BOOST_CHECK_EQUAL( H5S_SEL_POINTS, H5Sget_select_type( dataspace ) );
+  BOOST_CHECK_EQUAL( answer[0][0], result[0][0] );
+  BOOST_CHECK_EQUAL( answer[0][1], result[0][1] );
 }
 */
 
@@ -67,10 +67,10 @@ BOOST_AUTO_TEST_CASE( applyHyperslabSelection ) {
   xdmHdf::SelectionVisitor visitor( dataspace );
   selection.accept( visitor );
 
-  ASSERT_EQ( H5S_SEL_HYPERSLABS, H5Sget_select_type( dataspace ) );
+  BOOST_CHECK_EQUAL( H5S_SEL_HYPERSLABS, H5Sget_select_type( dataspace ) );
 
   hssize_t numblocks = H5Sget_select_hyper_nblocks( dataspace );
-  ASSERT_EQ( 1, numblocks );
+  BOOST_CHECK_EQUAL( 1, numblocks );
 
   hsize_t result[2][2];
   H5Sget_select_hyper_blocklist( dataspace, 0, 1, 
@@ -81,10 +81,10 @@ BOOST_AUTO_TEST_CASE( applyHyperslabSelection ) {
   answer[0][1] = 1;
   answer[1][0] = 1;
   answer[1][1] = 1;
-  ASSERT_EQ( answer[0][0], result[0][0] );
-  ASSERT_EQ( answer[0][1], result[0][1] );
-  ASSERT_EQ( answer[1][0], result[1][0] );
-  ASSERT_EQ( answer[1][1], result[1][1] );
+  BOOST_CHECK_EQUAL( answer[0][0], result[0][0] );
+  BOOST_CHECK_EQUAL( answer[0][1], result[0][1] );
+  BOOST_CHECK_EQUAL( answer[1][0], result[1][0] );
+  BOOST_CHECK_EQUAL( answer[1][1], result[1][1] );
 }
 
 int main( int argc, char* argv[] ) {

@@ -12,9 +12,9 @@ BOOST_AUTO_TEST_CASE( writeMetadata ) {
 
   test->writeMetadata( xml );
 
-  ASSERT_EQ( "Attribute", xml.tag() );
-  ASSERT_EQ( "Scalar", xml.attribute( "AttributeType" ) );
-  ASSERT_EQ( "Cell", xml.attribute( "Center" ) );
+  BOOST_CHECK_EQUAL( "Attribute", xml.tag() );
+  BOOST_CHECK_EQUAL( "Scalar", xml.attribute( "AttributeType" ) );
+  BOOST_CHECK_EQUAL( "Cell", xml.attribute( "Center" ) );
 }
 
 int main( int argc, char* argv[] ) {
