@@ -11,7 +11,7 @@ struct CollectionGrid : ::testing::Test {
     xml( new xdm::XmlObject ) {}
 };
 
-TEST_F( CollectionGrid, writeMetadataSpatial ) {
+BOOST_AUTO_TEST_CASE( writeMetadataSpatial ) {
   grid->setType( xdmGrid::CollectionGrid::kSpatial );
   grid->writeMetadata( xml );
 
@@ -20,7 +20,7 @@ TEST_F( CollectionGrid, writeMetadataSpatial ) {
   ASSERT_EQ( "Spatial", xml.attribute( "CollectionType" ) );
 }
 
-TEST_F( CollectionGrid, writeMetadataTemporal ) {
+BOOST_AUTO_TEST_CASE( writeMetadataTemporal ) {
   grid->setType( xdmGrid::CollectionGrid::kTemporal );
   grid->writeMetadata( xml );
 

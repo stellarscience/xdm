@@ -24,7 +24,7 @@ static const int kSize = 100;
 
 class HdfDatasetMpi : public MpiTest {};
 
-TEST_F( MpiTest, writeDataset1D ) {
+BOOST_AUTO_TEST_CASE( writeDataset1D ) {
   std::stringstream testCaseFile;
   testCaseFile << "HdfDataMpi-" << processCount() << ".h5";
   

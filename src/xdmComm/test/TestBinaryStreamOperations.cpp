@@ -37,7 +37,7 @@ public:
   {}
 };
 
-TEST_F( BinaryStreamOperationsTest, DataShapeRoundtrip ) {
+BOOST_AUTO_TEST_CASE( DataShapeRoundtrip ) {
   xdm::DataShape<> answer( 4 );
   answer[0] = 1;
   answer[1] = 2;
@@ -52,7 +52,7 @@ TEST_F( BinaryStreamOperationsTest, DataShapeRoundtrip ) {
   ASSERT_EQ( answer, result );
 }
 
-TEST_F( BinaryStreamOperationsTest, PrimitiveTypeRoundtrip ) {
+BOOST_AUTO_TEST_CASE( PrimitiveTypeRoundtrip ) {
   xdm::primitiveType::Value answer( xdm::primitiveType::kInt );
 
   stream << answer << xdmComm::flush;
@@ -62,7 +62,7 @@ TEST_F( BinaryStreamOperationsTest, PrimitiveTypeRoundtrip ) {
   ASSERT_EQ( answer, result );
 }
 
-TEST_F( BinaryStreamOperationsTest, StructuredArrayRoundtrip ) {
+BOOST_AUTO_TEST_CASE( StructuredArrayRoundtrip ) {
   std::vector< int > inData( 10 );
   std::generate( inData.begin(), inData.end(), rand );
   xdm::StructuredArray answer( xdm::primitiveType::kInt, &inData[0],
@@ -80,7 +80,7 @@ TEST_F( BinaryStreamOperationsTest, StructuredArrayRoundtrip ) {
   ASSERT_TRUE( std::equal( inData.begin(), inData.end(), outData.begin() ) );
 }
 
-TEST_F( BinaryStreamOperationsTest, HyperSlabRoundtrip ) {
+BOOST_AUTO_TEST_CASE( HyperSlabRoundtrip ) {
   xdm::HyperSlab<> answer( xdm::makeShape( 3, 3, 3 ) );
 
   stream << answer << xdmComm::flush;
@@ -90,7 +90,7 @@ TEST_F( BinaryStreamOperationsTest, HyperSlabRoundtrip ) {
   ASSERT_EQ( answer, result );
 }
 
-TEST_F( BinaryStreamOperationsTest, HyperslabDataSelectionRoundtrip ) {
+BOOST_AUTO_TEST_CASE( HyperslabDataSelectionRoundtrip ) {
   xdm::HyperslabDataSelection answer( 
     xdm::HyperSlab<>( xdm::makeShape( 3, 3, 3 ) ) );
 
@@ -101,7 +101,7 @@ TEST_F( BinaryStreamOperationsTest, HyperslabDataSelectionRoundtrip ) {
   ASSERT_EQ( answer.hyperslab(), result.hyperslab() );
 }
 
-TEST_F( BinaryStreamOperationsTest, DataSelectionMapRoundtrip ) {
+BOOST_AUTO_TEST_CASE( DataSelectionMapRoundtrip ) {
   xdm::RefPtr< xdm::AllDataSelection > answerDomain( 
     new xdm::AllDataSelection );
   xdm::RefPtr< xdm::HyperslabDataSelection > answerRange(

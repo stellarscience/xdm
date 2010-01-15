@@ -28,7 +28,7 @@ struct SelectionVisitor : ::testing::Test {
 Test removed due to 32/64 bit compatibility.  For more information, look at the
 CoordinateDataSelection class declaration in CoordinateDataSelection.hpp
 
-TEST_F( SelectionVisitor, applyCoordinateSelection ) {
+BOOST_AUTO_TEST_CASE( applyCoordinateSelection ) {
   std::vector< size_t > coords;
   coords.push_back( 1 );
   coords.push_back( 1 );
@@ -51,7 +51,7 @@ TEST_F( SelectionVisitor, applyCoordinateSelection ) {
 }
 */
 
-TEST_F( SelectionVisitor, applyHyperslabSelection ) {
+BOOST_AUTO_TEST_CASE( applyHyperslabSelection ) {
   xdm::DataShape<> shape( 2 );
   shape[0] = 2;
   shape[1] = 2;

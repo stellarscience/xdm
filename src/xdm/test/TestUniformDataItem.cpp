@@ -50,7 +50,7 @@ public:
 };
 
 
-TEST_F( UniformDataItem, writeMetadata ) {
+BOOST_AUTO_TEST_CASE( writeMetadata ) {
   xdm::RefPtr< xdm::XmlObject > obj( new xdm::XmlObject );
   xdm::XmlMetadataWrapper xml( obj );
   testItem->writeMetadata( xml );

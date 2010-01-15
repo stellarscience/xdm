@@ -43,7 +43,7 @@ public:
   ~WritableData() {}
 };
 
-TEST_F( WritableData, dynamicWrite ) {
+BOOST_AUTO_TEST_CASE( dynamicWrite ) {
   testWritable->setIsDynamic(true);
   
   ASSERT_FALSE( testDataset->dataWritten );
@@ -56,7 +56,7 @@ TEST_F( WritableData, dynamicWrite ) {
   ASSERT_TRUE( testDataset->dataWritten );
 }
 
-TEST_F( WritableData, staticWrite ) {
+BOOST_AUTO_TEST_CASE( staticWrite ) {
   testWritable->setIsDynamic( false );
 
   ASSERT_FALSE( testDataset->dataWritten );

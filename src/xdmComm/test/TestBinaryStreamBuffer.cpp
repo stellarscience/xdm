@@ -8,11 +8,11 @@ struct BinaryStreamBufferTest : ::testing::Test {
   BinaryStreamBufferTest() : testBuffer( 512 ) {}
 };
 
-TEST_F( BinaryStreamBufferTest, construct ) {
+BOOST_AUTO_TEST_CASE( construct ) {
   ASSERT_EQ( 512, testBuffer.size() );
 }
 
-TEST_F( BinaryStreamBufferTest, putgetc ) {
+BOOST_AUTO_TEST_CASE( putgetc ) {
   testBuffer.sputc( 'a' );
   testBuffer.sputc( 'b' );
   testBuffer.sputc( 'c' );
@@ -30,7 +30,7 @@ TEST_F( BinaryStreamBufferTest, putgetc ) {
   ASSERT_EQ( 'c', result );
 }
 
-TEST_F( BinaryStreamBufferTest, putgetn ) {
+BOOST_AUTO_TEST_CASE( putgetn ) {
   char characters[] = {'a', 'b', 'c'};
   
   testBuffer.sputn( characters, 3 );

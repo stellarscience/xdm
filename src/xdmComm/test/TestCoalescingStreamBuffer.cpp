@@ -29,7 +29,7 @@ struct CoalescingStreamBuffer : public ::testing::Test {
 
 };
 
-TEST_F( CoalescingStreamBuffer, sync ) {
+BOOST_AUTO_TEST_CASE( sync ) {
   char message = localRank;
   buffer.sputc( message );
 

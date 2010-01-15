@@ -22,7 +22,7 @@
 
 class FunctionDataParallel : public MpiTest {};
 
-TEST_F( FunctionDataParallel, writeResult ) {
+BOOST_AUTO_TEST_CASE( writeResult ) {
   std::stringstream baseName;
   baseName << "FunctionData.parallel." << processCount();
   
