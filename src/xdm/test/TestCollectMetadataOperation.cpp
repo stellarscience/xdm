@@ -1,3 +1,7 @@
+//=============================================================================
+// This software developed by Stellar Science Ltd Co and the U.S. Government.
+// Copyright (C) 2007 Stellar Science. Government-purpose rights granted.
+//-----------------------------------------------------------------------------
 #define BOOST_TEST_MODULE CollectMetadataOperation 
 #include <boost/test/unit_test.hpp>
 

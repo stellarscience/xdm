@@ -1,3 +1,7 @@
+//=============================================================================
+// This software developed by Stellar Science Ltd Co and the U.S. Government.
+// Copyright (C) 2007 Stellar Science. Government-purpose rights granted.
+//-----------------------------------------------------------------------------
 #ifndef xdmComm_test_MpiTestFixture_hpp
 #define xdmComm_test_MpiTestFixture_hpp
 
