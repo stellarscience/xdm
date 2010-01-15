@@ -143,7 +143,7 @@ xdm_integration_executable_parallel(
 )
 
 xdm_integration_run_parallel_test(
-  ParticleMotion.parallel.2
+  ParticleMotion.parallel.1
   xdmIntegrationTest.ParticleMotion.parallel.test
   1
 )
