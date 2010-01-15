@@ -2,6 +2,7 @@
 
 #include <xdm/DataSelection.hpp>
 
+#include <algorithm>
 #include <sstream>
 #include <stdexcept>
 
@@ -9,27 +10,28 @@
 
 XDM_NAMESPACE_BEGIN
 
-UniformDataItem::UniformDataItem( const DataShape<>& dataspace ) :
-  mIsDynamic( false ),
+namespace {
+
+  struct WriteData {
+    Dataset* mDataset;
+    WriteData( Dataset* dataset ) : mDataset(dataset) {}
+    void operator()( WritableData* writable ) {
+      writable->write( mDataset );
+    }
+  };
+
+} // namespace anon
+
+UniformDataItem::UniformDataItem( 
+  primitiveType::Value dataType,
+  const DataShape<>& dataspace ) :
+  mDataType( dataType ),
   mDataspace( dataspace ),
-  mArray(),
   mDataset(),
-  mSelectionMap() {
+  mWritables() {
 }
 
 UniformDataItem::~UniformDataItem() {
-}
-
-StructuredArray* UniformDataItem::array() {
-  return mArray.get();
-}
-
-const StructuredArray* UniformDataItem::array() const {
-  return mArray.get();
-}
-
-void UniformDataItem::setArray( StructuredArray* array ) {
-  mArray = array;
 }
 
 Dataset* UniformDataItem::dataset() {
@@ -44,6 +46,14 @@ void UniformDataItem::setDataset( Dataset* ds ) {
   mDataset = ds;
 }
 
+void UniformDataItem::setDataType( primitiveType::Value dataType ) {
+  mDataType = dataType;
+}
+
+primitiveType::Value UniformDataItem::dataType() const {
+  return mDataType;
+}
+
 const DataShape<>& UniformDataItem::dataspace() const {
   return mDataspace;
 }
@@ -54,6 +64,14 @@ void UniformDataItem::setDataspace( const DataShape<>& dataspace ) {
   for ( iterator it = dataspace.begin(); it != dataspace.end(); ++it ) {
     if ( *it > 0 ) mDataspace.push_back( *it );
   }
+}
+
+void UniformDataItem::appendData( WritableData* data ) {
+  mWritables.push_back( data );
+}
+
+void UniformDataItem::clearData() {
+  mWritables.clear();
 }
 
 void UniformDataItem::writeMetadata( XmlMetadataWrapper& xml ) {
@@ -68,31 +86,35 @@ void UniformDataItem::writeMetadata( XmlMetadataWrapper& xml ) {
   xml.setAttribute( "Dimensions", dimensions.str() );
 
   // write the type of data to the xml metadata.
-  primitiveType::Value type = mArray->dataType();
-  switch ( type ) {
+  switch ( mDataType ) {
   case primitiveType::kChar:
     xml.setAttribute( "NumberType", "Char" );
+    xml.setAttribute( "Precision", sizeof( char ) );
     break;
   case primitiveType::kUnsignedChar:
     xml.setAttribute( "NumberType", "UChar" );
+    xml.setAttribute( "Precision", sizeof( unsigned char ) );
     break;
   case primitiveType::kInt:
     xml.setAttribute( "NumberType", "Int" );
+    xml.setAttribute( "Precision", sizeof( int ) );
     break;
   case primitiveType::kUnsignedInt:
     xml.setAttribute( "NumberType", "UInt" );
+    xml.setAttribute( "Precision", sizeof( unsigned int ) );
     break;
   case primitiveType::kFloat:
+    xml.setAttribute( "NumberType", "Float" );
+    xml.setAttribute( "Precision", sizeof( float ) );
+    break;
   case primitiveType::kDouble:
     xml.setAttribute( "NumberType", "Float" );
+    xml.setAttribute( "Precision", sizeof( double ) );
     break;
   default:
     XDM_THROW( std::invalid_argument( "Unrecognized dataset number type" ) );
     break;
   }
-
-  // write the size of the data to the metadata.
-  xml.setAttribute( "Precision", mArray->elementSize() );
 
   // write the format of the dataset on disk.
   xml.setAttribute( "Format", mDataset->format() );
@@ -101,17 +123,10 @@ void UniformDataItem::writeMetadata( XmlMetadataWrapper& xml ) {
   mDataset->writeTextContent( xml );
 }
 
-const DataSelectionMap& UniformDataItem::selectionMap() const {
-  return mSelectionMap;
-}
-
-void UniformDataItem::setSelectionMap( const DataSelectionMap& selectionMap ) {
-  mSelectionMap = selectionMap;
-}
-
 void UniformDataItem::serializeData() {
-  mDataset->initialize( mArray->dataType(), mDataspace );
-  mDataset->serialize( mArray, mSelectionMap );
+  mDataset->initialize( mDataType, mDataspace );
+  std::for_each( mWritables.begin(), mWritables.end(),
+    WriteData( mDataset.get() ) );
   mDataset->finalize();
 }
 

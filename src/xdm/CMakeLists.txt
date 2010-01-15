@@ -25,6 +25,8 @@ set( ${PROJECT_NAME}_HEADERS
     TemplateStructuredArray.hpp
     UniformDataItem.hpp
     VectorStructuredArray.hpp
+    WritableArray.hpp
+    WritableData.hpp
     XmlObject.hpp
     XmlOutputStream.hpp
 )
@@ -46,6 +48,8 @@ set( ${PROJECT_NAME}_SOURCES
     SerializeDataOperation.cpp
     StructuredArray.cpp
     UniformDataItem.cpp
+    WritableArray.cpp
+    WritableData.cpp
     XmlObject.cpp
     XmlOutputStream.cpp
 )

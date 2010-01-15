@@ -8,6 +8,7 @@
 #include <xdm/StructuredArray.hpp>
 #include <xdm/TemplateStructuredArray.hpp>
 #include <xdm/UniformDataItem.hpp>
+#include <xdm/WritableArray.hpp>
 #include <xdm/XmlObject.hpp>
 #include <xdm/XmlOutputStream.hpp>
 
@@ -89,8 +90,8 @@ TEST( XdmfGridCompatibility, staticGrid ) {
   // since the coordinates are the same in x, y, and z we will share the
   // dataitem.
   xdm::RefPtr< xdm::UniformDataItem > sharedData( 
-    new xdm::UniformDataItem( xdm::makeShape( 10 ) ) );
-  sharedData->setArray( array );
+    new xdm::UniformDataItem( xdm::primitiveType::kDouble, xdm::makeShape( 10 ) ) );
+  sharedData->appendData( new xdm::WritableArray( array ) );
   for ( int i = 0; i < 3; ++i ) {
     geometry->setCoordinateValues( i, sharedData.get() );
   }
@@ -106,10 +107,10 @@ TEST( XdmfGridCompatibility, staticGrid ) {
   // create the data for the attribute.
   std::vector< float > data = createAttributeData( 10, 10, 10 );
   xdm::RefPtr< xdm::UniformDataItem > attributeDataItem(
-    new xdm::UniformDataItem( xdm::makeShape( "10 10 10" ) ) );
+    new xdm::UniformDataItem( xdm::primitiveType::kFloat, xdm::makeShape( "10 10 10" ) ) );
   xdm::RefPtr< xdm::StructuredArray > attrvalues 
     = xdm::createStructuredArray( &data[0], xdm::makeShape( "1000" ) );
-  attributeDataItem->setArray( attrvalues );
+  attributeDataItem->appendData( new xdm::WritableArray( attrvalues ) );
   attribute->appendChild( attributeDataItem );
 
   // attach an HDF dataset to all UniformDataItems
@@ -154,8 +155,8 @@ TEST( XdmfGridCompatibility, timeSeries ) {
   geometryDataset->setFile( "XdmfGridCompatibility.timeSeries.h5" );
   geometryDataset->setDataset( "gridValues" );
   xdm::RefPtr< xdm::UniformDataItem > geodata( 
-    new xdm::UniformDataItem( xdm::makeShape( 10 ) ) );
-  geodata->setArray( geometryArray );
+    new xdm::UniformDataItem( xdm::primitiveType::kFloat, xdm::makeShape( 10 ) ) );
+  geodata->appendData( new xdm::WritableArray( geometryArray ) );
   geodata->setDataset( geometryDataset );
   for ( int i = 0; i < 3; ++i ) {
     sharedGeometry->setCoordinateValues( i, geodata.get() );
@@ -199,9 +200,10 @@ TEST( XdmfGridCompatibility, timeSeries ) {
     std::stringstream stepStr;
     stepStr << std::setfill('0') << std::setw(5) << step;
     attrDataset->setDataset( stepStr.str() );
-    xdm::RefPtr< xdm::UniformDataItem > attrData( 
-      new xdm::UniformDataItem( xdm::makeShape( 9, 9, 9 ) ) );
-    attrData->setArray( attrArray.get() );
+    xdm::RefPtr< xdm::UniformDataItem > attrData( new xdm::UniformDataItem( 
+      xdm::primitiveType::kFloat, 
+      xdm::makeShape( 9, 9, 9 ) ) );
+    attrData->appendData( new xdm::WritableArray( attrArray.get() ) );
     attrData->setDataset( attrDataset.get() );
     attribute->appendChild( attrData );
     

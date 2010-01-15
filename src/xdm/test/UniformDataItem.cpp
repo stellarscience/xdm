@@ -2,6 +2,7 @@
 
 #include <xdm/TemplateStructuredArray.hpp>
 #include <xdm/UniformDataItem.hpp>
+#include <xdm/WritableArray.hpp>
 
 #include <algorithm>
 
@@ -38,9 +39,11 @@ public:
 
     xdm::DataShape<> datasetShape(2);
     datasetShape[0] = datasetShape[1] = 2;
-    testItem = new xdm::UniformDataItem( datasetShape );
+    testItem = new xdm::UniformDataItem( 
+      xdm::primitiveType::kFloat, 
+      datasetShape );
 
-    testItem->setArray( array );
+    testItem->appendData( new xdm::WritableArray( array ) );
     testItem->setDataset( dataset );
   }
 };

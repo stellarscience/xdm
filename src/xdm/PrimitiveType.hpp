@@ -1,8 +1,7 @@
 #ifndef xdm_PrimitiveType_hpp
 #define xdm_PrimitiveType_hpp
 
-#include <complex>
-#include <string>
+#include <map>
 
 #include <xdm/NamespaceMacro.hpp>
 
