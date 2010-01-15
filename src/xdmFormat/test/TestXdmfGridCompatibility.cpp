@@ -218,5 +218,5 @@ BOOST_AUTO_TEST_CASE( timeSeries ) {
   virtualDataset->close();
 }
 
-} // namespace anon
+} // namespace
 

@@ -103,5 +103,5 @@ BOOST_AUTO_TEST_CASE( iterateStride ) {
   BOOST_CHECK( test == xdm::HyperSlabBlockIterator<>() );
 }
 
-} // namespace anon
+} // namespace
 

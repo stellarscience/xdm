@@ -59,5 +59,5 @@ BOOST_AUTO_TEST_CASE( applyAggregateItem ) {
   BOOST_REQUIRE_EQUAL( answer, result.str() );
 }
 
-} // namespace anon
+} // namespace
 

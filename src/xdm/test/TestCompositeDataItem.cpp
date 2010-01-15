@@ -16,5 +16,5 @@ BOOST_AUTO_TEST_CASE( writeMetadata ) {
   BOOST_CHECK_EQUAL( xml.attribute( "ItemType" ), "Tree" );
 }
 
-} // namespace anon
+} // namespace
 

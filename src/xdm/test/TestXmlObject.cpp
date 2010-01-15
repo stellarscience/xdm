@@ -59,5 +59,5 @@ BOOST_AUTO_TEST_CASE( OStreamInsertion ) {
   BOOST_CHECK_EQUAL( answer, result.str() );
 }
 
-} // namespace anon
+} // namespace
 

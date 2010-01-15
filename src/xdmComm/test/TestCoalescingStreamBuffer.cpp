@@ -67,5 +67,5 @@ BOOST_AUTO_TEST_CASE( synchronize ) {
   }
 }
 
-} // namespace anon
+} // namespace
 

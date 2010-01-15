@@ -150,5 +150,5 @@ BOOST_AUTO_TEST_CASE( coalesce ) {
   }
 }
 
-} // namespace anon
+} // namespace
 

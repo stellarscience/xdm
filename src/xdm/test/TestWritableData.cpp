@@ -83,5 +83,5 @@ BOOST_AUTO_TEST_CASE( staticWrite ) {
   BOOST_CHECK( test.testDataset->dataWritten );
 }
 
-} // namespace anon
+} // namespace
 

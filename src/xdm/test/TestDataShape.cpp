@@ -33,5 +33,5 @@ BOOST_AUTO_TEST_CASE( makeShape ) {
   BOOST_CHECK_THROW( xdm::makeShape( "1 jeff" ), std::invalid_argument );
 }
 
-} // namespace anon
+} // namespace
 

@@ -48,5 +48,5 @@ BOOST_AUTO_TEST_CASE( writeReadLongDouble ) { writeReadTest< long double >(); }
 
 BOOST_AUTO_TEST_CASE( writeReadBool ) { writeReadTest< bool >(); }
 
-} // namespace anon
+} // namespace
 

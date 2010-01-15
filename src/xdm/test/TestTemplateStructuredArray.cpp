@@ -31,5 +31,5 @@ BOOST_AUTO_TEST_CASE( instantiateULInt ) { test< long unsigned int >(); }
 BOOST_AUTO_TEST_CASE( instantiateFloat ) { test< float >(); } 
 BOOST_AUTO_TEST_CASE( instantiateDouble ) { test< double >(); } 
 
-} // namespace anon
+} // namespace
 

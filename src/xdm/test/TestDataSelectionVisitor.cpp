@@ -59,5 +59,5 @@ BOOST_AUTO_TEST_CASE( checkVisitationHyperslabDataSelection ) {
   checkVisitation< HyperslabDataSelection >();
 }
 
-} // namespace anon
+} // namespace
 

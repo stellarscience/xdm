@@ -87,5 +87,5 @@ BOOST_AUTO_TEST_CASE( closeStream ) {
   test.closeStream();
 }
 
-} // namespace anon
+} // namespace
 

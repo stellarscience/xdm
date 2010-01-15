@@ -41,5 +41,5 @@ BOOST_AUTO_TEST_CASE( writeLongDouble ) { readValue< long double >(); }
 
 BOOST_AUTO_TEST_CASE( writeBool ) { readValue< bool >(); }
 
-} // namespace anon
+} // namespace
 

@@ -68,5 +68,5 @@ BOOST_AUTO_TEST_CASE( writeMetadata ) {
   BOOST_CHECK_EQUAL( "DummyDatasetInitializationContent", xml.contentLine( 0 ) );
 }
 
-} // namespace anon
+} // namespace
 

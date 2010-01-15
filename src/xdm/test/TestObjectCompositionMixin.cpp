@@ -48,5 +48,5 @@ BOOST_AUTO_TEST_CASE( child ) {
 	BOOST_CHECK_EQUAL( test.b, xdm::child< B >( test.t, 0 ) );
 }
 
-} // namespace anon
+} // namespace
 

@@ -21,5 +21,5 @@ BOOST_AUTO_TEST_CASE( writeMetadataTag ) {
   BOOST_CHECK_EQUAL( nameAnswer, nameResult );
 }
 
-} // namespace anon
+} // namespace
 

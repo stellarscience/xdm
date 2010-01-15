@@ -53,5 +53,5 @@ BOOST_AUTO_TEST_CASE( putgetn ) {
   BOOST_CHECK_EQUAL( 'c', result[2] );
 }
 
-} // namespace anon
+} // namespace
 

@@ -26,5 +26,5 @@ BOOST_AUTO_TEST_CASE( assignmentOperator ) {
   BOOST_CHECK_EQUAL( 2, b->referenceCount() );
 }
 
-} // namespace anon
+} // namespace
 

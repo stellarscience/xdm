@@ -147,5 +147,5 @@ BOOST_AUTO_TEST_CASE( DataSelectionMapRoundtrip ) {
   BOOST_CHECK( rangeCheck.result );
 }
 
-} // namespace anon
+} // namespace
 

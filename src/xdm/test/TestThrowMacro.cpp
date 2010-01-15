@@ -12,5 +12,5 @@ BOOST_AUTO_TEST_CASE( throws ) {
     std::runtime_error );
 }
 
-} // namespace anon
+} // namespace
 
