@@ -1,5 +1,6 @@
 #include <xdm/Array.hpp>
 #include <xdm/HdfDataset.hpp>
+#include <xdm/RefPtr.hpp>
 
 #include <sstream>
 
@@ -34,7 +35,7 @@ int main( int argc, char* argv[] ) {
   xdm::SlabMap<> mapping( memorySlab, fileSlab );
 
   // create the dataset
-  xdm::HdfDataset* dataset = new xdm::HdfDataset();
+  xdm::RefPtr< xdm::Dataset > dataset( new xdm::HdfDataset() );
 
   // write the data to disk
   std::stringstream content( "HdfDataset.h5:/testdata" );

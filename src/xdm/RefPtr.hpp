@@ -3,8 +3,10 @@
 
 #include <xdm/NamespaceMacro.hpp>
 
+XDM_NAMESPACE_BEGIN
+
 /// Smart pointer to manage the memory occupied by ReferencedObject subclasses.
-/// Much of this implementation is taken from the OpenSceneGraph library.
+/// Much of this implementation is inspired by the OpenSceneGraph library.
 template< typename T >
 class RefPtr {
 public:
@@ -62,13 +64,15 @@ private:
   T* mPtr;
   template< typename Other > friend class RefPtr;
   template< typename Other > void assign( const RefPtr< Other >& p ) {
-    if ( mPtr == other.mPtr ) return;
+    if ( mPtr == p.mPtr ) return;
     T* tmp = mPtr;
     mPtr = p.mPtr;
     if ( mPtr ) mPtr->addReference();
     if ( tmp ) tmp->removeReference();
   }
 };
+
+XDM_NAMESPACE_END
 
 #endif // xdm_RefPtr_hpp
 

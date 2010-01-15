@@ -3,6 +3,7 @@
 
 #include <xdm/Array.hpp>
 #include <xdm/DataShape.hpp>
+#include <xdm/ReferencedObject.hpp>
 #include <xdm/Slab.hpp>
 
 #include <xdm/NamespaceMacro.hpp>
@@ -16,7 +17,7 @@ XDM_NAMESPACE_BEGIN
 /// arrays to disk.  This class should be implemented by inheritors to write an
 /// array to disk as simply as possible.  Decorators (callbacks) should be used
 /// to customize the data flow for different application environments.
-class Dataset {
+class Dataset : public ReferencedObject {
 public:
   Dataset();
   virtual ~Dataset();
@@ -29,7 +30,7 @@ public:
 	/// example of where this is useful is in a parallel application that needs to
 	/// communicate all of the relevant data to a certain process in a communicator
 	/// to handle the actual file output of the data.
-	class InitializeCallback {
+	class InitializeCallback : public ReferencedObject {
 	public:
 	  virtual void initializeImplementation(
 	    Dataset* ds,
@@ -39,7 +40,7 @@ public:
 	
 	/// Serialization callback function.  Decorates the serialization process to
 	/// customize data flow.
-	class SerializeCallback {
+	class SerializeCallback : public ReferencedObject {
 	public:
 	  virtual void serializeImplementation(
 	    Dataset* ds,
@@ -50,7 +51,7 @@ public:
 	
 	/// Finalization Callback function.  Decorates the finalization process to
 	/// customize the data flow.
-	class FinalizeCallback {
+	class FinalizeCallback : public ReferencedObject {
 	public:
 	  virtual void finalizeImplementation( Dataset* ds ) = 0;
 	};
