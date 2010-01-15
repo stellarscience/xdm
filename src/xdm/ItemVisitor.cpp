@@ -24,6 +24,8 @@
 #include <xdm/DataItem.hpp>
 #include <xdm/UniformDataItem.hpp>
 
+#include <xdm/ThrowMacro.hpp>
+
 XDM_NAMESPACE_BEGIN
 
 ItemVisitor::ItemVisitor() {
@@ -46,6 +48,14 @@ void ItemVisitor::apply( CompositeDataItem& item ) {
 
 void ItemVisitor::apply( UniformDataItem& item ) {
   apply( static_cast< DataItem& >( item ) );
+}
+
+void ItemVisitor::captureState( BinaryOStream& ) {
+  XDM_THROW( MethodNotImplemented( "ItemVisitor::captureState" ) );
+}
+
+void ItemVisitor::restoreState( BinaryIStream& ) {
+  XDM_THROW( MethodNotImplemented( "ItemVisitor::restoreState" ) );
 }
 
 XDM_NAMESPACE_END

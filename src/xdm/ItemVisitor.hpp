@@ -21,9 +21,14 @@
 #ifndef xdm_ItemVisitor_hpp
 #define xdm_ItemVisitor_hpp
 
+#include <xdm/BinaryIStream.hpp>
+#include <xdm/BinaryOStream.hpp>
 #include <xdm/Item.hpp>
 #include <xdm/ReferencedObject.hpp>
 #include <xdm/RefPtr.hpp>
+
+#include <stdexcept>
+#include <string>
 
 #include <xdm/NamespaceMacro.hpp>
 
@@ -33,6 +38,17 @@ XDM_NAMESPACE_BEGIN
 class CompositeDataItem;
 class DataItem;
 class UniformDataItem;
+
+/// Error signalling that a method is not implemented for a type.
+class MethodNotImplemented : public std::runtime_error {
+private:
+  std::string mMethodName;
+public:
+  MethodNotImplemented( const std::string& methodName ) :
+    std::runtime_error( methodName + ": not implemented" ),
+    mMethodName( methodName ) {}
+  ~MethodNotImplemented() throw() {}
+};
 
 /// Class to represent type safe operations on the data tree.  Subclasses of
 /// ItemVisitor should reimplement the apply functions for the core xdm objects
@@ -55,6 +71,11 @@ public:
   inline void traverse( Item& item ) {
     item.traverse( *this );
   }
+
+  /// Write a snapshot of the ItemVisitor's current state to a BinaryOStream.
+  virtual void captureState( BinaryOStream& );
+  /// Restore from a state snapshot contained in a BinaryIStream.
+  virtual void restoreState( BinaryIStream& );
 };
 
 /// Convenience functor for applying a visitor to an Item.

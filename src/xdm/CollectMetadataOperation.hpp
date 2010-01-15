@@ -48,6 +48,9 @@ public:
   /// XmlObject that is then appended within the object's parent context.
   virtual void apply( Item& item );
 
+  virtual void captureState( BinaryOStream& ostr );
+  virtual void restoreState( BinaryIStream& istr );
+
   /// Get the result of applying this operation to a data tree.  This method
   /// will return the XmlObject for last completed item.
   RefPtr< XmlObject > result();

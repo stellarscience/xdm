@@ -83,6 +83,36 @@ BinaryOStream& operator<<( BinaryOStream& ostr, const xdm::StructuredArray& v );
 BinaryIStream& operator>>( BinaryIStream& istr, xdm::XmlObject& v );
 BinaryOStream& operator<<( BinaryOStream& ostr, const xdm::XmlObject& v );
 
+/// Convenience functor to write a type out to a BinaryOStream.
+template< typename T >
+struct OutputObject {
+  BinaryOStream& mOStr;
+  OutputObject( BinaryOStream& ostr ) : mOStr( ostr ) {}
+  void operator()( const T& object ) {
+    mOStr << object;
+  }
+};
+
+/// Convenience functor to write a pointer out to a BinaryOStream.
+template< typename T >
+struct OutputObject< xdm::RefPtr< T > > {
+  BinaryOStream& mOStr;
+  OutputObject( BinaryOStream& ostr ) : mOStr( ostr ) {}
+  void operator()( const xdm::RefPtr< T >& object ) {
+    mOStr << *object;
+  }
+};
+
+/// Convenience functor to read a type in from a BinaryIStream.
+template< typename T >
+struct InputObject {
+  BinaryIStream& mIStr;
+  InputObject( BinaryIStream& istr ) : mIStr( istr ) {}
+  void operator()( T& object ) {
+    mIStr >> object;
+  }
+};
+
 XDM_NAMESPACE_END
 
 #endif // xdm_BinaryStreamOperations_hpp

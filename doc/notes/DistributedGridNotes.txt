@@ -1,0 +1,12 @@
+Notes on the Distributed Grid Implementation
+--------------------------------------------
+
+- Capture of visitor state doesn't work because we'd need to keep a running
+  tally of visitor states, which completely serializes the operation and
+  introduces lots of communication. The problem is that the visitors must
+  accumulate state for each of the distributed children, and children may
+  require the state accumulated from their siblings, so you'd need to capture
+  the state, send it to rank 1, wait for rank 1, restore new state with
+  accumulation of rank 1, capture send to rank 2 and repeat. This seems overly
+  complicated to me.
+

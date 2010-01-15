@@ -38,9 +38,45 @@ DistributedItemCollectionProxy::~DistributedItemCollectionProxy() {
 }
 
 void DistributedItemCollectionProxy::accept( xdm::ItemVisitor& iv ) {
-  // forward to wrapped Item
-  mItem->accept( iv );
-  iv.apply( *this );
+  int processes;
+  MPI_Comm_size( mCommunicator, &processes );
+  int rank;
+  MPI_Comm_rank( mCommunicator, &rank );
+
+  // Rank 0 applies the visitor to the local element and waits for all processes
+  // to report their visitation results. Others explicitly traverse their local
+  // subtrees and send the result back to 0 for accumulation.
+  if ( rank == 0 ) {
+
+    // Apply the visitor to the wrapped Item.
+    mItem->accept( iv );
+
+    // Wait until we visit all processes participating in the communicator.
+    int processCount = 1;
+    while ( processCount < processes ) {
+
+      // Poll for messages from other processes.
+      while( mCommBuffer->poll() ) {
+        // A process is reporting. Update the visitor state to accumulate the
+        // results from the distributed Item.
+        xdm::BinaryIStream input( mCommBuffer.get() );
+        iv.restoreState( input );
+        processCount++;
+      }
+
+    }
+
+  } else {
+
+    // gather the results for the local children.
+    traverse( iv );
+
+    // send the results to rank 0.
+    xdm::BinaryOStream output( mCommBuffer.get() );
+    iv.captureState( output );
+    output << xdm::flush;
+
+  }
 }
 
 void DistributedItemCollectionProxy::traverse( xdm::ItemVisitor& iv ) {

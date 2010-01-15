@@ -25,13 +25,55 @@
 
 #include <xdmComm/DistributedItemCollectionProxy.hpp>
 
+#include <xdm/BinaryStreamOperations.hpp>
 #include <xdm/CollectMetadataOperation.hpp>
 #include <xdm/Item.hpp>
 #include <xdm/ItemVisitor.hpp>
 
+#include <algorithm>
+#include <ostream>
+#include <vector>
+
 namespace {
 
 xdmComm::test::MpiTestFixture globalFixture;
+
+typedef std::pair< int, std::string > ProcessItemPair;
+
+bool operator!=( const ProcessItemPair& lhs, const ProcessItemPair& rhs ) {
+  return ( lhs.first != rhs.first ) || ( lhs.second != rhs.second );
+}
+
+std::ostream& operator<<( std::ostream& ostr, const ProcessItemPair& pair ) {
+  ostr << pair.first << " -- " << pair.second;
+  return ostr;
+}
+
+class ProcessReportVisitor : public xdm::ItemVisitor {
+public:
+  std::vector< ProcessItemPair > mVisitedObjects;
+
+  virtual void apply( xdm::Item& item ) {
+    mVisitedObjects.push_back(
+      std::make_pair( globalFixture.localRank(), item.className() ) );
+  }
+
+  virtual void captureState( xdm::BinaryOStream& ostr ) {
+    ostr << mVisitedObjects.size();
+    std::for_each( mVisitedObjects.begin(), mVisitedObjects.end(),
+      xdm::OutputObject< ProcessItemPair >( ostr ) );
+  }
+
+  virtual void restoreState( xdm::BinaryIStream& istr ) {
+    std::vector< ProcessItemPair >::size_type size;
+    istr >> size;
+    for ( size_t i = 0; i < size; i++ ) {
+      ProcessItemPair element;
+      istr >> element;
+      mVisitedObjects.push_back( element );
+    }
+  }
+};
 
 class ItemCollection : public xdm::Item {
 public:
@@ -60,7 +102,7 @@ public:
   }
 };
 
-BOOST_AUTO_TEST_CASE( distributedCollection ) {
+/*BOOST_AUTO_TEST_CASE( distributedCollection ) {
   xdm::RefPtr< ItemCollection > item( new ItemCollection );
   item->mItems.push_back( new ProcessDescriptionItem );
 
@@ -78,6 +120,38 @@ BOOST_AUTO_TEST_CASE( distributedCollection ) {
   xdm::RefPtr< xdm::XmlObject > answer( new xdm::XmlObject( "answer" ) );
 
   BOOST_CHECK_EQUAL( *answer, *result );
+}*/
+
+BOOST_AUTO_TEST_CASE( visitsAll ) {
+  xdm::RefPtr< ItemCollection > item( new ItemCollection );
+  item->mItems.push_back( new ProcessDescriptionItem );
+
+  xdm::RefPtr< xdmComm::DistributedItemCollectionProxy > proxy(
+    new xdmComm::DistributedItemCollectionProxy(
+      item.get(),
+      MPI_COMM_WORLD,
+      1024 ) );
+
+  ProcessReportVisitor visitor;
+  proxy->accept( visitor );
+
+  if ( globalFixture.localRank() == 0 ) {
+
+    // Check that the visitor visited 1 + process count objects (parent and local,
+    // plus one for each remote).
+    BOOST_CHECK_EQUAL( visitor.mVisitedObjects.size(),
+                       globalFixture.processes() + 1 );
+
+    std::vector< ProcessItemPair > answer;
+    answer.push_back( std::make_pair( 0, std::string( "ItemCollection" ) ) );
+    for ( int i = 0; i < globalFixture.processes(); i++ ) {
+      answer.push_back( std::make_pair( i, std::string( "ProcessDescriptionItem" ) ) );
+    }
+
+    BOOST_CHECK_EQUAL_COLLECTIONS(
+        answer.begin(), answer.end(),
+        visitor.mVisitedObjects.begin(), visitor.mVisitedObjects.end() );
+  }
 }
 
-}
+} // namespace

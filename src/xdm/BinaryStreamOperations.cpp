@@ -32,36 +32,6 @@ XDM_NAMESPACE_BEGIN
 
 namespace {
 
-// Functor to write a type out to a BinaryOStream.
-template< typename T >
-struct OutputObject {
-  BinaryOStream& mOStr;
-  OutputObject( BinaryOStream& ostr ) : mOStr( ostr ) {}
-  void operator()( const T& object ) {
-    mOStr << object;
-  }
-};
-
-// Functor to write a pointer out to a BinaryOStream.
-template< typename T >
-struct OutputObject< xdm::RefPtr< T > > {
-  BinaryOStream& mOStr;
-  OutputObject( BinaryOStream& ostr ) : mOStr( ostr ) {}
-  void operator()( const xdm::RefPtr< T >& object ) {
-    mOStr << *object;
-  }
-};
-
-// Functor to read a type int from a BinaryIStream.
-template< typename T >
-struct InputObject {
-  BinaryIStream& mIStr;
-  InputObject( BinaryIStream& istr ) : mIStr( istr ) {}
-  void operator()( T& object ) {
-    mIStr >> object;
-  }
-};
-
 // Visitor implementation that serializes a DataSelection subclass depending on
 // its type.
 class DataSelectionOutputVisitor : public xdm::DataSelectionVisitor {

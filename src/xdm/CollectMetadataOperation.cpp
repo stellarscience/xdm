@@ -20,6 +20,7 @@
 //------------------------------------------------------------------------------
 #include <xdm/CollectMetadataOperation.hpp>
 
+#include <xdm/BinaryStreamOperations.hpp>
 #include <xdm/XmlObject.hpp>
 
 XDM_NAMESPACE_BEGIN
@@ -66,6 +67,19 @@ void CollectMetadataOperation::apply( xdm::Item& item ) {
   // manage the stack in case something happens below
   ContextManager mgr( *this, itemXml );
   traverse( item );
+}
+
+void CollectMetadataOperation::captureState( BinaryOStream& ostr ) {
+  ostr << *mResult;
+}
+
+void CollectMetadataOperation::restoreState( BinaryIStream& istr ) {
+  RefPtr< XmlObject > resultXml( new XmlObject );
+  istr >> *resultXml;
+
+  if ( ! mContextStack.empty() ) {
+    mContextStack.top()->appendChild( resultXml );
+  }
 }
 
 RefPtr< XmlObject > CollectMetadataOperation::result() {
