@@ -2,7 +2,7 @@
 # Add a serial test
 macro( xdm_test_serial test_name )
     add_executable( ${test_name} ${ARGN} )
-    target_link_libraries( ${test_name} xdm )
+    target_link_libraries( ${test_name} xdm gtest )
     add_test( ${test_name} ${test_name} )
 endmacro()
 
@@ -23,6 +23,7 @@ endmacro()
 
 xdm_test_serial( HdfDatasetSerial HdfDataset.cpp )
 xdm_test_serial( TemplateStructuredArray TemplateStructuredArray.cpp )
+xdm_test_serial( XmlObject XmlObject.cpp )
 
 # xdm_test_parallel( HdfDatasetMPI 4 HdfDatasetMPI.cpp )
 
