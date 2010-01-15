@@ -47,6 +47,10 @@ public:
   const std::string& contentLine( unsigned int line ) const {
     return mXml->contentLine( line );
   }
+
+  /// Return the full XmlObject that this content belongs to. This is provided
+  /// for special cases only.
+  RefPtr< XmlObject > completeObject() { return mXml; }
 };
 
 XDM_NAMESPACE_END

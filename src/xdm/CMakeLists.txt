@@ -1,6 +1,7 @@
 project( xdm )
 
 set( ${PROJECT_NAME}_HEADERS
+    Algorithm.hpp
     AllDataSelection.hpp
     CollectMetadataOperation.hpp
     CompositeDataItem.hpp
@@ -29,8 +30,10 @@ set( ${PROJECT_NAME}_HEADERS
     VectorStructuredArray.hpp
     WritableArray.hpp
     WritableData.hpp
+    XmlMetadataWrapper.hpp
     XmlObject.hpp
     XmlOutputStream.hpp
+    XmlTextContent.hpp
 )
 
 set( ${PROJECT_NAME}_SOURCES

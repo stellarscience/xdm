@@ -42,6 +42,16 @@ struct OutputObject {
   }
 };
 
+// Functor to write a pointer out to a BinaryOStream.
+template< typename T >
+struct OutputObject< xdm::RefPtr< T > > {
+  BinaryOStream& mOStr;
+  OutputObject( BinaryOStream& ostr ) : mOStr( ostr ) {}
+  void operator()( const xdm::RefPtr< T >& object ) {
+    mOStr << *object;
+  }
+};
+
 // Functor to read a type int from a BinaryIStream.
 template< typename T >
 struct InputObject {
@@ -134,6 +144,21 @@ BinaryIStream& operator>>( BinaryIStream& istr, DataSelectionInputProxy& v ) {
 // NOTE: in this file, pairs of corresponding IO operators for a given type are
 // separated  with the //---... blocks below.  Updating one will generally
 // require updating the other.
+
+//------------------------------------------------------------------------------
+BinaryIStream& operator>>( BinaryIStream& istr, std::string& v ) {
+  int c;
+  while( c = istr.get() ) {
+    v.push_back( c );
+  }
+  return istr;
+}
+
+BinaryOStream& operator<<( BinaryOStream& ostr, const std::string& v ) {
+  std::for_each( v.begin(), v.end(), OutputObject< char >( ostr ) );
+  ostr << '\0';
+  return ostr;
+}
 
 //-----------------------------------------------------------------------------
 BinaryIStream& operator>>( BinaryIStream& istr, xdm::AllDataSelection& v ) {
@@ -252,6 +277,61 @@ BinaryOStream& operator<<( BinaryOStream& ostr, const xdm::StructuredArray& v ) 
   return ostr;
 }
 
+//------------------------------------------------------------------------------
+BinaryIStream& operator>>( BinaryIStream& istr, xdm::XmlObject& v ) {
+  // tag - attribute count - attribute name - attribute value - ... -
+  // text content line count - text content line - ... -
+  // child count - children - ...
+  std::string tag;
+  istr >> tag;
+  v.setTag( tag );
+
+  ptrdiff_t attributeCount;
+  istr >> attributeCount;
+  for ( int i = 0; i < attributeCount; i++ ) {
+    std::pair< std::string, std::string > keyValuePair;
+    istr >> keyValuePair;
+    v.appendAttribute( keyValuePair.first, keyValuePair.second );
+  }
+
+  ptrdiff_t contentLineCount;
+  istr >> contentLineCount;
+  for ( int i = 0; i < contentLineCount; i++ ) {
+    std::string contentLine;
+    istr >> contentLine;
+    v.appendContent( contentLine );
+  }
+
+  ptrdiff_t childCount;
+  istr >> childCount;
+  for ( int i = 0; i < childCount; i++ ) {
+    xdm::RefPtr< xdm::XmlObject > child( new xdm::XmlObject );
+    istr >> *child;
+    v.appendChild( child );
+  }
+
+  return istr;
+}
+
+BinaryOStream& operator<<( BinaryOStream& ostr, const xdm::XmlObject& v ) {
+  // tag - attribute count - attribute name - attribute value - ... -
+  // text content line count - text content line - ... -
+  // child count - children - ...
+  ostr << v.tag();
+
+  ostr << std::distance( v.beginAttributes(), v.endAttributes() );
+  std::for_each( v.beginAttributes(), v.endAttributes(),
+    OutputObject< std::pair< std::string, std::string > >( ostr ) );
+
+  ostr << std::distance( v.beginTextContent(), v.endTextContent() );
+  std::for_each( v.beginTextContent(), v.endTextContent(),
+    OutputObject< std::string >( ostr ) );
+
+  ostr << std::distance( v.beginAttributes(), v.endAttributes() );
+  std::for_each( v.beginChildren(), v.endChildren(),
+    OutputObject< xdm::RefPtr< xdm::XmlObject > >( ostr ) );
+  return ostr;
+}
 
 XDM_COMM_NAMESPACE_END
 

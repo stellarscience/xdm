@@ -21,4 +21,5 @@ xdm_test_serial( TestObjectCompositionMixin TestObjectCompositionMixin.cpp )
 xdm_test_serial( TestDataSelectionVisitor TestDataSelectionVisitor.cpp )
 xdm_test_serial( TestWritableData TestWritableData.cpp )
 xdm_test_serial( TestHyperSlabBlockIterator TestHyperSlabBlockIterator.cpp )
+xdm_test_serial( TestAlgorithm TestAlgorithm.cpp )
 

@@ -10,6 +10,7 @@ set( ${PROJECT_NAME}_HEADERS
     BinaryStreamBuffer.hpp
     BinaryStreamOperations.hpp
     CoalescingStreamBuffer.hpp
+    DistributedItemCollectionProxy.hpp
     MpiDatasetProxy.hpp
     NamespaceMacro.hpp
     ParallelizeTreeVisitor.hpp
@@ -22,6 +23,7 @@ set( ${PROJECT_NAME}_SOURCES
     BinaryOStream.cpp
     BinaryStreamOperations.cpp
     CoalescingStreamBuffer.cpp
+    DistributedItemCollectionProxy.cpp
     MpiDatasetProxy.cpp
     ParallelizeTreeVisitor.cpp
 )

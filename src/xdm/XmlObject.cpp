@@ -20,6 +20,8 @@
 //------------------------------------------------------------------------------
 #include <xdm/XmlObject.hpp>
 
+#include <xdm/Algorithm.hpp>
+
 #include <algorithm>
 #include <sstream>
 #include <stdexcept>
@@ -62,7 +64,7 @@ namespace {
     }
   }
 
-} // namespace anon
+} // namespace
 
 XmlObject::XmlObject() :
   mTag(),
@@ -179,6 +181,40 @@ std::ostream& operator<<( std::ostream& ostr, const XmlObject& obj ) {
   return writeIndent( ostr, obj, 0 );
 }
 
+bool operator==( const XmlObject& lhs, const XmlObject& rhs ) {
+  if ( lhs.tag() != rhs.tag() ) {
+    return false;
+  }
+
+  // attribute order doesn't matter.
+  if ( !unorderedCollectionsEqual(
+    lhs.beginAttributes(), lhs.endAttributes(),
+    rhs.beginAttributes(), rhs.endAttributes() ) ) {
+    return false;
+  }
+
+  // Text line order matters.
+  if ( !orderedCollectionsEqual(
+    lhs.beginTextContent(), lhs.endTextContent(),
+    rhs.beginTextContent(), rhs.endTextContent() ) ) {
+    return false;
+  }
+
+  // Child order matters. Check the children are equal recursively.
+  if ( !orderedCollectionsEqual(
+    lhs.beginChildren(), lhs.endChildren(),
+    rhs.beginChildren(), rhs.endChildren(),
+    EqualPointerValue< RefPtr< XmlObject > > () ) ) {
+    return false;
+  }
+
+  // It is known that the attributes, text content, and children are equal.
+  return true;
+}
+
+bool operator!=( const XmlObject& lhs, const XmlObject& rhs ) {
+  return !( lhs == rhs );
+}
 
 XDM_NAMESPACE_END
 

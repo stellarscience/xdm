@@ -41,6 +41,10 @@ BinaryIStream::BinaryIStream( BinaryStreamBuffer* buf ) :
 BinaryIStream::~BinaryIStream() {
 }
 
+int BinaryIStream::get() {
+  return rdbuf()->sgetc();
+}
+
 BinaryIStream& BinaryIStream::get( char& c ) {
   c = rdbuf()->sgetc();
   return *this;

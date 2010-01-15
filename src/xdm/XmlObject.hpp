@@ -50,8 +50,18 @@ private:
 
 public:
 
+  /// Iterator to expose attributes as a collection of std::pairs.
+  typedef AttributeMap::iterator AttributeIterator;
+  /// Iterator to expose attributes as a collection of constant std::pairs.
+  typedef AttributeMap::const_iterator ConstAttributeIterator;
+  /// Iterator to expose children as a collection of reference counted objects.
   typedef ChildList::iterator ChildIterator;
+  /// Iterator to expose children as a collection of const reference counted objects.
   typedef ChildList::const_iterator ConstChildIterator;
+  /// Iterator to expose the text content as a collection of strings.
+  typedef TextContent::iterator TextContentIterator;
+  /// Iterator to expose the text content as a collection of const strings.
+  typedef TextContent::const_iterator ConstTextContentIterator;
 
   /// Construct an XmlObject with no tag.
   XmlObject();
@@ -60,6 +70,7 @@ public:
   virtual ~XmlObject();
 
   //-- Methods for constructing an XML tree --//
+
   /// Set the tag for the Object.
   void setTag( const std::string& tag );
 
@@ -90,10 +101,22 @@ public:
   /// Determine if the object has children.
   bool hasChildren() const { return !mChildren.empty(); }
 
+  //-- Iterator interfaces --//
+
+  AttributeIterator beginAttributes() { return mAttributeMap.begin(); }
+  ConstAttributeIterator beginAttributes() const { return mAttributeMap.begin(); }
+  AttributeIterator endAttributes() { return mAttributeMap.end(); }
+  ConstAttributeIterator endAttributes() const { return mAttributeMap.end(); }
+
   ChildIterator beginChildren() { return mChildren.begin(); }
   ConstChildIterator beginChildren() const { return mChildren.begin(); }
   ChildIterator endChildren() { return mChildren.end(); }
   ConstChildIterator endChildren() const { return mChildren.end(); }
+
+  TextContentIterator beginTextContent() { return mTextContent.begin(); }
+  ConstTextContentIterator beginTextContent() const { return mTextContent.begin(); }
+  TextContentIterator endTextContent() { return mTextContent.end(); }
+  ConstTextContentIterator endTextContent() const { return mTextContent.end(); }
 
   //-- Methods for outputting an XML object --//
 
@@ -128,6 +151,18 @@ std::ostream& writeIndent( std::ostream& ostr, const XmlObject& obj,
 
 /// Stream insertion operator for an XmlObject.
 std::ostream& operator<<( std::ostream& ostr, const XmlObject& obj );
+
+/// Check that two XmlObjects are equal. Objects are considered equal if they
+/// have the same tag, attributes, each of their text content lines are equal
+/// and in the same order, and all of their descendents are equal in the same
+/// way and are in the same order.
+bool operator==( const XmlObject& lhs, const XmlObject& rhs );
+
+/// Check that two XmlObjects are not equal. Objects are considered unequal if
+/// their tags differ, the attributes they contain or their values differ, any
+/// text content lines differ or are out of order, or any descendant is unequal
+/// in the same way or in a different order.
+bool operator!=( const XmlObject& lhs, const XmlObject& rhs );
 
 XDM_NAMESPACE_END
 

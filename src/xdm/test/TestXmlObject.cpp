@@ -79,5 +79,52 @@ BOOST_AUTO_TEST_CASE( OStreamInsertion ) {
   BOOST_CHECK_EQUAL( answer, result.str() );
 }
 
+BOOST_AUTO_TEST_CASE( operatorEqual ) {
+  xdm::RefPtr< xdm::XmlObject > lhs( buildTree() );
+  xdm::RefPtr< xdm::XmlObject > rhs( buildTree() );
+
+  BOOST_CHECK( *lhs == *rhs );
+}
+
+BOOST_AUTO_TEST_CASE( operatorNotEqualDifferentTag ) {
+  xdm::RefPtr< xdm::XmlObject > lhs( buildTree() );
+  xdm::RefPtr< xdm::XmlObject > rhs( buildTree() );
+
+  rhs->setTag( "badtag" );
+  BOOST_CHECK( *lhs != *rhs );
+}
+
+BOOST_AUTO_TEST_CASE( operatorNotEqualDifferentAttributeValue ) {
+  xdm::RefPtr< xdm::XmlObject > lhs( buildTree() );
+  xdm::RefPtr< xdm::XmlObject > rhs( buildTree() );
+
+  rhs->appendAttribute( "bar", "84" );
+  BOOST_CHECK( *lhs != *rhs );
+}
+
+BOOST_AUTO_TEST_CASE( operatorNotEqualDifferentAttribute ) {
+  xdm::RefPtr< xdm::XmlObject > lhs( buildTree() );
+  xdm::RefPtr< xdm::XmlObject > rhs( buildTree() );
+
+  rhs->appendAttribute( "badattr", "84" );
+  BOOST_CHECK( *lhs != *rhs );
+}
+
+BOOST_AUTO_TEST_CASE( operatorNotEqualDifferentText ) {
+  xdm::RefPtr< xdm::XmlObject > lhs( buildTree() );
+  xdm::RefPtr< xdm::XmlObject > rhs( buildTree() );
+
+  rhs->appendContent( "line mismatch" );
+  BOOST_CHECK( *lhs != *rhs );
+}
+
+BOOST_AUTO_TEST_CASE( operatorNotEqualDifferentChild ) {
+  xdm::RefPtr< xdm::XmlObject > lhs( buildTree() );
+  xdm::RefPtr< xdm::XmlObject > rhs( buildTree() );
+
+  rhs->appendChild( new xdm::XmlObject( "badchild" ) );
+  BOOST_CHECK( *lhs != *rhs );
+}
+
 } // namespace
 

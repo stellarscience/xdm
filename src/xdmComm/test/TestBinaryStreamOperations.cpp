@@ -61,6 +61,19 @@ public:
   {}
 };
 
+BOOST_AUTO_TEST_CASE( StdStringRoundtrip ) {
+  Fixture test;
+
+  std::string answer( "fred" );
+
+  test.stream << answer << xdmComm::flush;
+
+  std::string result;
+  test.stream >> result;
+
+  BOOST_CHECK_EQUAL( answer, result );
+}
+
 BOOST_AUTO_TEST_CASE( DataShapeRoundtrip ) {
   Fixture test;
 
@@ -168,6 +181,23 @@ BOOST_AUTO_TEST_CASE( DataSelectionMapRoundtrip ) {
     answerRange.get() );
   result.range()->accept( rangeCheck );
   BOOST_CHECK( rangeCheck.result );
+}
+
+BOOST_AUTO_TEST_CASE( XmlObjectRoundtrip ) {
+  Fixture test;
+
+  xdm::XmlObject answer( "test-object" );
+  answer.appendAttribute( "name", "test" );
+  answer.appendChild( new xdm::XmlObject( "test-child" ) );
+  answer.appendContent( "line1" );
+  answer.appendContent( "line2" );
+
+  test.stream << answer << xdmComm::flush;
+
+  xdm::XmlObject result;
+  test.stream >> result;
+
+  BOOST_CHECK_EQUAL( answer, result );
 }
 
 } // namespace

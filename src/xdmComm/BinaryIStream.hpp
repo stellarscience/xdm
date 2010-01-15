@@ -34,7 +34,10 @@ public:
   BinaryIStream( BinaryStreamBuffer* buf ); 
   virtual ~BinaryIStream();
 
-  /// Read a single character from the stream.
+  /// Read and return the next character in the stream.
+  int get();
+  /// Read a single character from the stream into the parameter.
+  /// @param c Location to write the next character in the stream.
   BinaryIStream& get( char& c );
   /// Read a block of n characters from the stream.
   BinaryIStream& read( char* const p, size_t n );

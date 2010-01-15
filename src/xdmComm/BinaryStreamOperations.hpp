@@ -33,10 +33,30 @@
 #include <xdm/HyperslabDataSelection.hpp>
 #include <xdm/PrimitiveType.hpp>
 #include <xdm/StructuredArray.hpp>
+#include <xdm/XmlObject.hpp>
+
+#include <string>
+#include <utility>
 
 #include <xdmComm/NamespaceMacro.hpp>
 
 XDM_COMM_NAMESPACE_BEGIN
+
+BinaryIStream& operator>>( BinaryIStream& istr, std::string& v );
+BinaryOStream& operator<<( BinaryOStream& ostr, const std::string& v );
+
+template< typename T, typename U >
+BinaryIStream& operator>>( BinaryIStream& istr, std::pair< T, U >& v ) {
+  istr >> v.first;
+  istr >> v.second;
+  return istr;
+}
+template< typename T, typename U >
+BinaryOStream& operator<<( BinaryOStream& ostr, const std::pair< T, U >& v ) {
+  ostr << v.first;
+  ostr << v.second;
+  return ostr;
+}
 
 BinaryIStream& operator>>( BinaryIStream& istr, xdm::AllDataSelection& v );
 BinaryOStream& operator<<( BinaryOStream& ostr, const xdm::AllDataSelection& v );
@@ -60,6 +80,9 @@ BinaryOStream& operator<<( BinaryOStream& ostr, const xdm::primitiveType::Value&
 /// enough space allocated to hold the data.
 BinaryIStream& operator>>( BinaryIStream& istr, xdmComm::ReceiveBufferArray& v );
 BinaryOStream& operator<<( BinaryOStream& ostr, const xdm::StructuredArray& v );
+
+BinaryIStream& operator>>( BinaryIStream& istr, xdm::XmlObject& v );
+BinaryOStream& operator<<( BinaryOStream& ostr, const xdm::XmlObject& v );
 
 XDM_COMM_NAMESPACE_END
 
