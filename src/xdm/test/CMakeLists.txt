@@ -33,6 +33,7 @@ xdm_test_serial( CollectMetadataOperation CollectMetadataOperation.cpp )
 xdm_test_serial( RefPtr RefPtr.cpp )
 xdm_test_serial( ObjectCompositionMixin ObjectCompositionMixin.cpp )
 xdm_test_serial( DataSelectionVisitor DataSelectionVisitor.cpp )
+xdm_test_serial( WritableData WritableData.cpp )
 
 # xdm_test_parallel( HdfDatasetMPI 4 HdfDatasetMPI.cpp )
 
