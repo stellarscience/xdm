@@ -97,6 +97,17 @@ xdm_integration_executable_parallel(
     FunctionData.parallel
     FunctionDataParallel.cpp
 )
+# run it with 2 processes
+xdm_integration_run_parallel_test( 
+    FunctionData.parallel.2
+    xdmIntegrationTest.FunctionData.parallel.test
+    2
+)
+# check the parallel and serial files are equal
+xdm_integration_test_hdf5_diff( 
+    FunctionData.serial.h5
+    FunctionData.parallel.2.h5 
+)
 # run it with 4 processes
 xdm_integration_run_parallel_test( 
     FunctionData.parallel.4
@@ -107,5 +118,16 @@ xdm_integration_run_parallel_test(
 xdm_integration_test_hdf5_diff( 
     FunctionData.serial.h5
     FunctionData.parallel.4.h5 
+)
+# run it with 8 processes
+xdm_integration_run_parallel_test( 
+    FunctionData.parallel.8
+    xdmIntegrationTest.FunctionData.parallel.test
+    8
+)
+# check the parallel and serial files are equal
+xdm_integration_test_hdf5_diff( 
+    FunctionData.serial.h5
+    FunctionData.parallel.8.h5 
 )
 
