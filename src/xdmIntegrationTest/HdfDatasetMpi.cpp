@@ -1,7 +1,5 @@
-#define BOOST_TEST_MODULE 
+#define BOOST_TEST_MODULE HdfDatasetMpi 
 #include <boost/test/unit_test.hpp>
-
-#include <xdmIntegrationTest/ParallelTestHelpers.hpp>
 
 #include <xdm/AllDataSelection.hpp>
 #include <xdm/DataSelectionMap.hpp>
@@ -13,6 +11,8 @@
 
 #include <xdmComm/MpiDatasetProxy.hpp>
 
+#include <xdmComm/test/MpiTestFixture.hpp>
+
 #include <xdmHdf/HdfDataset.hpp>
 
 #include <mpi.h>
@@ -22,11 +22,11 @@
 
 static const int kSize = 100;
 
-class HdfDatasetMpi : public MpiTest {};
+xdmComm::test::MpiTestFixture globalFixture;
 
 BOOST_AUTO_TEST_CASE( writeDataset1D ) {
   std::stringstream testCaseFile;
-  testCaseFile << "HdfDataMpi-" << processCount() << ".h5";
+  testCaseFile << "HdfDataMpi-" << globalFixture.processes() << ".h5";
   
   xdm::RefPtr< xdmHdf::HdfDataset > hdfDataset( new xdmHdf::HdfDataset );
   hdfDataset->setFile( testCaseFile.str() );
@@ -34,19 +34,19 @@ BOOST_AUTO_TEST_CASE( writeDataset1D ) {
 
   xdm::DataShape<> shape = xdm::makeShape( kSize );
 
-  int valuesPerProcess = kSize / processCount();
-  int remainder = kSize % processCount();
+  int valuesPerProcess = kSize / globalFixture.processes();
+  int remainder = kSize % globalFixture.processes();
 
   // divide up the remainder so that all spaces are filled by someone
   int localNumberOfValues = valuesPerProcess;
-  int localStart = rank() * valuesPerProcess;
-  if ( rank() < remainder ) {
+  int localStart = globalFixture.localRank() * valuesPerProcess;
+  if ( globalFixture.localRank() < remainder ) {
     // add one space to the current process realm
     localNumberOfValues += 1;
     // offset the start location according to the number of spaces added to the
     // processes before this one, in this case it is the rank since exactly one
     // space was added to all previous ranks
-    localStart += rank();
+    localStart += globalFixture.localRank();
   } else {
     // offset the start location by the number of spaces added to the processes
     // with lower rank than the local process, in this case, it is just the
@@ -82,11 +82,5 @@ BOOST_AUTO_TEST_CASE( writeDataset1D ) {
   dataset->initialize( xdm::primitiveType::kInt, shape );
   dataset->serialize( processArray, selectionMap );
   dataset->finalize();
-}
-
-int main( int argc, char* argv[] ) {
-  ::testing::AddGlobalTestEnvironment( new MpiEnvironment( &argc, &argv ) );
-  ::testing::InitGoogleTest( &argc, argv );
-  return RUN_ALL_TESTS();
 }
 

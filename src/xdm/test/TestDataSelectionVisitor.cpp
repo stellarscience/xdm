@@ -1,4 +1,4 @@
-#define BOOST_TEST_MODULE 
+#define BOOST_TEST_MODULE DataSelectionVisitor 
 #include <boost/test/unit_test.hpp>
 
 #include <xdm/DataSelectionVisitor.hpp>
@@ -13,24 +13,26 @@ using xdm::AllDataSelection;
 using xdm::HyperslabDataSelection;
 
 // To add a visitation test for a new DataSelection class, add a virtual method
-// that fails for your type to CheckVisitationBase below and add your type to
-// the ::testing::Types typedef below.
+// that fails for your type to CheckVisitationBase below and add a test case
+// that instantiates the checkVisitation function template with your type.
+
+char const * const kErrorMessage = "Data selection visit failed";
 
 // Visitor that fails on everything
 struct CheckVisitationBase : DataSelectionVisitor {
-  virtual void apply( const DataSelection& ) { FAIL(); }
-  virtual void apply( const AllDataSelection& ) { FAIL(); }
-  virtual void apply( const HyperslabDataSelection& ) { FAIL(); }
+  virtual void apply( const DataSelection& ) { BOOST_ERROR( kErrorMessage ); }
+  virtual void apply( const AllDataSelection& ) { BOOST_ERROR( kErrorMessage ); }
+  virtual void apply( const HyperslabDataSelection& ) { BOOST_ERROR( kErrorMessage ); }
 };
 
 // succeeds with T input, fails otherwise
 template< typename T >
 struct Succeed : CheckVisitationBase {
-  void apply( const T& ) { SUCCEED(); }
+  void apply( const T& ) {}
 };
 
 template< typename T >
-class CheckVisitation : public ::testing::Test {
+class CheckVisitation {
 public:
   T* t;
   Succeed< T > visitor;
@@ -38,20 +40,20 @@ public:
   ~CheckVisitation() { delete t; }
 };
 
-typedef ::testing::Types<
-  DataSelection,
-  AllDataSelection,
-  HyperslabDataSelection > SelectionTypes;
-TYPED_TEST_CASE( CheckVisitation, SelectionTypes );
-
-TYPED_TEST( CheckVisitation, success ) {
-  // remove specific type information for a real check
-  DataSelection* baseobj = this->t;
-  baseobj->accept( this->visitor );
+template< typename T > void checkVisitation() {
+  CheckVisitation< T > test;
+  test.t->accept( test.visitor );
 }
 
-int main( int argc, char* argv[] ) {
-  ::testing::InitGoogleTest( &argc, argv );
-  return RUN_ALL_TESTS();
+BOOST_AUTO_TEST_CASE( checkVisitationDataSelection ) {
+  checkVisitation< DataSelection >();
+}
+
+BOOST_AUTO_TEST_CASE( checkVisitationAllDataSelection ) {
+  checkVisitation< AllDataSelection >();
+}
+
+BOOST_AUTO_TEST_CASE( checkVisitationHyperslabDataSelection ) {
+  checkVisitation< HyperslabDataSelection >();
 }
 

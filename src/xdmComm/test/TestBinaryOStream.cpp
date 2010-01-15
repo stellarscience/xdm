@@ -1,4 +1,4 @@
-#define BOOST_TEST_MODULE 
+#define BOOST_TEST_MODULE BinaryOStream 
 #include <boost/test/unit_test.hpp>
 
 #include <xdmComm/BinaryOStream.hpp>
@@ -7,39 +7,35 @@
 
 // define a test parameterized on the types we care about.
 template< typename T >
-class BinaryOStreamTest : public ::testing::Test {
+class Fixture {
 public:
   T value;
   xdmComm::BinaryStreamBuffer mBuf;
   xdmComm::BinaryOStream mOstr;
-  BinaryOStreamTest() : value(), mBuf( 512 ), mOstr( &mBuf ) {}
+  Fixture() : value(), mBuf( 512 ), mOstr( &mBuf ) {}
 };
-TYPED_TEST_CASE_P( BinaryOStreamTest );
 
-TYPED_TEST_P( BinaryOStreamTest, writevalue ) {
-  this->mOstr << this->value;
+template< typename T > void readValue() {
+  Fixture< T > test;
+
+  test.mOstr << test.value;
   
-  TypeParam* result = reinterpret_cast< TypeParam* >( this->mBuf.pointer() );
-  BOOST_CHECK_EQUAL( this->value, *result );
+  T* result = reinterpret_cast< T* >( test.mBuf.pointer() );
+  BOOST_CHECK_EQUAL( test.value, *result );
 }
 
-REGISTER_TYPED_TEST_CASE_P( BinaryOStreamTest, writevalue );
+BOOST_AUTO_TEST_CASE( writeChar ) { readValue< char >(); }
+BOOST_AUTO_TEST_CASE( writeShort ) { readValue< short >(); }
+BOOST_AUTO_TEST_CASE( writeInt ) { readValue< int >(); }
+BOOST_AUTO_TEST_CASE( writeLong ) { readValue< long >(); }
 
-typedef ::testing::Types< 
-  short,
-  int,
-  long,
-  unsigned short,
-  unsigned int,
-  unsigned long,
-  float,
-  double,
-  long double,
-  bool > WriteTypes;
-INSTANTIATE_TYPED_TEST_CASE_P( Write, BinaryOStreamTest, WriteTypes );
+BOOST_AUTO_TEST_CASE( writeUShort ) { readValue< unsigned short >(); }
+BOOST_AUTO_TEST_CASE( writeUInt ) { readValue< unsigned int >(); }
+BOOST_AUTO_TEST_CASE( writeULong ) { readValue< unsigned long >(); }
 
-int main( int argc, char* argv[] ) {
-  ::testing::InitGoogleTest( &argc, argv );
-  return RUN_ALL_TESTS();
-}
+BOOST_AUTO_TEST_CASE( writeFloat ) { readValue< float >(); }
+BOOST_AUTO_TEST_CASE( writeDouble ) { readValue< double >(); }
+BOOST_AUTO_TEST_CASE( writeLongDouble ) { readValue< long double >(); }
+
+BOOST_AUTO_TEST_CASE( writeBool ) { readValue< bool >(); }
 

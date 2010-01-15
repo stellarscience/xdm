@@ -1,4 +1,4 @@
-#define BOOST_TEST_MODULE 
+#define BOOST_TEST_MODULE HyperSlabBlockIterator 
 #include <boost/test/unit_test.hpp>
 
 #include <xdm/HyperSlabBlockIterator.hpp>
@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE( iterate ) {
   BOOST_CHECK_EQUAL( 1, test->count(1) );
 
   ++test;
-  ASSERT_TRUE( test == xdm::HyperSlabBlockIterator<>() );
+  BOOST_CHECK( test == xdm::HyperSlabBlockIterator<>() );
 }
 
 BOOST_AUTO_TEST_CASE( iterateStride ) {
@@ -98,11 +98,6 @@ BOOST_AUTO_TEST_CASE( iterateStride ) {
   BOOST_CHECK_EQUAL( 1, test->count(1) );
 
   ++test;
-  ASSERT_TRUE( test == xdm::HyperSlabBlockIterator<>() );
-}
-
-int main( int argc, char* argv[] ) {
-  ::testing::InitGoogleTest( &argc, argv );
-  return RUN_ALL_TESTS();
+  BOOST_CHECK( test == xdm::HyperSlabBlockIterator<>() );
 }
 

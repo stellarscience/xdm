@@ -11,7 +11,7 @@ macro( xdmComm_test_parallel test_name num_procs )
     find_package( MPI )
     if( MPI_FOUND AND MPIEXEC )
         include_directories( 
-          ${Boost_LIBRARIES}
+          ${Boost_INCLUDE_DIRS}
           ${MPI_INCLUDE_PATH} )
         add_executable( xdmComm.${test_name}.test ${ARGN} )
         target_link_libraries( xdmComm.${test_name}.test

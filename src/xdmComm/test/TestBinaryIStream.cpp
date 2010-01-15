@@ -1,4 +1,4 @@
-#define BOOST_TEST_MODULE 
+#define BOOST_TEST_MODULE BinaryIStream 
 #include <boost/test/unit_test.hpp>
 
 #include <xdmComm/BinaryIStream.hpp>
@@ -7,45 +7,40 @@
 
 // define a test parameterized on the types we care about.
 template< typename T >
-class BinaryIStreamTest : public ::testing::Test {
+class Fixture {
 public:
   T value;
   xdmComm::BinaryStreamBuffer mBuf;
   xdmComm::BinaryIStream mIStr;
-  BinaryIStreamTest() : value(), mBuf( 512 ), mIStr( &mBuf ) {
+  Fixture() : value(), mBuf( 512 ), mIStr( &mBuf ) {
     mBuf.sputn( reinterpret_cast< char* >(&value), sizeof(T) );
     mBuf.pubsync();
   }
 };
-TYPED_TEST_CASE_P( BinaryIStreamTest );
 
-TYPED_TEST_P( BinaryIStreamTest, writevalue ) {
-  TypeParam result;
+template< typename T > void writeValue() {
+  Fixture< T > test;
+
+  T result;
   // make sure result isn't the default object
   result = !result;
 
-  this->mIStr >> result;
-  BOOST_CHECK_EQUAL( this->value, result );
+  test.mIStr >> result;
+  BOOST_CHECK_EQUAL( test.value, result );
 }
 
-REGISTER_TYPED_TEST_CASE_P( BinaryIStreamTest, writevalue );
+BOOST_AUTO_TEST_CASE( writeChar ) { writeValue< char >(); }
+BOOST_AUTO_TEST_CASE( writeShort ) { writeValue< short >(); }
+BOOST_AUTO_TEST_CASE( writeInt ) { writeValue< int >(); }
+BOOST_AUTO_TEST_CASE( writeLong ) { writeValue< long >(); }
 
-typedef ::testing::Types< 
-  char,
-  short,
-  int,
-  long,
-  unsigned short,
-  unsigned int,
-  unsigned long,
-  float,
-  double,
-  long double,
-  bool > WriteTypes;
-INSTANTIATE_TYPED_TEST_CASE_P( Read, BinaryIStreamTest, WriteTypes );
+BOOST_AUTO_TEST_CASE( writeUShort ) { writeValue< unsigned short >(); }
+BOOST_AUTO_TEST_CASE( writeUInt ) { writeValue< unsigned int >(); }
+BOOST_AUTO_TEST_CASE( writeULong ) { writeValue< unsigned long >(); }
 
-int main( int argc, char* argv[] ) {
-  ::testing::InitGoogleTest( &argc, argv );
-  return RUN_ALL_TESTS();
-}
+BOOST_AUTO_TEST_CASE( writeFloat ) { writeValue< float >(); }
+BOOST_AUTO_TEST_CASE( writeDouble ) { writeValue< double >(); }
+BOOST_AUTO_TEST_CASE( writeLongDouble ) { writeValue< long double >(); }
+
+BOOST_AUTO_TEST_CASE( writeBool ) { writeValue< bool >(); }
 

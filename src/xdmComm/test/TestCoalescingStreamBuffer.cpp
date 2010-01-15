@@ -1,67 +1,67 @@
-#define BOOST_TEST_MODULE 
+#define BOOST_TEST_MODULE CoalescingStreamBuffer
 #include <boost/test/unit_test.hpp>
+#include <boost/test/results_reporter.hpp>
+#include <boost/test/unit_test_log.hpp>
 
 #include <xdmComm/CoalescingStreamBuffer.hpp>
+
+#include <xdmComm/test/MpiTestFixture.hpp>
 
 #include <mpi.h>
 
 #include <iostream>
+#include <sstream>
 
-struct CoalescingStreamBuffer : public ::testing::Test {
+xdmComm::test::MpiTestFixture globalFixture;
+
+struct Fixture {
   xdmComm::CoalescingStreamBuffer buffer;
-  int localRank;
-  int processes;
   char * result;
 
-  CoalescingStreamBuffer() : 
+  Fixture() : 
     buffer( 512, MPI_COMM_WORLD ),
-    localRank(),
-    processes(0),
-    result(0) {
-    MPI_Comm_size( MPI_COMM_WORLD, &processes );
-    MPI_Comm_rank( MPI_COMM_WORLD, &localRank );
-    result = new char[processes];
+    result(0) 
+  {
+    result = new char[globalFixture.processes()];
   }
 
-  ~CoalescingStreamBuffer() {
+  ~Fixture() {
     delete [] result;
   }
 
 };
 
-BOOST_AUTO_TEST_CASE( sync ) {
-  char message = localRank;
-  buffer.sputc( message );
+BOOST_AUTO_TEST_CASE( synchronize ) {
+  Fixture test;
 
-  if ( localRank != 0 ) {
+  char message = globalFixture.localRank();
+  test.buffer.sputc( message );
+
+  if ( globalFixture.localRank() != 0 ) {
     
-    buffer.pubsync();
+    // ranks != 0 send a single character with their rank
+    test.buffer.pubsync();
   
   } else {
     
-    result[0] = message;
+    // write rank 0 to the first location of the result buffer
+    test.result[0] = message;
 
+    // receive a single number from all other processes and write them in order
+    // of rank to the result buffer.
     int received = 1;
-    while( received < processes ) {
-      buffer.pubsync();
-      char recvMessage = buffer.sgetc();
+    while( received < globalFixture.processes() ) {
+      test.buffer.pubsync();
+      char recvMessage = test.buffer.sgetc();
       // order the messages by rank.
-      result[recvMessage] = recvMessage;
+      test.result[recvMessage] = recvMessage;
       received++;
     }
 
-    for ( char i = 0; i < processes; i++ ) {
-      BOOST_CHECK_EQUAL( i, result[i] );
+    for ( char i = 0; i < globalFixture.processes(); i++ ) {
+      BOOST_CHECK_EQUAL( i, test.result[i] );
     }
 
   }
-}
-
-int main( int argc, char* argv[] ) {
-  ::testing::InitGoogleTest( &argc, argv );
-  MPI_Init( &argc, &argv );
-  int ret = RUN_ALL_TESTS();
-  MPI_Finalize();
-  return ret;
 }
 

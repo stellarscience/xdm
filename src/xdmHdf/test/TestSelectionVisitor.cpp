@@ -1,4 +1,4 @@
-#define BOOST_TEST_MODULE 
+#define BOOST_TEST_MODULE TestSelectionVisitor 
 #include <boost/test/unit_test.hpp>
 
 #include <xdmHdf/SelectionVisitor.hpp>
@@ -11,14 +11,14 @@
 
 #include <vector>
 
-struct SelectionVisitor : ::testing::Test {
+struct Fixture {
   hid_t dataspace;
-  SelectionVisitor() {
+  Fixture() {
     hsize_t rank = 2;
     hsize_t dims[] = {2, 2};
     dataspace = H5Screate_simple( rank, dims, NULL );
   }
-  ~SelectionVisitor() {
+  ~Fixture() {
     H5Sclose( dataspace );
   }
 };
@@ -52,6 +52,8 @@ BOOST_AUTO_TEST_CASE( applyCoordinateSelection ) {
 */
 
 BOOST_AUTO_TEST_CASE( applyHyperslabSelection ) {
+  Fixture test;
+
   xdm::DataShape<> shape( 2 );
   shape[0] = 2;
   shape[1] = 2;
@@ -64,16 +66,16 @@ BOOST_AUTO_TEST_CASE( applyHyperslabSelection ) {
   slab.setCount( 1, 1 );
 
   xdm::HyperslabDataSelection selection( slab );
-  xdmHdf::SelectionVisitor visitor( dataspace );
+  xdmHdf::SelectionVisitor visitor( test.dataspace );
   selection.accept( visitor );
 
-  BOOST_CHECK_EQUAL( H5S_SEL_HYPERSLABS, H5Sget_select_type( dataspace ) );
+  BOOST_CHECK_EQUAL( H5S_SEL_HYPERSLABS, H5Sget_select_type( test.dataspace ) );
 
-  hssize_t numblocks = H5Sget_select_hyper_nblocks( dataspace );
+  hssize_t numblocks = H5Sget_select_hyper_nblocks( test.dataspace );
   BOOST_CHECK_EQUAL( 1, numblocks );
 
   hsize_t result[2][2];
-  H5Sget_select_hyper_blocklist( dataspace, 0, 1, 
+  H5Sget_select_hyper_blocklist( test.dataspace, 0, 1, 
     reinterpret_cast< hsize_t* >( result ) );
 
   hsize_t answer[2][2];
@@ -85,10 +87,5 @@ BOOST_AUTO_TEST_CASE( applyHyperslabSelection ) {
   BOOST_CHECK_EQUAL( answer[0][1], result[0][1] );
   BOOST_CHECK_EQUAL( answer[1][0], result[1][0] );
   BOOST_CHECK_EQUAL( answer[1][1], result[1][1] );
-}
-
-int main( int argc, char* argv[] ) {
-  ::testing::InitGoogleTest( &argc, argv );
-  return RUN_ALL_TESTS();
 }
 

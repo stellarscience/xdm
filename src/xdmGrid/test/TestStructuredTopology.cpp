@@ -1,4 +1,4 @@
-#define BOOST_TEST_MODULE 
+#define BOOST_TEST_MODULE StructuredTopology 
 #include <boost/test/unit_test.hpp>
 
 #include <xdmGrid/StructuredTopology.hpp>
@@ -17,10 +17,5 @@ BOOST_AUTO_TEST_CASE( writeMetadata ) {
 
   BOOST_CHECK_EQUAL( "Topology", xml.tag() );
   BOOST_CHECK_EQUAL( "1 2 3", xml.attribute( "Dimensions" ) );
-}
-
-int main( int argc, char* argv[] ) {
-  ::testing::InitGoogleTest( &argc, argv );
-  return RUN_ALL_TESTS();
 }
 

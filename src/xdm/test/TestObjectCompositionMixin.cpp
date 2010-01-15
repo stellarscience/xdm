@@ -1,4 +1,4 @@
-#define BOOST_TEST_MODULE 
+#define BOOST_TEST_MODULE ObjectCompositionMixin 
 #include <boost/test/unit_test.hpp>
 
 #include <xdm/ObjectCompositionMixin.hpp>
@@ -15,11 +15,11 @@ class TestHarness :
   public ObjectCompositionMixin< B >
 {};
 
-class ObjectCompositionMixinTest : public ::testing::Test {
+class ObjectCompositionMixinTest {
 public:
 	TestHarness t;
-	A* a;
-	B* b;
+	RefPtr< A > a;
+	RefPtr< B > b;
 	ObjectCompositionMixinTest() :
 		t(),
 		a( new A ),
@@ -30,19 +30,19 @@ public:
 };
 
 BOOST_AUTO_TEST_CASE( begin ) {
-	ObjectCompositionMixin< A >::Iterator it = xdm::begin< A >( t );
-	BOOST_CHECK_EQUAL( a, *it );
-	ObjectCompositionMixin< B >::Iterator bit = xdm::begin< B >( t );
-	BOOST_CHECK_EQUAL( b, *bit );
+  ObjectCompositionMixinTest test;
+	
+  ObjectCompositionMixin< A >::Iterator it = xdm::begin< A >( test.t );
+	BOOST_CHECK_EQUAL( test.a, *it );
+	
+  ObjectCompositionMixin< B >::Iterator bit = xdm::begin< B >( test.t );
+	BOOST_CHECK_EQUAL( test.b, *bit );
 }
 
 BOOST_AUTO_TEST_CASE( child ) {
-	BOOST_CHECK_EQUAL( a, xdm::child< A >( t, 0 ) );
-	BOOST_CHECK_EQUAL( b, xdm::child< B >( t, 0 ) );
-}
+  ObjectCompositionMixinTest test;
 
-int main( int argc, char* argv[] ) {
-  ::testing::InitGoogleTest( &argc, argv );
-  return RUN_ALL_TESTS();
+	BOOST_CHECK_EQUAL( test.a, xdm::child< A >( test.t, 0 ) );
+	BOOST_CHECK_EQUAL( test.b, xdm::child< B >( test.t, 0 ) );
 }
 

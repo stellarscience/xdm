@@ -1,4 +1,4 @@
-#define BOOST_TEST_MODULE 
+#define BOOST_TEST_MODULE BinaryIOStream 
 #include <boost/test/unit_test.hpp>
 
 #include <xdmComm/BinaryIOStream.hpp>
@@ -7,47 +7,42 @@
 
 // define a test parameterized on the types we care about.
 template< typename T >
-class BinaryIOStreamTest : public ::testing::Test {
+class Fixture {
 public:
   xdmComm::BinaryStreamBuffer mBuf;
   xdmComm::BinaryIOStream mIOStr;
-  BinaryIOStreamTest() : mBuf( 512 ), mIOStr( &mBuf ) {
+  Fixture() : mBuf( 512 ), mIOStr( &mBuf ) {
   }
 };
-TYPED_TEST_CASE_P( BinaryIOStreamTest );
 
-TYPED_TEST_P( BinaryIOStreamTest, writereadvalue ) {
-  TypeParam answer = TypeParam();
+template< typename T > void writeReadTest() {
+  Fixture< T > test;
+  
+  T answer = T();
 
-  this->mIOStr << answer;
+  test.mIOStr << answer;
 
-  this->mIOStr.flush();
+  test.mIOStr.flush();
 
-  TypeParam result = TypeParam();
-  result = !result;
-  this->mIOStr >> result;
+  T result = T();
+  result = !result; // ensure result is not default value for a good test
+  test.mIOStr >> result;
 
   BOOST_CHECK_EQUAL( answer, result );
 }
 
-REGISTER_TYPED_TEST_CASE_P( BinaryIOStreamTest, writereadvalue );
+BOOST_AUTO_TEST_CASE( writeReadChar ) { writeReadTest< char >(); }
+BOOST_AUTO_TEST_CASE( writeReadShort ) { writeReadTest< short >(); }
+BOOST_AUTO_TEST_CASE( writeReadInt ) { writeReadTest< int >(); }
+BOOST_AUTO_TEST_CASE( writeReadLong ) { writeReadTest< long >(); }
 
-typedef ::testing::Types< 
-  char,
-  short,
-  int,
-  long,
-  unsigned short,
-  unsigned int,
-  unsigned long,
-  float,
-  double,
-  long double,
-  bool > ReadWriteTypes;
-INSTANTIATE_TYPED_TEST_CASE_P( ReadWrite, BinaryIOStreamTest, ReadWriteTypes );
+BOOST_AUTO_TEST_CASE( writeReadUShort ) { writeReadTest< unsigned short >(); }
+BOOST_AUTO_TEST_CASE( writeReadUInt ) { writeReadTest< unsigned int >(); }
+BOOST_AUTO_TEST_CASE( writeReadULong ) { writeReadTest< unsigned long >(); }
 
-int main( int argc, char* argv[] ) {
-  ::testing::InitGoogleTest( &argc, argv );
-  return RUN_ALL_TESTS();
-}
+BOOST_AUTO_TEST_CASE( writeReadFloat ) { writeReadTest< float >(); }
+BOOST_AUTO_TEST_CASE( writeReadDouble ) { writeReadTest< double >(); }
+BOOST_AUTO_TEST_CASE( writeReadLongDouble ) { writeReadTest< long double >(); }
+
+BOOST_AUTO_TEST_CASE( writeReadBool ) { writeReadTest< bool >(); }
 

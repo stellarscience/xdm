@@ -1,4 +1,4 @@
-#define BOOST_TEST_MODULE 
+#define BOOST_TEST_MODULE XmlOutputStream 
 #include <boost/test/unit_test.hpp>
 
 #include <xdm/XmlObject.hpp>
@@ -83,10 +83,5 @@ BOOST_AUTO_TEST_CASE( closeStream ) {
   test.openContext( obj );
   test.openContext( chi );
   test.closeStream();
-}
-
-int main( int argc, char* argv[] ) {
-  ::testing::InitGoogleTest( &argc, argv );
-  return RUN_ALL_TESTS();
 }
 

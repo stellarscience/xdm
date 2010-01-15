@@ -1,12 +1,12 @@
-#define BOOST_TEST_MODULE 
+#define BOOST_TEST_MODULE FunctionDataParallel 
 #include <boost/test/unit_test.hpp>
-
-#include <xdmIntegrationTest/ParallelTestHelpers.hpp>
 
 #include <xdm/HyperSlab.hpp>
 #include <xdm/UniformDataItem.hpp>
 
 #include <xdmComm/ParallelizeTreeVisitor.hpp>
+
+#include <xdmComm/test/MpiTestFixture.hpp>
 
 #include <xdmFormat/TemporalCollection.hpp>
 
@@ -20,11 +20,11 @@
 #include <algorithm>
 #include <sstream>
 
-class FunctionDataParallel : public MpiTest {};
+xdmComm::test::MpiTestFixture globalFixture;
 
 BOOST_AUTO_TEST_CASE( writeResult ) {
   std::stringstream baseName;
-  baseName << "FunctionData.parallel." << processCount();
+  baseName << "FunctionData.parallel." << globalFixture.processes();
   
   // get the information for the global problem grid
   GridBounds problemBounds = testCaseBounds();
@@ -37,15 +37,15 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
 
   // To compute the hyperslab of interest for this process, we'll partition the
   // grid along the x axis and assign roughly equal volumes to everyone.
-  int planesPerProcess = problemBounds.size(0) / processCount();
-  int remainingPlanes = problemBounds.size(0) % processCount();
+  int planesPerProcess = problemBounds.size(0) / globalFixture.processes();
+  int remainingPlanes = problemBounds.size(0) % globalFixture.processes();
   
   // distribute the remaining number of planes among the first few processes
   int localNumberOfPlanes = planesPerProcess;
-  int localStartingPlane = rank() * planesPerProcess;
-  if ( rank() < remainingPlanes ) {
+  int localStartingPlane = globalFixture.localRank() * planesPerProcess;
+  if ( globalFixture.localRank() < remainingPlanes ) {
     localNumberOfPlanes += 1;
-    localStartingPlane += rank();
+    localStartingPlane += globalFixture.localRank();
   } else {
     localStartingPlane += remainingPlanes;
   }
@@ -75,11 +75,5 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
   timeSeries->open();
   xdmFormat::writeTimestepGrid( timeSeries, grid );
   timeSeries->close();
-}
-
-int main( int argc, char* argv[] ) {
-  ::testing::AddGlobalTestEnvironment( new MpiEnvironment( &argc, &argv ) );
-  ::testing::InitGoogleTest( &argc, argv );
-  return RUN_ALL_TESTS();
 }
 

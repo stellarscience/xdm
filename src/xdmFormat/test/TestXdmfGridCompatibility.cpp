@@ -1,7 +1,7 @@
 //-----------------------------------------------------------------------------
 // These are tests to verify format compatibility with ParaView's XDMF Library
 //-----------------------------------------------------------------------------
-#define BOOST_TEST_MODULE 
+#define BOOST_TEST_MODULE XdmfGridCompatibility 
 #include <boost/test/unit_test.hpp>
 
 #include <xdm/CollectMetadataOperation.hpp>
@@ -138,11 +138,11 @@ BOOST_AUTO_TEST_CASE( timeSeries ) {
   // write this as both a temporal collection and as a virtual dataset
   xdm::RefPtr< xdmFormat::TimeSeries > temporalCollection (
     new xdmFormat::TemporalCollection(
-      "XdmfGridCompatibility.temporalCollection" ) );
+      "XdmfGridCompatibility.temporalCollection.xmf" ) );
   temporalCollection->open();
 
   xdm::RefPtr< xdmFormat::TimeSeries > virtualDataset(
-    new xdmFormat::VirtualDataset( "XdmfGridCompatibility.virtualDataset" ) );
+    new xdmFormat::VirtualDataset( "XdmfGridCompatibility.virtualDataset.xmf" ) );
   virtualDataset->open();
 
   // since the geometry and topology of the grid will remain constant throughout
@@ -214,10 +214,5 @@ BOOST_AUTO_TEST_CASE( timeSeries ) {
   }
   temporalCollection->close();
   virtualDataset->close();
-}
-
-int main( int argc, char* argv[] ) {
-  ::testing::InitGoogleTest( &argc, argv );
-  return RUN_ALL_TESTS();
 }
 

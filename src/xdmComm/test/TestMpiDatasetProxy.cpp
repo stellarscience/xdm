@@ -1,7 +1,9 @@
-#define BOOST_TEST_MODULE 
+#define BOOST_TEST_MODULE MpiDatasetProxy 
 #include <boost/test/unit_test.hpp>
 
 #include <xdmComm/MpiDatasetProxy.hpp>
+
+#include <xdmComm/test/MpiTestFixture.hpp>
 
 #include <xdm/AllDataSelection.hpp>
 #include <xdm/DataSelectionVisitor.hpp>
@@ -14,6 +16,8 @@
 #include <vector>
 
 #include <cassert>
+
+xdmComm::test::MpiTestFixture globalFixture;
 
 class TestSelectionVisitor : public xdm::DataSelectionVisitor {
 public:
@@ -142,13 +146,5 @@ BOOST_AUTO_TEST_CASE( coalesce ) {
     // the dataset's array should have nothing in it
     BOOST_CHECK_EQUAL( 0, testDataset->mValues.size() );
   }
-}
-
-int main( int argc, char* argv[] ) {
-  ::testing::InitGoogleTest( &argc, argv );
-  MPI_Init( &argc, &argv );
-  int ret = RUN_ALL_TESTS();
-  MPI_Finalize();
-  return ret;
 }
 

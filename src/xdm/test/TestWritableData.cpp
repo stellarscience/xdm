@@ -1,4 +1,4 @@
-#define BOOST_TEST_MODULE 
+#define BOOST_TEST_MODULE WritableData 
 #include <boost/test/unit_test.hpp>
 
 #include <xdm/Dataset.hpp>
@@ -33,52 +33,51 @@ public:
   }
 };
 
-class WritableData : public ::testing::Test {
+class Fixture {
 public:
   xdm::RefPtr< DatasetTestImplementation > testDataset;
   xdm::RefPtr< WritableDataTestImplementation > testWritable;
-  WritableData() :
+  Fixture() :
     testDataset( new DatasetTestImplementation ),
     testWritable( new WritableDataTestImplementation ) {}
-  ~WritableData() {}
+  ~Fixture() {}
 };
 
 BOOST_AUTO_TEST_CASE( dynamicWrite ) {
-  testWritable->setIsDynamic(true);
+  Fixture test;
+
+  test.testWritable->setIsDynamic(true);
   
-  ASSERT_FALSE( testDataset->dataWritten );
+  BOOST_CHECK( !test.testDataset->dataWritten );
 
-  testWritable->write( testDataset.get() );
-  ASSERT_TRUE( testDataset->dataWritten );
+  test.testWritable->write( test.testDataset.get() );
+  BOOST_CHECK( test.testDataset->dataWritten );
 
-  testDataset->dataWritten = false;
-  testWritable->write( testDataset.get() );
-  ASSERT_TRUE( testDataset->dataWritten );
+  test.testDataset->dataWritten = false;
+  test.testWritable->write( test.testDataset.get() );
+  BOOST_CHECK( test.testDataset->dataWritten );
 }
 
 BOOST_AUTO_TEST_CASE( staticWrite ) {
-  testWritable->setIsDynamic( false );
+  Fixture test;
 
-  ASSERT_FALSE( testDataset->dataWritten );
+  test.testWritable->setIsDynamic( false );
+
+  BOOST_CHECK( !test.testDataset->dataWritten );
 
   // should write the first time
-  testWritable->write( testDataset.get() );
-  ASSERT_TRUE( testDataset->dataWritten );
+  test.testWritable->write( test.testDataset.get() );
+  BOOST_CHECK( test.testDataset->dataWritten );
 
   // should not write the second time
-  testDataset->dataWritten = false;
-  testWritable->write( testDataset.get() );
-  ASSERT_FALSE( testDataset->dataWritten );
+  test.testDataset->dataWritten = false;
+  test.testWritable->write( test.testDataset.get() );
+  BOOST_CHECK( !test.testDataset->dataWritten );
 
   // should write when needs update is set
-  testWritable->setNeedsUpdate(true);
-  testDataset->dataWritten = false;
-  testWritable->write( testDataset.get() );
-  ASSERT_TRUE( testDataset->dataWritten );
-}
-
-int main( int argc, char* argv[] ) {
-  ::testing::InitGoogleTest( &argc, argv );
-  return RUN_ALL_TESTS();
+  test.testWritable->setNeedsUpdate(true);
+  test.testDataset->dataWritten = false;
+  test.testWritable->write( test.testDataset.get() );
+  BOOST_CHECK( test.testDataset->dataWritten );
 }
 

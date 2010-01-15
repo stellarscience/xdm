@@ -1,4 +1,4 @@
-#define BOOST_TEST_MODULE 
+#define BOOST_TEST_MODULE UniformDataItem 
 #include <boost/test/unit_test.hpp>
 
 #include <xdm/TemplateStructuredArray.hpp>
@@ -23,12 +23,12 @@ class DummyDataset : public xdm::Dataset {
 };
 
 // Fixture defines a common UniformDataItem for testing.
-class UniformDataItem : public ::testing::Test {
+class Fixture {
 public:
   float data[4];
   xdm::RefPtr< xdm::UniformDataItem > testItem;
 
-  UniformDataItem() :
+  Fixture() :
     data(),
     testItem() {
     std::fill( data, data + 4, 0.0 );
@@ -51,9 +51,11 @@ public:
 
 
 BOOST_AUTO_TEST_CASE( writeMetadata ) {
+  Fixture test;
+  
   xdm::RefPtr< xdm::XmlObject > obj( new xdm::XmlObject );
   xdm::XmlMetadataWrapper xml( obj );
-  testItem->writeMetadata( xml );
+  test.testItem->writeMetadata( xml );
 
   BOOST_CHECK_EQUAL( xml.tag(), "DataItem" );
   BOOST_CHECK_EQUAL( xml.attribute( "ItemType" ), "Uniform" );
@@ -62,10 +64,5 @@ BOOST_AUTO_TEST_CASE( writeMetadata ) {
   BOOST_CHECK_EQUAL( xml.attribute( "Precision" ), "4" );
   BOOST_CHECK_EQUAL( xml.attribute( "Format" ), "Dummy" );
   BOOST_CHECK_EQUAL( "DummyDatasetInitializationContent", xml.contentLine( 0 ) );
-}
-
-int main( int argc, char* argv[] ) {
-  ::testing::InitGoogleTest( &argc, argv );
-  return RUN_ALL_TESTS();
 }
 

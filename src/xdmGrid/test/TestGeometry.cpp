@@ -1,4 +1,4 @@
-#define BOOST_TEST_MODULE 
+#define BOOST_TEST_MODULE Geometry 
 #include <boost/test/unit_test.hpp>
 
 #include <xdmGrid/Geometry.hpp>
@@ -10,10 +10,5 @@ BOOST_AUTO_TEST_CASE( writeMetadata ) {
   g.writeMetadata( xml );
 
   BOOST_CHECK_EQUAL( "Geometry", xml.tag() );
-}
-
-int main( int argc, char* argv[] ) {
-  ::testing::InitGoogleTest( &argc, argv );
-  return RUN_ALL_TESTS();
 }
 
