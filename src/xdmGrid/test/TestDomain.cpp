@@ -1,7 +1,3 @@
-//=============================================================================
-// This software developed by Stellar Science Ltd Co and the U.S. Government.
-// Copyright (C) 2009 Stellar Science. Government-purpose rights granted.
-//-----------------------------------------------------------------------------
 #define BOOST_TEST_MODULE Domain 
 #include <boost/test/unit_test.hpp>
 
