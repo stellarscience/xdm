@@ -1,3 +1,0 @@
-
-#include <xdm/Grid.hpp>
-

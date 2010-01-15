@@ -5,16 +5,14 @@ find_package( HDF5 )
 set( ${PROJECT_NAME}_HEADERS 
     Array.hpp
     Dataset.hpp
-	Grid.hpp
 	NamespaceMacro.hpp
     ReferencedObject.hpp
     RefPtr.hpp
-    Slab.hpp
+    HyperSlab.hpp
 )
 set( ${PROJECT_NAME}_SOURCES 
     Array.cpp
     Dataset.cpp
-	Grid.cpp
     ReferencedObject.cpp
 )
 
