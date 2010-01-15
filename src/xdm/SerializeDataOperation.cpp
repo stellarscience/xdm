@@ -14,7 +14,7 @@ void SerializeDataOperation::apply( UniformDataItem& udi ) {
   Dataset* dataset = udi.dataset();
   StructuredArray* array = udi.array();
   dataset->initialize( array->dataType(), udi.dataspace() );
-  dataset->serialize( array );
+  dataset->serialize( array, udi.selectionMap() );
   dataset->finalize();
 }
 

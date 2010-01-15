@@ -184,7 +184,8 @@ void HdfDataset::initializeImplementation(
 }
 
 void HdfDataset::serializeImplementation(
-  const xdm::StructuredArray* data ) {
+  const xdm::StructuredArray* data,
+  const xdm::DataSelectionMap& selectionMap ) {
 
   // create the memory space to match the shape of the array
   // convert between types for size representation
@@ -195,9 +196,9 @@ void HdfDataset::serializeImplementation(
     NULL );
 
   SelectionVisitor memspaceSelector( memory_space );
-  data->selection()->accept( memspaceSelector );
+  selectionMap.domain()->accept( memspaceSelector );
   SelectionVisitor filespaceSelector( imp->filespace_identifier );
-  selection()->accept( filespaceSelector );
+  selectionMap.range()->accept( filespaceSelector );
 
   hssize_t datasetNumpoints = H5Sget_select_npoints( imp->filespace_identifier );
   hssize_t arrayNumpoints = H5Sget_select_npoints( memory_space );

@@ -20,7 +20,7 @@
 #include <xdmGrid/RectilinearMesh.hpp>
 #include <xdmGrid/Time.hpp>
 
-#include <xdmHdf/HdfDataset.hpp>
+#include <xdmHdf/AttachHdfDatasetOperation.hpp>
 
 #include <algorithm>
 #include <fstream>
@@ -82,20 +82,12 @@ TEST( XdmfGridCompatibility, staticGrid ) {
   xdm::RefPtr< xdm::StructuredArray > array 
     = xdm::createStructuredArray( &vertices[0], arrayShape );
 
-  // dataset on disk
-  xdm::RefPtr< xdmHdf::HdfDataset > dataset( new xdmHdf::HdfDataset );
-  dataset->setFile( "XdmfGridCompatibility.h5" );
-  dataset->setDataset( "staticGrid" );
-  xdm::DataShape<> fileShape(1);
-  fileShape[0] = 10;
-
   // the data item to map the array in memory to the file
   // since the coordinates are the same in x, y, and z we will share the
   // dataitem.
   xdm::RefPtr< xdm::UniformDataItem > sharedData( 
-    new xdm::UniformDataItem( fileShape ) );
+    new xdm::UniformDataItem( xdm::makeShape( 10 ) ) );
   sharedData->setArray( array );
-  sharedData->setDataset( dataset );
   for ( int i = 0; i < 3; ++i ) {
     geometry->setCoordinateValues( i, sharedData.get() );
   }
@@ -112,14 +104,15 @@ TEST( XdmfGridCompatibility, staticGrid ) {
   std::vector< float > data = createAttributeData( 10, 10, 10 );
   xdm::RefPtr< xdm::UniformDataItem > attributeDataItem(
     new xdm::UniformDataItem( xdm::makeShape( "10 10 10" ) ) );
-  xdm::RefPtr< xdmHdf::HdfDataset > attrds( new xdmHdf::HdfDataset );
-  attrds->setFile( "attribute.h5" );
-  attrds->setDataset( "values" );
   xdm::RefPtr< xdm::StructuredArray > attrvalues 
     = xdm::createStructuredArray( &data[0], xdm::makeShape( "1000" ) );
   attributeDataItem->setArray( attrvalues );
-  attributeDataItem->setDataset( attrds );
   attribute->appendChild( attributeDataItem );
+
+  // attach an HDF dataset to all UniformDataItems
+  xdmHdf::AttachHdfDatasetOperation attachHdfDataset( 
+    "XdmfCompatibility.staticGrid.h5", "data" );
+  domain->accept( attachHdfDataset );
 
   // write the tree's data to disk
   xdm::SerializeDataOperation serializer;

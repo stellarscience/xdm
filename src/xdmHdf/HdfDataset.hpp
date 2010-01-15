@@ -47,7 +47,8 @@ public:
     xdm::primitiveType::Value type,
     const xdm::DataShape<>& shape );
   virtual void serializeImplementation( 
-    const xdm::StructuredArray* data );
+    const xdm::StructuredArray* data,
+    const xdm::DataSelectionMap& selectionMap );
   virtual void finalizeImplementation();
 
 private:

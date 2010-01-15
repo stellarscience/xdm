@@ -7,6 +7,7 @@ set( ${PROJECT_NAME}_HEADERS
     CoordinateDataSelection.hpp
     DataItem.hpp
     DataSelection.hpp
+    DataSelectionMap.hpp
     DataSelectionVisitor.hpp
     Dataset.hpp
     DataShape.hpp
@@ -33,6 +34,7 @@ set( ${PROJECT_NAME}_SOURCES
     CoordinateDataSelection.cpp
     DataItem.cpp
     DataSelection.cpp
+    DataSelectionMap.cpp
     DataSelectionVisitor.cpp
     Dataset.cpp
     DataShape.cpp

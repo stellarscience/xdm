@@ -1,5 +1,7 @@
 #include <xdm/UniformDataItem.hpp>
 
+#include <xdm/DataSelection.hpp>
+
 #include <sstream>
 #include <stdexcept>
 
@@ -10,7 +12,8 @@ XDM_NAMESPACE_BEGIN
 UniformDataItem::UniformDataItem( const DataShape<>& dataspace ) :
   mDataspace( dataspace ),
   mArray(),
-  mDataset() {
+  mDataset(),
+  mSelectionMap() {
 }
 
 UniformDataItem::~UniformDataItem() {
@@ -95,6 +98,14 @@ void UniformDataItem::writeMetadata( XmlMetadataWrapper& xml ) {
 
   // Allow the dataset to configure the text content for this item.
   mDataset->writeTextContent( xml );
+}
+
+const DataSelectionMap& UniformDataItem::selectionMap() const {
+  return mSelectionMap;
+}
+
+void UniformDataItem::setSelectionMap( const DataSelectionMap& selectionMap ) {
+  mSelectionMap = selectionMap;
 }
 
 XDM_NAMESPACE_END

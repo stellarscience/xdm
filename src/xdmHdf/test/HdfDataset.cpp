@@ -1,6 +1,8 @@
 #include <xdm/StructuredArray.hpp>
 #include <xdm/RefPtr.hpp>
 
+#include <xdm/DataSelection.hpp>
+
 #include <xdmHdf/HdfDataset.hpp>
 
 #include <sstream>
@@ -30,7 +32,7 @@ int main( int argc, char* argv[] ) {
 
   // write the data to disk
   dataset->initialize( xdm::primitiveType::kFloat, fileshape );
-  dataset->serialize( &array );
+  dataset->serialize( &array, xdm::DataSelectionMap() );
   dataset->finalize();
   
   return 0;

@@ -22,12 +22,13 @@ void Dataset::initialize(
 }
 
 void Dataset::serialize(
-  const StructuredArray* data )
+  const StructuredArray* data,
+  const DataSelectionMap& selectionMap )
 {
   if ( mSerializeCallback ) {
-    mSerializeCallback->serializeImplementation( this, data );
+    mSerializeCallback->serializeImplementation( this, data, selectionMap );
   } else {
-    serializeImplementation( data );
+    serializeImplementation( data, selectionMap );
   }
 }
 

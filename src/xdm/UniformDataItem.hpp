@@ -1,6 +1,7 @@
 #ifndef xdm_UniformDataItem_hpp
 #define xdm_UniformDataItem_hpp
 
+#include <xdm/DataSelectionMap.hpp>
 #include <xdm/Dataset.hpp>
 #include <xdm/HyperSlab.hpp>
 #include <xdm/DataItem.hpp>
@@ -32,12 +33,16 @@ public:
   const DataShape<>& dataspace() const;
   void setDataspace( const DataShape<>& dataspace );
 
+  const DataSelectionMap& selectionMap() const;
+  void setSelectionMap( const DataSelectionMap& selectionMap );
+
   virtual void writeMetadata( XmlMetadataWrapper& xml );
 
 private:
   DataShape<> mDataspace;
   RefPtr< StructuredArray > mArray;
   RefPtr< Dataset > mDataset;
+  DataSelectionMap mSelectionMap;
 };
 
 XDM_NAMESPACE_END

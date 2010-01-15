@@ -2,6 +2,7 @@
 #define xdm_Dataset_hpp
 
 #include <xdm/StructuredArray.hpp>
+#include <xdm/DataSelectionMap.hpp>
 #include <xdm/DataShape.hpp>
 #include <xdm/HyperSlab.hpp>
 #include <xdm/PrimitiveType.hpp>
@@ -17,9 +18,7 @@ XDM_NAMESPACE_BEGIN
 /// arrays to disk.  This class should be implemented by inheritors to write an
 /// array to disk as simply as possible.  Decorators (callbacks) should be used
 /// to customize the data flow for different application environments.
-class Dataset : 
-  public ReferencedObject,
-  public SelectableDataMixin {
+class Dataset : public ReferencedObject {
 public:
   Dataset();
   virtual ~Dataset();
@@ -46,7 +45,8 @@ public:
 	public:
 	  virtual void serializeImplementation( 
       Dataset* ds, 
-      const StructuredArray* data ) = 0;
+      const StructuredArray* data,
+      const DataSelectionMap& selectionMap ) = 0;
 	};
 	
 	/// Finalization Callback function.  Decorates the finalization process to
@@ -69,7 +69,8 @@ public:
   /// @param data The data to be written.
   /// @param slabMap The mapping from memory space to file space
   /// @param content A stream from which to pull/push content that is generated
-  void serialize( const StructuredArray* data );
+  void serialize( const StructuredArray* data, 
+    const DataSelectionMap& selectionMap );
 
   /// Complete writing the dataset.
   void finalize();
@@ -105,7 +106,8 @@ public:
   /// this function to provide the necessary calls to write an array to disk or
   /// to the input stream, depending on the needs of the underlying dataset
   /// type. No one should call this except for callbacks.
-  virtual void serializeImplementation( const StructuredArray* data ) = 0;
+  virtual void serializeImplementation( const StructuredArray* data,
+    const DataSelectionMap& selectionMap ) = 0;
 
   /// Pure virtual function to complete the process of writing a dataset. This
   /// should be called only by callbacks.
