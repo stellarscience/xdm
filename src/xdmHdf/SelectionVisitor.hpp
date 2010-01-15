@@ -9,8 +9,9 @@
 #include <xdm/NamespaceMacro.hpp>
 
 XDM_NAMESPACE_BEGIN
-  class HyperslabDataSelection;
   class AllDataSelection;
+  class CoordinateDataSelection;
+  class HyperslabDataSelection;
 XDM_NAMESPACE_END
 
 XDM_HDF_NAMESPACE_BEGIN
@@ -27,6 +28,7 @@ public:
   //-- Type Safe apply methods from xdm::DataSelectionVisitor --//
   virtual void apply( const xdm::DataSelection& selection );
   virtual void apply( const xdm::AllDataSelection& selection );
+  virtual void apply( const xdm::CoordinateDataSelection& selection );
   virtual void apply( const xdm::HyperslabDataSelection& selection );
 };
 

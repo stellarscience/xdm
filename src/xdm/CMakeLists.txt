@@ -4,6 +4,7 @@ set( ${PROJECT_NAME}_HEADERS
     AllDataSelection.hpp
     CollectMetadataOperation.hpp
     CompositeDataItem.hpp
+    CoordinateDataSelection.hpp
     DataItem.hpp
     DataSelection.hpp
     DataSelectionVisitor.hpp
@@ -29,6 +30,7 @@ set( ${PROJECT_NAME}_HEADERS
 set( ${PROJECT_NAME}_SOURCES
     CollectMetadataOperation.cpp
     CompositeDataItem.cpp
+    CoordinateDataSelection.cpp
     DataItem.cpp
     DataSelection.cpp
     DataSelectionVisitor.cpp

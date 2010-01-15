@@ -1,7 +1,8 @@
 #include <xdmHdf/SelectionVisitor.hpp>
 
-#include <xdm/HyperslabDataSelection.hpp>
 #include <xdm/AllDataSelection.hpp>
+#include <xdm/CoordinateDataSelection.hpp>
+#include <xdm/HyperslabDataSelection.hpp>
 #include <xdm/ThrowMacro.hpp>
 
 #include <stdexcept>
@@ -21,6 +22,15 @@ void SelectionVisitor::apply( const xdm::DataSelection& selection ) {
 
 void SelectionVisitor::apply( const xdm::AllDataSelection& selection ) {
   H5Sselect_all( mIdent );
+}
+
+void SelectionVisitor::apply( const xdm::CoordinateDataSelection& selection ) {
+  xdm::CoordinateArray<> coords = selection.coordinates();
+  H5Sselect_elements( 
+    mIdent, 
+    H5S_SELECT_SET, 
+    coords.numberOfElements(), 
+    (hsize_t*)(coords.values()) );
 }
 
 void SelectionVisitor::apply( const xdm::HyperslabDataSelection& selection ) {
