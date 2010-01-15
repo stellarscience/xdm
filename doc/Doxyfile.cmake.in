@@ -355,11 +355,11 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                  = ../src/xdm \
-                         ../src/xdmComm \
-                         ../src/xdmFormat \
-                         ../src/xdmGrid \
-                         ../src/xdmHdf
+INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/../src/xdm \
+                         @CMAKE_CURRENT_SOURCE_DIR@/../src/xdmComm \
+                         @CMAKE_CURRENT_SOURCE_DIR@/../src/xdmFormat \
+                         @CMAKE_CURRENT_SOURCE_DIR@/../src/xdmGrid \
+                         @CMAKE_CURRENT_SOURCE_DIR@/../src/xdmHdf
                          
 
 # If the value of the INPUT tag contains directories, you can use the 
