@@ -3,6 +3,7 @@
 
 #include <xdm/RefPtr.hpp>
 #include <xdm/XmlObject.hpp>
+#include <xdm/XmlTextContent.hpp>
 
 #include <xdm/NamespaceMacro.hpp>
 
@@ -15,12 +16,10 @@ XDM_NAMESPACE_BEGIN
 /// children are added via visitors.  This interface allows us to pass only the
 /// portion of the XmlObject required to specify metadata, not aggregate
 /// objects.
-class XmlMetadataWrapper {
-private:
-  RefPtr< XmlObject > mXml;
+class XmlMetadataWrapper : public XmlTextContent {
 public:
   /// Constructor takes an XmlObject to wrap.
-  XmlMetadataWrapper( RefPtr< XmlObject > xml ) : mXml( xml ) {}
+  XmlMetadataWrapper( RefPtr< XmlObject > xml ) : XmlTextContent( xml ) {}
   ~XmlMetadataWrapper() {}
 
   /// Set the tag for the underlying XmlObject.
@@ -36,15 +35,6 @@ public:
   /// Get a named attribute for the underlying XmlObject.
   const std::string& attribute( const std::string& key ) const {
     return mXml->attribute( key );
-  }
-
-  /// Append a line of text content to the XmlObject.
-  void appendContent( const std::string& content ) {
-    mXml->appendContent( content );
-  }
-  /// Get a line of content from the XmlObject.
-  const std::string& contentLine( unsigned int line ) const {
-    return mXml->contentLine( line );
   }
 };
 

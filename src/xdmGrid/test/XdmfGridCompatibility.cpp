@@ -28,9 +28,7 @@ TEST( XdmfGridCompatibility, staticGrid ) {
   // build the topology for the grid.
   xdm::RefPtr< xdmGrid::RectilinearMesh > topology( 
     new xdmGrid::RectilinearMesh );
-  xdm::DataShape<> topologyShape( 3 );
-  std::fill( topologyShape.begin(), topologyShape.end(), 3 );
-  topology->setShape( topologyShape );
+  topology->setShape( xdm::makeShape("3 3 3") );
   grid->setTopology( topology );
 
   // build the geometry for the grid.
@@ -50,6 +48,8 @@ TEST( XdmfGridCompatibility, staticGrid ) {
 
   // dataset on disk
   xdm::RefPtr< xdm::HdfDataset > dataset( new xdm::HdfDataset );
+  dataset->setFile( "XdmfGridCompatibility.h5" );
+  dataset->setDataset( "staticGrid" );
   xdm::DataShape<> fileShape(1);
   fileShape[0] = 3;
 

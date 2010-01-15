@@ -47,32 +47,75 @@ static const HdfTypeMapping sHdfTypeMapping;
 } // namespace anon
 
 struct HdfDataset::Private {
+  std::string mFile;
+  std::string mGroup;
+  std::string mDataset;
+  
   hid_t file_identifier;
   hid_t dataset_identifier;
   hid_t filespace_identifier;
+
+  Private() {}
+  Private( 
+    const std::string& file,
+    const std::string& group,
+    const std::string& dataset ) :
+    mFile( file ),
+    mGroup( group ),
+    mDataset( dataset ) {}
 };
 
 HdfDataset::HdfDataset() : 
   imp( new Private ){
 }
 
+HdfDataset::HdfDataset( 
+  const std::string& file,
+  const std::string& group,
+  const std::string& dataset ) :
+  imp( new Private( file, group, dataset ) ) {
+}
+
 HdfDataset::~HdfDataset() {
+}
+
+void HdfDataset::setFile( const std::string& file ) {
+  imp->mFile = file;
+}
+
+const std::string& HdfDataset::file() const {
+  return imp->mFile;
+}
+
+void HdfDataset::setGroup( const std::string& group ) {
+  imp->mGroup = group;
+}
+
+const std::string& HdfDataset::group() const {
+  return imp->mGroup;
+}
+
+void HdfDataset::setDataset( const std::string& dataset ) {
+  imp->mDataset = dataset;
+}
+
+const std::string& HdfDataset::dataset() const {
+  return imp->mDataset;
+}
+
+void HdfDataset::writeTextContent( XmlTextContent& text ) {
+  std::stringstream out;
+  out << imp->mFile << ":" << imp->mGroup << "/" << imp->mDataset;
+  text.appendContentLine( out.str() );
 }
 
 void HdfDataset::initializeImplementation(
   primitiveType::Value type,
-  const DataShape<>& shape, 
-  std::iostream& content ) {
+  const DataShape<>& shape ) {
   
-  // in an HDF dataset, the initialization content looks like:
-  // <filename>.h5:/path/to/dataset
-  std::stringstream init;
-  init << content.rdbuf();
-  HdfLocation locator( init.str() );
-
   // open the HDF file for writing
   imp->file_identifier = H5Fcreate( 
-    locator.mFilePath.c_str(),
+    imp->mFile.c_str(),
     H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT );
 
   // construct the file space to correspond to the requested shape
@@ -81,9 +124,11 @@ void HdfDataset::initializeImplementation(
   imp->filespace_identifier = H5Screate_simple( file_shape.rank(), &file_shape[0], NULL );
 
   // construct the dataset in the file
+  std::stringstream datasetPath;
+  datasetPath << imp->mGroup << "/" << imp->mDataset;
   imp->dataset_identifier = H5Dcreate(
     imp->file_identifier,
-    locator.mDatasetPath.c_str(),
+    datasetPath.str().c_str(),
     sHdfTypeMapping[type],
     imp->filespace_identifier,
     H5P_DEFAULT,
@@ -93,8 +138,7 @@ void HdfDataset::initializeImplementation(
 
 void HdfDataset::serializeImplementation(
   const StructuredArray& data,
-  const HyperSlabMap<>& memory_map,
-  std::iostream& content ) {
+  const HyperSlabMap<>& memory_map ) {
 
   // create the memory space to match the shape of the array
   // convert between types for size representation

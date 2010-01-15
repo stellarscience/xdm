@@ -8,14 +8,15 @@
 // dummy dataset implementation for testing.
 class DummyDataset : public xdm::Dataset {
   const char* format() { return "Dummy"; }
+  void writeTextContent( xdm::XmlTextContent& text ) {
+    text.appendContentLine( "DummyDatasetInitializationContent" );
+  }
   void initializeImplementation(
     xdm::primitiveType::Value,
-    const xdm::DataShape<>&,
-    std::iostream&  ) {}
+    const xdm::DataShape<>& ) {}
   void serializeImplementation(
     const xdm::StructuredArray&,
-    const xdm::HyperSlabMap<>&, 
-    std::iostream& ) {}
+    const xdm::HyperSlabMap<>& ) {}
   void finalizeImplementation() {}
 };
 
@@ -56,6 +57,7 @@ TEST_F( UniformDataItem, writeMetadata ) {
   ASSERT_EQ( xml.attribute( "NumberType" ), "Float" );
   ASSERT_EQ( xml.attribute( "Precision" ), "4" );
   ASSERT_EQ( xml.attribute( "Format" ), "Dummy" );
+  ASSERT_EQ( "DummyDatasetInitializationContent", xml.contentLine( 0 ) );
 }
 
 int main( int argc, char* argv[] ) {

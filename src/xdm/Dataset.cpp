@@ -13,24 +13,22 @@ Dataset::~Dataset() {
 
 void Dataset::initialize(
   primitiveType::Value type,
-  const DataShape<>& shape, 
-  std::iostream& content ) {
+  const DataShape<>& shape ) {
   if ( mInitializeCallback ) {
-    mInitializeCallback->initializeImplementation( this, type, shape, content );
+    mInitializeCallback->initializeImplementation( this, type, shape );
   } else {
-    initializeImplementation( type, shape, content );
+    initializeImplementation( type, shape );
   }
 }
 
 void Dataset::serialize(
   const StructuredArray& data,
-  const HyperSlabMap<>& slabMap,
-  std::iostream& content )
+  const HyperSlabMap<>& slabMap )
 {
   if ( mSerializeCallback ) {
-    mSerializeCallback->serializeImplementation( this, data, slabMap, content );
+    mSerializeCallback->serializeImplementation( this, data, slabMap );
   } else {
-    serializeImplementation( data, slabMap, content );
+    serializeImplementation( data, slabMap );
   }
 }
 

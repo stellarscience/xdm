@@ -37,12 +37,14 @@ int main( int argc, char* argv[] ) {
   xdm::HyperSlabMap<> mapping( memorySlab, fileSlab );
 
   // create the dataset
-  xdm::RefPtr< xdm::Dataset > dataset = new xdm::HdfDataset();
+  xdm::RefPtr< xdm::HdfDataset > dataset = new xdm::HdfDataset();
+  dataset->setFile( "HdfDataset.h5" );
+  dataset->setGroup( "" );
+  dataset->setDataset( "testdata" );
 
   // write the data to disk
-  std::stringstream content( "HdfDataset.h5:/testdata" );
-  dataset->initialize( xdm::primitiveType::kFloat, fileshape, content );
-  dataset->serialize( array, mapping, content );
+  dataset->initialize( xdm::primitiveType::kFloat, fileshape );
+  dataset->serialize( array, mapping );
   dataset->finalize();
   
   return 0;

@@ -92,6 +92,9 @@ void UniformDataItem::writeMetadata( XmlMetadataWrapper& xml ) {
 
   // write the format of the dataset on disk.
   xml.setAttribute( "Format", mDataset->format() );
+
+  // Allow the dataset to configure the text content for this item.
+  mDataset->writeTextContent( xml );
 }
 
 XDM_NAMESPACE_END
