@@ -74,8 +74,8 @@ void MpiDatasetProxy::serializeImplementation(
     // receive data from everyone else in the communicator.
     int totalProcesses;
     MPI_Comm_size( mCommunicator, &totalProcesses );
-    int received = 1; // already wrote local data
-    while( received < totalProcesses ) {
+    // loop through processes starts at 1 since local data has been written
+    for ( int received = 1; received < totalProcesses; received++ ) {
       // synchronize the stream to receive from a single process.
       dataStream.sync();
 
@@ -90,9 +90,6 @@ void MpiDatasetProxy::serializeImplementation(
 
       // write the process data to the dataset.
       mDataset->serialize( &processArray, processSelectionMap );
-      
-      // completed a process
-      received++;
     }
   }
 }
