@@ -3,6 +3,7 @@ project( xdmHdf )
 find_package( HDF5 REQUIRED )
 
 set( ${PROJECT_NAME}_HEADERS 
+    AttachHdfDatasetOperation.hpp
     DatasetIdentifier.hpp
     FileIdentifier.hpp
     FileIdentifierRegistry.hpp
@@ -13,6 +14,7 @@ set( ${PROJECT_NAME}_HEADERS
 )
 
 set( ${PROJECT_NAME}_SOURCES 
+    AttachHdfDatasetOperation.cpp
     DatasetIdentifier.cpp
     FileIdentifier.cpp
     FileIdentifierRegistry.cpp

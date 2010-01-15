@@ -210,7 +210,7 @@ TEST( XdmfGridCompatibility, timeSeries ) {
         xdm::makeShape( 9*9*9 ) );
     xdm::RefPtr< xdmHdf::HdfDataset > attrDataset( new xdmHdf::HdfDataset );
     attrDataset->setFile( "XdmfGridCompatibility.timeSeries.h5" );
-    attrDataset->setGroup( "FunctionValues" );
+    attrDataset->setGroupPath( xdmHdf::GroupPath( 1, "FunctionValues" ) );
     std::stringstream stepStr;
     stepStr << std::setfill('0') << std::setw(5) << step;
     attrDataset->setDataset( stepStr.str() );

@@ -57,11 +57,19 @@ struct HdfTypeMapping {
 };
 static const HdfTypeMapping sHdfTypeMapping;
 
+struct AppendGroup {
+  std::stringstream& mStream;
+  AppendGroup( std::stringstream& stream ) : mStream( stream ) {}
+  void operator()( const std::string& groupName ) {
+    mStream << "/" << groupName;
+  }
+};
+
 } // namespace anon
 
 struct HdfDataset::Private {
   std::string mFile;
-  std::string mGroup;
+  GroupPath mGroupPath;
   std::string mDataset;
   
   xdm::RefPtr< FileIdentifier > mFileId;
@@ -72,7 +80,7 @@ struct HdfDataset::Private {
 
   Private() :
     mFile(),
-    mGroup(),
+    mGroupPath(),
     mDataset(),
     mFileId(),
     mGroupId(),
@@ -80,10 +88,10 @@ struct HdfDataset::Private {
     filespace_identifier( 0 ) {}
   Private( 
     const std::string& file,
-    const std::string& group,
+    const GroupPath& groupPath,
     const std::string& dataset ) :
     mFile( file ),
-    mGroup( group ),
+    mGroupPath( groupPath ),
     mDataset( dataset ),
     mFileId(),
     mGroupId(),
@@ -97,9 +105,9 @@ HdfDataset::HdfDataset() :
 
 HdfDataset::HdfDataset( 
   const std::string& file,
-  const std::string& group,
+  const GroupPath& groupPath,
   const std::string& dataset ) :
-  imp( new Private( file, group, dataset ) ) {
+  imp( new Private( file, groupPath, dataset ) ) {
 }
 
 HdfDataset::~HdfDataset() {
@@ -113,12 +121,12 @@ const std::string& HdfDataset::file() const {
   return imp->mFile;
 }
 
-void HdfDataset::setGroup( const std::string& group ) {
-  imp->mGroup = group;
+void HdfDataset::setGroupPath( const GroupPath& groupPath ) {
+  imp->mGroupPath = groupPath;
 }
 
-const std::string& HdfDataset::group() const {
-  return imp->mGroup;
+const GroupPath& HdfDataset::groupPath() const {
+  return imp->mGroupPath;
 }
 
 void HdfDataset::setDataset( const std::string& dataset ) {
@@ -131,7 +139,10 @@ const std::string& HdfDataset::dataset() const {
 
 void HdfDataset::writeTextContent( xdm::XmlTextContent& text ) {
   std::stringstream out;
-  out << imp->mFile << ":" << imp->mGroup << "/" << imp->mDataset;
+  out << imp->mFile << ":";
+  std::for_each( imp->mGroupPath.begin(), imp->mGroupPath.end(), 
+    AppendGroup( out ) );
+  out << "/" << imp->mDataset;
   text.appendContentLine( out.str() );
 }
 
@@ -144,8 +155,18 @@ void HdfDataset::initializeImplementation(
   hid_t datasetLocId = imp->mFileId->get();
 
   // construct the group in the file.
-  if ( !imp->mGroup.empty() ) {
-    imp->mGroupId = createGroupIdentifier( imp->mFileId->get(), imp->mGroup );
+  if ( !imp->mGroupPath.empty() ) {
+    hid_t parentIdentifier = imp->mFileId->get();
+    for ( 
+      GroupPath::iterator group = imp->mGroupPath.begin();
+      group != imp->mGroupPath.end();
+      ++group ) {
+      // Note: we are using the raw resource to identify the parent.  This is ok
+      // because the parent resource will be released after the call to 
+      // createGroupIdentifier.
+      imp->mGroupId = createGroupIdentifier( parentIdentifier, *group );
+      parentIdentifier = imp->mGroupId->get();
+    }  
     datasetLocId = imp->mGroupId->get();
   }
   

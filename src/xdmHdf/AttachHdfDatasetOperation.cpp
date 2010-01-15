@@ -11,25 +11,6 @@
 XDM_HDF_NAMESPACE_BEGIN
 
 namespace {
-  struct AppendGroup {
-    std::stringstream& mStream;
-    AppendGroup( std::stringstream& stream ) : mStream( stream ) {}
-    void operator()( const std::string& groupName ) {
-      mStream << "/" << groupName;
-    }
-  };
-
-  std::string makePath( const std::vector< std::string >& groups ) {
-    if ( groups.empty() ) {
-      return std::string();
-    }
-
-    std::vector< std::string >::const_iterator start = groups.begin();
-    std::stringstream groupString;
-    groupString << "/" << *start++;
-    std::for_each( start, groups.end(), AppendGroup( groupString ) );
-    return groupString.str();
-  }
 } // namespace anon
 
 AttachHdfDatasetOperation::AttachHdfDatasetOperation( 

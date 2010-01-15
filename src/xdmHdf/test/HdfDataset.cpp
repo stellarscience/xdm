@@ -26,7 +26,6 @@ int main( int argc, char* argv[] ) {
   // create the dataset
   xdm::RefPtr< xdmHdf::HdfDataset > dataset = new xdmHdf::HdfDataset();
   dataset->setFile( "HdfDataset.h5" );
-  dataset->setGroup( "" );
   dataset->setDataset( "testdata" );
 
   // write the data to disk

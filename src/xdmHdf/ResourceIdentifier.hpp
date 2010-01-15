@@ -39,14 +39,25 @@ public:
 
   /// Destructor releases the resource.
   virtual ~ResourceIdentifier() {
+    release();
+  }
+
+  /// Access the identifier.
+  hid_t get() const { return mIdentifier; }
+
+  /// Release the identifier.
+  void release() {
     if ( mIdentifier ) {
       mReleaseFunctor( mIdentifier );
       mIdentifier = 0;
     }
   }
 
-  /// Access the identifier.
-  hid_t get() const { return mIdentifier; }
+  /// Reset the identifier.
+  void reset( hid_t identifier ) {
+    release();
+    mIdentifier = identifier;
+  }
 };
 
 XDM_HDF_NAMESPACE_END

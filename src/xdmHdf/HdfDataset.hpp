@@ -5,10 +5,14 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include <xdmHdf/NamespaceMacro.hpp>
 
 XDM_HDF_NAMESPACE_BEGIN
+
+/// Path of groups identifying a location in the HDF file.
+typedef std::vector< std::string > GroupPath;
 
 class HdfDataset : public xdm::Dataset {
 public:
@@ -17,7 +21,7 @@ public:
   /// Constructor takes file, group, and dataset names.
   HdfDataset( 
     const std::string& file, 
-    const std::string& group,
+    const GroupPath& groupPath,
     const std::string& dataset );
   virtual ~HdfDataset();
 
@@ -26,10 +30,10 @@ public:
   /// Get the file name.
   const std::string& file() const;
 
-  /// Set the group name.
-  void setGroup( const std::string& group );
+  /// Set the group path in the HDF file.
+  void setGroupPath( const GroupPath& group );
   /// Get the group name.
-  const std::string& group() const;
+  const GroupPath& groupPath() const;
 
   /// Set the dataset name.
   void setDataset( const std::string& dataset );
