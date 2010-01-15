@@ -1,7 +1,3 @@
-//=============================================================================
-// This software developed by Stellar Science Ltd Co and the U.S. Government.
-// Copyright (C) 2009 Stellar Science. Government-purpose rights granted.
-//-----------------------------------------------------------------------------
 #ifndef xdm_XmlMetadataWrapper_hpp
 #define xdm_XmlMetadataWrapper_hpp
 

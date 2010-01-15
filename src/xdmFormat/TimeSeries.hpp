@@ -1,7 +1,3 @@
-//=============================================================================
-// This software developed by Stellar Science Ltd Co and the U.S. Government.
-// Copyright (C) 2009 Stellar Science. Government-purpose rights granted.
-//-----------------------------------------------------------------------------
 #ifndef xdmFormat_TimeSeries_hpp
 #define xdmFormat_TimeSeries_hpp
 
