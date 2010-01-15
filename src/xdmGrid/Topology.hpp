@@ -1,7 +1,7 @@
 #ifndef xdmGrid_Topology_hpp
 #define xdmGrid_Topology_hpp
 
-#include <xdm/CompositeData.hpp>
+#include <xdm/CompositeDataItem.hpp>
 #include <xdm/DataShape.hpp>
 
 #include <xdmGrid/NamespaceMacro.hpp>
@@ -14,7 +14,7 @@ XDM_GRID_NAMESPACE_BEGIN
 /// property.
 ///
 /// A Grid consists of elements (or cells) and nodes.
-class Topology : public xdm::CompositeData {
+class Topology : public xdm::CompositeDataItem {
 public:
   Topology();
   virtual ~Topology();

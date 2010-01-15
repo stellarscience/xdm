@@ -1,5 +1,5 @@
-#ifndef xdm_CompositeData_hpp
-#define xdm_CompositeData_hpp
+#ifndef xdm_CompositeDataItem_hpp
+#define xdm_CompositeDataItem_hpp
 
 #include <xdm/DataItem.hpp>
 #include <xdm/RefPtr.hpp>
@@ -10,13 +10,13 @@
 
 XDM_NAMESPACE_BEGIN
 
-/// Class that groups multiple Data nodes together.  CompositeData is a Data
+/// Class that groups multiple Data nodes together.  CompositeDataItem is a Data
 /// type that can hold child Data types.  It is used to construct a large
 /// dataset from multiple smaller datasets.
-class CompositeData : public DataItem {
+class CompositeDataItem : public DataItem {
 public:
-  CompositeData();
-  virtual ~CompositeData();
+  CompositeDataItem();
+  virtual ~CompositeDataItem();
 
   /// Add a child Data element.
   virtual void appendChild( DataItem* child );
@@ -32,5 +32,5 @@ private:
 
 XDM_NAMESPACE_END
 
-#endif // xdm_CompositeData_hpp
+#endif // xdm_CompositeDataItem_hpp
 

@@ -3,7 +3,7 @@ project( xdm )
 find_package( HDF5 )
 
 set( ${PROJECT_NAME}_HEADERS
-    CompositeData.hpp
+    CompositeDataItem.hpp
     DataItem.hpp
     Dataset.hpp
     HyperSlab.hpp
@@ -16,7 +16,7 @@ set( ${PROJECT_NAME}_HEADERS
     UniformDataItem.hpp
 )
 set( ${PROJECT_NAME}_SOURCES
-    CompositeData.cpp
+    CompositeDataItem.cpp
     DataItem.cpp
     Dataset.cpp
     Item.cpp
