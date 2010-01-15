@@ -42,11 +42,11 @@ const Topology* UniformGrid::topology() const {
 }
 
 void UniformGrid::traverse( xdm::ItemVisitor& iv ) {
+  Grid::traverse( iv );
   // apply the visitor to my internal geometry and topology items
   mTopology->accept( iv );
   mGeometry->accept( iv );
-  std::for_each( mAttributes.begin(), mAttributes.end(), 
-    xdm::ApplyVisitor( iv ) );
+  std::for_each( mAttributes.begin(), mAttributes.end(), xdm::ApplyVisitor( iv ) );
 }
 
 void UniformGrid::writeMetadata( xdm::XmlMetadataWrapper& xml ) {

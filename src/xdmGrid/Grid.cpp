@@ -22,6 +22,10 @@ void Grid::setTime( Time* time ) {
   mTime = time;
 }
 
+void Grid::traverse( xdm::ItemVisitor& iv ) {
+  mTime->accept( iv );
+}
+
 void Grid::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
   Item::writeMetadata( xml );
   xml.setTag( "Grid" );

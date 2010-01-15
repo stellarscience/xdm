@@ -21,11 +21,13 @@ public:
   const Time* time() const;
   void setTime( Time* time );
 
+  virtual void traverse( xdm::ItemVisitor& iv );
+
   /// Write grid metadata.
   virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
 
 public:
-  xdm::RefPtr< xdm::Time > mTime;
+  xdm::RefPtr< Time > mTime;
 };
 
 XDM_GRID_NAMESPACE_END

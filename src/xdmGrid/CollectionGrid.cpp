@@ -29,6 +29,7 @@ void CollectionGrid::appendChild( Grid* g ) {
 }
 
 void CollectionGrid::traverse( xdm::ItemVisitor& iv ) {
+  Grid::traverse( iv );
   std::for_each( mChildren.begin(), mChildren.end(), xdm::ApplyVisitor( iv ) );
 }
 
