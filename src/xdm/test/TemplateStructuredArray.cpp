@@ -12,7 +12,7 @@ bool test() {
   T value = T();
   xdm::RefPtr< xdm::TemplateStructuredArray< T > > array;
   array = xdm::createStructuredArray( &value, shape );
-  T* result = array->typedData();
+  T* result = array->begin();
   return !( result == &value );
 }
 

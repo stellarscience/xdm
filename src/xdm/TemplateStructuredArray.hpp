@@ -13,20 +13,36 @@ template< typename T > TemplateStructuredArray< T >*
   createStructuredArray( T*, const DataShape<>& );
 
 /// Attaches type information to a StructuredArray and provides convenience
-/// functions for accessing typed data stored in the array.
+/// functions for accessing typed data stored in the array.  Access to the
+/// underlying data is exposed as an STL compliant random access iterator.
 template< typename T >
 class TemplateStructuredArray : public StructuredArray {
 public:
   virtual ~TemplateStructuredArray() {}
 
-  /// Get a const pointer to the underlying data as a typed array.
-  const T* typedData() const {
+  //-- iterators to expose the underlying data --//
+  typedef T value_type;
+  typedef T* iterator;
+  typedef const T* const_iterator;
+
+  /// Get an iterator pointing to the beginning of the data.
+  iterator begin() {
+    return static_cast< T* >( data() );
+  }
+
+  /// Get a const iterator pointing to the beginning of the data.
+  const_iterator begin() const {
     return static_cast< const T* >( data() );
   }
   
-  /// Get a pointer to the underlying data as a typed array.
-  T* typedData() {
-    return static_cast< T* >( data() );
+  /// Get an iterator pointing to the end of the data.
+  iterator end() {
+    return static_cast< T* >( data() ) + dataSize();
+  }
+
+  /// Get a const iterator pointing to the end of the data.
+  const_iterator end() const {
+    return static_cast< const T* >( data() ) + dataSize();
   }
 
 private:

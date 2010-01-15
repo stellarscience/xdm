@@ -27,7 +27,7 @@ set( ${PROJECT_NAME}_SOURCES
 )
 
 include_directories(
-    ${HDF5_INCLUDE_DIRS}
+    ${HDF5_INCLUDE_DIR}
 )
 
 add_library( ${PROJECT_NAME} STATIC
