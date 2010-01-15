@@ -5,6 +5,9 @@
 
 #include <xdm/NamespaceMacro.hpp>
 
+#include <iterator>
+#include <ostream>
+
 #include <cstdlib>
 
 XDM_NAMESPACE_BEGIN
@@ -22,13 +25,26 @@ private:
   IndexArray mStride;
   IndexArray mCount;
 
+  void updateShape() {
+    mStart.resize( mDataShape.rank() );
+    mStride.resize( mDataShape.rank() );
+    mCount.resize( mDataShape.rank() );
+  }
+
 public:
   /// The size representation for the slab.
   typedef T size_type;
 
+  /// Iterators to iterate through slab information.
+  typedef typename IndexArray::iterator iterator;
+  typedef typename IndexArray::const_iterator const_iterator;
+
   /// Default constructor initializes to an empty shape with no sampling.
   HyperSlab() :
-    mDataShape() {
+    mDataShape(),
+    mStart( mDataShape.rank() ),
+    mStride( mDataShape.rank() ),
+    mCount( mDataShape.rank() ) {
   }
 
   /// Initialization from a shape.  Initializes the start, stride, and count
@@ -68,6 +84,14 @@ public:
   /// Destructor.
   ~HyperSlab() {}
 
+  /// Set the DataShape of the HyperSlab.  This will resize the start, stride,
+  /// and count elements of the slab so that their size matches the rank of the
+  /// shape.
+  void setShape( const DataShape< T >& shape ) {
+    mDataShape = shape;
+    updateShape();
+  }
+
   /// Get the DataShape of the HyperSlab.
   const DataShape< T >& shape() const {
     return mDataShape;
@@ -93,43 +117,60 @@ public:
   const size_type& count( size_type dim ) const {
     return mCount[dim];
   }
+
+  //-- Slab information iterator interface --//
+  iterator beginStart() { return mStart.begin(); }
+  const_iterator beginStart() const { return mStart.begin(); }
+  iterator endStart() { return mStart.end(); }
+  const_iterator endStart() const { return mStart.end(); }
+  
+  iterator beginStride() { return mStride.begin(); }
+  const_iterator beginStride() const { return mStride.begin(); }
+  iterator endStride() { return mStride.end(); }
+  const_iterator endStride() const { return mStride.end(); }
+  
+  iterator beginCount() { return mCount.begin(); }
+  const_iterator beginCount() const { return mCount.begin(); }
+  iterator endCount() { return mCount.end(); }
+  const_iterator endCount() const { return mCount.end(); }
 };
 
-/// Defines a mapping from one HyperSlab to another.  Used to transform one
-/// representation of the data in memory or on disk to another.
-template< typename T = std::size_t >
-class HyperSlabMap {
-private:
-  HyperSlab<T> mFrom;
-  HyperSlab<T> mTo;
-
-public:
-  HyperSlabMap() :
-    mFrom(),
-    mTo()
-  {}
-
-  HyperSlabMap( const HyperSlab<T>& from, const HyperSlab<T>& to ) :
-    mFrom( from ),
-    mTo( to )
-  {}
-  ~HyperSlabMap() {}
-
-  void setDomain( const HyperSlab<T>& from ) {
-    mFrom = from;
+template< typename T >
+bool operator==( const HyperSlab< T >& lhs, const HyperSlab< T >& rhs ) {
+  if ( lhs.shape() != rhs.shape() ) {
+    return false;
   }
-  const HyperSlab<T>& domain() const {
-    return mFrom;
-  }
+  return (
+    std::equal( lhs.beginStart(), lhs.endStart(), rhs.beginStart() ) &&
+    std::equal( lhs.beginStride(), lhs.endStride(), rhs.beginStride() ) &&
+    std::equal( lhs.beginCount(), lhs.endCount(), rhs.beginCount() ) 
+  ); 
+}
 
-  void setRange( const HyperSlab<T>& to ) {
-    mTo = to;
-  }
-  const HyperSlab<T>& range() const {
-    return mTo;
-  }
-};
+template< typename T >
+std::ostream& operator<<( std::ostream& ostr, const HyperSlab<T>& slab ) {
+  typedef typename HyperSlab<T>::size_type SizeType;
+  // start
+  ostr << "( ";
+  std::copy( slab.beginStart(), slab.endStart(), 
+    std::ostream_iterator< SizeType >( ostr, " " ) );
+  ostr << " )";
+  
+  // stride
+  ostr << "( ";
+  std::copy( slab.beginStride(), slab.endStride(), 
+    std::ostream_iterator< SizeType >( ostr, " " ) );
+  ostr << " )";
+  
+  // count
+  ostr << "( ";
+  std::copy( slab.beginCount(), slab.endCount(), 
+    std::ostream_iterator< SizeType >( ostr, " " ) );
+  ostr << " )";
+  return ostr;
+}
 
 XDM_NAMESPACE_END
 
 #endif // xdm_HyperSlab_hpp
+

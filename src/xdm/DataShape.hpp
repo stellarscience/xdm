@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <iterator>
 #include <ostream>
 #include <string>
 #include <vector>
@@ -105,6 +106,11 @@ bool operator==( const DataShape<T>& lhs, const DataShape<T>& rhs ) {
   return std::equal( lhs.begin(), lhs.end(), rhs.begin() );
 }
 
+template< typename T >
+bool operator!=( const DataShape< T >& lhs, const DataShape< T >& rhs ) {
+  return !( lhs == rhs );
+}
+
 /// Make a DataShape given a space separated string with the dimensions.
 DataShape<> makeShape( const std::string& dimensions );
 
@@ -135,15 +141,17 @@ DataShape<> makeContraction( const DataShape<>& space, DataShape<>::size_type n 
 template< typename T >
 std::ostream& operator<<( std::ostream& ostr, const DataShape< T >& shape ) {
   typedef DataShape< T > TypedDataShape;
-  typename TypedDataShape::size_type rank = shape.rank();
-  if ( rank == 0 ) {
+  typedef typename TypedDataShape::size_type SizeType;
+  typedef typename DataShape< T >::ConstDimensionIterator Iterator;
+
+  if ( shape.rank() == 0 ) {
     return ostr;
   }
-  typename TypedDataShape::ConstDimensionIterator begin = shape.begin();
-  ostr << *begin++;
-  typename TypedDataShape::ConstDimensionIterator current;
-  for ( current = begin; current != shape.end(); ++current ) {
-    ostr << " " << *current;
+
+  Iterator current = shape.begin();
+  ostr << *current++;
+  while ( current != shape.end() ) {
+    ostr << " " << *current++;
   }
   return ostr;
 }

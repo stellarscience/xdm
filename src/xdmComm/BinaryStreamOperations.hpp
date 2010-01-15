@@ -8,6 +8,7 @@
 #include <xdm/DataSelection.hpp>
 #include <xdm/DataSelectionMap.hpp>
 #include <xdm/DataShape.hpp>
+#include <xdm/HyperSlab.hpp>
 #include <xdm/HyperslabDataSelection.hpp>
 #include <xdm/PrimitiveType.hpp>
 #include <xdm/StructuredArray.hpp>
@@ -19,14 +20,14 @@ XDM_COMM_NAMESPACE_BEGIN
 BinaryIStream& operator>>( BinaryIStream& istr, xdm::AllDataSelection& v );
 BinaryOStream& operator<<( BinaryOStream& ostr, const xdm::AllDataSelection& v );
 
-BinaryIStream& operator>>( BinaryIStream& istr, xdm::DataSelection& v );
-BinaryOStream& operator<<( BinaryOStream& ostr, const xdm::DataSelection& v );
-
 BinaryIStream& operator>>( BinaryIStream& istr, xdm::DataSelectionMap& v );
 BinaryOStream& operator<<( BinaryOStream& ostr, const xdm::DataSelectionMap& v );
 
 BinaryIStream& operator>>( BinaryIStream& istr, xdm::DataShape<>& v );
 BinaryOStream& operator<<( BinaryOStream& ostr, const xdm::DataShape<>& v );
+
+BinaryIStream& operator>>( BinaryIStream& istr, xdm::HyperSlab<>& v );
+BinaryOStream& operator<<( BinaryOStream& ostr, const xdm::HyperSlab<>& v );
 
 BinaryIStream& operator>>( BinaryIStream& istr, xdm::HyperslabDataSelection& v );
 BinaryOStream& operator<<( BinaryOStream& ostr, const xdm::HyperslabDataSelection& v );

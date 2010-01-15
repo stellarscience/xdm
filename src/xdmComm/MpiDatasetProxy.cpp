@@ -68,13 +68,13 @@ void MpiDatasetProxy::serializeImplementation(
   
   } else {
     
-    // first, write rank 0 local process data to the dataset.
+    // write local process data to the dataset.
     mDataset->serialize( array, selectionMap );
 
     // receive data from everyone else in the communicator.
     int totalProcesses;
     MPI_Comm_size( mCommunicator, &totalProcesses );
-    int received = 1;
+    int received = 1; // already wrote local data
     while( received < totalProcesses ) {
       // synchronize the stream to receive from a single process.
       dataStream.sync();

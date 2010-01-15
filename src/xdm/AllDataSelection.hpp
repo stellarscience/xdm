@@ -16,6 +16,12 @@ public:
   virtual void accept( DataSelectionVisitor& v ) const { v.apply(*this); }
 };
 
+inline bool operator==( 
+  const AllDataSelection& lhs, 
+  const AllDataSelection& rhs ) {
+  return true;
+}
+
 XDM_NAMESPACE_END
 
 #endif // xdm_AllDataSelection_hpp

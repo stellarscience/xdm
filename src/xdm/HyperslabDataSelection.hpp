@@ -34,6 +34,12 @@ public:
   }
 };
 
+inline bool operator==( 
+  const HyperslabDataSelection& lhs, 
+  const HyperslabDataSelection& rhs ) {
+  return ( lhs.hyperslab() == rhs.hyperslab() );
+}
+
 XDM_NAMESPACE_END
 
 #endif // xdm_HyperslabDataSelection_hpp

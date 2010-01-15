@@ -3,3 +3,5 @@
 - Implement error checking and MPI specific stream state queries in
   CoalescingStreamBuffer.
 - Fix the StructuredArray stream extractor to not required pre-allocated buffer.
+- Remove const qualifiers from xdm::DataSelectionVisitor and implement the input
+  of polymorphic data selection subclasses using visitors.
