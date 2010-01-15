@@ -21,6 +21,8 @@
 #ifndef xdmComm_DistributedItemCollectionProxy_hpp
 #define xdmComm_DistributedItemCollectionProxy_hpp
 
+#include <xdmComm/CoalescingStreamBuffer.hpp>
+
 #include <xdm/Item.hpp>
 
 #include <mpi.h>
@@ -46,7 +48,10 @@ public:
   /// collecting data.
   /// @param item The xdm::Item to act as a proxy for.
   /// @param communicator Communicator containing participating processes.
-  DistributedItemCollectionProxy( xdm::Item* item, MPI_Comm communicator );
+  DistributedItemCollectionProxy(
+    xdm::Item* item,
+    MPI_Comm communicator,
+    size_t bufferSizeHint );
 
   /// Destructor does not free the communicator.
   virtual ~DistributedItemCollectionProxy();
@@ -69,6 +74,7 @@ public:
 private:
   xdm::RefPtr< xdm::Item > mItem;
   MPI_Comm mCommunicator;
+  std::auto_ptr< xdmComm::CoalescingStreamBuffer > mCommBuffer;
 };
 
 XDM_COMM_NAMESPACE_END

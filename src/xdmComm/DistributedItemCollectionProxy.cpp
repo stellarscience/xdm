@@ -20,12 +20,18 @@
 //------------------------------------------------------------------------------
 #include <xdmComm/DistributedItemCollectionProxy.hpp>
 
+#include <xdmComm/BinaryIOStream.hpp>
+#include <xdmComm/BinaryStreamOperations.hpp>
+
+#include <xdm/CollectMetadataOperation.hpp>
+
 XDM_COMM_NAMESPACE_BEGIN
 
 DistributedItemCollectionProxy::DistributedItemCollectionProxy(
-  xdm::Item* item, MPI_Comm communicator ) :
+  xdm::Item* item, MPI_Comm communicator, size_t bufferSizeHint ) :
   mItem( item ),
-  mCommunicator( communicator ) {
+  mCommunicator( communicator ),
+  mCommBuffer( new xdmComm::CoalescingStreamBuffer( bufferSizeHint, communicator ) ) {
 }
 
 DistributedItemCollectionProxy::~DistributedItemCollectionProxy() {
@@ -34,6 +40,7 @@ DistributedItemCollectionProxy::~DistributedItemCollectionProxy() {
 void DistributedItemCollectionProxy::accept( xdm::ItemVisitor& iv ) {
   // forward to wrapped Item
   mItem->accept( iv );
+  iv.apply( *this );
 }
 
 void DistributedItemCollectionProxy::traverse( xdm::ItemVisitor& iv ) {
@@ -59,7 +66,28 @@ void DistributedItemCollectionProxy::writeMetadata(
   int rank;
   MPI_Comm_rank( mCommunicator, &rank );
   if ( rank == 0 ) {
+
+    int processesCompleted = 1;
+    while ( processesCompleted < processCount ) {
+      while( mCommBuffer->poll() ) {
+        BinaryIStream istr( mCommBuffer.get() );
+        istr.sync();
+        xdm::RefPtr< xdm::XmlObject > xml( new xdm::XmlObject );
+        istr >> *xml;
+        metadata.completeObject()->appendChild( xml );
+        processesCompleted++;
+      }
+    }
+
   } else {
+
+    BinaryOStream ostr( mCommBuffer.get() );
+
+    xdm::RefPtr< xdm::XmlObject > xml( metadata.completeObject() );
+    xdm::CollectMetadataOperation collector( xml );
+    mItem->accept( collector );
+    ostr << *xml << flush;
+
   }
 
 }
