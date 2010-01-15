@@ -3,6 +3,7 @@
 #include <xdm/AllDataSelection.hpp>
 #include <xdm/DataShape.hpp>
 #include <xdm/HyperSlab.hpp>
+#include <xdm/HyperSlabBlockIterator.hpp>
 #include <xdm/HyperslabDataSelection.hpp>
 #include <xdm/UniformDataItem.hpp>
 #include <xdm/TemplateStructuredArray.hpp>
@@ -15,6 +16,8 @@
 #include <xdmGrid/Time.hpp>
 
 #include <xdmHdf/HdfDataset.hpp>
+
+#include <numeric>
 
 #include <cmath>
 
@@ -93,11 +96,16 @@ FunctionData::FunctionData(
   mStructuredArray(),
   mFunction( function ),
   mBlockSize( blockSize ) {
+  
+  using std::accumulate;
+  typedef std::multiplies< std::vector< double >::size_type > MultiplySize;
 
   mStorage.resize( 
-    mRegionOfInterest.count( 0 ) *
-    mRegionOfInterest.count( 1 ) *
-    mRegionOfInterest.count( 2 ) );
+    accumulate( 
+      mBlockSize.begin(), 
+      mBlockSize.end(),
+      1,
+      MultiplySize() ) );
   mStructuredArray = xdm::createStructuredArray( 
     &mStorage[0], xdm::makeShape( mStorage.size() ) );
 }
@@ -106,32 +114,43 @@ FunctionData::~FunctionData() {
 }
 
 void FunctionData::writeImplementation( xdm::Dataset* dataset ) {
-  int startI = mRegionOfInterest.start(0);
-  int startJ = mRegionOfInterest.start(1);
-  int startK = mRegionOfInterest.start(2);
-  int sizeI = mRegionOfInterest.count(0);
-  int sizeJ = mRegionOfInterest.count(1);
-  int sizeK = mRegionOfInterest.count(2);
+  using std::accumulate;
+  typedef std::multiplies< xdm::DataShape<>::size_type > MultiplySize;
 
-  for ( int k = 0; k < sizeK; k++ ) {
-    double z = mGrid.cellCoordinate( 2, startK + k );
-    for ( int j = 0; j < sizeJ; j++ ) {
-      double y = mGrid.cellCoordinate( 1, startJ + j );
-      for ( int i = 0; i < sizeI; i++ ) {
-        double x = mGrid.cellCoordinate( 0, startI + i );
-        double result = (*mFunction)( x, y, z );
-        int arrayLocation = i + j*sizeI + k*sizeI*sizeJ;
-        mStorage[arrayLocation] = result;
+  xdm::HyperSlabBlockIterator<> block( mRegionOfInterest, mBlockSize );
+  xdm::HyperSlabBlockIterator<> end;
+  for( /* no-init */; block != end; ++block ) {
+    int startI = block->start(0);
+    int startJ = block->start(1);
+    int startK = block->start(2);
+    int sizeI = block->count(0);
+    int sizeJ = block->count(1);
+    int sizeK = block->count(2);
+
+    for ( int k = 0; k < sizeK; k++ ) {
+      double z = mGrid.cellCoordinate( 2, startK + k );
+      for ( int j = 0; j < sizeJ; j++ ) {
+        double y = mGrid.cellCoordinate( 1, startJ + j );
+        for ( int i = 0; i < sizeI; i++ ) {
+          double x = mGrid.cellCoordinate( 0, startI + i );
+          double result = (*mFunction)( x, y, z );
+          int arrayLocation = i + j*sizeI + k*sizeI*sizeJ;
+          mStorage[arrayLocation] = result;
+        }
       }
     }
-  }
 
-  xdm::HyperSlab<> fileSelectionSlab( mRegionOfInterest );
-  reverseDimensionOrder( fileSelectionSlab );
-  xdm::DataSelectionMap selectionMap(
-    new xdm::AllDataSelection,
-    new xdm::HyperslabDataSelection( fileSelectionSlab ) );
-  dataset->serialize( mStructuredArray, selectionMap );
+    xdm::DataShape<>::size_type blockSize = accumulate(
+      block->beginCount(), block->endCount(), 1, MultiplySize() );
+    mStructuredArray->setShape( xdm::makeShape( blockSize ) );
+
+    xdm::HyperSlab<> fileSelectionSlab( *block );
+    reverseDimensionOrder( fileSelectionSlab );
+    xdm::DataSelectionMap selectionMap(
+      new xdm::AllDataSelection,
+      new xdm::HyperslabDataSelection( fileSelectionSlab ) );
+    dataset->serialize( mStructuredArray, selectionMap );
+  }
 }
 
 //-----------------------------------------------------------------------------

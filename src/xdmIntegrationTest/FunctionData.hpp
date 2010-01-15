@@ -75,7 +75,7 @@ inline const GridBounds& testCaseBounds() {
     std::make_pair( 0.0, 6.28 ),
     std::make_pair( 0.0, 6.28 ),
     std::make_pair( 0.0, 6.28 ),
-    xdm::makeShape( 50, 50, 50 ) );
+    xdm::makeShape( 57, 50, 50 ) );
   return result;
 }
 
