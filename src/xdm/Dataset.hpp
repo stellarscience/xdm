@@ -1,7 +1,7 @@
 #ifndef xdm_Dataset_hpp
 #define xdm_Dataset_hpp
 
-#include <xdm/Array.hpp>
+#include <xdm/StructuredArray.hpp>
 #include <xdm/DataShape.hpp>
 #include <xdm/HyperSlab.hpp>
 #include <xdm/ReferencedObject.hpp>
@@ -44,7 +44,7 @@ public:
 	public:
 	  virtual void serializeImplementation(
 	    Dataset* ds,
-	    const Array& data,
+	    const StructuredArray& data,
 	    const HyperSlabMap<>& slabMap,
 	    std::iostream& content ) = 0;
 	};
@@ -70,7 +70,7 @@ public:
   /// @param slabMap The mapping from memory space to file space
   /// @param content A stream from which to pull/push content that is generated
   void serialize( 
-    const Array& data, 
+    const StructuredArray& data, 
     const HyperSlabMap<>& slabMap,
     std::iostream& content );
 
@@ -102,7 +102,7 @@ public:
   /// to the input stream, depending on the needs of the underlying dataset
   /// type. No one should call this except for callbacks.
   virtual void serializeImplementation( 
-    const Array& data, 
+    const StructuredArray& data, 
     const HyperSlabMap<>& slabMap, 
     std::iostream& content ) = 0;
 

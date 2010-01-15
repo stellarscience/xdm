@@ -1,4 +1,4 @@
-#include <xdm/Array.hpp>
+#include <xdm/StructuredArray.hpp>
 #include <xdm/HdfDataset.hpp>
 #include <xdm/RefPtr.hpp>
 
@@ -7,13 +7,14 @@
 int main( int argc, char* argv[] ) {
   
   // set up the input data
+  std::vector< float > data(16);
+  for( int i = 0; i < 16; ++i ) {
+    data[i] = i;
+  }
+  
   xdm::DataShape<> arrayShape( 1 );
   arrayShape[0] = 16;
-  xdm::Array data( arrayShape );
-  float* ptr = data.data();
-  for( int i = 0; i < 16; ++i ) {
-    ptr[i] = i;
-  }
+  xdm::StructuredArray array( xdm::primitiveType::kFloat32, &data[0], arrayShape );
 
   // initialize the dataset on disk
   xdm::DataShape<> fileshape( 2 );
@@ -40,7 +41,7 @@ int main( int argc, char* argv[] ) {
   // write the data to disk
   std::stringstream content( "HdfDataset.h5:/testdata" );
   dataset->initialize( fileshape, content );
-  dataset->serialize( data, mapping, content );
+  dataset->serialize( array, mapping, content );
   dataset->finalize();
   
   return 0;

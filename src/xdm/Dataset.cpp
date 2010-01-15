@@ -20,7 +20,7 @@ void Dataset::initialize( const DataShape<>& shape, std::iostream& content ) {
 }
 
 void Dataset::serialize(
-  const Array& data,
+  const StructuredArray& data,
   const HyperSlabMap<>& slabMap,
   std::iostream& content )
 {

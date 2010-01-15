@@ -3,16 +3,16 @@ project( xdm )
 find_package( HDF5 )
 
 set( ${PROJECT_NAME}_HEADERS 
-    Array.hpp
     Dataset.hpp
 	NamespaceMacro.hpp
     ReferencedObject.hpp
     RefPtr.hpp
+    StructuredArray.hpp
     HyperSlab.hpp
 )
 set( ${PROJECT_NAME}_SOURCES 
-    Array.cpp
     Dataset.cpp
+    StructuredArray.cpp
     ReferencedObject.cpp
 )
 

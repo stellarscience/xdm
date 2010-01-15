@@ -68,7 +68,7 @@ void HdfDataset::initializeImplementation(
 }
 
 void HdfDataset::serializeImplementation(
-  const Array& data,
+  const StructuredArray& data,
   const HyperSlabMap<>& memory_map,
   std::iostream& content ) {
 

@@ -16,14 +16,16 @@ XDM_NAMESPACE_BEGIN
 /// represent size.  The size type defaults to std::size_t
 template< typename T = std::size_t >
 class DataShape {
+public:
+  typedef T size_type;
+  typedef std::vector< T > Index;
+
 private:
-  T mRank;
-  typedef std::vector< T > DimensionList;
-  DimensionList mDimensions;
+  size_type mRank;
+  Index mDimensions;
 
 public:
 
-  typedef T size_type;
 
   /// Default constructor initializes to empty shape (rank 0).
   DataShape() :

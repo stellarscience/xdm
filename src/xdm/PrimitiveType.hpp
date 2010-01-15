@@ -8,19 +8,37 @@
 
 XDM_NAMESPACE_BEGIN
 
-typedef char int8;
-typedef short int16;
-typedef int int32;
-typedef long int int64;
-typedef unsigned char uint8;
-typedef unsigned short uint16;
-typedef unsigned int uint32;
-typedef long unsigned int uint64;
-typedef float float32;
-typedef double float64;
-typedef std::complex< float32, float32 > complex_float32;
-typedef std::complex< float64, float64 > complex_float64;
-typedef std::string string;
+typedef char Int8;
+typedef short Int16;
+typedef int Int32;
+typedef long int Int64;
+typedef unsigned char UInt8;
+typedef unsigned short UInt16;
+typedef unsigned int UInt32;
+typedef long unsigned int UInt64;
+typedef float Float32;
+typedef double Float64;
+typedef std::complex< Float32 > ComplexFloat32;
+typedef std::complex< Float64 > ComplexFloat64;
+typedef std::string String;
+
+namespace primitiveType {
+  enum Value {
+    kInt8 = 0,
+    kInt16,
+    kInt32,
+    kInt64,
+    kUInt8,
+    kUInt16,
+    kUInt32,
+    kUInt64,
+    kFloat32,
+    kFloat64,
+    ComplexFloat32,
+    ComplexFloat64,
+    String
+  };
+} // namespace primitiveType
 
 XDM_NAMESPACE_END
 

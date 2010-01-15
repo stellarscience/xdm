@@ -19,7 +19,7 @@ public:
     const DataShape<>& shape, 
     std::iostream& content );
   virtual void serializeImplementation(
-    const Array& data,
+    const StructuredArray& data,
     const HyperSlabMap<>& memory_map,
     std::iostream& content );
   virtual void finalizeImplementation();
