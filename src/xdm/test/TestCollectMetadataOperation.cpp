@@ -7,6 +7,8 @@
 
 #include <algorithm>
 
+namespace {
+
 struct AggregateItem : xdm::Item {
   std::vector< xdm::RefPtr< Item > > mItems;
   void appendChild( xdm::Item* i ) { mItems.push_back( i ); }
@@ -56,4 +58,6 @@ BOOST_AUTO_TEST_CASE( applyAggregateItem ) {
   result << *opResult;
   BOOST_REQUIRE_EQUAL( answer, result.str() );
 }
+
+} // namespace anon
 

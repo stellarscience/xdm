@@ -11,6 +11,8 @@
 
 #include <vector>
 
+namespace {
+
 struct Fixture {
   hid_t dataspace;
   Fixture() {
@@ -88,4 +90,6 @@ BOOST_AUTO_TEST_CASE( applyHyperslabSelection ) {
   BOOST_CHECK_EQUAL( answer[1][0], result[1][0] );
   BOOST_CHECK_EQUAL( answer[1][1], result[1][1] );
 }
+
+} // namespace 
 

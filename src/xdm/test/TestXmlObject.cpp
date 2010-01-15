@@ -5,6 +5,8 @@
 
 #include <sstream>
 
+namespace {
+
 using xdm::XmlObject;
 
 xdm::RefPtr< XmlObject > buildTree() {
@@ -56,4 +58,6 @@ BOOST_AUTO_TEST_CASE( OStreamInsertion ) {
   result << *obj;
   BOOST_CHECK_EQUAL( answer, result.str() );
 }
+
+} // namespace anon
 

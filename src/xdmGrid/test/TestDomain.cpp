@@ -3,6 +3,8 @@
 
 #include <xdmGrid/Domain.hpp>
 
+namespace {
+
 BOOST_AUTO_TEST_CASE( writeMetadata ) {
   xdmGrid::Domain d;
   xdm::XmlMetadataWrapper xml( new xdm::XmlObject );
@@ -11,4 +13,6 @@ BOOST_AUTO_TEST_CASE( writeMetadata ) {
 
   BOOST_CHECK_EQUAL( "Domain", xml.tag() );
 }
+
+} // namespace 
 

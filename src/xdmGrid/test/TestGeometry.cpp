@@ -3,6 +3,8 @@
 
 #include <xdmGrid/Geometry.hpp>
 
+namespace {
+
 BOOST_AUTO_TEST_CASE( writeMetadata ) {
   xdmGrid::Geometry g( 3 );
   xdm::XmlMetadataWrapper xml( new xdm::XmlObject );
@@ -11,4 +13,6 @@ BOOST_AUTO_TEST_CASE( writeMetadata ) {
 
   BOOST_CHECK_EQUAL( "Geometry", xml.tag() );
 }
+
+} // namespace 
 

@@ -3,6 +3,8 @@
 
 #include <xdmGrid/Attribute.hpp>
 
+namespace {
+
 BOOST_AUTO_TEST_CASE( writeMetadata ) {
   xdm::RefPtr< xdmGrid::Attribute > test( 
     new xdmGrid::Attribute( xdmGrid::Attribute::kScalar, 
@@ -17,3 +19,5 @@ BOOST_AUTO_TEST_CASE( writeMetadata ) {
   BOOST_CHECK_EQUAL( "Cell", xml.attribute( "Center" ) );
 }
 
+
+ } // namespace 

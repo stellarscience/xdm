@@ -3,6 +3,8 @@
 
 #include <xdmGrid/RectilinearMesh.hpp>
 
+namespace {
+
 BOOST_AUTO_TEST_CASE( writeMetadata ) {
   xdmGrid::RectilinearMesh t;
   xdm::XmlMetadataWrapper xml( new xdm::XmlObject );
@@ -16,4 +18,6 @@ BOOST_AUTO_TEST_CASE( writeMetadata ) {
   BOOST_CHECK_EQUAL( "2DRectMesh", xml.attribute( "TopologyType" ) );
   BOOST_CHECK_EQUAL( "2 2", xml.attribute( "Dimensions" ) );
 }
+
+} // namespace 
 

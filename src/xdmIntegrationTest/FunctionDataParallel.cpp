@@ -20,6 +20,8 @@
 #include <algorithm>
 #include <sstream>
 
+namespace {
+
 xdmComm::test::MpiTestFixture globalFixture;
 
 BOOST_AUTO_TEST_CASE( writeResult ) {
@@ -76,4 +78,6 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
   xdmFormat::writeTimestepGrid( timeSeries, grid );
   timeSeries->close();
 }
+
+} // namespace 
 

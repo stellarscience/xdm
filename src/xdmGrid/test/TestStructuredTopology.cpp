@@ -3,6 +3,8 @@
 
 #include <xdmGrid/StructuredTopology.hpp>
 
+namespace {
+
 BOOST_AUTO_TEST_CASE( writeMetadata ) {
   xdmGrid::StructuredTopology t;
   xdm::XmlMetadataWrapper xml( new xdm::XmlObject );
@@ -18,4 +20,6 @@ BOOST_AUTO_TEST_CASE( writeMetadata ) {
   BOOST_CHECK_EQUAL( "Topology", xml.tag() );
   BOOST_CHECK_EQUAL( "1 2 3", xml.attribute( "Dimensions" ) );
 }
+
+} // namespace 
 

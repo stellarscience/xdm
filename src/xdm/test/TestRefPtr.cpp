@@ -4,6 +4,8 @@
 #include <xdm/ReferencedObject.hpp>
 #include <xdm/RefPtr.hpp>
 
+namespace {
+
 class Derived : public xdm::ReferencedObject {};
 
 BOOST_AUTO_TEST_CASE( templateAssignmentOperator ) {
@@ -23,4 +25,6 @@ BOOST_AUTO_TEST_CASE( assignmentOperator ) {
   BOOST_CHECK_EQUAL( 2, a->referenceCount() );
   BOOST_CHECK_EQUAL( 2, b->referenceCount() );
 }
+
+} // namespace anon
 

@@ -7,6 +7,8 @@
 #include <xdm/AllDataSelection.hpp>
 #include <xdm/HyperslabDataSelection.hpp>
 
+namespace {
+
 using xdm::DataSelectionVisitor;
 using xdm::DataSelection;
 using xdm::AllDataSelection;
@@ -56,4 +58,6 @@ BOOST_AUTO_TEST_CASE( checkVisitationAllDataSelection ) {
 BOOST_AUTO_TEST_CASE( checkVisitationHyperslabDataSelection ) {
   checkVisitation< HyperslabDataSelection >();
 }
+
+} // namespace anon
 

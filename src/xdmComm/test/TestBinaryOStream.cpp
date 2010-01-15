@@ -5,6 +5,8 @@
 
 #include <memory>
 
+namespace {
+
 // define a test parameterized on the types we care about.
 template< typename T >
 class Fixture {
@@ -38,4 +40,6 @@ BOOST_AUTO_TEST_CASE( writeDouble ) { readValue< double >(); }
 BOOST_AUTO_TEST_CASE( writeLongDouble ) { readValue< long double >(); }
 
 BOOST_AUTO_TEST_CASE( writeBool ) { readValue< bool >(); }
+
+} // namespace anon
 

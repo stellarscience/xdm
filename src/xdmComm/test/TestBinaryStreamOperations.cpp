@@ -11,6 +11,8 @@
 
 #include <cstdlib>
 
+namespace {
+
 // helper class to check if two DataSelection subclasses are equal.
 template< typename T >
 struct CheckDataSelectionSubclassesEqual : 
@@ -144,4 +146,6 @@ BOOST_AUTO_TEST_CASE( DataSelectionMapRoundtrip ) {
   result.range()->accept( rangeCheck );
   BOOST_CHECK( rangeCheck.result );
 }
+
+} // namespace anon
 

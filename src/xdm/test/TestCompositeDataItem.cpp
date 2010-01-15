@@ -3,6 +3,8 @@
 
 #include <xdm/CompositeDataItem.hpp>
 
+namespace {
+
 BOOST_AUTO_TEST_CASE( writeMetadata ) {
   xdm::CompositeDataItem i;
   xdm::RefPtr< xdm::XmlObject > obj( new xdm::XmlObject );
@@ -13,4 +15,6 @@ BOOST_AUTO_TEST_CASE( writeMetadata ) {
   BOOST_CHECK_EQUAL( xml.tag(), "DataItem" );
   BOOST_CHECK_EQUAL( xml.attribute( "ItemType" ), "Tree" );
 }
+
+} // namespace anon
 

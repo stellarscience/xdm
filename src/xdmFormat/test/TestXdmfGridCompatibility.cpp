@@ -34,6 +34,8 @@
 
 #include <cmath>
 
+namespace {
+
 std::vector< double > createGridPoints( int size ) {
   std::vector< double > result( size );
   for ( int i = 0; i < size; ++i ) {
@@ -215,4 +217,6 @@ BOOST_AUTO_TEST_CASE( timeSeries ) {
   temporalCollection->close();
   virtualDataset->close();
 }
+
+} // namespace anon
 

@@ -6,6 +6,8 @@
 
 #include <sstream>
 
+namespace {
+
 using xdm::RefPtr;
 using xdm::XmlObject;
 using xdm::XmlOutputStream;
@@ -84,4 +86,6 @@ BOOST_AUTO_TEST_CASE( closeStream ) {
   test.openContext( chi );
   test.closeStream();
 }
+
+} // namespace anon
 

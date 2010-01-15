@@ -5,8 +5,12 @@
 
 #include <stdexcept>
 
+namespace {
+
 BOOST_AUTO_TEST_CASE( throws ) {
   BOOST_CHECK_THROW( XDM_THROW( std::runtime_error( "Test exception" ) ), 
     std::runtime_error );
 }
+
+} // namespace anon
 

@@ -6,6 +6,8 @@
 #include <sstream>
 #include <stdexcept>
 
+namespace {
+
 typedef xdm::DataShape<> TestShape;
 
 BOOST_AUTO_TEST_CASE( OStreamInserter ) {
@@ -30,4 +32,6 @@ BOOST_AUTO_TEST_CASE( makeShape ) {
 
   BOOST_CHECK_THROW( xdm::makeShape( "1 jeff" ), std::invalid_argument );
 }
+
+} // namespace anon
 

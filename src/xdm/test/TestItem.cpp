@@ -3,6 +3,8 @@
 
 #include <xdm/Item.hpp>
 
+namespace {
+
 BOOST_AUTO_TEST_CASE( writeMetadataTag ) {
   xdm::RefPtr< xdm::Item > i( new xdm::Item );
   i->setName( "Fred" );
@@ -18,4 +20,6 @@ BOOST_AUTO_TEST_CASE( writeMetadataTag ) {
   std::string nameResult = xml.attribute( "Name" );
   BOOST_CHECK_EQUAL( nameAnswer, nameResult );
 }
+
+} // namespace anon
 

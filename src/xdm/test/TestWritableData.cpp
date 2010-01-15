@@ -5,6 +5,8 @@
 #include <xdm/RefPtr.hpp>
 #include <xdm/WritableData.hpp>
 
+namespace {
+
 class DatasetTestImplementation : public xdm::Dataset {
 public:
   bool dataWritten;
@@ -80,4 +82,6 @@ BOOST_AUTO_TEST_CASE( staticWrite ) {
   test.testWritable->write( test.testDataset.get() );
   BOOST_CHECK( test.testDataset->dataWritten );
 }
+
+} // namespace anon
 

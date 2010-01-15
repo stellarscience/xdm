@@ -3,6 +3,8 @@
 
 #include <xdmGrid/CollectionGrid.hpp>
 
+namespace {
+
 struct Fixture {
   xdm::RefPtr< xdmGrid::CollectionGrid > grid;
   xdm::XmlMetadataWrapper xml;
@@ -32,4 +34,6 @@ BOOST_AUTO_TEST_CASE( writeMetadataTemporal ) {
   BOOST_CHECK_EQUAL( "Collection", test.xml.attribute( "GridType" ) );
   BOOST_CHECK_EQUAL( "Temporal", test.xml.attribute( "CollectionType" ) );
 }
+
+} // namespace 
 

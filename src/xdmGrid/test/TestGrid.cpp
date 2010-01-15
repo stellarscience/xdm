@@ -3,6 +3,8 @@
 
 #include <xdmGrid/Grid.hpp>
 
+namespace {
+
 BOOST_AUTO_TEST_CASE( writeMetadata ) {
   xdmGrid::Grid g;
   g.setName( "Fred" );
@@ -14,4 +16,6 @@ BOOST_AUTO_TEST_CASE( writeMetadata ) {
   BOOST_CHECK_EQUAL( "Grid", xml.tag() );
   BOOST_CHECK_EQUAL( "Fred", xml.attribute( "Name" ) );
 }
+
+} // namespace
 

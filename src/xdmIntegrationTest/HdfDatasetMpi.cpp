@@ -20,6 +20,8 @@
 #include <sstream>
 #include <vector>
 
+namespace {
+
 static const int kSize = 100;
 
 xdmComm::test::MpiTestFixture globalFixture;
@@ -83,4 +85,6 @@ BOOST_AUTO_TEST_CASE( writeDataset1D ) {
   dataset->serialize( processArray, selectionMap );
   dataset->finalize();
 }
+
+} // namespace 
 

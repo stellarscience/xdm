@@ -128,7 +128,8 @@ protected:
   /// Implementation method to define array serialization. Inheritors should
   /// implement this method to provide the necessary calls for mapping a subset
   /// of the input array to a subset of the dataset on disk. 
-  virtual void serializeImplementation( const StructuredArray* data,
+  virtual void serializeImplementation( 
+    const StructuredArray* data,
     const DataSelectionMap& selectionMap ) = 0;
 
   /// Definition of the finalization process for a dataset.  Inheritors should

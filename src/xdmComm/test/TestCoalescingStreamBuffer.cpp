@@ -12,6 +12,8 @@
 #include <iostream>
 #include <sstream>
 
+namespace {
+
 xdmComm::test::MpiTestFixture globalFixture;
 
 struct Fixture {
@@ -64,4 +66,6 @@ BOOST_AUTO_TEST_CASE( synchronize ) {
 
   }
 }
+
+} // namespace anon
 

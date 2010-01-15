@@ -5,6 +5,8 @@
 #include <xdm/TemplateStructuredArray.hpp>
 #include <xdm/RefPtr.hpp>
 
+namespace {
+
 template< typename T > 
 bool test() {
   xdm::DataShape<> shape(1);
@@ -28,4 +30,6 @@ BOOST_AUTO_TEST_CASE( instantiateULInt ) { test< long unsigned int >(); }
 
 BOOST_AUTO_TEST_CASE( instantiateFloat ) { test< float >(); } 
 BOOST_AUTO_TEST_CASE( instantiateDouble ) { test< double >(); } 
+
+} // namespace anon
 

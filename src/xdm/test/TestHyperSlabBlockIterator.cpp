@@ -5,6 +5,8 @@
 
 #include <algorithm>
 
+namespace {
+
 BOOST_AUTO_TEST_CASE( constructSmall ) {
   // construct a 5x5 slab
   xdm::HyperSlab<> total( xdm::makeShape( 5, 5 ) );
@@ -100,4 +102,6 @@ BOOST_AUTO_TEST_CASE( iterateStride ) {
   ++test;
   BOOST_CHECK( test == xdm::HyperSlabBlockIterator<>() );
 }
+
+} // namespace anon
 

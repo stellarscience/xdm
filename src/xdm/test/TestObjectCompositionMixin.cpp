@@ -3,6 +3,8 @@
 
 #include <xdm/ObjectCompositionMixin.hpp>
 
+namespace {
+
 using xdm::ReferencedObject;
 using xdm::ObjectCompositionMixin;
 using xdm::RefPtr;
@@ -45,4 +47,6 @@ BOOST_AUTO_TEST_CASE( child ) {
 	BOOST_CHECK_EQUAL( test.a, xdm::child< A >( test.t, 0 ) );
 	BOOST_CHECK_EQUAL( test.b, xdm::child< B >( test.t, 0 ) );
 }
+
+} // namespace anon
 

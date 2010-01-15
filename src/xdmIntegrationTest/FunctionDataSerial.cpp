@@ -13,6 +13,8 @@
 
 #include <algorithm>
 
+namespace {
+
 BOOST_AUTO_TEST_CASE( writeResult ) {
   // get the information for the problem grid
   GridBounds problemBounds = testCaseBounds();
@@ -45,4 +47,6 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
   xdmFormat::writeTimestepGrid( timeSeries, problem.first );
   timeSeries->close();
 }
+
+} // namespace 
 

@@ -7,6 +7,8 @@
 
 #include <algorithm>
 
+namespace {
+
 // dummy dataset implementation for testing.
 class DummyDataset : public xdm::Dataset {
   const char* format() { return "Dummy"; }
@@ -65,4 +67,6 @@ BOOST_AUTO_TEST_CASE( writeMetadata ) {
   BOOST_CHECK_EQUAL( xml.attribute( "Format" ), "Dummy" );
   BOOST_CHECK_EQUAL( "DummyDatasetInitializationContent", xml.contentLine( 0 ) );
 }
+
+} // namespace anon
 

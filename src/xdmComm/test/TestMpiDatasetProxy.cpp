@@ -17,6 +17,8 @@
 
 #include <cassert>
 
+namespace {
+
 xdmComm::test::MpiTestFixture globalFixture;
 
 class TestSelectionVisitor : public xdm::DataSelectionVisitor {
@@ -147,4 +149,6 @@ BOOST_AUTO_TEST_CASE( coalesce ) {
     BOOST_CHECK_EQUAL( 0, testDataset->mValues.size() );
   }
 }
+
+} // namespace anon
 
