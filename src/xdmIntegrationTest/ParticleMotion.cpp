@@ -171,8 +171,15 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
   geometryData->setDataset( geometryDataset.get() );
 
   // parallelize the tree
+  // Choose a buffer size to hold the maximum number of points for any of the
+  // processes.
+  unsigned int maxParticlesPerProcess;
+  MPI_Allreduce( &localParticles, &maxParticlesPerProcess, 
+    1, MPI_INTEGER, MPI_MAX, MPI_COMM_WORLD );
+  // Parallelize the tree with a buffer size to hold vector data and selection
+  // header information. To be safe, we give the header 1K of storage.
   xdmComm::ParallelizeTreeVisitor parallelize(
-    (3 * kParticleCount + 1) * sizeof( float ) );
+    (3 * maxParticlesPerProcess) * sizeof( float ) + 1024 );
   grid->accept( parallelize );
 
   // create the time series, opening the output stream
