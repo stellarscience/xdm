@@ -145,5 +145,27 @@ xdm_integration_executable_parallel(
 xdm_integration_run_parallel_test(
   ParticleMotion.parallel.2
   xdmIntegrationTest.ParticleMotion.parallel.test
+  1
+)
+
+# run with 2 processes and check that parallel and serial files are equal
+xdm_integration_run_parallel_test(
+  ParticleMotion.parallel.2
+  xdmIntegrationTest.ParticleMotion.parallel.test
   2
+)
+xdm_integration_test_hdf5_diff(
+  ParticleMotion.parallel.1.h5
+  ParticleMotion.parallel.2.h5
+)
+
+# run with 4 processes and check that parallel and serial files are equal
+xdm_integration_run_parallel_test(
+  ParticleMotion.parallel.4
+  xdmIntegrationTest.ParticleMotion.parallel.test
+  4
+)
+xdm_integration_test_hdf5_diff(
+  ParticleMotion.parallel.1.h5
+  ParticleMotion.parallel.4.h5
 )
