@@ -7,10 +7,12 @@
 
 #include <xdm/PrimitiveType.hpp>
 #include <xdm/RefPtr.hpp>
+#include <xdm/ThrowMacro.hpp>
 
 #include <algorithm>
 #include <map>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 
 #include <hdf5.h>
@@ -175,6 +177,16 @@ void HdfDataset::serializeImplementation(
   data->selection()->accept( memspaceSelector );
   SelectionVisitor filespaceSelector( imp->filespace_identifier );
   selection()->accept( filespaceSelector );
+
+  hssize_t datasetNumpoints = H5Sget_select_npoints( imp->filespace_identifier );
+  hssize_t arrayNumpoints = H5Sget_select_npoints( memory_space );
+  if ( datasetNumpoints != arrayNumpoints ) {
+    std::stringstream ss;
+    ss << "Data size mismatch: ";
+    ss << "dataset, " << datasetNumpoints;
+    ss << " array, " << arrayNumpoints;
+    XDM_THROW( std::runtime_error( ss.str() ) );
+  }
 
   // write the array to disk
   H5Dwrite( 
