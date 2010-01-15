@@ -1,5 +1,5 @@
-#ifndef xdm_ArrayData_hpp
-#define xdm_ArrayData_hpp
+#ifndef xdm_UniformDataItem_hpp
+#define xdm_UniformDataItem_hpp
 
 #include <xdm/Dataset.hpp>
 #include <xdm/HyperSlab.hpp>
@@ -10,13 +10,13 @@
 
 XDM_NAMESPACE_BEGIN
 
-/// Terminal node containing the actual heavy data sets.  A ArrayData contains
+/// Terminal node containing the actual heavy data sets.  A UniformDataItem contains
 /// all of the information required to map a StructuredArray in memory to a
 /// Dataset in a file. 
-class ArrayData : public DataItem {
+class UniformDataItem : public DataItem {
 public:
-  explicit ArrayData( const DataShape<>& dataspace );
-  virtual ~ArrayData();
+  explicit UniformDataItem( const DataShape<>& dataspace );
+  virtual ~UniformDataItem();
 
   StructuredArray* array();
   const StructuredArray* array() const;
@@ -38,5 +38,5 @@ private:
 
 XDM_NAMESPACE_END
 
-#endif // xdm_ArrayData_hpp
+#endif // xdm_UniformDataItem_hpp
 

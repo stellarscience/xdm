@@ -3,26 +3,26 @@ project( xdm )
 find_package( HDF5 )
 
 set( ${PROJECT_NAME}_HEADERS
-    ArrayData.hpp
     CompositeData.hpp
     DataItem.hpp
     Dataset.hpp
+    HyperSlab.hpp
     Item.hpp
 	NamespaceMacro.hpp
     ReferencedObject.hpp
     RefPtr.hpp
     StructuredArray.hpp
     TemplateStructuredArray.hpp
-    HyperSlab.hpp
+    UniformDataItem.hpp
 )
 set( ${PROJECT_NAME}_SOURCES
-    ArrayData.cpp
     CompositeData.cpp
     DataItem.cpp
     Dataset.cpp
     Item.cpp
     ReferencedObject.cpp
     StructuredArray.cpp
+    UniformDataItem.cpp
 )
 
 if( HDF5_FOUND )
