@@ -122,6 +122,7 @@ public:
   BOOST_CHECK_EQUAL( *answer, *result );
 }*/
 
+/*
 BOOST_AUTO_TEST_CASE( visitsAll ) {
   xdm::RefPtr< ItemCollection > item( new ItemCollection );
   item->mItems.push_back( new ProcessDescriptionItem );
@@ -153,5 +154,6 @@ BOOST_AUTO_TEST_CASE( visitsAll ) {
         visitor.mVisitedObjects.begin(), visitor.mVisitedObjects.end() );
   }
 }
+*/
 
 } // namespace

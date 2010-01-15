@@ -21,6 +21,8 @@
 #ifndef xdm_Algorithm_hpp
 #define xdm_Algorithm_hpp
 
+#include <algorithm>
+
 #include <xdm/NamespaceMacro.hpp>
 
 XDM_NAMESPACE_BEGIN
