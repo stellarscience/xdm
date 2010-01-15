@@ -8,7 +8,7 @@
 namespace {
 
 template< typename T > 
-bool test() {
+void test() {
   xdm::DataShape<> shape(1);
   shape[0] = 1;
   T value = T();

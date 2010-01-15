@@ -1,3 +1,6 @@
+#define BOOST_TEST_MODULE TestHdfDataset
+#include <boost/test/unit_test.hpp>
+
 #include <xdm/StructuredArray.hpp>
 #include <xdm/RefPtr.hpp>
 
@@ -7,7 +10,9 @@
 
 #include <sstream>
 
-int main( int argc, char* argv[] ) {
+namespace {
+
+BOOST_AUTO_TEST_CASE( write ) {
   
   // set up the input data
   std::vector< float > data(16);
@@ -35,6 +40,8 @@ int main( int argc, char* argv[] ) {
   dataset->serialize( &array, xdm::DataSelectionMap() );
   dataset->finalize();
   
-  return 0;
+  BOOST_CHECK( true );
 }
+
+} // namespace
 
