@@ -65,6 +65,10 @@ const Topology* UniformGrid::topology() const {
   return mTopology;
 }
 
+void UniformGrid::addAttribute( Attribute* attribute ) {
+  appendChild( attribute );
+}
+
 void UniformGrid::traverse( xdm::ItemVisitor& iv ) {
   Grid::traverse( iv );
   // apply the visitor to my internal geometry and topology items

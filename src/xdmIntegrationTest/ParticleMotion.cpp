@@ -35,6 +35,7 @@
 #include <xdmFormat/TemporalCollection.hpp>
 #include <xdmFormat/VirtualDataset.hpp>
 
+#include <xdmGrid/Attribute.hpp>
 #include <xdmGrid/InterlacedGeometry.hpp>
 #include <xdmGrid/Polyvertex.hpp>
 #include <xdmGrid/Time.hpp>
@@ -43,6 +44,7 @@
 #include <xdmHdf/HdfDataset.hpp>
 
 #include <algorithm>
+#include <limits>
 #include <iomanip>
 #include <sstream>
 
@@ -62,15 +64,20 @@ float magnitudeSquared( float* v ) {
   return v[0]*v[0] + v[1]*v[1] + v[2]*v[2];
 }
 
-// evolve according to an inverse square force law.
-void evolve( float* position, float* velocity, float dt ) {
+// evolve according to an inverse square force law. Returns false if
+// the object gets too close to the center and the object is removed.
+bool evolve( float* position, float* velocity, float dt ) {
   float rSquared = magnitudeSquared( position );
-  // Offset the number a bit to avoid a divide by 0
-  rSquared += 0.01;
+  // threshold r^2 to avoid a division by 0.
+  if ( rSquared < 0.001f ) {
+    rSquared = 0.001f;
+  }
   for ( int i = 0; i < 3; i++ ) {
-    velocity[i] = velocity[i] + dt * ( 1.0f / rSquared );
+    float rHat = position[i] / rSquared;
+    velocity[i] = velocity[i] + dt * ( -1.0f / rSquared ) * rHat;
     position[i] = position[i] + dt * velocity[i];
   }
+  return true;
 }
 
 // Update callback to tell a HDF5 dataset to rename itself on every time step
@@ -112,11 +119,9 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
   // generate some initial values
   for ( int i = 0; i < localParticles; i++ ) {
     unsigned int globalIndex = localStartIndex + i;
-    float r = static_cast< float >( globalIndex ) / 
-      static_cast< float >( kParticleCount );
     float theta = ( 6.28 / kParticleCount ) * ( globalIndex );
-    (*mPositions)[3*i + 0] = r * std::cos( theta );
-    (*mPositions)[3*i + 1] = r * std::sin( theta );
+    (*mPositions)[3*i + 0] = std::cos( theta );
+    (*mPositions)[3*i + 1] = 0.5f * std::sin( theta );
     (*mPositions)[3*i + 2] = 0.0f;
   }
 
@@ -156,6 +161,38 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
   geometryMemory->setIsDynamic( true ); // changes throughout the simulation
   geometryData->appendData( geometryMemory.get() );
 
+  // put the geometry memory in an HDF dataset
+  xdm::RefPtr< xdmHdf::HdfDataset > geometryDataset( new xdmHdf::HdfDataset );
+  xdmHdf::GroupPath datasetPath( 1, "points" );
+  geometryDataset->setFile( baseName.str() + ".h5" );
+  geometryDataset->setGroupPath( datasetPath );
+  // install the callback to set a new dataset name every timestep
+  geometryDataset->setUpdateCallback( new NameDataset );
+  geometryData->setDataset( geometryDataset.get() );
+
+  // create a vector attribute for the velocity.
+  xdm::RefPtr< xdmGrid::Attribute > velocityAttribute( 
+    new xdmGrid::Attribute( xdmGrid::Attribute::kVector ) );
+  velocityAttribute->setName( "velocity" );
+  grid->addAttribute( velocityAttribute );
+  // create the data item for the velocity attribute.
+  xdm::RefPtr< xdm::UniformDataItem > velocityData( new xdm::UniformDataItem(
+    xdm::primitiveType::kFloat, outputShape ) );
+  velocityAttribute->setDataItem( velocityData.get() );
+  // create dynamic data for the velocity values.
+  xdm::RefPtr< xdm::WritableArray > velocityMemory( new xdm::WritableArray(
+    mVelocities.get() ) );
+  velocityMemory->setIsDynamic( true );
+  velocityData->appendData( velocityMemory.get() );
+  // put the velocities in an HDF dataset.
+  xdm::RefPtr< xdmHdf::HdfDataset > velocityDataset( new xdmHdf::HdfDataset );
+  xdmHdf::GroupPath velGroup( 1, "velocities" );
+  velocityDataset->setFile( baseName.str() + ".h5" );
+  velocityDataset->setGroupPath( velGroup );
+  velocityDataset->setUpdateCallback( new NameDataset );
+  velocityData->setDataset( velocityDataset.get() );
+
+  
   // Set up the memory's data selection to map from the entire array to the
   // subset of the output dataset beginning at my local start index.
   xdm::HyperSlab<> datasetSlab( outputShape );
@@ -169,16 +206,11 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
   xdm::DataSelectionMap mapping(
     new xdm::AllDataSelection, // select the entire array
     new xdm::HyperslabDataSelection( datasetSlab ) ); // only the portion I own
+  // The selection map applies to both the positions and velocities of the
+  // particles, so we can use it for both memory mappings.
   geometryMemory->setSelectionMap( mapping );
+  velocityMemory->setSelectionMap( mapping );
 
-  // put the geometry memory in an HDF dataset
-  xdm::RefPtr< xdmHdf::HdfDataset > geometryDataset( new xdmHdf::HdfDataset );
-  xdmHdf::GroupPath datasetPath( 1, "points" );
-  geometryDataset->setFile( baseName.str() + ".h5" );
-  geometryDataset->setGroupPath( datasetPath );
-  // install the callback to set a new dataset name every timestep
-  geometryDataset->setUpdateCallback( new NameDataset );
-  geometryData->setDataset( geometryDataset.get() );
 
   // parallelize the tree
   // Choose a buffer size to hold the maximum number of points for any of the
