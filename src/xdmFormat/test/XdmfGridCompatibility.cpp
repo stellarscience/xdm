@@ -111,7 +111,7 @@ TEST( XdmfGridCompatibility, staticGrid ) {
   xdm::RefPtr< xdm::StructuredArray > attrvalues 
     = xdm::createStructuredArray( &data[0], xdm::makeShape( "1000" ) );
   attributeDataItem->appendData( new xdm::WritableArray( attrvalues ) );
-  attribute->appendChild( attributeDataItem );
+  attribute->setDataItem( attributeDataItem );
 
   // attach an HDF dataset to all UniformDataItems
   xdmHdf::AttachHdfDatasetOperation attachHdfDataset( 
@@ -205,7 +205,7 @@ TEST( XdmfGridCompatibility, timeSeries ) {
       xdm::makeShape( 9, 9, 9 ) ) );
     attrData->appendData( new xdm::WritableArray( attrArray.get() ) );
     attrData->setDataset( attrDataset.get() );
-    attribute->appendChild( attrData );
+    attribute->setDataItem( attrData );
     
     // write the grid for this step to the TimeSeries files
     temporalCollection->writeTimestepGrid( grid.get() );

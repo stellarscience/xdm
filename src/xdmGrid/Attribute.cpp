@@ -1,5 +1,7 @@
 #include <xdmGrid/Attribute.hpp>
 
+#include <xdm/UniformDataItem.hpp>
+
 #include <algorithm>
 #include <map>
 #include <string>
@@ -42,8 +44,20 @@ Attribute::Attribute( Type t, Center c ) :
 Attribute::~Attribute() {
 }
 
+void Attribute::setDataItem( xdm::UniformDataItem* item ) {
+  mDataItem = item;
+}
+
+xdm::UniformDataItem* Attribute::dataItem() {
+  return mDataItem;
+}
+
+const xdm::UniformDataItem* Attribute::dataItem() const {
+  return mDataItem;
+}
+
 void Attribute::traverse( xdm::ItemVisitor& iv ) {
-  std::for_each( begin(), end(), xdm::ApplyVisitor( iv ) );
+  mDataItem->accept( iv );
 }
 
 void Attribute::writeMetadata( xdm::XmlMetadataWrapper& xml ) {

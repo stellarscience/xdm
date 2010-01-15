@@ -119,6 +119,10 @@ DataShape<> makeShape(
   DataShape<>::size_type k,
   DataShape<>::size_type l );
 
+/// Make a new shape by contracting the input space by the specified amount in
+/// each dimension.
+DataShape<> makeContraction( const DataShape<>& space, DataShape<>::size_type n );
+
 /// Print a DataShape to an ostream.
 template< typename T >
 std::ostream& operator<<( std::ostream& ostr, const DataShape< T >& shape ) {

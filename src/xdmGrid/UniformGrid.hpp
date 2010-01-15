@@ -5,8 +5,10 @@
 #include <xdmGrid/Grid.hpp>
 
 #include <xdm/ObjectCompositionMixin.hpp>
+#include <xdm/PrimitiveType.hpp>
 #include <xdm/RefPtr.hpp>
 
+#include <string>
 #include <vector>
 
 #include <xdm/NamespaceMacro.hpp>
@@ -41,6 +43,7 @@ public:
   Topology* topology();
   const Topology* topology() const;
 
+  /// Add an attribute definition to the grid.
   void addAttribute( Attribute* attribute );
 
   /// Redefinition of visitor traversal from xdm::Item.
@@ -53,6 +56,19 @@ private:
   xdm::RefPtr< Geometry > mGeometry;
   xdm::RefPtr< Topology > mTopology;
 };
+
+/// Construct an attribute on a uniform grid with the given center.  
+///
+/// This non-member function will construct the attribute definition with a
+/// corresponding UniformDataItem to hold the attribute data.  The attribute is
+/// not automatically added to the grid, it is up to clients to do that.
+xdm::RefPtr< xdmGrid::Attribute >
+createAttribute( 
+  const UniformGrid* grid, 
+  Attribute::Center center,
+  Attribute::Type type,
+  const std::string& name,
+  xdm::primitiveType::Value dataType );
 
 XDM_GRID_NAMESPACE_END
 
