@@ -15,8 +15,7 @@ class DummyDataset : public xdm::Dataset {
     xdm::primitiveType::Value,
     const xdm::DataShape<>& ) {}
   void serializeImplementation(
-    const xdm::StructuredArray&,
-    const xdm::HyperSlabMap<>& ) {}
+    const xdm::StructuredArray* ) {}
   void finalizeImplementation() {}
 };
 

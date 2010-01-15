@@ -1,5 +1,6 @@
 
 #include <xdmHdf/HdfDataset.hpp>
+#include <xdmHdf/SelectionVisitor.hpp>
 
 #include <xdm/PrimitiveType.hpp>
 
@@ -138,45 +139,29 @@ void HdfDataset::initializeImplementation(
 }
 
 void HdfDataset::serializeImplementation(
-  const xdm::StructuredArray& data,
-  const xdm::HyperSlabMap<>& memory_map ) {
+  const xdm::StructuredArray* data ) {
 
   // create the memory space to match the shape of the array
   // convert between types for size representation
-  xdm::DataShape< hsize_t > memory_shape( data.shape() );
+  xdm::DataShape< hsize_t > memory_shape( data->shape() );
   hid_t memory_space = H5Screate_simple( 
     memory_shape.rank(),
     &memory_shape[0],
     NULL );
 
-  // select the hyperslab of the data in memory
-  xdm::HyperSlab< hsize_t > domain( memory_map.domain() );
-  H5Sselect_hyperslab( 
-    memory_space,
-    H5S_SELECT_SET, 
-    &(domain.start( 0 )), 
-    &(domain.stride( 0 )),
-    &(domain.count( 0 )),
-    NULL );
-
-  // select the hyperslab of the data on disk
-  xdm::HyperSlab< hsize_t > range( memory_map.range() );
-  H5Sselect_hyperslab(
-    imp->filespace_identifier,
-    H5S_SELECT_SET,
-    &(range.start(0)),
-    &(range.stride(0)),
-    &(range.count(0)),
-    NULL );
+  SelectionVisitor memspaceSelector( memory_space );
+  data->selection()->accept( memspaceSelector );
+  SelectionVisitor filespaceSelector( imp->filespace_identifier );
+  selection()->accept( filespaceSelector );
 
   // write the array to disk
   H5Dwrite( 
     imp->dataset_identifier, 
-    sHdfTypeMapping[data.dataType()], 
+    sHdfTypeMapping[data->dataType()], 
     memory_space, 
     imp->filespace_identifier,
     H5P_DEFAULT,
-    data.data() );
+    data->data() );
 }
 
 void HdfDataset::finalizeImplementation() {

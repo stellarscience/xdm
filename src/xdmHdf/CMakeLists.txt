@@ -4,10 +4,12 @@ find_package( HDF5 REQUIRED )
 
 set( ${PROJECT_NAME}_HEADERS 
     HdfDataset.hpp
+    SelectionVisitor.hpp
 )
 
 set( ${PROJECT_NAME}_SOURCES 
     HdfDataset.cpp
+    SelectionVisitor.cpp
 )
 
 include_directories(

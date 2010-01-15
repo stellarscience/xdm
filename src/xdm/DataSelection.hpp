@@ -33,7 +33,7 @@ public:
   /// Visitor accept interface for typed operations on subclasses.  Inheritors
   /// should reimplement this as v.apply(*this) to pass their specific subclass
   /// into the visitor's apply method.
-  virtual void accept( DataSelectionVisitor& v );
+  virtual void accept( DataSelectionVisitor& v ) const;
 };
 
 XDM_NAMESPACE_END

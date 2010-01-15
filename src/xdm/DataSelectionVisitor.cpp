@@ -11,16 +11,16 @@ DataSelectionVisitor::DataSelectionVisitor() {
 DataSelectionVisitor::~DataSelectionVisitor() {
 }
 
-void DataSelectionVisitor::apply( DataSelection& selection ) {
+void DataSelectionVisitor::apply( const DataSelection& selection ) {
   // no-op
 }
 
-void DataSelectionVisitor::apply( AllDataSelection& selection ) {
-  apply( static_cast< DataSelection& >( selection ) );
+void DataSelectionVisitor::apply( const AllDataSelection& selection ) {
+  apply( static_cast< const DataSelection& >( selection ) );
 }
 
-void DataSelectionVisitor::apply( HyperslabDataSelection& selection ) {
-  apply( static_cast< DataSelection& >( selection ) );
+void DataSelectionVisitor::apply( const HyperslabDataSelection& selection ) {
+  apply( static_cast< const DataSelection& >( selection ) );
 }
 
 XDM_NAMESPACE_END

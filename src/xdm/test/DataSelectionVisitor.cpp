@@ -17,15 +17,15 @@ using xdm::HyperslabDataSelection;
 
 // Visitor that fails on everything
 struct CheckVisitationBase : DataSelectionVisitor {
-  virtual void apply( DataSelection& ) { FAIL(); }
-  virtual void apply( AllDataSelection& ) { FAIL(); }
-  virtual void apply( HyperslabDataSelection& ) { FAIL(); }
+  virtual void apply( const DataSelection& ) { FAIL(); }
+  virtual void apply( const AllDataSelection& ) { FAIL(); }
+  virtual void apply( const HyperslabDataSelection& ) { FAIL(); }
 };
 
 // succeeds with T input, fails otherwise
 template< typename T >
 struct Succeed : CheckVisitationBase {
-  void apply( T& ) { SUCCEED(); }
+  void apply( const T& ) { SUCCEED(); }
 };
 
 template< typename T >

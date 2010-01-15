@@ -18,9 +18,9 @@ public:
   virtual ~DataSelectionVisitor();
 
   //-- apply methods for known subclasses of DataSelection --//
-  virtual void apply( DataSelection& selection );
-  virtual void apply( AllDataSelection& selection );
-  virtual void apply( HyperslabDataSelection& selection );
+  virtual void apply( const DataSelection& selection );
+  virtual void apply( const AllDataSelection& selection );
+  virtual void apply( const HyperslabDataSelection& selection );
 };
 
 XDM_NAMESPACE_END

@@ -44,10 +44,9 @@ public:
 	/// customize data flow.
 	class SerializeCallback : public ReferencedObject {
 	public:
-	  virtual void serializeImplementation(
-	    Dataset* ds,
-	    const StructuredArray& data,
-	    const HyperSlabMap<>& slabMap ) = 0;
+	  virtual void serializeImplementation( 
+      Dataset* ds, 
+      const StructuredArray* data ) = 0;
 	};
 	
 	/// Finalization Callback function.  Decorates the finalization process to
@@ -63,18 +62,14 @@ public:
   /// content.
   /// @param shape the shape of the data on disk.
   /// @param content stream with content to initialize the dataset from.
-  void initialize( 
-    primitiveType::Value type, 
-    const DataShape<>& shape );
+  void initialize( primitiveType::Value type, const DataShape<>& shape );
 
   /// Serialize an array.  Maps a hyper-slab in an array to a hyper-slab on
   /// disk.  Manipulating the stream is optional.
   /// @param data The data to be written.
   /// @param slabMap The mapping from memory space to file space
   /// @param content A stream from which to pull/push content that is generated
-  void serialize( 
-    const StructuredArray& data, 
-    const HyperSlabMap<>& slabMap );
+  void serialize( const StructuredArray* data );
 
   /// Complete writing the dataset.
   void finalize();
@@ -103,17 +98,14 @@ public:
   /// implement this function to provide the necessary calls required to
   /// initialize a dataset with the given shape from the content provided via
   /// the input stream.  No one should call this except callbacks.
-  virtual void initializeImplementation(
-    primitiveType::Value type,
+  virtual void initializeImplementation( primitiveType::Value type, 
     const DataShape<>& shape ) = 0;
 
   /// Pure virtual function to serialize an array.  Inheritors should implement
   /// this function to provide the necessary calls to write an array to disk or
   /// to the input stream, depending on the needs of the underlying dataset
   /// type. No one should call this except for callbacks.
-  virtual void serializeImplementation( 
-    const StructuredArray& data, 
-    const HyperSlabMap<>& slabMap ) = 0;
+  virtual void serializeImplementation( const StructuredArray* data ) = 0;
 
   /// Pure virtual function to complete the process of writing a dataset. This
   /// should be called only by callbacks.

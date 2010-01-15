@@ -13,7 +13,7 @@ class AllDataSelection : public DataSelection {
 public:
   AllDataSelection() {}
   virtual ~AllDataSelection() {}
-  virtual void accept( DataSelectionVisitor& v ) { v.apply(*this); }
+  virtual void accept( DataSelectionVisitor& v ) const { v.apply(*this); }
 };
 
 XDM_NAMESPACE_END

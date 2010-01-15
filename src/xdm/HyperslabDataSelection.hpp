@@ -29,7 +29,7 @@ public:
   }
 
   /// Visitor accept interface.
-  virtual void accept( DataSelectionVisitor& v ) {
+  virtual void accept( DataSelectionVisitor& v ) const {
     v.apply( *this );
   }
 };

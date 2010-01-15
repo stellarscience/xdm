@@ -23,20 +23,6 @@ int main( int argc, char* argv[] ) {
   fileshape[0] = 4;
   fileshape[1] = 4;
 
-  // set up the mapping from memory space to file space
-  xdm::HyperSlab<> memorySlab( arrayShape );
-  memorySlab.setStart( 0, 0 );
-  memorySlab.setStride( 0, 1 );
-  memorySlab.setCount( 0, 16 );
-  xdm::HyperSlab<> fileSlab( fileshape );
-  fileSlab.setStart( 0, 0 );
-  fileSlab.setStart( 1, 0 );
-  fileSlab.setStride( 0, 1 );
-  fileSlab.setStride( 1, 1 );
-  fileSlab.setCount( 0, 4 );
-  fileSlab.setCount( 1, 4 );
-  xdm::HyperSlabMap<> mapping( memorySlab, fileSlab );
-
   // create the dataset
   xdm::RefPtr< xdmHdf::HdfDataset > dataset = new xdmHdf::HdfDataset();
   dataset->setFile( "HdfDataset.h5" );
@@ -45,7 +31,7 @@ int main( int argc, char* argv[] ) {
 
   // write the data to disk
   dataset->initialize( xdm::primitiveType::kFloat, fileshape );
-  dataset->serialize( array, mapping );
+  dataset->serialize( &array );
   dataset->finalize();
   
   return 0;

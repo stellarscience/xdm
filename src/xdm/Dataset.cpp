@@ -22,13 +22,12 @@ void Dataset::initialize(
 }
 
 void Dataset::serialize(
-  const StructuredArray& data,
-  const HyperSlabMap<>& slabMap )
+  const StructuredArray* data )
 {
   if ( mSerializeCallback ) {
-    mSerializeCallback->serializeImplementation( this, data, slabMap );
+    mSerializeCallback->serializeImplementation( this, data );
   } else {
-    serializeImplementation( data, slabMap );
+    serializeImplementation( data );
   }
 }
 

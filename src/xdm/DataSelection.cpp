@@ -10,7 +10,7 @@ DataSelection::DataSelection() {
 DataSelection::~DataSelection() {
 }
 
-void DataSelection::accept( DataSelectionVisitor& v ) {
+void DataSelection::accept( DataSelectionVisitor& v ) const {
   v.apply( *this );
 }
 

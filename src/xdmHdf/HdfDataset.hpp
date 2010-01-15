@@ -42,9 +42,8 @@ public:
   virtual void initializeImplementation(
     xdm::primitiveType::Value type,
     const xdm::DataShape<>& shape );
-  virtual void serializeImplementation(
-    const xdm::StructuredArray& data,
-    const xdm::HyperSlabMap<>& memory_map );
+  virtual void serializeImplementation( 
+    const xdm::StructuredArray* data );
   virtual void finalizeImplementation();
 
 private:
