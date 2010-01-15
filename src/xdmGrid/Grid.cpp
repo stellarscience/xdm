@@ -23,7 +23,9 @@ void Grid::setTime( Time* time ) {
 }
 
 void Grid::traverse( xdm::ItemVisitor& iv ) {
-  mTime->accept( iv );
+  if ( mTime.valid() ) {
+    mTime->accept( iv );
+  }
 }
 
 void Grid::writeMetadata( xdm::XmlMetadataWrapper& xml ) {

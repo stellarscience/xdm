@@ -2,6 +2,7 @@
 #define xdmGrid_CollectionGrid_hpp
 
 #include <xdmGrid/Grid.hpp>
+#include <xdmGrid/GridCompositionMixin.hpp>
 
 #include <xdm/RefPtr.hpp>
 
@@ -15,7 +16,9 @@ XDM_GRID_NAMESPACE_BEGIN
 /// temporal, that is a collection of multiple grids in different locations, or
 /// a collection of grids representing the simulation at different points in
 /// time.
-class CollectionGrid : public Grid {
+class CollectionGrid : 
+  public Grid,
+  public GridCompositionMixin {
 public:
 
   /// Enumeration of collection type.  Spatial or temporal.
@@ -34,9 +37,6 @@ public:
   void setType( CollectionType t );
   CollectionType type() const;
 
-  /// add a child grid.
-  void appendChild( Grid* g );
-
   /// Definition of visitor traversal.
   virtual void traverse( xdm::ItemVisitor& iv );
 
@@ -44,7 +44,6 @@ public:
   virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
 private:
   CollectionType mType;
-  std::vector< xdm::RefPtr< Grid > > mChildren;
 };
 
 XDM_GRID_NAMESPACE_END

@@ -7,5 +7,9 @@ void Domain::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
   xml.setTag( "Domain" );
 }
 
+void Domain::traverse( xdm::ItemVisitor& iv ) {
+  applyGridFunctor( xdm::ApplyVisitor( iv ) );
+}
+
 XDM_GRID_NAMESPACE_END
 

@@ -9,8 +9,7 @@ XDM_GRID_NAMESPACE_BEGIN
 
 CollectionGrid::CollectionGrid( CollectionType type ) :
   Grid(),
-  mType( type ),
-  mChildren() {
+  mType( type ) {
 }
 
 CollectionGrid::~CollectionGrid() {
@@ -24,13 +23,9 @@ CollectionGrid::CollectionType CollectionGrid::type() const {
   return mType;
 }
 
-void CollectionGrid::appendChild( Grid* g ) {
-  mChildren.push_back( g );
-}
-
 void CollectionGrid::traverse( xdm::ItemVisitor& iv ) {
   Grid::traverse( iv );
-  std::for_each( mChildren.begin(), mChildren.end(), xdm::ApplyVisitor( iv ) );
+  applyGridFunctor( xdm::ApplyVisitor( iv ) );
 }
 
 void CollectionGrid::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
