@@ -18,5 +18,9 @@ void ItemVisitor::apply( Item& item ) {
   traverse( item );
 }
 
+void applyVisitor( ItemVisitor& iv, Item& item ) {
+  item.accept( iv );
+}
+
 XDM_NAMESPACE_END
 
