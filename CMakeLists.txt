@@ -19,6 +19,11 @@ if( UNIT_TEST_XDM )
     include_directories( third_party/gtest/include )
 endif()
 
+# Set the compiler flags required for a coverage build
+set( CMAKE_C_FLAGS_COVERAGE "-g -O0 -fprofile-arcs -ftest-coverage" )
+set( CMAKE_CXX_FLAGS_COVERAGE "-g -O0 -fprofile-arcs -ftest-coverage" )
+set( CMAKE_LD_FLAGS_COVERAGE "-g -O0 -fprofile-arcs -ftest-coverage" )
+
 add_subdirectory( third_party )
 add_subdirectory( src )
 
