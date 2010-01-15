@@ -105,6 +105,7 @@ TEST( XdmfGridCompatibility, staticGrid ) {
     new xdmGrid::Attribute( 
       xdmGrid::Attribute::kScalar, 
       xdmGrid::Attribute::kNode ) );
+  attribute->setName( "FunctionValues" );
   grid->appendChild( attribute );
   
   // create the data for the attribute.
