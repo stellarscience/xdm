@@ -44,10 +44,14 @@ directory.
 CMAKE_INSTALL_PREFIX : (Path) choose a different install path. Default is
                        /usr/local.
 
-BUILD_TESTING : (True/False) Enable the library unit tests. Default is True.
+BUILD_TESTING        : (True/False) Enable the library unit tests. Default is 
+                       True.
 
-XDM_COMMUNICATION : (True/False) Enable the communication library for MPI
-                    enabled datasets.  Default is false.
+XDM_COMMUNICATION    : (True/False) Enable the communication library for MPI
+                       enabled datasets.  Default is false.
+
+BUILD_SHARED_LIBS    : (True/False) Build shared libraries instead of static
+                       libraries.
 
 Documentation
 -------------
