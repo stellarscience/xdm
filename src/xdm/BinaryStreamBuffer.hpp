@@ -22,12 +22,23 @@
 #define xdm_BinaryStreamBuffer_hpp
 
 #include <memory>
-
-#include <cassert>
+#include <stdexcept>
 
 #include <xdm/NamespaceMacro.hpp>
+#include <xdm/ThrowMacro.hpp>
 
 XDM_NAMESPACE_BEGIN
+
+/// Exception signalling a buffer overrun error when filling a
+/// BinaryStreamBuffer. A BinaryStreamBuffer does not fill and output as a
+/// std::streambuf would. An explicit call to BinaryStreamBuffer::pubsync()
+/// is required to flush the buffer occasionally to empty the buffer. This
+/// exception should be raised when the buffer is overrun.
+class BinaryStreamBufferOverrun : public std::runtime_error {
+public:
+  BinaryStreamBufferOverrun() :
+    std::runtime_error( "Attempt to place object in a full binary buffer." ) {}
+};
 
 /// Class to handle reading and writing binary data to/from a buffer.  The I/O
 /// functions in this buffer handle the management of a buffer pointer so that
@@ -37,8 +48,8 @@ XDM_NAMESPACE_BEGIN
 ///
 /// This class does not fill and output as a std::streambuf would.  An explicit
 /// call to sync() must be called to flush the buffer occasionally, or it will
-/// fill up.  Attempts to put new data into a full buffer will result in failed
-/// assertions.
+/// fill up.  Attempts to put new data into a full buffer will result in thrown
+/// exceptions.
 template< typename AllocT = std::allocator<char> >
 class BasicBinaryStreamBuffer {
 private:
@@ -60,27 +71,43 @@ public:
   }
 
   /// Put a single character into the buffer at the current location.
+  /// @throw BinaryStreamBufferOverrun The data to place in the buffer is larger
+  /// than the available buffer space.
   void sputc( char c ) { 
-    assert( mLocation + 1 < mData + mSize );
+    if ( mData + mSize < mLocation + 1 ) {
+      XDM_THROW( BinaryStreamBufferOverrun() );
+    }
     *mLocation++ = c; 
   }
 
-  /// Put a character sequence into the buffer at the current location. 
+  /// Put a character sequence into the buffer at the current location.
+  /// @throw BinaryStreamBufferOverrun The data to place in the buffer is larger
+  /// than the available buffer space.
   void sputn( const char* in, size_t n ) {
-    assert( mLocation + n < mData + mSize );
+    if ( mData + mSize < mLocation + n ) {
+      XDM_THROW( BinaryStreamBufferOverrun() );
+    }
     std::uninitialized_copy( in, in + n, mLocation );
     mLocation += n;
   }
 
   /// Get a single character from the buffer at the current location.
+  /// @throw BinaryStreamBufferOverrun The data to place in the buffer is larger
+  /// than the available buffer space.
   char sgetc() {
-    assert( mLocation < mData + mSize );
+    if ( mData + mSize < mLocation ) {
+      XDM_THROW( BinaryStreamBufferOverrun() );
+    }
     return *mLocation++;
   }
 
   /// Get a sequence of characters from the buffer at the current location.
+  /// @throw BinaryStreamBufferOverrun The data to place in the buffer is larger
+  /// than the available buffer space.
   void sgetn( char* out, size_t n ) {
-    assert( mLocation + n < mData + mSize );
+    if ( mData + mSize < mLocation + n ) {
+      XDM_THROW( BinaryStreamBufferOverrun() );
+    }
     std::uninitialized_copy( mLocation, mLocation + n, out );
     mLocation += n;
   }
@@ -90,6 +117,7 @@ public:
     return mSize;
   }
 
+  /// Get the raw pointer to the beginning of the buffer.
   char* pointer() {
     return mData;
   }

@@ -27,6 +27,8 @@
 
 XDM_NAMESPACE_BEGIN
 
+/// Stream class for reading binary object representations from a
+/// BinaryStreamBuffer.
 class BinaryIStream : virtual public BinaryIosBase {
 public:
   

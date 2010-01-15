@@ -73,5 +73,14 @@ BOOST_AUTO_TEST_CASE( putgetn ) {
   BOOST_CHECK_EQUAL( 'c', result[2] );
 }
 
+BOOST_AUTO_TEST_CASE( bufferOverrun ) {
+  xdm::BinaryStreamBuffer test( 4 );
+  test.sputc( 'a' );
+  test.sputc( 'b' );
+  test.sputc( 'c' );
+  test.sputc( 'd' );
+  BOOST_CHECK_THROW( test.sputc( 'e' ), xdm::BinaryStreamBufferOverrun );
+}
+
 } // namespace
 

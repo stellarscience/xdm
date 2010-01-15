@@ -27,6 +27,8 @@
 
 XDM_NAMESPACE_BEGIN
 
+/// Stream class for writing object binary representations to a
+/// BinaryStreamBuffer.
 class BinaryOStream : virtual public BinaryIosBase {
 public:
   

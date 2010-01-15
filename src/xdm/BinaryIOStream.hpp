@@ -28,6 +28,7 @@
 
 XDM_NAMESPACE_BEGIN
 
+/// Stream for reading and writing objects to a BinaryStreamBuffer.
 class BinaryIOStream : 
   public BinaryIStream,
   public BinaryOStream {
