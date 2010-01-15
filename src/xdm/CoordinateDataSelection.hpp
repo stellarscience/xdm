@@ -12,7 +12,7 @@ XDM_NAMESPACE_BEGIN
 template< typename SizeT = size_t >
 class CoordinateArray {
 private:
-  const SizeT** mValues;
+  const SizeT* mValues;
   SizeT mRank;
   SizeT mNumberOfElements;
 
@@ -25,10 +25,13 @@ public:
     mRank( 0 ),
     mNumberOfElements( 0 ) {}
 
-  /// construct given a two-dimensional array and it's sizes.  Does not take
-  /// ownership.
+  /// Construct given a one dimensional array of interleaved coordinate values.
+  /// The array is expected to be of size at least numberOfElements*rank.
+  /// @param values Array with interleaved coordinate values.
+  /// @param rank Number of values required to identify a point.
+  /// @param numberOfElements Number of points to select.
   CoordinateArray( 
-    const size_type** values, 
+    const size_type* values, 
     size_type rank, 
     size_type numberOfElements ) :
     mValues( values ),
@@ -49,7 +52,7 @@ public:
     mNumberOfElements = rhs.mNumberOfElements;
   }
 
-  const size_type** values() const { return mValues; }
+  const size_type* values() const { return mValues; }
   size_type rank() const { return mRank; }
   size_type numberOfElements() const { return mNumberOfElements; }
 };
@@ -60,7 +63,7 @@ public:
 class CoordinateDataSelection : public DataSelection {
 public:
   CoordinateDataSelection();
-  CoordinateDataSelection( const CoordinateArray<>& coordinates );
+  explicit CoordinateDataSelection( const CoordinateArray<>& coordinates );
   virtual ~CoordinateDataSelection();
 
   const CoordinateArray<>& coordinates() const;

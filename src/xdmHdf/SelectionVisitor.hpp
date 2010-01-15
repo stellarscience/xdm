@@ -5,6 +5,8 @@
 
 #include <hdf5.h>
 
+#include <vector>
+
 #include <xdmHdf/NamespaceMacro.hpp>
 #include <xdm/NamespaceMacro.hpp>
 
@@ -19,6 +21,7 @@ XDM_HDF_NAMESPACE_BEGIN
 class SelectionVisitor : public xdm::DataSelectionVisitor {
 private:
   hid_t mIdent;
+  static std::vector< const hsize_t* > sPointerBuffer; 
 
 public:
   /// Constructor takes the dataspace identifier to act on.

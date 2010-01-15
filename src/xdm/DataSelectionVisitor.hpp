@@ -10,6 +10,7 @@
 XDM_NAMESPACE_BEGIN
 
 class AllDataSelection;
+class CoordinateDataSelection;
 class HyperslabDataSelection;
 
 class DataSelectionVisitor : public virtual ReferencedObject {
@@ -21,6 +22,8 @@ public:
   virtual void apply( const DataSelection& selection );
   virtual void apply( const AllDataSelection& selection );
   virtual void apply( const HyperslabDataSelection& selection );
+  virtual void apply( const CoordinateDataSelection& selection );
+
 };
 
 XDM_NAMESPACE_END

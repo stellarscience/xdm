@@ -7,7 +7,11 @@
 
 #include <stdexcept>
 
+#include <cassert>
+
 XDM_HDF_NAMESPACE_BEGIN
+
+std::vector< const hsize_t* > SelectionVisitor::sPointerBuffer;
 
 SelectionVisitor::SelectionVisitor( hid_t ident ) :
   mIdent( ident ) {
@@ -25,12 +29,30 @@ void SelectionVisitor::apply( const xdm::AllDataSelection& selection ) {
 }
 
 void SelectionVisitor::apply( const xdm::CoordinateDataSelection& selection ) {
+  // we are going to do a dangerous cast below to avoid a copy.  Ensure that it
+  // will work.
+  // FIXME: this can be a compile time assertion.  If we go this route,
+  // implement it.
+  assert( sizeof( xdm::CoordinateArray<>::size_type ) == sizeof( hsize_t ) );
+
   xdm::CoordinateArray<> coords = selection.coordinates();
+  
+  // HDF requires a numberOfElements x rank array for selection. Set up an array
+  // of pointers in the static buffer to simulate this from the contiguous
+  // input.
+  xdm::CoordinateArray<>::size_type numberOfElements = coords.numberOfElements();
+  xdm::CoordinateArray<>::size_type rank = coords.rank();
+  sPointerBuffer.resize( numberOfElements );
+  int count = 0;
+  for ( int index = 0; index < numberOfElements; index += rank ) {
+    sPointerBuffer[count++] = reinterpret_cast< const hsize_t* >( &coords.values()[index] );
+  }
+
   H5Sselect_elements( 
     mIdent, 
     H5S_SELECT_SET, 
     coords.numberOfElements(), 
-    (hsize_t*)(coords.values()) );
+    sPointerBuffer[0] );
 }
 
 void SelectionVisitor::apply( const xdm::HyperslabDataSelection& selection ) {
