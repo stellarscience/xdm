@@ -19,21 +19,23 @@ TEST( FunctionDataSerial, writeResult ) {
   // construct the problem grid
   ProblemInfo problem = constructFunctionGrid( 
     testCaseBounds(),
-    "FunctionData.serial.hdf" );
+    "FunctionData.serial.h5" );
 
   // in serial, the hyperslab of interest is the whole problem
-  xdm::HyperSlab<> slab( problemBounds.mSize );
+  xdm::HyperSlab<> slab( problemBounds.shape() );
   std::fill( slab.beginStart(), slab.endStart(), 0 );
   std::fill( slab.beginStride(), slab.endStride(), 1 );
   std::copy( 
-    problemBounds.mSize.begin(), 
-    problemBounds.mSize.end(),
+    problemBounds.shape().begin(), 
+    problemBounds.shape().end(),
     slab.beginCount() );
 
   // add the data for the slab of interest to the grid attribute
   xdm::RefPtr< xdmGrid::Attribute > attribute = problem.second;
-  attribute->dataItem()->appendData( 
-    new ConstantFunction( problemBounds, slab, 0 ) );
+  attribute->dataItem()->appendData( new FunctionData( 
+    problemBounds, 
+    slab, 
+    new TestCaseFunction ) );
   
   xdm::RefPtr< xdmFormat::TimeSeries > timeSeries( 
     new xdmFormat::TemporalCollection( "FunctionData.serial" ) );

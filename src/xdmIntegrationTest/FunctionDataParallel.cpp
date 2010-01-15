@@ -36,8 +36,8 @@ TEST_F( FunctionDataParallel, writeResult ) {
 
   // To compute the hyperslab of interest for this process, we'll partition the
   // grid along the x axis and assign roughly equal volumes to everyone.
-  int planesPerProcess = problemBounds.mSize[0] / processCount();
-  int remainingPlanes = problemBounds.mSize[0] % processCount();
+  int planesPerProcess = problemBounds.size(0) / processCount();
+  int remainingPlanes = problemBounds.size(0) % processCount();
   
   // distribute the remaining number of planes among the first few processes
   int localNumberOfPlanes = planesPerProcess;
@@ -49,18 +49,20 @@ TEST_F( FunctionDataParallel, writeResult ) {
     localStartingPlane += remainingPlanes;
   }
 
-  xdm::HyperSlab<> localRegion( problemBounds.mSize );
+  xdm::HyperSlab<> localRegion( problemBounds.shape() );
   localRegion.setStart( 0, localStartingPlane );
   localRegion.setStart( 1, 0 );
   localRegion.setStart( 2, 0 );
   std::fill( localRegion.beginStride(), localRegion.endStride(), 1 );
   localRegion.setCount( 0, localNumberOfPlanes );
-  localRegion.setCount( 1, problemBounds.mSize[1] );
-  localRegion.setCount( 2, problemBounds.mSize[2] );
+  localRegion.setCount( 1, problemBounds.size(1) );
+  localRegion.setCount( 2, problemBounds.size(2) );
 
   // add the data for the region of interest to the grid attribute
-  attribute->dataItem()->appendData( 
-    new ConstantFunction( problemBounds, localRegion, rank() + 1 ) );
+  attribute->dataItem()->appendData( new FunctionData( 
+    problemBounds, 
+    localRegion, 
+    new TestCaseFunction ) );
 
   xdm::RefPtr< xdmFormat::TimeSeries > timeSeries(
     new xdmFormat::TemporalCollection( baseName.str() ) );

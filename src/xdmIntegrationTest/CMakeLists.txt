@@ -91,9 +91,21 @@ xdm_integration_test_hdf5_diff( HdfDataMpi-1.h5 HdfDataMpi-8.h5 )
 #------------------------------------------------------------------------------
 # FunctionData Test Suite 
 #------------------------------------------------------------------------------
+# run it in serial
 xdm_integration_test_serial( FunctionData.serial FunctionDataSerial.cpp ) 
 xdm_integration_executable_parallel( 
     FunctionData.parallel
     FunctionDataParallel.cpp
+)
+# run it with 4 processes
+xdm_integration_run_parallel_test( 
+    FunctionData.parallel.4
+    xdmIntegrationTest.FunctionData.parallel.test
+    4
+)
+# check the parallel and serial files are equal
+xdm_integration_test_hdf5_diff( 
+    FunctionData.serial.h5
+    FunctionData.parallel.4.h5 
 )
 

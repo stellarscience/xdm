@@ -16,6 +16,8 @@
 
 #include <xdmHdf/HdfDataset.hpp>
 
+#include <cmath>
+
 ProblemInfo
 constructFunctionGrid( const GridBounds& bounds, const std::string& hdfFile ) {
   const char* axisNames[] = { "X", "Y", "Z" };
@@ -32,9 +34,9 @@ constructFunctionGrid( const GridBounds& bounds, const std::string& hdfFile ) {
   // Topology
   xdm::RefPtr< xdmGrid::RectilinearMesh > topology( new xdmGrid::RectilinearMesh );
   topology->setShape( xdm::makeShape( 
-    bounds.mSize[2] + 1, 
-    bounds.mSize[1] + 1,
-    bounds.mSize[0] + 1 ) );
+    bounds.size(2) + 1, 
+    bounds.size(1) + 1,
+    bounds.size(0) + 1 ) );
   grid->setTopology( topology.get() );
 
   // Geometry
@@ -45,19 +47,16 @@ constructFunctionGrid( const GridBounds& bounds, const std::string& hdfFile ) {
   // assign geometry values
   for ( int i = 0; i < 3 ; i++ ) {
     xdm::RefPtr< xdm::UniformDataItem > dataItem( new xdm::UniformDataItem( 
-      xdm::primitiveType::kDouble, xdm::makeShape( bounds.mSize[i] + 1 ) ) );
+      xdm::primitiveType::kDouble, xdm::makeShape( bounds.size(i) + 1 ) ) );
     // allocate enough space for bounds + 1 vertices to encompass the whole
     // range.
     xdm::RefPtr< xdm::VectorStructuredArray< double > > values( 
-      new xdm::VectorStructuredArray< double >( bounds.mSize[i] + 1 ) );
-    for ( int j = 0; j < bounds.mSize[i]; j++ ) {
-      (*values)[j] = 
-        bounds.mBounds[i].first + 
-        j * ( bounds.mBounds[i].second - bounds.mBounds[i].first ) 
-        / bounds.mSize[i];
+      new xdm::VectorStructuredArray< double >( bounds.size(i) + 1 ) );
+    for ( int j = 0; j < bounds.size(i); j++ ) {
+      (*values)[j] = bounds.nodeCoordinate( i, j );
     }
     // fill the final point
-    (*values)[ bounds.mSize[i] ] = bounds.mBounds[i].second;
+    (*values)[ bounds.size(i) ] = bounds.bounds(i).second;
     dataItem->appendData( new xdm::WritableArray( values.get() ) );
     geometry->setCoordinateValues( i, dataItem.get() );
     xdm::RefPtr< xdmHdf::HdfDataset > dataset( new xdmHdf::HdfDataset );
@@ -85,16 +84,15 @@ constructFunctionGrid( const GridBounds& bounds, const std::string& hdfFile ) {
 //-----------------------------------------------------------------------------
 FunctionData::FunctionData( 
   const GridBounds& grid, 
-  const xdm::HyperSlab<>& region ) :
+  const xdm::HyperSlab<>& region,
+  Function* function,
+  const xdm::DataShape<>& blockSize ) :
   mGrid( grid ),
   mRegionOfInterest( region ),
   mStorage(),
-  mStructuredArray() {
-
-  // reverse the order of the dimension specification in the grid and region of
-  // interest since the data will be written in KJI order.
-  reverseDimensionOrder( mGrid.mSize );
-  reverseDimensionOrder( mRegionOfInterest );
+  mStructuredArray(),
+  mFunction( function ),
+  mBlockSize( blockSize ) {
 
   mStorage.resize( 
     mRegionOfInterest.count( 0 ) *
@@ -108,22 +106,36 @@ FunctionData::~FunctionData() {
 }
 
 void FunctionData::writeImplementation( xdm::Dataset* dataset ) {
+  int startI = mRegionOfInterest.start(0);
+  int startJ = mRegionOfInterest.start(1);
+  int startK = mRegionOfInterest.start(2);
   int sizeI = mRegionOfInterest.count(0);
   int sizeJ = mRegionOfInterest.count(1);
   int sizeK = mRegionOfInterest.count(2);
   for ( int k = 0; k < sizeK; k++ ) {
+    double z = mGrid.cellCoordinate( 2, startK + k );
     for ( int j = 0; j < sizeJ; j++ ) {
+      double y = mGrid.cellCoordinate( 1, startJ + j );
       for ( int i = 0; i < sizeI; i++ ) {
-        double result = evaluate( i, j, k );
+        double x = mGrid.cellCoordinate( 0, startI + i );
+        double result = (*mFunction)( x, y, z );
         int arrayLocation = i + j*sizeI + k*sizeI*sizeJ;
         mStorage[arrayLocation] = result;
       }
     }
   }
 
+  xdm::HyperSlab<> fileSelectionSlab( mRegionOfInterest );
+  reverseDimensionOrder( fileSelectionSlab );
   xdm::DataSelectionMap selectionMap(
     new xdm::AllDataSelection,
-    new xdm::HyperslabDataSelection( mRegionOfInterest ) );
+    new xdm::HyperslabDataSelection( fileSelectionSlab ) );
   dataset->serialize( mStructuredArray, selectionMap );
+}
+
+//-----------------------------------------------------------------------------
+double TestCaseFunction::operator()( double x, double y, double z ) {
+  using std::sin;
+  return sin( x + 2*y + 4*z );
 }
 
