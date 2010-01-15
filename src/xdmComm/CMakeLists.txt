@@ -43,7 +43,7 @@ target_link_libraries( ${PROJECT_NAME}
     ${MPI_LIBRARIES}
 )
 
-if( UNIT_TEST_XDM )
+if( BUILD_TESTING )
     add_subdirectory( test )
 endif()
 

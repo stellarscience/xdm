@@ -7,10 +7,6 @@ cmake_minimum_required( VERSION 2.6 )
 list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules )
 
 include( CTest )
-enable_testing()
-
-# option specifies whether or not to build the XDM unit test suite
-option( UNIT_TEST_XDM "Enable unit tests for the XDM library" ${UNIT_TEST_XDM} )
 
 # option specifies whether or not to use the XDM communication library
 option( XDM_COMMUNICATION 
@@ -18,7 +14,7 @@ option( XDM_COMMUNICATION
     ${XDM_COMMUNICATION}
 )
 
-if( UNIT_TEST_XDM )
+if( BUILD_TESTING )
   find_package( Boost REQUIRED COMPONENTS unit_test_framework )
 endif()
 

@@ -1,3 +1,6 @@
+find_package( HDF5 )
+find_package( MPI )
+
 include_directories( ${Boost_INCLUDE_DIRS} )
 
 set( XDM_COMPONENTS
@@ -30,7 +33,6 @@ endmacro()
 
 # compile a parallel executable
 macro( xdm_integration_executable_parallel executable_name )
-    find_package( MPI )
     if( MPI_FOUND )
         include_directories( ${MPI_INCLUDE_PATH} )
         add_executable( xdmIntegrationTest.${executable_name}.test ${ARGN} )
@@ -45,7 +47,6 @@ endmacro()
 
 # run a test in parallel with the given number of processes
 macro( xdm_integration_run_parallel_test test_name executable_name num_procs )
-    find_package( MPI )
     if( MPIEXEC )
         add_test( xdmIntegrationTest.${test_name} ${MPIEXEC}
             ${MPIEXEC_NUMPROC_FLAG} ${num_procs}
@@ -63,10 +64,10 @@ macro( xdm_integration_test_parallel test_name num_procs )
         xdmIntegrationTest.${test_name}.test ${num_procs} )
 endmacro()
 
-# add a test that compares the output of two HDF files
+# add a test that compares the output of two HDF files.  The test will be run
+# only if the MPI executor and h5diff are both available.
 macro( xdm_integration_test_hdf5_diff lhs rhs )
-    find_package( HDF5 )
-    if( HDF5_DIFF_EXECUTABLE )
+    if( MPIEXEC AND HDF5_DIFF_EXECUTABLE )
         add_test( xdmIntegrationTest.diff.${lhs}-to-${rhs} 
             ${HDF5_DIFF_EXECUTABLE} ${lhs} ${rhs}
         )

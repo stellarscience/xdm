@@ -12,6 +12,6 @@ if ( XDM_COMMUNICATION )
     add_subdirectory( xdmComm )
 endif()
 
-if( UNIT_TEST_XDM AND XDM_COMMUNICATION )
+if( BUILD_TESTING AND XDM_COMMUNICATION )
     add_subdirectory( xdmIntegrationTest )
 endif()

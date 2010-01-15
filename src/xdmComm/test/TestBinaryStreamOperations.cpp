@@ -101,8 +101,14 @@ BOOST_AUTO_TEST_CASE( HyperSlabRoundtrip ) {
 BOOST_AUTO_TEST_CASE( HyperslabDataSelectionRoundtrip ) {
   Fixture test;
   
-  xdm::HyperslabDataSelection answer( 
-    xdm::HyperSlab<>( xdm::makeShape( 3, 3, 3 ) ) );
+  // You might have noticed the extra set of parentheses below...This is to deal
+  // with a GCC 3.2 error: For some reason, GCC 3.2 thinks the declaration below
+  // is declaring a function pointer. The extra set of parentheses forces the
+  // compiler to evaluate the call inside of the answer constructor first, and
+  // then the compiler knows it should be calling a constructor, not declaring a
+  // function pointer.
+  xdm::HyperslabDataSelection answer(( 
+    xdm::HyperSlab<>( xdm::makeShape( 3, 3, 3 ) ) ));
 
   test.stream << answer << xdmComm::flush;
 
