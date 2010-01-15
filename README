@@ -49,3 +49,14 @@ BUILD_TESTING : (True/False) Enable the library unit tests. Default is True.
 XDM_COMMUNICATION : (True/False) Enable the communication library for MPI
                     enabled datasets.  Default is false.
 
+Documentation
+-------------
+
+The source code is documented using Doxygen directives. To generate the
+documentation for the library, change into the build directory and run
+
+$ make htmldoc
+
+This will generate HTML documentation for the library and place the main
+documentation file in xdm-build/doc/api_doc/index.html
+

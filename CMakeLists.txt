@@ -6,16 +6,27 @@ cmake_minimum_required( VERSION 2.6 )
 
 list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules )
 
-include( CTest )
-
 # option specifies whether or not to use the XDM communication library
 option( XDM_COMMUNICATION 
     "Enable the build of the XDM parallel communication library"
     ${XDM_COMMUNICATION}
 )
 
+# option specifies whether or not to enable the unit tests
+option( BUILD_TESTING 
+  "Enable the build of the project's unit tests."
+  OFF 
+)
+
 if( BUILD_TESTING )
+  message( STATUS "Unit tests are enabled" )
+  include( CTest )
   find_package( Boost REQUIRED COMPONENTS unit_test_framework )
+endif()
+
+if ( NOT CMAKE_BUILD_TYPE )
+  message( STATUS "No build type specified -- default is Release" )
+  set( CMAKE_BUILD_TYPE Release CACHE STRING "Default build type" FORCE )
 endif()
 
 # Set the compiler flags required for a coverage build
