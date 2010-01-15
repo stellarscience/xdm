@@ -30,7 +30,7 @@ public:
   Attribute( Type t = kScalar, Center c = kNode );
   virtual ~Attribute();
 
-public:
+private:
   Type mType;
   Center mCenter;
 };
