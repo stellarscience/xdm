@@ -15,8 +15,7 @@ option( XDM_COMMUNICATION
 )
 
 if( UNIT_TEST_XDM )
-    # add the unit test include directory
-    include_directories( third_party/gtest/include )
+  find_package( Boost REQUIRED COMPONENTS unit_test_framework )
 endif()
 
 # Set the compiler flags required for a coverage build

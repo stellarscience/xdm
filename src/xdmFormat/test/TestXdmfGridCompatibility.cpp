@@ -1,7 +1,8 @@
 //-----------------------------------------------------------------------------
 // These are tests to verify format compatibility with ParaView's XDMF Library
 //-----------------------------------------------------------------------------
-#include <gtest/gtest.h>
+#define BOOST_TEST_MODULE 
+#include <boost/test/unit_test.hpp>
 
 #include <xdm/CollectMetadataOperation.hpp>
 #include <xdm/SerializeDataOperation.hpp>

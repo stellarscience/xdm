@@ -1,4 +1,5 @@
-#include <gtest/gtest.h>
+#define BOOST_TEST_MODULE 
+#include <boost/test/unit_test.hpp>
 
 #include <xdm/ReferencedObject.hpp>
 #include <xdm/RefPtr.hpp>

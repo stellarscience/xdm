@@ -1,4 +1,5 @@
-#include <gtest/gtest.h>
+#define BOOST_TEST_MODULE CollectMetadataOperation 
+#include <boost/test/unit_test.hpp>
 
 #include <xdm/CollectMetadataOperation.hpp>
 
@@ -14,7 +15,7 @@ struct AggregateItem : xdm::Item {
   }
 };
 
-TEST( CollectMetadataOperation, applyItem ) {
+BOOST_AUTO_TEST_CASE( applyItem ) {
   xdm::CollectMetadataOperation op;
   xdm::Item i;
 
@@ -27,10 +28,10 @@ TEST( CollectMetadataOperation, applyItem ) {
     "</Item>\n";
   std::stringstream result;
   result << *opResult;
-  ASSERT_EQ( answer, result.str() );
+  BOOST_REQUIRE_EQUAL( answer, result.str() );
 }
 
-TEST( CollectMetadataOperation, applyAggregateItem ) {
+BOOST_AUTO_TEST_CASE( applyAggregateItem ) {
   xdm::RefPtr< AggregateItem > item[4];
   item[0] = new AggregateItem;
   for ( int i = 1; i < 4; ++i ) {
@@ -53,11 +54,6 @@ TEST( CollectMetadataOperation, applyAggregateItem ) {
     "</Item>\n";
   std::stringstream result;
   result << *opResult;
-  ASSERT_EQ( answer, result.str() );
-}
-
-int main( int argc, char* argv[] ) {
-  ::testing::InitGoogleTest( &argc, argv );
-  return RUN_ALL_TESTS();
+  BOOST_REQUIRE_EQUAL( answer, result.str() );
 }
 

@@ -1,7 +1,8 @@
 
 macro( xdmGrid_test_serial test_name )
+    include_directories( ${Boost_INCLUDE_DIRS} )
     add_executable( xdmGrid.${test_name}.test ${ARGN} )
-    target_link_libraries( xdmGrid.${test_name}.test xdmGrid gtest )
+    target_link_libraries( xdmGrid.${test_name}.test xdmGrid ${Boost_LIBRARIES} )
     add_test( xdmGrid.${test_name} xdmGrid.${test_name}.test )
 endmacro()
 

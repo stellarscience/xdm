@@ -1,8 +1,9 @@
 
 # Add a serial test
 macro( xdm_test_serial test_name )
+    include_directories( ${Boost_INCLUDE_DIRS} )
     add_executable( xdm.${test_name}.test ${ARGN} )
-    target_link_libraries( xdm.${test_name}.test xdm gtest )
+    target_link_libraries( xdm.${test_name}.test xdm ${Boost_LIBRARIES} )
     add_test( xdm.${test_name} xdm.${test_name}.test )
 endmacro()
 

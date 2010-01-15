@@ -1,3 +1,5 @@
+include_directories( ${Boost_INCLUDE_DIRS} )
+
 set( XDM_COMPONENTS
     xdm
     xdmComm
@@ -21,7 +23,7 @@ macro( xdm_integration_test_serial test_name )
     target_link_libraries( xdmIntegrationTest.${test_name}.test 
         xdmIntegrationTest
         ${XDM_COMPONENTS}
-        gtest 
+        ${Boost_LIBRARIES} 
     )
     add_test( xdmIntegrationTest.${test_name} xdmIntegrationTest.${test_name}.test )
 endmacro()
@@ -35,7 +37,7 @@ macro( xdm_integration_executable_parallel executable_name )
         target_link_libraries( xdmIntegrationTest.${executable_name}.test
             xdmIntegrationTest
             ${XDM_COMPONENTS}
-            gtest 
+            ${Boost_LIBRARIES} 
             ${MPI_LIBRARIES} 
         )
     endif()
