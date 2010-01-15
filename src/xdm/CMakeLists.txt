@@ -1,4 +1,4 @@
-project( xdmf )
+project( xdm )
 
 find_package( HDF5 )
 
@@ -44,4 +44,6 @@ add_library( ${PROJECT_NAME}
 target_link_libraries( ${PROJECT_NAME} 
     ${HDF5_LIBRARIES}
 )
+
+add_subdirectory( test )
 
