@@ -21,13 +21,9 @@ public:
   XmlOutputStream( std::ostream& output );
   virtual ~XmlOutputStream();
 
-  /// Open a new new context given an XML object.  This will output the
-  /// XmlObject's header and body (if it has one) to the output stream. Content
-  /// fo the objects written to the stream will appear after the body of the
-  /// input object.  A call to this method causes the reference count of the
-  /// XmlObject to be incremented.
-  ///
-  /// @param obj XmlObject to open and print header and body.
+  /// Open a new stream context given an XML object.  If the object is an
+  /// aggregation of other objects (has children), multiple contexts will be
+  /// opened leading to the final child of the innermost object.
   void openContext( RefPtr< XmlObject > obj );
 
   /// Write a a complete XML object within the current context.

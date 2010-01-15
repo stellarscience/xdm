@@ -29,6 +29,10 @@ private:
   ChildList mChildren;
 
 public:
+
+  typedef ChildList::iterator ChildIterator;
+  typedef ChildList::const_iterator ConstChildIterator;
+
   /// Construct an XmlObject with no tag.
   XmlObject();
   /// Construct an XmlObject with the given tag.
@@ -63,15 +67,25 @@ public:
   /// Get the numbered line of text content.
   const std::string& contentLine( unsigned int line ) const;
 
+  /// Determine if the object has children.
+  bool hasChildren() const { return !mChildren.empty(); }
+
+  ChildIterator beginChildren() { return mChildren.begin(); }
+  ConstChildIterator beginChildren() const { return mChildren.begin(); }
+  ChildIterator endChildren() { return mChildren.end(); }
+  ConstChildIterator endChildren() const { return mChildren.end(); }
+
   //-- Methods for outputting an XML object --//
 
   /// Print the header for the XML object to an ostream.  This is the content
   /// between the <...> of the XML object.
   void printHeader( std::ostream& ostr, int indentLevel = 0 ) const;
-  
-  /// Print the body of the XML object (including the full body of all of it's
-  /// children) to an ostream.
-  void printBody( std::ostream& ostr, int indentLevel = 0 ) const;
+
+  /// Print the text content of the XML object to an ostream.
+  void printTextContent( std::ostream& ostr, int indentLevel = 0 ) const;
+
+  /// Print the full body of all of an XmlObject's children to an ostream.
+  void printChildren( std::ostream& ostr, int indentLevel = 0 ) const;
 
   /// Print the footer of the XML object to an ostream.
   void printFooter( std::ostream& ostr, int indentLevel = 0 ) const;

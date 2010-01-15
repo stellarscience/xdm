@@ -29,7 +29,8 @@ namespace {
       mOstr( ostr ), mIndent( indent ) {}
     void operator()( const XmlObject* obj ) {
       obj->printHeader( mOstr, mIndent );
-      obj->printBody( mOstr, mIndent + 1 );
+      obj->printTextContent( mOstr, mIndent + 1 );
+      obj->printChildren( mOstr, mIndent + 1 );
       obj->printFooter( mOstr, mIndent );
     }
   };
@@ -125,15 +126,15 @@ void XmlObject::printHeader( std::ostream& ostr, int indentLevel ) const {
   ostr << ">" << std::endl;
 }
 
-void XmlObject::printBody( std::ostream& ostr, int indentLevel ) const {
-  // print my text first
+void XmlObject::printTextContent( std::ostream& ostr, int indentLevel ) const {
   TextContent::const_iterator line;
   for ( line = mTextContent.begin(); line != mTextContent.end(); ++line ) {
     indentLine( ostr, indentLevel );
     ostr << *line << std::endl;
   }
-  
-  // now print the children.
+}
+
+void XmlObject::printChildren( std::ostream& ostr, int indentLevel ) const {
   std::for_each( mChildren.begin(), mChildren.end(), 
     PrintXmlObjectFunctor( ostr, indentLevel ) );
 }

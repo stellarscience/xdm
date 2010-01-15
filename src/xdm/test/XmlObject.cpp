@@ -35,7 +35,8 @@ TEST( XmlObject, printTextContent ) {
   char const * const answer = "text content\n";
 
   std::stringstream result;
-  obj->printBody( result );
+  obj->printTextContent( result );
+  obj->printChildren( result );
 
   ASSERT_EQ( answer, result.str() );
 }

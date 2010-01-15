@@ -29,5 +29,29 @@ DataShape<> makeShape( const std::string& dimensions ) {
   return ret;
 }
 
+DataShape<> makeShape( DataShape<>::size_type i ) {
+  DataShape<> result( 1 );
+  result[0] = i;
+  return result;
+}
+
+DataShape<> makeShape( DataShape<>::size_type i, DataShape<>::size_type j ){
+  DataShape<> result( 2 );
+  result[0] = i;
+  result[1] = j;
+  return result;
+}
+
+DataShape<> makeShape( 
+  DataShape<>::size_type i,
+  DataShape<>::size_type j,
+  DataShape<>::size_type k ) {
+  DataShape<> result( 3 );
+  result[0] = i;
+  result[1] = j;
+  result[2] = k;
+  return result;
+}
+
 XDM_NAMESPACE_END
 

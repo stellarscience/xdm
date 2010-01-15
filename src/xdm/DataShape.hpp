@@ -101,6 +101,18 @@ public:
 /// Make a DataShape given a space separated string with the dimensions.
 DataShape<> makeShape( const std::string& dimensions );
 
+/// Make a DataShape of rank 1 with the given dimension.
+DataShape<> makeShape( DataShape<>::size_type i );
+
+/// Make a DataShape of rank 2 with the given dimensions.
+DataShape<> makeShape( DataShape<>::size_type i, DataShape<>::size_type j );
+
+/// Make a DataShape of rank 3 with the given dimensions.
+DataShape<> makeShape( 
+  DataShape<>::size_type i,
+  DataShape<>::size_type j,
+  DataShape<>::size_type k );
+
 /// Print a DataShape to an ostream.
 template< typename T >
 std::ostream& operator<<( std::ostream& ostr, const DataShape< T >& shape ) {

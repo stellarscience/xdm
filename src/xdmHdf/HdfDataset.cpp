@@ -1,8 +1,11 @@
 
+#include <xdmHdf/FileIdentifier.hpp>
+#include <xdmHdf/FileIdentifierRegistry.hpp>
 #include <xdmHdf/HdfDataset.hpp>
 #include <xdmHdf/SelectionVisitor.hpp>
 
 #include <xdm/PrimitiveType.hpp>
+#include <xdm/RefPtr.hpp>
 
 #include <algorithm>
 #include <map>
@@ -14,16 +17,6 @@
 XDM_HDF_NAMESPACE_BEGIN
 
 namespace {
-
-struct HdfLocation {  
-  std::string mFilePath;
-  std::string mDatasetPath;
-  HdfLocation( const std::string& data ) {
-    size_t pos = data.find( ':' );
-    mFilePath = data.substr(0, pos );
-    mDatasetPath = data.substr( pos + 1 );
-  }
-};
 
 struct HdfTypeMapping {
   std::map< xdm::primitiveType::Value, int > mTypeMap;
@@ -53,18 +46,31 @@ struct HdfDataset::Private {
   std::string mGroup;
   std::string mDataset;
   
-  hid_t file_identifier;
+  xdm::RefPtr< FileIdentifier > mFileId;
+  
   hid_t dataset_identifier;
   hid_t filespace_identifier;
+  hid_t group_identifier;
 
-  Private() {}
+  Private() :
+    mFile(),
+    mGroup(),
+    mDataset(),
+    mFileId(),
+    dataset_identifier( 0 ),
+    filespace_identifier( 0 ),
+    group_identifier( 0 ) {}
   Private( 
     const std::string& file,
     const std::string& group,
     const std::string& dataset ) :
     mFile( file ),
     mGroup( group ),
-    mDataset( dataset ) {}
+    mDataset( dataset ),
+    mFileId(),
+    dataset_identifier( 0 ),
+    filespace_identifier( 0 ),
+    group_identifier( 0 ) {}
 };
 
 HdfDataset::HdfDataset() : 
@@ -116,21 +122,37 @@ void HdfDataset::initializeImplementation(
   const xdm::DataShape<>& shape ) {
   
   // open the HDF file for writing
-  imp->file_identifier = H5Fcreate( 
-    imp->mFile.c_str(),
-    H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT );
+  imp->mFileId = FileIdentifierRegistry::instance()->findOrCreateIdentifier(
+    imp->mFile );
+  hid_t datasetLocId = imp->mFileId->get();
 
+  // construct the group in the file.
+  if ( !imp->mGroup.empty() ) {
+    // first try to open the group to see if it's there
+    imp->group_identifier = H5Gopen( 
+      imp->mFileId->get(), 
+      imp->mGroup.c_str(), 
+      H5P_DEFAULT );
+    if ( imp->group_identifier < 0 ) {
+      imp->group_identifier = H5Gcreate( 
+        imp->mFileId->get(), 
+        imp->mGroup.c_str(), 
+        H5P_DEFAULT,
+        H5P_DEFAULT,
+        H5P_DEFAULT );
+    }
+    datasetLocId = imp->group_identifier;
+  }
+  
   // construct the file space to correspond to the requested shape
   // convert between size type
   xdm::DataShape< hsize_t > file_shape( shape );
   imp->filespace_identifier = H5Screate_simple( file_shape.rank(), &file_shape[0], NULL );
 
   // construct the dataset in the file
-  std::stringstream datasetPath;
-  datasetPath << imp->mGroup << "/" << imp->mDataset;
   imp->dataset_identifier = H5Dcreate(
-    imp->file_identifier,
-    datasetPath.str().c_str(),
+    datasetLocId,
+    imp->mDataset.c_str(),
     sHdfTypeMapping[type],
     imp->filespace_identifier,
     H5P_DEFAULT,
@@ -167,7 +189,9 @@ void HdfDataset::serializeImplementation(
 void HdfDataset::finalizeImplementation() {
   H5Sclose( imp->filespace_identifier );
   H5Dclose( imp->dataset_identifier );
-  H5Fclose( imp->file_identifier );
+  if ( imp->group_identifier ) {
+    H5Gclose( imp->group_identifier );
+  }
 }
 
 XDM_HDF_NAMESPACE_END
