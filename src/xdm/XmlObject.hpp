@@ -23,7 +23,7 @@ private:
   std::string mTag;
   typedef std::map< std::string, std::string > AttributeMap;
   AttributeMap mAttributeMap;
-  typedef std::list< std::string > TextContent;
+  typedef std::vector< std::string > TextContent;
   TextContent mTextContent;
   typedef std::vector< RefPtr< XmlObject > > ChildList;
   ChildList mChildren;
@@ -43,6 +43,20 @@ public:
   
   /// Append another XmlObject as a child of this object.
   void appendChild( XmlObject* child );
+
+  //-- Methods for querying an XML object --//
+
+  /// Get the tag name for this object.
+  const std::string& tag() const;
+
+  /// Determine if the object has the specified attribute.
+  bool hasAttribute( const std::string& key ) const;
+
+  /// Get the value of the specified attribute.
+  const std::string& attribute( const std::string& key ) const;
+
+  /// Get the numbered line of text content.
+  const std::string& contentLine( unsigned int line ) const;
 
   //-- Methods for outputting an XML object --//
 

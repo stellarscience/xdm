@@ -16,6 +16,30 @@ xdm::RefPtr< XmlObject > buildTree() {
   return foo;
 }
 
+TEST( XmlObject, printHeader ) {
+  xdm::RefPtr< XmlObject > obj( new XmlObject( "obj" ) );
+
+  char const * const answer = "<obj>\n";
+
+  std::stringstream result;
+  obj->printHeader( result );
+
+  ASSERT_EQ( answer, result.str() );
+}
+
+TEST( XmlObject, printTextContent ) {
+  xdm::RefPtr< XmlObject > obj( new XmlObject( "obj" ) );
+  obj->appendContent( "text content" );
+  ASSERT_EQ( "text content", obj->contentLine(0) );
+
+  char const * const answer = "text content\n";
+
+  std::stringstream result;
+  obj->printBody( result );
+
+  ASSERT_EQ( answer, result.str() );
+}
+
 TEST( XmlObject, OStreamInsertion ) {
   char const * const answer = 
     "<foo bar='42'>\n"

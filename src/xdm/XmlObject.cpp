@@ -1,5 +1,8 @@
 #include <xdm/XmlObject.hpp>
 
+#include <sstream>
+#include <stdexcept>
+
 XDM_NAMESPACE_BEGIN
 
 namespace {
@@ -13,7 +16,7 @@ namespace {
     }
     
     void operator()( const std::pair< std::string, std::string >& p ) {
-      mOstr << p.first << "=" << p.second << mDelimiter;
+      mOstr << mDelimiter << p.first << "='" << p.second << "'";
     }
   };
 
@@ -46,6 +49,9 @@ XmlObject::XmlObject( const std::string& tag ) :
 XmlObject::~XmlObject() {
 }
 
+//-----------------------------------------------------------------------------
+// Tree Construction
+//-----------------------------------------------------------------------------
 void XmlObject::appendAttribute( 
   const std::string& name, 
   const std::string& value ) {
@@ -53,18 +59,50 @@ void XmlObject::appendAttribute(
 }
 
 void XmlObject::appendContent( const std::string& text ) {
-  std::stringstream ss( text );
-  ss << std::endl;
-  mTextContent.push_back( ss.str() );
+  mTextContent.push_back( text );
 }
 
 void XmlObject::appendChild( XmlObject* child ) {
   mChildren.push_back( child );
 }
 
+//-----------------------------------------------------------------------------
+// Queries
+//-----------------------------------------------------------------------------
+const std::string& XmlObject::tag() const {
+  return mTag;
+}
+
+bool XmlObject::hasAttribute( const std::string& key ) const {
+  AttributeMap::const_iterator it = mAttributeMap.find( key );
+  return ( it != mAttributeMap.end() );
+}
+
+const std::string& XmlObject::attribute( const std::string& key ) const {
+  AttributeMap::const_iterator it = mAttributeMap.find( key );
+  if ( it == mAttributeMap.end() ) {
+    std::stringstream msg( "No such attribute: " );
+    msg << key;
+    throw std::runtime_error( msg.str() );
+  }
+  return it->second;
+}
+
+const std::string& XmlObject::contentLine( unsigned int line ) const {
+  if ( line >= mTextContent.size() ) {
+    std::stringstream msg( "Content line out of range: " );
+    msg << line;
+    throw std::runtime_error( msg.str() );
+  }
+  return mTextContent[line];
+}
+
+//-----------------------------------------------------------------------------
+// Formatting
+//-----------------------------------------------------------------------------
 void XmlObject::printHeader( std::ostream& ostr, int indentLevel ) const {
   indentLine( ostr, indentLevel );
-  ostr << "<" << mTag << " ";
+  ostr << "<" << mTag;
   std::for_each( mAttributeMap.begin(), mAttributeMap.end(), 
     PrintAttributeValuePair( ostr, ' ' ) );
   ostr << ">" << std::endl;
