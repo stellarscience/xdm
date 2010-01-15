@@ -3,6 +3,7 @@
 #include <xdm/DataShape.hpp>
 
 #include <sstream>
+#include <stdexcept>
 
 typedef xdm::DataShape<> TestShape;
 
@@ -16,6 +17,17 @@ TEST( DataShape, OStreamInserter ) {
   std::stringstream result;
   result << test;
   ASSERT_EQ( answer, result.str() );
+}
+
+TEST( DataShape, makeShape ) {
+  TestShape result = xdm::makeShape( "1 2 3 4" );
+  ASSERT_EQ( 4, result.rank() );
+  ASSERT_EQ( 1, result[0] );
+  ASSERT_EQ( 2, result[1] );
+  ASSERT_EQ( 3, result[2] );
+  ASSERT_EQ( 4, result[3] );
+
+  ASSERT_THROW( xdm::makeShape( "1 jeff" ), std::invalid_argument );
 }
 
 int main( int argc, char* argv[] ) {

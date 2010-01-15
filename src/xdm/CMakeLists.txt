@@ -7,11 +7,12 @@ set( ${PROJECT_NAME}_HEADERS
     CompositeDataItem.hpp
     DataItem.hpp
     Dataset.hpp
+    DataShape.hpp
     HyperSlab.hpp
     Item.hpp
     ItemVisitor.hpp
-	  NamespaceMacro.hpp
-	  ObjectCompositionMixin.hpp
+	NamespaceMacro.hpp
+	ObjectCompositionMixin.hpp
     ReferencedObject.hpp
     RefPtr.hpp
     StructuredArray.hpp
@@ -26,6 +27,7 @@ set( ${PROJECT_NAME}_SOURCES
     CompositeDataItem.cpp
     DataItem.cpp
     Dataset.cpp
+    DataShape.cpp
     Item.cpp
     ItemVisitor.cpp
     ReferencedObject.cpp

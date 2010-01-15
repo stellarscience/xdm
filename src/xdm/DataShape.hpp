@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cassert>
 #include <ostream>
+#include <string>
 #include <vector>
 
 #include <xdm/NamespaceMacro.hpp>
@@ -96,6 +97,9 @@ public:
     return mDimensions[i];
   }
 };
+
+/// Make a DataShape given a space separated string with the dimensions.
+DataShape<> makeShape( const std::string& dimensions );
 
 /// Print a DataShape to an ostream.
 template< typename T >
