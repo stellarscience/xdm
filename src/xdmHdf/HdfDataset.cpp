@@ -1,6 +1,7 @@
-
+#include <xdmHdf/DatasetIdentifier.hpp>
 #include <xdmHdf/FileIdentifier.hpp>
 #include <xdmHdf/FileIdentifierRegistry.hpp>
+#include <xdmHdf/GroupIdentifier.hpp>
 #include <xdmHdf/HdfDataset.hpp>
 #include <xdmHdf/SelectionVisitor.hpp>
 
@@ -17,6 +18,21 @@
 XDM_HDF_NAMESPACE_BEGIN
 
 namespace {
+
+// By default, the HDF library will clean up all identifiers upon application
+// exit.  The following class contains instructions that tell HDF not to do
+// this.  This is necessary because we hold on to certain identifiers in a
+// singleton registry object, whose at exit destructor takes care of the
+// identifiers.  This means uncareful programming can cause HDF to leak, so it
+// is important to manage HDF resources.  An RAII class, ResourceIdentifier is
+// available to assist with this.
+class HdfInitializationInstruction {
+public:
+  HdfInitializationInstruction() {
+    H5dont_atexit();
+  }
+};
+static HdfInitializationInstruction initHdf;
 
 struct HdfTypeMapping {
   std::map< xdm::primitiveType::Value, int > mTypeMap;
@@ -47,19 +63,19 @@ struct HdfDataset::Private {
   std::string mDataset;
   
   xdm::RefPtr< FileIdentifier > mFileId;
-  
-  hid_t dataset_identifier;
+  xdm::RefPtr< GroupIdentifier > mGroupId;
+  xdm::RefPtr< DatasetIdentifier > mDatasetId;
+
   hid_t filespace_identifier;
-  hid_t group_identifier;
 
   Private() :
     mFile(),
     mGroup(),
     mDataset(),
     mFileId(),
-    dataset_identifier( 0 ),
-    filespace_identifier( 0 ),
-    group_identifier( 0 ) {}
+    mGroupId(),
+    mDatasetId(),
+    filespace_identifier( 0 ) {}
   Private( 
     const std::string& file,
     const std::string& group,
@@ -68,9 +84,9 @@ struct HdfDataset::Private {
     mGroup( group ),
     mDataset( dataset ),
     mFileId(),
-    dataset_identifier( 0 ),
-    filespace_identifier( 0 ),
-    group_identifier( 0 ) {}
+    mGroupId(),
+    mDatasetId(),
+    filespace_identifier( 0 ) {}
 };
 
 HdfDataset::HdfDataset() : 
@@ -122,26 +138,13 @@ void HdfDataset::initializeImplementation(
   const xdm::DataShape<>& shape ) {
   
   // open the HDF file for writing
-  imp->mFileId = FileIdentifierRegistry::instance()->findOrCreateIdentifier(
-    imp->mFile );
+  imp->mFileId = createFileIdentifier( imp->mFile );
   hid_t datasetLocId = imp->mFileId->get();
 
   // construct the group in the file.
   if ( !imp->mGroup.empty() ) {
-    // first try to open the group to see if it's there
-    imp->group_identifier = H5Gopen( 
-      imp->mFileId->get(), 
-      imp->mGroup.c_str(), 
-      H5P_DEFAULT );
-    if ( imp->group_identifier < 0 ) {
-      imp->group_identifier = H5Gcreate( 
-        imp->mFileId->get(), 
-        imp->mGroup.c_str(), 
-        H5P_DEFAULT,
-        H5P_DEFAULT,
-        H5P_DEFAULT );
-    }
-    datasetLocId = imp->group_identifier;
+    imp->mGroupId = createGroupIdentifier( imp->mFileId->get(), imp->mGroup );
+    datasetLocId = imp->mGroupId->get();
   }
   
   // construct the file space to correspond to the requested shape
@@ -150,14 +153,11 @@ void HdfDataset::initializeImplementation(
   imp->filespace_identifier = H5Screate_simple( file_shape.rank(), &file_shape[0], NULL );
 
   // construct the dataset in the file
-  imp->dataset_identifier = H5Dcreate(
+  imp->mDatasetId = createDatasetIdentifier(
     datasetLocId,
-    imp->mDataset.c_str(),
+    imp->mDataset,
     sHdfTypeMapping[type],
-    imp->filespace_identifier,
-    H5P_DEFAULT,
-    H5P_DEFAULT,
-    H5P_DEFAULT );
+    imp->filespace_identifier );
 }
 
 void HdfDataset::serializeImplementation(
@@ -178,7 +178,7 @@ void HdfDataset::serializeImplementation(
 
   // write the array to disk
   H5Dwrite( 
-    imp->dataset_identifier, 
+    imp->mDatasetId->get(), 
     sHdfTypeMapping[data->dataType()], 
     memory_space, 
     imp->filespace_identifier,
@@ -188,10 +188,6 @@ void HdfDataset::serializeImplementation(
 
 void HdfDataset::finalizeImplementation() {
   H5Sclose( imp->filespace_identifier );
-  H5Dclose( imp->dataset_identifier );
-  if ( imp->group_identifier ) {
-    H5Gclose( imp->group_identifier );
-  }
 }
 
 XDM_HDF_NAMESPACE_END

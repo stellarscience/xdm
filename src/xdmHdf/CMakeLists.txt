@@ -3,15 +3,20 @@ project( xdmHdf )
 find_package( HDF5 REQUIRED )
 
 set( ${PROJECT_NAME}_HEADERS 
+    DatasetIdentifier.hpp
     FileIdentifier.hpp
     FileIdentifierRegistry.hpp
+    GroupIdentifier.hpp
     HdfDataset.hpp
     ResourceIdentifier.hpp
     SelectionVisitor.hpp
 )
 
 set( ${PROJECT_NAME}_SOURCES 
+    DatasetIdentifier.cpp
+    FileIdentifier.cpp
     FileIdentifierRegistry.cpp
+    GroupIdentifier.cpp
     HdfDataset.cpp
     SelectionVisitor.cpp
 )

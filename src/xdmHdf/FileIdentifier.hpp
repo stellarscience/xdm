@@ -3,7 +3,11 @@
 
 #include <xdmHdf/ResourceIdentifier.hpp>
 
+#include <xdm/RefPtr.hpp>
+
 #include <hdf5.h>
+
+#include <string>
 
 #include <xdmHdf/NamespaceMacro.hpp>
 
@@ -17,6 +21,10 @@ public:
 };
 
 typedef ResourceIdentifier< FileIdentifierReleaseFunctor > FileIdentifier;
+
+/// Non-member function to create a file identifier given a file name.
+xdm::RefPtr< FileIdentifier > 
+createFileIdentifier( const std::string& filename );
 
 XDM_HDF_NAMESPACE_END
 

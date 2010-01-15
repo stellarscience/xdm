@@ -180,7 +180,7 @@ TEST( XdmfGridCompatibility, timeSeries ) {
   sharedTopology->setShape( xdm::makeShape( 10, 10, 10 ) );
 
   double timeval = 0.0;
-  for ( unsigned int step = 0; step <= 3; ++step ) {
+  for ( unsigned int step = 0; step <= 500; ++step ) {
     timeval += 0.1;
 
     // create a grid and set it up to use the shared geometry and topology
