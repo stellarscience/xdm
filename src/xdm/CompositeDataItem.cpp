@@ -10,11 +10,28 @@ CompositeDataItem::CompositeDataItem() :
   mChildData() {
 }
 
+CompositeDataItem::CompositeDataItem( unsigned int n ) :
+  mChildData( n ) {
+}
+
 CompositeDataItem::~CompositeDataItem() {
+}
+
+void CompositeDataItem::setNumberOfChildren( unsigned int n ) {
+  mChildData.resize( n );
+}
+
+unsigned int CompositeDataItem::numberOfChildren() const {
+  return mChildData.size();
 }
 
 void CompositeDataItem::appendChild( DataItem* child ) {
   mChildData.push_back( child );
+}
+
+void CompositeDataItem::setChild( unsigned int i, RefPtr< DataItem > data ) {
+  assert( i < mChildData.size() );
+  mChildData[i] = data;
 }
 
 const DataItem* CompositeDataItem::child( unsigned int i ) const {

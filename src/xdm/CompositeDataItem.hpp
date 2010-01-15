@@ -16,12 +16,24 @@ XDM_NAMESPACE_BEGIN
 class CompositeDataItem : public DataItem {
 public:
   CompositeDataItem();
+  
+  /// Constructor takes the number of children to hold.
+  explicit CompositeDataItem( unsigned int n );
+
   virtual ~CompositeDataItem();
 
   XDM_META_ITEM( CompositeDataItem );
 
-  /// Add a child Data element.
+  /// Set the number of children contained by this DataItem.
+  void setNumberOfChildren( unsigned int n );
+  /// Get the number of children contained by this DataItem.
+  unsigned int numberOfChildren() const;
+
+  /// Add a child Data element to the end of the list.  This will increase the
+  /// size of the list of children.
   virtual void appendChild( DataItem* child );
+  /// Set the i_th child of the data item.
+  virtual void setChild( unsigned int i, RefPtr< DataItem > data );
   
   /// Get the const child item at the numbered location.
   const DataItem* child( unsigned int i ) const;

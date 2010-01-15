@@ -5,7 +5,12 @@
 
 #include <xdm/RefPtr.hpp>
 
+#include <xdm/NamespaceMacro.hpp>
 #include <xdmGrid/NamespaceMacro.hpp>
+
+XDM_NAMESPACE_BEGIN
+  class ItemVisitor;
+XDM_NAMESPACE_END
 
 XDM_GRID_NAMESPACE_BEGIN
 
@@ -29,6 +34,9 @@ public:
   void setTopology( Topology* topo );
   Topology* topology();
   const Topology* topology() const;
+
+  /// Redefinition of visitor traversal from xdm::Item.
+  virtual void traverse( xdm::ItemVisitor& iv );
 
 private:
   xdm::RefPtr< Geometry > mGeometry;

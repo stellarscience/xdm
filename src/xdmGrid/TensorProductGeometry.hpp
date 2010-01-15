@@ -22,6 +22,14 @@ public:
   virtual ~TensorProductGeometry();
 
   XDM_META_ITEM( TensorProductGeometry );
+
+  /// Set the StructuredArray representing the coordinate values in a given 
+  /// dimension. This is a convenience function that will validate the input 
+  /// data to ensure that each coordinate axis has the same number of values.
+  ///
+  /// @param dim The axis of the coordinate represented by the data.
+  /// @param data The data representing the coordinate values on the axis.
+  void setCoordinateValues( unsigned int dim, xdm::RefPtr< xdm::DataItem > data );
 };
 
 XDM_GRID_NAMESPACE_END
