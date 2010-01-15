@@ -6,10 +6,44 @@
 #include <iostream>
 #include <sstream>
 
+/// Simple memory buffer.
+class MemoryBuffer {
+private:
+  char* mBuf;
+  char* mLoc;
+
+public:
+  MemoryBuffer( std::size_t size ) :
+    mBuf( new char[size] ),
+    mLoc( mBuf ) {
+  }
+  ~MemoryBuffer() {
+    delete [] mBuf;
+  }
+
+  template< typename T >
+  void put( const T& t ) {
+    memcpy( mLoc, &t, sizeof( T ) );
+    mLoc += sizeof( T );
+  }
+
+  template< typename T >
+  T get() {
+    T tmp;
+    memcpy( &tmp, mLoc, sizeof( T ) );
+    mLoc += sizeof( T );
+    return tmp;
+  }
+
+  char* raw_buffer() {
+    return mBuf;
+  }
+};
+
 class CommunicationCallback : 
-  public xdm::InitializeCallback,
-  public xdm::SerializeCallback,
-  public xdm::FinalizeCallback {
+  public xdm::Dataset::InitializeCallback,
+  public xdm::Dataset::SerializeCallback,
+  public xdm::Dataset::FinalizeCallback {
 public:
   int m_rank;
   int m_processes;
@@ -37,8 +71,6 @@ public:
     // allocate a buffer of the correct to send or receive information
     // this assumes that all processes require the same amount of space
     // the memory map and the actual data need to be sent
-    size_t bufsz = sizeof( xdm::SlabMap<> ) + data.size();
-    char* buf = new char[bufsz];
 
     if ( m_rank != 0 ) {
       memcpy( buf, &memory_map, sizeof( xdm::SlabMap<> ) );

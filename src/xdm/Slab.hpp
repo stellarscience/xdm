@@ -9,6 +9,10 @@
 
 XDM_NAMESPACE_BEGIN
 
+/// Sampled subset of a dataset.  The data is indexed by a start, stride, and
+/// count in each dimension.  This class is templated on it's size type to
+/// provide interoperbility with datasets that may use a different primitive
+/// type to represent the size of a dimension.  Defaults to std::size_t
 template< typename T = std::size_t >
 class Slab {
 private:
@@ -19,11 +23,16 @@ private:
   IndexArray mCount;
 
 public:
+  /// The size representation for the slab.
   typedef T size_type;
 
+  /// Default constructor initializes to an empty shape with no sampling.
   Slab() :
     mDataShape() {
   }
+
+  /// Initialization from a shape.  Initializes the start, stride, and count
+  /// arrays to match the rank of the shape.
   Slab( const DataShape<T>& shape ) :
     mDataShape( shape ),
     mStart( mDataShape.rank() ),
@@ -31,7 +40,11 @@ public:
     mCount( mDataShape.rank() ) {
   }
 
+  /// Give privelaged access to Slabs with a different size type.
   template< typename U > friend class Slab;
+
+  /// Initialize from another Slab with a different fundamental size
+  /// representation.
   template< typename U >
   Slab( const Slab<U>& other ) :
     mDataShape( other.mDataShape ),
@@ -52,8 +65,10 @@ public:
       mCount.begin() );
   }
 
+  /// Destructor.
   ~Slab() {}
 
+  /// Get the DataShape of the Slab.
   const DataShape< T >& shape() const {
     return mDataShape;
   }
@@ -80,6 +95,8 @@ public:
   }
 };
 
+/// Defines a mapping from one Slab to another.  Used to transform one
+/// representation of the data in memory or on disk to another.
 template< typename T = std::size_t >
 class SlabMap {
 private:
