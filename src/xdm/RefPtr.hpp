@@ -35,6 +35,29 @@ public:
     return *this;
   }
 
+  void swap( RefPtr& other ) {
+    T* tmp = mPtr;
+    mPtr = other.mPtr;
+    other.mPtr = tmp;
+  }
+
+  operator T*() const { return mPtr; }
+  T& operator*() const { return *mPtr; }
+  T* operator->() const { return mPtr; }
+  T* get() const { return mPtr; }
+
+  bool operator!() const { return mPtr == 0; }
+  bool valid() const { return mPtr != 0; }
+
+  T* release() {
+    T* tmp = mPtr;
+    if ( mPtr ) {
+      mPtr->removeReferenceWithoutDelete();
+    }
+    mPtr = 0;
+    return tmp;
+  }
+
 private:
   T* mPtr;
   template< typename Other > friend class RefPtr;
