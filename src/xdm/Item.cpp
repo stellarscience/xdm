@@ -30,5 +30,9 @@ void Item::traverse( ItemVisitor& ) {
   // No-op
 }
 
+void Item::writeMetadata( XmlMetadataWrapper& xml ) {
+  xml.setTag( className() );
+}
+
 XDM_NAMESPACE_END
 

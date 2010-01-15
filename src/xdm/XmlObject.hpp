@@ -29,10 +29,15 @@ private:
   ChildList mChildren;
 
 public:
+  /// Construct an XmlObject with no tag.
+  XmlObject();
+  /// Construct an XmlObject with the given tag.
   explicit XmlObject( const std::string& tag );
   virtual ~XmlObject();
 
   //-- Methods for constructing an XML tree --//
+  /// Set the tag for the Object.
+  void setTag( const std::string& tag );
 
   /// Set the attribute with the given name to the given value.  If the
   /// attribute already exists in the XmlObject, it will be overwritten.

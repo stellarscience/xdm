@@ -40,6 +40,12 @@ namespace {
 
 } // namespace anon
 
+XmlObject::XmlObject() :
+  mTag(),
+  mAttributeMap(),
+  mTextContent() {
+}
+
 XmlObject::XmlObject( const std::string& tag ) :
   mTag( tag ),
   mAttributeMap(),
@@ -52,6 +58,11 @@ XmlObject::~XmlObject() {
 //-----------------------------------------------------------------------------
 // Tree Construction
 //-----------------------------------------------------------------------------
+
+void XmlObject::setTag( const std::string& tag ) {
+  mTag = tag;
+}
+
 void XmlObject::appendAttribute( 
   const std::string& name, 
   const std::string& value ) {
@@ -101,6 +112,10 @@ const std::string& XmlObject::contentLine( unsigned int line ) const {
 // Formatting
 //-----------------------------------------------------------------------------
 void XmlObject::printHeader( std::ostream& ostr, int indentLevel ) const {
+  // raise an exception if the XmlObject has an empty tag.
+  if ( mTag.empty() ) {
+    throw std::runtime_error( "XmlObject is empty" );
+  }
   indentLine( ostr, indentLevel );
   ostr << "<" << mTag;
   std::for_each( mAttributeMap.begin(), mAttributeMap.end(), 
@@ -122,6 +137,9 @@ void XmlObject::printBody( std::ostream& ostr, int indentLevel ) const {
 }
 
 void XmlObject::printFooter( std::ostream& ostr, int indentLevel ) const {
+  if ( mTag.empty() ) { 
+    throw std::runtime_error( "XmlObject is empty" );
+  }
   indentLine( ostr, indentLevel );
   ostr << "</" << mTag << ">" << std::endl;
 }

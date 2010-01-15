@@ -25,6 +25,7 @@ xdm_test_serial( HdfDatasetSerial HdfDataset.cpp )
 xdm_test_serial( TemplateStructuredArray TemplateStructuredArray.cpp )
 xdm_test_serial( XmlObject XmlObject.cpp )
 xdm_test_serial( XmlOutputStream XmlOutputStream.cpp )
+xdm_test_serial( Item Item.cpp )
 
 # xdm_test_parallel( HdfDatasetMPI 4 HdfDatasetMPI.cpp )
 

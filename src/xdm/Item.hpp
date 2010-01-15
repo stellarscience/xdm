@@ -2,6 +2,7 @@
 #define xdm_Item_hpp
 
 #include <xdm/ReferencedObject.hpp>
+#include <xdm/XmlMetadataWrapper.hpp>
 
 #include <string>
 
@@ -38,6 +39,13 @@ public:
   /// subclasses of item tell it how.
   virtual void traverse( ItemVisitor& );
 
+  //-- End Visitor Traversal Interface --//
+
+  /// Write an Item's metadata to an XmlObject.  NOTE: implementors should *NOT*
+  /// write data for child objects to the input XmlObject.  That responsibility
+  /// is reserved for visitor classes so that the communication, memory
+  /// referencing, and cacheing can be managed by client applications.
+  virtual void writeMetadata( XmlMetadataWrapper& metadata );
 
 private:
   std::string mName;
