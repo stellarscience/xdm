@@ -37,7 +37,7 @@ namespace {
 
 xdmComm::test::MpiTestFixture globalFixture;
 
-const unsigned int kParticleCount = 100;
+const unsigned int kParticleCount = 1000;
 const float kEndTime = 1.0f;
 const unsigned int kSteps = 1000;
 
