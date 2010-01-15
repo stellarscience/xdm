@@ -5,5 +5,5 @@ macro( xdmFormat_serial_test test_name )
     add_test( xdmFormat.${test_name} xdmFormat.${test_name}.test )
 endmacro()
 
-xdmFormat_serial_test( XdmfGridCompatibility XdmfGridCompatibility.cpp )
+xdmFormat_serial_test( XdmfGridCompatibility TestXdmfGridCompatibility.cpp )
 
