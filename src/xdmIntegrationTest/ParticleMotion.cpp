@@ -57,19 +57,20 @@ const unsigned int kParticleCount = 1000;
 const float kEndTime = 1.0f;
 const unsigned int kSteps = 1000;
 
-// Point structure, just for passing data
-struct Point {
-  float x;
-  float y;
-  float z;
-};
+// get the square of the magnitude of a vector.
+float magnitudeSquared( float* v ) {
+  return v[0]*v[0] + v[1]*v[1] + v[2]*v[2];
+}
 
-Point evolve( const Point& current, float dt ) {
-  Point result;
-  result.x = current.x + dt * 10.0f * ( current.y - current.x );
-  result.y = current.y + dt * ( current.x - current.x*current.z - current.y );
-  result.z = current.z + dt * ( current.x*current.y - 2.6667*current.z );
-  return result;
+// evolve according to an inverse square force law.
+void evolve( float* position, float* velocity, float dt ) {
+  float rSquared = magnitudeSquared( position );
+  // Offset the number a bit to avoid a divide by 0
+  rSquared += 0.01;
+  for ( int i = 0; i < 3; i++ ) {
+    velocity[i] = velocity[i] + dt * ( 1.0f / rSquared );
+    position[i] = position[i] + dt * velocity[i];
+  }
 }
 
 // Update callback to tell a HDF5 dataset to rename itself on every time step
@@ -105,16 +106,25 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
     localStartIndex += remainingParticles;
   }
 
-  // allocate an array for the local process' particle data
+  // allocate an array for the local process' particle position data
   xdm::RefPtr< xdm::VectorStructuredArray< float > > mPositions(
     new xdm::VectorStructuredArray< float >( 3 * localParticles ) );
   // generate some initial values
   for ( int i = 0; i < localParticles; i++ ) {
-    float theta = ( 6.28 / kParticleCount ) * ( localStartIndex + i );
-    (*mPositions)[3*i + 0] = std::cos( theta );
-    (*mPositions)[3*i + 1] = std::sin( theta );
+    unsigned int globalIndex = localStartIndex + i;
+    float r = static_cast< float >( globalIndex ) / 
+      static_cast< float >( kParticleCount );
+    float theta = ( 6.28 / kParticleCount ) * ( globalIndex );
+    (*mPositions)[3*i + 0] = r * std::cos( theta );
+    (*mPositions)[3*i + 1] = r * std::sin( theta );
     (*mPositions)[3*i + 2] = 0.0f;
   }
+
+  // allocate an array for the local process' particle velocity data and
+  // initialize the values to 0.
+  xdm::RefPtr< xdm::VectorStructuredArray< float > > mVelocities(
+    new xdm::VectorStructuredArray< float >( 3 * localParticles ) );
+  std::fill( mVelocities->begin(), mVelocities->end(), 0.0f );
 
   // build the dynamic grid tree
   xdm::RefPtr< xdmGrid::UniformGrid > grid( new xdmGrid::UniformGrid() );
@@ -199,16 +209,10 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
   for ( unsigned int i = 0; i < kSteps; i++ ) {
     t += dt;
     grid->time()->setValue( t );
+    
+    // particle update loop
     for ( unsigned int i = 0; i < localParticles; i++ ) {
-      Point current;
-      current.x = (*mPositions)[i * 3 + 0];
-      current.y = (*mPositions)[i * 3 + 1];
-      current.z = (*mPositions)[i * 3 + 2];
-
-      Point update = evolve( current, dt );
-      (*mPositions)[i * 3 + 0] = update.x;
-      (*mPositions)[i * 3 + 1] = update.y;
-      (*mPositions)[i * 3 + 2] = update.z;
+      evolve( &(*mPositions)[3*i], &(*mVelocities)[3*i], dt );
     }
 
     // write the data for this timestep to disk.

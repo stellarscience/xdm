@@ -169,3 +169,4 @@ xdm_integration_test_hdf5_diff(
   ParticleMotion.parallel.1.h5
   ParticleMotion.parallel.4.h5
 )
+
