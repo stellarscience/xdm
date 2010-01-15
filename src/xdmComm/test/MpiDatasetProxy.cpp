@@ -16,9 +16,7 @@
 
 class TestSelectionVisitor : public xdm::DataSelectionVisitor {
 public:
-  size_t start;
-  size_t stride;
-  size_t count;
+  size_t startIndex;
 
   void apply( const xdm::AllDataSelection& s ) {
     startIndex = 0;

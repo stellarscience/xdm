@@ -96,6 +96,13 @@ public:
   void push_back( size_type i ) {
     mDimensions.push_back( i );
   }
+
+  /// Reverse the dimension order in a data shape.  This will take the given
+  /// DataShape and reverse the dimension order so that a shape with dimensions 
+  /// [d(0) d(1) ...d(n)] becomes [d(n) d(n-1) ... d(1) d(0)].
+  void reverseDimensionOrder() {
+    std::reverse( begin(), end() );
+  }
 };
 
 template< typename T >
@@ -109,6 +116,14 @@ bool operator==( const DataShape<T>& lhs, const DataShape<T>& rhs ) {
 template< typename T >
 bool operator!=( const DataShape< T >& lhs, const DataShape< T >& rhs ) {
   return !( lhs == rhs );
+}
+
+/// Reverse the dimension order in a data shape.  This will take the given
+/// DataShape and reverse the dimension order so that a shape with dimensions 
+/// [d(0) d(1) ...d(n)] becomes [d(n) d(n-1) ... d(1) d(0)].
+template< typename T >
+void reverseDimensionOrder( DataShape< T >& shape ) {
+  shape.reverseDimensionOrder();
 }
 
 /// Make a DataShape given a space separated string with the dimensions.

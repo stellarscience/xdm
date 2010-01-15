@@ -97,6 +97,10 @@ void MpiDatasetProxy::serializeImplementation(
       mDataset->serialize( &processArray, processSelectionMap );
     }
   }
+
+  // Block until all processes have completed writing their data.  This is
+  // necessary in order to avoid mixing messages from different datasets.
+  MPI_Barrier( mCommunicator );
 }
 
 void MpiDatasetProxy::finalizeImplementation() {

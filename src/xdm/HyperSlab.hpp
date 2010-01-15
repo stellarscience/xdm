@@ -97,6 +97,14 @@ public:
     return mDataShape;
   }
 
+  size_type size() const {
+    size_type result = 1;
+    for ( size_type i = 0; i < mCount.size(); i++ ) {
+      result *= ( mCount[i] / mStride[i] );
+    }
+    return result;
+  }
+
   void setStart( size_type dim, size_type start ) {
     mStart[dim] = start;
   }
@@ -133,6 +141,15 @@ public:
   const_iterator beginCount() const { return mCount.begin(); }
   iterator endCount() { return mCount.end(); }
   const_iterator endCount() const { return mCount.end(); }
+
+  /// Reverse the dimension ordering for the hyperslab.
+  /// @see DataShape::reverseDimensionOrder
+  void reverseDimensionOrder() {
+    mDataShape.reverseDimensionOrder();
+    std::reverse( beginStart(), endStart() );
+    std::reverse( beginStride(), endStride() );
+    std::reverse( beginCount(), endCount() );
+  }
 };
 
 template< typename T >
@@ -145,6 +162,13 @@ bool operator==( const HyperSlab< T >& lhs, const HyperSlab< T >& rhs ) {
     std::equal( lhs.beginStride(), lhs.endStride(), rhs.beginStride() ) &&
     std::equal( lhs.beginCount(), lhs.endCount(), rhs.beginCount() ) 
   ); 
+}
+
+/// Reverse the dimension ordering for a hyperslab.
+/// @see DataShape::reverseDimensionOrder
+template< typename T >
+void reverseDimensionOrder( HyperSlab< T >& hyperSlab ) {
+  hyperSlab.reverseDimensionOrder();
 }
 
 template< typename T >

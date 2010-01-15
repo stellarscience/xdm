@@ -6,3 +6,7 @@ add_subdirectory( xdmComm )
 add_subdirectory( xdmGrid )
 add_subdirectory( xdmHdf )
 add_subdirectory( xdmFormat )
+
+if( UNIT_TEST_XDM )
+    add_subdirectory( xdmIntegrationTest )
+endif()
