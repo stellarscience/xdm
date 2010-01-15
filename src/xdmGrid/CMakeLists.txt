@@ -6,6 +6,7 @@ set( ${PROJECT_NAME}_HEADERS
     Domain.hpp
     Geometry.hpp
     Grid.hpp
+    InterlacedGeometry.hpp
     NamespaceMacro.hpp
     Polyvertex.hpp
     RectilinearMesh.hpp
@@ -23,6 +24,7 @@ set( ${PROJECT_NAME}_SOURCES
     Domain.cpp
     Geometry.cpp
     Grid.cpp
+    InterlacedGeometry.cpp
     Polyvertex.cpp
     RectilinearMesh.cpp
     StructuredTopology.cpp
