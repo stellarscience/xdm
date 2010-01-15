@@ -16,4 +16,5 @@ xdmGrid_test_serial( StructuredTopology StructuredTopology.cpp )
 xdmGrid_test_serial( TensorProductGeometry TensorProductGeometry.cpp )
 xdmGrid_test_serial( Topology Topology.cpp )
 xdmGrid_test_serial( Time Time.cpp )
+xdmGrid_test_serial( XdmfGridCompatibility XdmfGridCompatibility.cpp ) 
 

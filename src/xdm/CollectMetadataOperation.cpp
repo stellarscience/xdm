@@ -38,6 +38,11 @@ void CollectMetadataOperation::apply( xdm::Item& item ) {
   XmlMetadataWrapper wrapper( itemXml );
   item.writeMetadata( wrapper );
 
+  // if this is not the root item, append the new xml to the back of the stack
+  if ( !mContextStack.empty() ) {
+    mContextStack.top()->appendChild( itemXml );
+  }
+
   // manage the stack in case something happens below
   ContextManager mgr( *this, itemXml );
   traverse( item );
