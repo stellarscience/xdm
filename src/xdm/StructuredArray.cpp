@@ -20,11 +20,11 @@ StructuredArray::StructuredArray(
 StructuredArray::~StructuredArray() {
 }
 
-size_t StructuredArray::arrayElementSize() const {
+size_t StructuredArray::elementSize() const {
   return mArrayElementSize;
 }
 
-size_t StructuredArray::dataSize() const {
+size_t StructuredArray::size() const {
   return std::accumulate( mShape.begin(), mShape.end(),
     1, std::multiplies< size_t >() );
 }

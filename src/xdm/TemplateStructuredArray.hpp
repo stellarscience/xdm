@@ -37,12 +37,12 @@ public:
   
   /// Get an iterator pointing to the end of the data.
   iterator end() {
-    return static_cast< T* >( data() ) + dataSize();
+    return static_cast< T* >( data() ) + size();
   }
 
   /// Get a const iterator pointing to the end of the data.
   const_iterator end() const {
-    return static_cast< const T* >( data() ) + dataSize();
+    return static_cast< const T* >( data() ) + size();
   }
 
 private:

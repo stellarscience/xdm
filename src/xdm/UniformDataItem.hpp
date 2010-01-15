@@ -38,6 +38,10 @@ public:
 
   virtual void writeMetadata( XmlMetadataWrapper& xml );
 
+  /// Virtual function to serialize the data contained in the item.  Inheritors
+  /// should reimplement this function to write data to a Dataset.
+  virtual void serializeData();
+
 private:
   DataShape<> mDataspace;
   RefPtr< StructuredArray > mArray;

@@ -41,10 +41,10 @@ public:
   }
 
   /// Get the size of the array elements in bytes.
-  size_t arrayElementSize() const;
+  size_t elementSize() const;
 
   /// Get the number of data elements.
-  size_t dataSize() const;
+  size_t size() const;
 
   /// Get a pointer to the actual data.
   void* data();

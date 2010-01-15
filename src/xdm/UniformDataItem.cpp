@@ -91,7 +91,7 @@ void UniformDataItem::writeMetadata( XmlMetadataWrapper& xml ) {
   }
 
   // write the size of the data to the metadata.
-  xml.setAttribute( "Precision", mArray->arrayElementSize() );
+  xml.setAttribute( "Precision", mArray->elementSize() );
 
   // write the format of the dataset on disk.
   xml.setAttribute( "Format", mDataset->format() );
@@ -106,6 +106,12 @@ const DataSelectionMap& UniformDataItem::selectionMap() const {
 
 void UniformDataItem::setSelectionMap( const DataSelectionMap& selectionMap ) {
   mSelectionMap = selectionMap;
+}
+
+void UniformDataItem::serializeData() {
+  mDataset->initialize( mArray->dataType(), mDataspace );
+  mDataset->serialize( mArray, mSelectionMap );
+  mDataset->finalize();
 }
 
 XDM_NAMESPACE_END
