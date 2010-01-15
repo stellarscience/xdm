@@ -134,3 +134,16 @@ xdm_integration_test_hdf5_diff(
     FunctionData.parallel.8.h5 
 )
 
+#-------------------------------------------------------------------------------
+# ParticleMotion Test Suite
+#-------------------------------------------------------------------------------
+xdm_integration_executable_parallel(
+  ParticleMotion.parallel
+  ParticleMotion.cpp
+)
+
+xdm_integration_run_parallel_test(
+  ParticleMotion.parallel.2
+  xdmIntegrationTest.ParticleMotion.parallel.test
+  2
+)
