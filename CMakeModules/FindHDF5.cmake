@@ -6,6 +6,11 @@
 # the compiler with the -show argument to see what flags are used when compiling
 # an HDF5 client application.
 #
+# This module will read the variable HDF5_USE_STATIC_LIBRARIES to determine
+# whether or not to prefer a static link to a dynamic link for HDF5 and all of
+# it's dependencies.  To use this feature, make sure that the
+# HDF5_USE_STATIC_LIBRARIES variable is set before the call to find_package.
+#
 # This module will define the following variables:
 #  HDF5_INCLUDE_DIRS - location of the hdf5 includes
 #  HDF5_LIBRARIES - link libraries for HDF5
@@ -37,9 +42,7 @@ elseif( HDF5_COMPILER_EXECUTABLE )
     endif()
 endif()
 
-if( HDF5_INCLUDE_PATH AND HDF5_LIBRARIES )
-    # do nothing
-elseif( HDF5_COMPILE_CMDLINE )
+if( HDF5_COMPILE_CMDLINE )
     # grab the hdf5 libraries from the command line.  We will use the path of
     # these things to find the include dirs
     # First: linker paths
@@ -70,14 +73,23 @@ elseif( HDF5_COMPILE_CMDLINE )
     # However, we need to search for other libraries because HDF5 relies on a
     # couple of things depending upon how it was compiled.  An example of this
     # problem is when HDF is compiled with SZip support.
-    set( HDF5_LIBRARY_NAMES hdf5 hdf5_hl )
+    set( HDF5_LIBRARY_NAMES hdf5_hl hdf5 )
     foreach( LIB ${HDF5_ALL_LIBRARY_FLAGS} )
         string( REGEX REPLACE "^[, ]-l" "" LIB ${LIB} )
         list( APPEND HDF5_LIBRARY_NAMES ${LIB} )
     endforeach()
     set( HDF5_LIBRARIES )
     foreach( LIB ${HDF5_LIBRARY_NAMES} )
-        find_library( HDF5_${LIB}_LIBRARY ${LIB} HINTS ${HDF5_LINK_PATH} )
+        if( HDF5_USE_STATIC_LIBRARIES )
+            # According to bug 1643 on the CMake bug tracker, this is the
+            # preferred method for searching for a static library.
+            # See http://www.cmake.org/Bug/view.php?id=1643
+            set( THIS_LIBRARY_SEARCH lib${LIB}.a )
+        else()
+            set( THIS_LIBRARY_SEARCH ${LIB} )
+        endif()
+        find_library( HDF5_${LIB}_LIBRARY ${THIS_LIBRARY_SEARCH} 
+            HINTS ${HDF5_LINK_PATH} )
         list( APPEND HDF5_LIBRARIES ${HDF5_${LIB}_LIBRARY} )
         mark_as_advanced( HDF5_${LIB}_LIBRARY )
     endforeach()

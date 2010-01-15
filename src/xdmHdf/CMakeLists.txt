@@ -1,5 +1,8 @@
 project( xdmHdf )
 
+set( HDF5_USE_STATIC_LIBRARIES TRUE CACHE BOOL
+    "Favor static HDF5 libraries" )
+mark_as_advanced( HDF5_USE_STATIC_LIBRARIES )
 find_package( HDF5 REQUIRED )
 
 set( ${PROJECT_NAME}_HEADERS 
