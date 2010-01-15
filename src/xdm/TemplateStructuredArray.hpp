@@ -77,7 +77,7 @@ XDM_CREATE_STRUCTURED_ARRAY_DEFINITION( unsigned short, primitiveType::kUnsigned
 XDM_CREATE_STRUCTURED_ARRAY_DEFINITION( unsigned int, primitiveType::kUnsignedInt )
 XDM_CREATE_STRUCTURED_ARRAY_DEFINITION( long unsigned int, primitiveType::kLongUnsignedInt )
 XDM_CREATE_STRUCTURED_ARRAY_DEFINITION( float, primitiveType::kFloat )
-XDM_CREATE_STRUCTURED_ARRAY_DEFINITION( double, primitiveType::kDouble ) 
+XDM_CREATE_STRUCTURED_ARRAY_DEFINITION( double, primitiveType::kDouble )
 
 XDM_NAMESPACE_END
 
