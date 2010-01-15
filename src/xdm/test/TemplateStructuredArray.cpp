@@ -10,8 +10,8 @@ bool test() {
   xdm::DataShape<> shape(1);
   shape[0] = 1;
   T value = T();
-  xdm::RefPtr< xdm::TemplateStructuredArray< T > > array;
-  array = xdm::createStructuredArray( &value, shape );
+  xdm::RefPtr< xdm::TemplateStructuredArray< T > > array( 
+    new xdm::TemplateStructuredArray< T >( &value, shape ) );
   T* result = array->begin();
   return !( result == &value );
 }
