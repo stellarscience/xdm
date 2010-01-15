@@ -85,14 +85,12 @@ constructFunctionGrid( const GridBounds& bounds, const std::string& hdfFile ) {
 FunctionData::FunctionData( 
   const GridBounds& grid, 
   const xdm::HyperSlab<>& region,
-  Function* function,
-  const xdm::DataShape<>& blockSize ) :
+  Function* function ) :
   mGrid( grid ),
   mRegionOfInterest( region ),
   mStorage(),
   mStructuredArray(),
-  mFunction( function ),
-  mBlockSize( blockSize ) {
+  mFunction( function ) {
 
   mStorage.resize( 
     mRegionOfInterest.count( 0 ) *
@@ -112,6 +110,7 @@ void FunctionData::writeImplementation( xdm::Dataset* dataset ) {
   int sizeI = mRegionOfInterest.count(0);
   int sizeJ = mRegionOfInterest.count(1);
   int sizeK = mRegionOfInterest.count(2);
+
   for ( int k = 0; k < sizeK; k++ ) {
     double z = mGrid.cellCoordinate( 2, startK + k );
     for ( int j = 0; j < sizeJ; j++ ) {

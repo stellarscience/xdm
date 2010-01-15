@@ -104,14 +104,12 @@ private:
   std::vector< double > mStorage;
   xdm::RefPtr< xdm::StructuredArray > mStructuredArray;
   xdm::RefPtr< Function > mFunction;
-  xdm::DataShape<> mBlockSize;
 
 public:
   FunctionData( 
     const GridBounds& grid, 
     const xdm::HyperSlab<>& region,
-    Function* function, 
-    const xdm::DataShape<>& blockSize = xdm::makeShape( 14, 14, 14 ) );
+    Function* function );
   virtual ~FunctionData();
 
   virtual void writeImplementation( xdm::Dataset* dataset );
