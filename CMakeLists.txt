@@ -29,7 +29,6 @@ if ( CMAKE_COMPILER_IS_GNUC OR CMAKE_COMPILER_IS_GNUCXX )
   set( CMAKE_LD_FLAGS_COVERAGE "-g -O0 -fno-default-inline -fprofile-arcs -ftest-coverage" )
 endif()
 
-add_subdirectory( third_party )
 add_subdirectory( src )
 
 add_subdirectory( doc )
