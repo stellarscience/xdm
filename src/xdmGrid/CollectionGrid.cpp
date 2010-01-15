@@ -35,6 +35,9 @@ void CollectionGrid::traverse( xdm::ItemVisitor& iv ) {
 void CollectionGrid::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
   Grid::writeMetadata( xml );
 
+  // write the grid type as a collection
+  xml.setAttribute( "GridType", "Collection" );
+
   // write the type of collection.
   switch ( mType ) {
   case kSpatial:

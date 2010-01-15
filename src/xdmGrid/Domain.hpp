@@ -8,8 +8,11 @@
 XDM_GRID_NAMESPACE_BEGIN
 
 class Domain : public xdm::CompositeDataItem {
+public:
 
   XDM_META_ITEM( Domain );
+
+  virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
 };
 
 XDM_GRID_NAMESPACE_END

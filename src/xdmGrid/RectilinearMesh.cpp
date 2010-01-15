@@ -10,6 +10,9 @@ RectilinearMesh::RectilinearMesh() :
   StructuredTopology() {
 }
 
+RectilinearMesh::~RectilinearMesh() {
+}
+
 void RectilinearMesh::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
   StructuredTopology::writeMetadata( xml );
 
