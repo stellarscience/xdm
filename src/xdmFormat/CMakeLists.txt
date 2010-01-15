@@ -20,3 +20,5 @@ target_link_libraries( ${PROJECT_NAME}
     xdmHdf
 )
 
+add_subdirectory( test )
+
