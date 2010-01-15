@@ -27,6 +27,8 @@ public:
   explicit CollectionGrid( CollectionType type = kSpatial );
   virtual ~CollectionGrid();
 
+  XDM_META_ITEM( CollectionGrid );
+
   /// Set the collection type for this grid to spatial or temporal.
   /// @see CollectionType
   void setType( CollectionType t );
@@ -34,6 +36,9 @@ public:
 
   /// add a child grid.
   void appendChild( Grid* g );
+
+  /// Definition of visitor traversal.
+  virtual void traverse( xdm::ItemVisitor& iv );
 
 private:
   CollectionType mType;

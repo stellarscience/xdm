@@ -18,6 +18,8 @@ public:
   explicit UniformDataItem( const DataShape<>& dataspace );
   virtual ~UniformDataItem();
 
+  XDM_META_ITEM( UniformDataItem );
+
   StructuredArray* array();
   const StructuredArray* array() const;
   void setArray( StructuredArray* array );

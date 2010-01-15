@@ -30,6 +30,8 @@ public:
   Attribute( Type t = kScalar, Center c = kNode );
   virtual ~Attribute();
 
+  XDM_META_ITEM( Attribute );
+
 private:
   Type mType;
   Center mCenter;

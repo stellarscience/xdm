@@ -2,6 +2,7 @@
 #define xdm_DataItem_hpp
 
 #include <xdm/Item.hpp>
+#include <xdm/ItemVisitor.hpp>
 #include <xdm/PrimitiveType.hpp>
 
 #include <xdm/NamespaceMacro.hpp>
@@ -13,6 +14,8 @@ class DataItem : public Item {
 public:
   DataItem();
   virtual ~DataItem();
+
+  XDM_META_ITEM( DataItem );
 };
 
 XDM_NAMESPACE_END

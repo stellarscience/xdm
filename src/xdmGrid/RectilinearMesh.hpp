@@ -13,6 +13,8 @@ class RectilinearMesh : public StructuredTopology {
 public:
   RectilinearMesh();
   virtual ~RectilinearMesh();
+
+  XDM_META_ITEM( RectilinearMesh );
 };
 
 XDM_GRID_NAMESPACE_END

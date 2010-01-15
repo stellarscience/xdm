@@ -1,5 +1,7 @@
 #include <xdmGrid/CollectionGrid.hpp>
 
+#include <algorithm>
+
 XDM_GRID_NAMESPACE_BEGIN
 
 CollectionGrid::CollectionGrid( CollectionType type ) :
@@ -21,6 +23,10 @@ CollectionGrid::CollectionType CollectionGrid::type() const {
 
 void CollectionGrid::appendChild( Grid* g ) {
   mChildren.push_back( g );
+}
+
+void CollectionGrid::traverse( xdm::ItemVisitor& iv ) {
+  std::for_each( mChildren.begin(), mChildren.end(), xdm::ApplyVisitor( iv ) );
 }
 
 XDM_GRID_NAMESPACE_END

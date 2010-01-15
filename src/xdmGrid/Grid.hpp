@@ -2,6 +2,7 @@
 #define xdm_Grid_hpp
 
 #include <xdm/Item.hpp>
+#include <xdm/ItemVisitor.hpp>
 
 #include <xdmGrid/NamespaceMacro.hpp>
 
@@ -11,6 +12,8 @@ class Grid : public xdm::Item {
 public:
   Grid();
   virtual ~Grid();
+
+  XDM_META_ITEM( Grid );
 };
 
 XDM_GRID_NAMESPACE_END

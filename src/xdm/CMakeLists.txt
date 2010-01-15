@@ -8,6 +8,7 @@ set( ${PROJECT_NAME}_HEADERS
     Dataset.hpp
     HyperSlab.hpp
     Item.hpp
+    ItemVisitor.hpp
 	NamespaceMacro.hpp
     ReferencedObject.hpp
     RefPtr.hpp
@@ -23,6 +24,7 @@ set( ${PROJECT_NAME}_SOURCES
     DataItem.cpp
     Dataset.cpp
     Item.cpp
+    ItemVisitor.cpp
     ReferencedObject.cpp
     StructuredArray.cpp
     UniformDataItem.cpp

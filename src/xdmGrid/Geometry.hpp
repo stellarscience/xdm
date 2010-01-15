@@ -18,6 +18,8 @@ public:
   Geometry( unsigned int dimension );
   virtual ~Geometry();
 
+  XDM_META_ITEM( Geometry );
+
   /// Set the dimension of the space.
   void setDimension( unsigned int dimension );
   /// Get the dimension of the space.

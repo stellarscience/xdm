@@ -18,6 +18,8 @@ class Topology : public xdm::CompositeDataItem {
 public:
   Topology();
   virtual ~Topology();
+
+  XDM_META_ITEM( Topology );
 };
 
 XDM_GRID_NAMESPACE_END

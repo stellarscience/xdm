@@ -18,6 +18,8 @@ public:
   CompositeDataItem();
   virtual ~CompositeDataItem();
 
+  XDM_META_ITEM( CompositeDataItem );
+
   /// Add a child Data element.
   virtual void appendChild( DataItem* child );
   
@@ -26,6 +28,8 @@ public:
   /// Get the child item at the numbered location.
   DataItem* child( unsigned int i );
 
+  /// Redefinition of visitor traversal from Item.
+  virtual void traverse( ItemVisitor& iv );
 private:
   std::vector< RefPtr< DataItem > > mChildData;
 };

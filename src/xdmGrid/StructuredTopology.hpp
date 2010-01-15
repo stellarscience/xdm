@@ -17,6 +17,8 @@ public:
   StructuredTopology();
   virtual ~StructuredTopology();
 
+  XDM_META_ITEM( StructuredTopology );
+
   /// Set the shape defined by the cells in the topology.  This shape should
   /// correspond to the arrangement of cells in n-dimensional space.
   void setShape( const xdm::DataShape<>& shape );

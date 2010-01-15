@@ -20,6 +20,8 @@ public:
   UniformGrid();
   virtual ~UniformGrid();
 
+  XDM_META_ITEM( UniformGrid );
+
   void setGeometry( Geometry* geo );
   Geometry* geometry();
   const Geometry* geometry() const;

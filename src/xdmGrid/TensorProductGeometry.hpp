@@ -20,6 +20,8 @@ class TensorProductGeometry : public Geometry {
 public:
   TensorProductGeometry( unsigned int dimension );
   virtual ~TensorProductGeometry();
+
+  XDM_META_ITEM( TensorProductGeometry );
 };
 
 XDM_GRID_NAMESPACE_END

@@ -1,5 +1,7 @@
 #include <xdm/CompositeDataItem.hpp>
 
+#include <algorithm>
+
 #include <cassert>
 
 XDM_NAMESPACE_BEGIN
@@ -24,6 +26,10 @@ DataItem* CompositeDataItem::child( unsigned int i ) {
   // call the const version to minimize code duplication.
   return const_cast< DataItem* >( 
     (static_cast< const CompositeDataItem* >(this))->child(i));
+}
+
+void CompositeDataItem::traverse( ItemVisitor& iv ) {
+  std::for_each( mChildData.begin(), mChildData.end(), ApplyVisitor( iv ) );
 }
 
 XDM_NAMESPACE_END
