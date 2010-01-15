@@ -1,5 +1,5 @@
-#ifndef xdm_Slab_hpp
-#define xdm_Slab_hpp
+#ifndef xdm_HyperSlab_hpp
+#define xdm_HyperSlab_hpp
 
 #include <xdm/DataShape.hpp>
 
@@ -14,7 +14,7 @@ XDM_NAMESPACE_BEGIN
 /// provide interoperbility with datasets that may use a different primitive
 /// type to represent the size of a dimension.  Defaults to std::size_t
 template< typename T = std::size_t >
-class Slab {
+class HyperSlab {
 private:
   typedef std::vector< T > IndexArray;
   DataShape<T> mDataShape;
@@ -27,26 +27,26 @@ public:
   typedef T size_type;
 
   /// Default constructor initializes to an empty shape with no sampling.
-  Slab() :
+  HyperSlab() :
     mDataShape() {
   }
 
   /// Initialization from a shape.  Initializes the start, stride, and count
   /// arrays to match the rank of the shape.
-  Slab( const DataShape<T>& shape ) :
+  HyperSlab( const DataShape<T>& shape ) :
     mDataShape( shape ),
     mStart( mDataShape.rank() ),
     mStride( mDataShape.rank() ),
     mCount( mDataShape.rank() ) {
   }
 
-  /// Give privelaged access to Slabs with a different size type.
-  template< typename U > friend class Slab;
+  /// Give privelaged access to HyperSlabs with a different size type.
+  template< typename U > friend class HyperSlab;
 
-  /// Initialize from another Slab with a different fundamental size
+  /// Initialize from another HyperSlab with a different fundamental size
   /// representation.
   template< typename U >
-  Slab( const Slab<U>& other ) :
+  HyperSlab( const HyperSlab<U>& other ) :
     mDataShape( other.mDataShape ),
     mStart( mDataShape.rank() ),
     mStride( mDataShape.rank() ),
@@ -66,9 +66,9 @@ public:
   }
 
   /// Destructor.
-  ~Slab() {}
+  ~HyperSlab() {}
 
-  /// Get the DataShape of the Slab.
+  /// Get the DataShape of the HyperSlab.
   const DataShape< T >& shape() const {
     return mDataShape;
   }
@@ -95,41 +95,41 @@ public:
   }
 };
 
-/// Defines a mapping from one Slab to another.  Used to transform one
+/// Defines a mapping from one HyperSlab to another.  Used to transform one
 /// representation of the data in memory or on disk to another.
 template< typename T = std::size_t >
-class SlabMap {
+class HyperSlabMap {
 private:
-  Slab<T> mFrom;
-  Slab<T> mTo;
+  HyperSlab<T> mFrom;
+  HyperSlab<T> mTo;
 
 public:
-  SlabMap() :
+  HyperSlabMap() :
     mFrom(),
     mTo()
   {}
 
-  SlabMap( const Slab<T>& from, const Slab<T>& to ) :
+  HyperSlabMap( const HyperSlab<T>& from, const HyperSlab<T>& to ) :
     mFrom( from ),
     mTo( to )
   {}
-  ~SlabMap() {}
+  ~HyperSlabMap() {}
 
-  void setDomain( const Slab<T>& from ) {
+  void setDomain( const HyperSlab<T>& from ) {
     mFrom = from;
   }
-  const Slab<T>& domain() const {
+  const HyperSlab<T>& domain() const {
     return mFrom;
   }
 
-  void setRange( const Slab<T>& to ) {
+  void setRange( const HyperSlab<T>& to ) {
     mTo = to;
   }
-  const Slab<T>& range() const {
+  const HyperSlab<T>& range() const {
     return mTo;
   }
 };
 
 XDM_NAMESPACE_END
 
-#endif // xdm_Slab_hpp
+#endif // xdm_HyperSlab_hpp

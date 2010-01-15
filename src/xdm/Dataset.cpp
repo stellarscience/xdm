@@ -21,7 +21,7 @@ void Dataset::initialize( const DataShape<>& shape, std::iostream& content ) {
 
 void Dataset::serialize(
   const Array& data,
-  const SlabMap<>& slabMap,
+  const HyperSlabMap<>& slabMap,
   std::iostream& content )
 {
   if ( mSerializeCallback ) {

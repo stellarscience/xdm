@@ -21,18 +21,18 @@ int main( int argc, char* argv[] ) {
   fileshape[1] = 4;
 
   // set up the mapping from memory space to file space
-  xdm::Slab<> memorySlab( arrayShape );
+  xdm::HyperSlab<> memorySlab( arrayShape );
   memorySlab.setStart( 0, 0 );
   memorySlab.setStride( 0, 1 );
   memorySlab.setCount( 0, 16 );
-  xdm::Slab<> fileSlab( fileshape );
+  xdm::HyperSlab<> fileSlab( fileshape );
   fileSlab.setStart( 0, 0 );
   fileSlab.setStart( 1, 0 );
   fileSlab.setStride( 0, 1 );
   fileSlab.setStride( 1, 1 );
   fileSlab.setCount( 0, 4 );
   fileSlab.setCount( 1, 4 );
-  xdm::SlabMap<> mapping( memorySlab, fileSlab );
+  xdm::HyperSlabMap<> mapping( memorySlab, fileSlab );
 
   // create the dataset
   xdm::RefPtr< xdm::Dataset > dataset( new xdm::HdfDataset() );

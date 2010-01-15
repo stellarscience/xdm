@@ -69,7 +69,7 @@ void HdfDataset::initializeImplementation(
 
 void HdfDataset::serializeImplementation(
   const Array& data,
-  const SlabMap<>& memory_map,
+  const HyperSlabMap<>& memory_map,
   std::iostream& content ) {
 
   // create the memory space to match the shape of the array
@@ -81,7 +81,7 @@ void HdfDataset::serializeImplementation(
     NULL );
 
   // select the hyperslab of the data in memory
-  Slab< hsize_t > domain( memory_map.domain() );
+  HyperSlab< hsize_t > domain( memory_map.domain() );
   H5Sselect_hyperslab( 
     memory_space,
     H5S_SELECT_SET, 
@@ -91,7 +91,7 @@ void HdfDataset::serializeImplementation(
     NULL );
 
   // select the hyperslab of the data on disk
-  Slab< hsize_t > range( memory_map.range() );
+  HyperSlab< hsize_t > range( memory_map.range() );
   H5Sselect_hyperslab(
     imp->filespace_identifier,
     H5S_SELECT_SET,

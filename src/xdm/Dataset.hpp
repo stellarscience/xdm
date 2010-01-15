@@ -3,8 +3,8 @@
 
 #include <xdm/Array.hpp>
 #include <xdm/DataShape.hpp>
+#include <xdm/HyperSlab.hpp>
 #include <xdm/ReferencedObject.hpp>
-#include <xdm/Slab.hpp>
 
 #include <xdm/NamespaceMacro.hpp>
 
@@ -45,7 +45,7 @@ public:
 	  virtual void serializeImplementation(
 	    Dataset* ds,
 	    const Array& data,
-	    const SlabMap<>& slabMap,
+	    const HyperSlabMap<>& slabMap,
 	    std::iostream& content ) = 0;
 	};
 	
@@ -71,7 +71,7 @@ public:
   /// @param content A stream from which to pull/push content that is generated
   void serialize( 
     const Array& data, 
-    const SlabMap<>& slabMap,
+    const HyperSlabMap<>& slabMap,
     std::iostream& content );
 
   /// Complete writing the dataset.
@@ -103,7 +103,7 @@ public:
   /// type. No one should call this except for callbacks.
   virtual void serializeImplementation( 
     const Array& data, 
-    const SlabMap<>& slabMap, 
+    const HyperSlabMap<>& slabMap, 
     std::iostream& content ) = 0;
 
   /// Pure virtual function to complete the process of writing a dataset. This

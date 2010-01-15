@@ -20,7 +20,7 @@ public:
     std::iostream& content );
   virtual void serializeImplementation(
     const Array& data,
-    const SlabMap<>& memory_map,
+    const HyperSlabMap<>& memory_map,
     std::iostream& content );
   virtual void finalizeImplementation();
 
