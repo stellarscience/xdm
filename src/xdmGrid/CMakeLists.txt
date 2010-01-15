@@ -1,6 +1,7 @@
 project( xdmGrid )
 
 set( ${PROJECT_NAME}_HEADERS 
+    Attribute.hpp
     CollectionGrid.hpp
     Domain.hpp
     Geometry.hpp
@@ -14,6 +15,7 @@ set( ${PROJECT_NAME}_HEADERS
 )
 
 set( ${PROJECT_NAME}_SOURCES
+    Attribute.cpp
     CollectionGrid.cpp
     Domain.cpp
     Geometry.cpp
