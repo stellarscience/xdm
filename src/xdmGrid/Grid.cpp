@@ -3,7 +3,7 @@
 XDM_GRID_NAMESPACE_BEGIN
 
 Grid::Grid() :
-  xdm::Node() {
+  xdm::Item() {
 }
 
 Grid::~Grid() {

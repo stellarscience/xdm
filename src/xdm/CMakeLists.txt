@@ -7,8 +7,8 @@ set( ${PROJECT_NAME}_HEADERS
     CompositeData.hpp
     Data.hpp
     Dataset.hpp
+    Item.hpp
 	NamespaceMacro.hpp
-    Node.hpp
     ReferencedObject.hpp
     RefPtr.hpp
     StructuredArray.hpp
@@ -20,7 +20,7 @@ set( ${PROJECT_NAME}_SOURCES
     CompositeData.cpp
     Data.cpp
     Dataset.cpp
-    Node.hpp
+    Item.cpp
     ReferencedObject.cpp
     StructuredArray.cpp
 )

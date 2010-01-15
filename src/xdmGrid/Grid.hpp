@@ -1,13 +1,13 @@
 #ifndef xdm_Grid_hpp
 #define xdm_Grid_hpp
 
-#include <xdm/Node.hpp>
+#include <xdm/Item.hpp>
 
 #include <xdmGrid/NamespaceMacro.hpp>
 
 XDM_GRID_NAMESPACE_BEGIN
 
-class Grid : public xdm::Node {
+class Grid : public xdm::Item {
 public:
   Grid();
   virtual ~Grid();
