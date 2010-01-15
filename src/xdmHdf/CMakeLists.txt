@@ -8,6 +8,7 @@ find_package( HDF5 REQUIRED )
 set( ${PROJECT_NAME}_HEADERS 
     AttachHdfDatasetOperation.hpp
     DatasetIdentifier.hpp
+    DataspaceIdentifier.hpp
     FileIdentifier.hpp
     FileIdentifierRegistry.hpp
     GroupIdentifier.hpp
@@ -19,6 +20,7 @@ set( ${PROJECT_NAME}_HEADERS
 set( ${PROJECT_NAME}_SOURCES 
     AttachHdfDatasetOperation.cpp
     DatasetIdentifier.cpp
+    DataspaceIdentifier.cpp
     FileIdentifier.cpp
     FileIdentifierRegistry.cpp
     GroupIdentifier.cpp

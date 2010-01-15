@@ -1,4 +1,5 @@
 #include <xdmHdf/DatasetIdentifier.hpp>
+#include <xdmHdf/DataspaceIdentifier.hpp>
 #include <xdmHdf/FileIdentifier.hpp>
 #include <xdmHdf/FileIdentifierRegistry.hpp>
 #include <xdmHdf/GroupIdentifier.hpp>
@@ -75,8 +76,7 @@ struct HdfDataset::Private {
   xdm::RefPtr< FileIdentifier > mFileId;
   xdm::RefPtr< GroupIdentifier > mGroupId;
   xdm::RefPtr< DatasetIdentifier > mDatasetId;
-
-  hid_t filespace_identifier;
+  xdm::RefPtr< DataspaceIdentifier > mDataspaceId; 
 
   Private() :
     mFile(),
@@ -85,7 +85,7 @@ struct HdfDataset::Private {
     mFileId(),
     mGroupId(),
     mDatasetId(),
-    filespace_identifier( 0 ) {}
+    mDataspaceId() {}
   Private( 
     const std::string& file,
     const GroupPath& groupPath,
@@ -96,7 +96,7 @@ struct HdfDataset::Private {
     mFileId(),
     mGroupId(),
     mDatasetId(),
-    filespace_identifier( 0 ) {}
+    mDataspaceId() {}
 };
 
 HdfDataset::HdfDataset() : 
@@ -172,15 +172,14 @@ void HdfDataset::initializeImplementation(
   
   // construct the file space to correspond to the requested shape
   // convert between size type
-  xdm::DataShape< hsize_t > file_shape( shape );
-  imp->filespace_identifier = H5Screate_simple( file_shape.rank(), &file_shape[0], NULL );
+  imp->mDataspaceId = createDataspaceIdentifier( shape );
 
   // construct the dataset in the file
   imp->mDatasetId = createDatasetIdentifier(
     datasetLocId,
     imp->mDataset,
     sHdfTypeMapping[type],
-    imp->filespace_identifier );
+    imp->mDataspaceId->get() );
 }
 
 void HdfDataset::serializeImplementation(
@@ -189,19 +188,16 @@ void HdfDataset::serializeImplementation(
 
   // create the memory space to match the shape of the array
   // convert between types for size representation
-  xdm::DataShape< hsize_t > memory_shape( data->shape() );
-  hid_t memory_space = H5Screate_simple( 
-    memory_shape.rank(),
-    &memory_shape[0],
-    NULL );
+  xdm::RefPtr< DataspaceIdentifier > memorySpace =
+    createDataspaceIdentifier( data->shape() );
 
-  SelectionVisitor memspaceSelector( memory_space );
+  SelectionVisitor memspaceSelector( memorySpace->get() );
   selectionMap.domain()->accept( memspaceSelector );
-  SelectionVisitor filespaceSelector( imp->filespace_identifier );
+  SelectionVisitor filespaceSelector( imp->mDataspaceId->get() );
   selectionMap.range()->accept( filespaceSelector );
 
-  hssize_t datasetNumpoints = H5Sget_select_npoints( imp->filespace_identifier );
-  hssize_t arrayNumpoints = H5Sget_select_npoints( memory_space );
+  hssize_t datasetNumpoints = H5Sget_select_npoints( imp->mDataspaceId->get() );
+  hssize_t arrayNumpoints = H5Sget_select_npoints( memorySpace->get() );
   if ( datasetNumpoints != arrayNumpoints ) {
     std::stringstream ss;
     ss << "Data size mismatch: ";
@@ -214,14 +210,13 @@ void HdfDataset::serializeImplementation(
   H5Dwrite( 
     imp->mDatasetId->get(), 
     sHdfTypeMapping[data->dataType()], 
-    memory_space, 
-    imp->filespace_identifier,
+    memorySpace->get(), 
+    imp->mDataspaceId->get(),
     H5P_DEFAULT,
     data->data() );
 }
 
 void HdfDataset::finalizeImplementation() {
-  H5Sclose( imp->filespace_identifier );
 }
 
 XDM_HDF_NAMESPACE_END
