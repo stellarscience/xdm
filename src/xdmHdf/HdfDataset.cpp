@@ -217,6 +217,7 @@ void HdfDataset::serializeImplementation(
 }
 
 void HdfDataset::finalizeImplementation() {
+  H5Fflush( imp->mFileId->get(), H5F_SCOPE_GLOBAL );
 }
 
 XDM_HDF_NAMESPACE_END

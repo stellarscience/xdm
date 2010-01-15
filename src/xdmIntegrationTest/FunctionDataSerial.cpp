@@ -41,7 +41,7 @@ TEST( FunctionDataSerial, writeResult ) {
     new xdmFormat::TemporalCollection( "FunctionData.serial" ) );
   
   timeSeries->open();
-  timeSeries->writeTimestepGrid( problem.first );
+  xdmFormat::writeTimestepGrid( timeSeries, problem.first );
   timeSeries->close();
 }
 

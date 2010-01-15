@@ -28,6 +28,9 @@ void SelectionVisitor::apply( const xdm::AllDataSelection& selection ) {
   H5Sselect_all( mIdent );
 }
 
+/*
+// Temporarily removed due to 32-64 bit compatibility issues.  See the note in
+// the class declaration.
 void SelectionVisitor::apply( const xdm::CoordinateDataSelection& selection ) {
   // we are going to do a dangerous cast below to avoid a copy.  Ensure that it
   // will work.
@@ -56,6 +59,7 @@ void SelectionVisitor::apply( const xdm::CoordinateDataSelection& selection ) {
     coords.numberOfElements(), 
     sPointerBuffer[0] );
 }
+*/
 
 void SelectionVisitor::apply( const xdm::HyperslabDataSelection& selection ) {
   xdm::HyperSlab< hsize_t > slab( selection.hyperslab() );

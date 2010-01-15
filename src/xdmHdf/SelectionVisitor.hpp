@@ -21,6 +21,7 @@ XDM_HDF_NAMESPACE_BEGIN
 class SelectionVisitor : public xdm::DataSelectionVisitor {
 private:
   hid_t mIdent;
+  
   static std::vector< const hsize_t* > sPointerBuffer; 
 
 public:
@@ -31,7 +32,14 @@ public:
   //-- Type Safe apply methods from xdm::DataSelectionVisitor --//
   virtual void apply( const xdm::DataSelection& selection );
   virtual void apply( const xdm::AllDataSelection& selection );
-  virtual void apply( const xdm::CoordinateDataSelection& selection );
+  
+  // Temporarily removed due to 32/64 bit compatibility issues, and because ther
+  // currently no application users of this function.  The implementation needs
+  // to be fixed to support copying the input coordinate data when the sizes of
+  // types on the system allow for it and do a copy of the coordinate array
+  // otherwise.
+  // virtual void apply( const xdm::CoordinateDataSelection& selection );
+  
   virtual void apply( const xdm::HyperslabDataSelection& selection );
 };
 

@@ -21,10 +21,13 @@ public:
   virtual ~TemporalCollection();
 
   virtual void open();
-  virtual void writeTimestepGrid( xdm::RefPtr< xdmGrid::Grid > grid );
+  virtual void updateGrid( xdm::RefPtr< xdmGrid::Grid > grid );
+  virtual void writeGridMetadata( xdm::RefPtr< xdmGrid::Grid > grid );
+  virtual void writeGridData( xdm::RefPtr< xdmGrid::Grid > grid );
   virtual void close();
 
 private:
+  std::string mFilename;
   std::fstream mFileStream;
   xdm::XmlOutputStream mXmlStream;
 };

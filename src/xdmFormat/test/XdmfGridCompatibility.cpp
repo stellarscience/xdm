@@ -208,8 +208,8 @@ TEST( XdmfGridCompatibility, timeSeries ) {
     attribute->setDataItem( attrData );
     
     // write the grid for this step to the TimeSeries files
-    temporalCollection->writeTimestepGrid( grid.get() );
-    virtualDataset->writeTimestepGrid( grid.get() );
+    xdmFormat::writeTimestepGrid( temporalCollection, grid.get() );
+    xdmFormat::writeTimestepGrid( virtualDataset, grid.get() );
   }
   temporalCollection->close();
   virtualDataset->close();

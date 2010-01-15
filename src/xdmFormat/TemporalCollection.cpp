@@ -15,7 +15,8 @@
 XDM_FORMAT_NAMESPACE_BEGIN
 
 TemporalCollection::TemporalCollection( const std::string& metadataFile ) :
-  mFileStream( (metadataFile + ".xmf").c_str(), std::ios::out ),
+  mFilename( metadataFile ),
+  mFileStream(),
   mXmlStream( mFileStream )
 {
 }
@@ -26,6 +27,8 @@ TemporalCollection::~TemporalCollection()
 
 void TemporalCollection::open() 
 {
+  mFileStream.open( mFilename.c_str(), std::ios::out );
+
   xdm::RefPtr< xdmGrid::Domain > domain( new xdmGrid::Domain );
   xdm::RefPtr< xdmGrid::CollectionGrid > temporalCollection(
     new xdmGrid::CollectionGrid( xdmGrid::CollectionGrid::kTemporal ) );
@@ -39,21 +42,24 @@ void TemporalCollection::open()
   mXmlStream.openContext( xdmf );
 }
 
-void TemporalCollection::writeTimestepGrid( xdm::RefPtr< xdmGrid::Grid > grid )
-{
+void TemporalCollection::updateGrid( xdm::RefPtr< xdmGrid::Grid > grid ) {
   // update the data tree for a new timestep.
   xdm::UpdateVisitor update;
   grid->accept( update );
+}
 
-  // serialize the heavy data
-  xdm::SerializeDataOperation serializer;
-  grid->accept( serializer );
-
+void TemporalCollection::writeGridMetadata( xdm::RefPtr< xdmGrid::Grid > grid ) {
   // write the metadata to the stream
   xdm::CollectMetadataOperation collect;
   grid->accept( collect );
   xdm::RefPtr< xdm::XmlObject > xml( collect.result() );
   mXmlStream.writeObject( xml );
+}
+
+void TemporalCollection::writeGridData( xdm::RefPtr< xdmGrid::Grid > grid ) {
+  // serialize the heavy data
+  xdm::SerializeDataOperation serializer;
+  grid->accept( serializer );
 }
 
 void TemporalCollection::close()

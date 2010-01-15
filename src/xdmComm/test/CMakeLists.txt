@@ -8,7 +8,7 @@ endmacro()
 # add a parallel test
 macro( xdmComm_test_parallel test_name num_procs )
     find_package( MPI )
-    if( MPI_FOUND )
+    if( MPI_FOUND AND MPIEXEC )
         include_directories( ${MPI_INCLUDE_PATH} )
         add_executable( xdmComm.${test_name}.test ${ARGN} )
         target_link_libraries( xdmComm.${test_name}.test
@@ -20,7 +20,7 @@ macro( xdmComm_test_parallel test_name num_procs )
             ${MPIEXEC_PREFLAGS}
             xdmComm.${test_name}.test
             ${MPIEXEC_POSTFLAGS} )
-    endif( MPI_FOUND )
+    endif( MPI_FOUND AND MPIEXEC )
 endmacro()
 
 xdmComm_test_serial( BinaryStreamBuffer BinaryStreamBuffer.cpp )

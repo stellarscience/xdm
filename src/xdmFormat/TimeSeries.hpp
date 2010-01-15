@@ -23,13 +23,30 @@ public:
   /// accepting timestep grids.
   virtual void open() = 0;
 
-  /// Write a grid to the time series for the specified timestep.  Writes the
-  /// grid data for the given timestep.
-  virtual void writeTimestepGrid( xdm::RefPtr< xdmGrid::Grid > grid ) = 0;
+  /// Update the grid for a new timestep.
+  virtual void updateGrid( xdm::RefPtr< xdmGrid::Grid > grid ) = 0;
+
+  /// Write the metadata for a grid.
+  virtual void writeGridMetadata( xdm::RefPtr< xdmGrid::Grid > grid ) = 0;
+
+  /// Write the large datasets for the grid.
+  virtual void writeGridData( xdm::RefPtr< xdmGrid::Grid > grid ) = 0;
 
   /// Close the time series.
   virtual void close() = 0;
 };
+
+/// Convenience function to perform all steps of writing a TimeSeries grid.
+inline void writeTimestepGrid( 
+  xdm::RefPtr< TimeSeries > timeSeries, 
+  xdm::RefPtr< xdmGrid::Grid > grid ) {
+
+  timeSeries->updateGrid( grid );
+  timeSeries->writeGridMetadata( grid );
+  timeSeries->writeGridData( grid );
+
+}
+  
 
 XDM_FORMAT_NAMESPACE_END
 

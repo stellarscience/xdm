@@ -35,19 +35,16 @@ void VirtualDataset::open()
   mTimeStep = 0;
 }
 
-void VirtualDataset::writeTimestepGrid( xdm::RefPtr< xdmGrid::Grid > grid )
-{
-  // add the grid to a new domain for a valid layout
-  xdm::RefPtr< xdmGrid::Domain > domain( new xdmGrid::Domain );
-  domain->addGrid( grid );
-
+void VirtualDataset::updateGrid( xdm::RefPtr< xdmGrid::Grid > grid ) {
   // update the grid for the new timestep.
   xdm::UpdateVisitor update;
   grid->accept( update );
+}
 
-  // serialize the heavy data
-  xdm::SerializeDataOperation serializer;
-  domain->accept( serializer );
+void VirtualDataset::writeGridMetadata( xdm::RefPtr< xdmGrid::Grid > grid ) {
+  // add the grid to a new domain for a valid layout
+  xdm::RefPtr< xdmGrid::Domain > domain( new xdmGrid::Domain );
+  domain->addGrid( grid );
   
   // open a new xml stream to write this timestep to
   std::stringstream outputName;
@@ -68,6 +65,13 @@ void VirtualDataset::writeTimestepGrid( xdm::RefPtr< xdmGrid::Grid > grid )
 
   xml.closeStream();
 
+}
+
+void VirtualDataset::writeGridData( xdm::RefPtr< xdmGrid::Grid > grid )
+{
+  // serialize the heavy data
+  xdm::SerializeDataOperation serializer;
+  grid->accept( serializer ); 
   mTimeStep++;
 }
 

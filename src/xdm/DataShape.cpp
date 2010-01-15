@@ -69,7 +69,7 @@ DataShape<> makeShape(
 DataShape<> makeContraction( const DataShape<>& space, DataShape<>::size_type n ) {
   DataShape<> result( space.rank() );
   for ( DataShape<>::size_type i = 0; i < space.rank(); i++ ) {
-    result[i] = std::max( space[i] - n, 1lu );
+    result[i] = std::max< std::size_t >( space[i] - n, 1 );
   }
   return result;
 }

@@ -5,7 +5,14 @@ list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules )
 include( CTest )
 enable_testing()
 
+# option specifies whether or not to build the XDM unit test suite
 option( UNIT_TEST_XDM "Enable unit tests for the XDM library" ${UNIT_TEST_XDM} )
+
+# option specifies whether or not to use the XDM communication library
+option( XDM_COMMUNICATION 
+    "Enable the build of the XDM parallel communication library"
+    ${XDM_COMMUNICATION}
+)
 
 if( UNIT_TEST_XDM )
     # add the unit test include directory

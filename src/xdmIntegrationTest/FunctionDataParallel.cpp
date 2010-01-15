@@ -72,7 +72,7 @@ TEST_F( FunctionDataParallel, writeResult ) {
   grid->accept( parallelize );
 
   timeSeries->open();
-  timeSeries->writeTimestepGrid( grid );
+  xdmFormat::writeTimestepGrid( timeSeries, grid );
   timeSeries->close();
 }
 
