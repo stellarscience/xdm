@@ -12,6 +12,8 @@ set( ${PROJECT_NAME}_HEADERS
 	Item.hpp
 	ItemVisitor.hpp
 	NamespaceMacro.hpp
+    ReferencedObject.hpp
+    RefPtr.hpp
     Slab.hpp
 	Topology.hpp
 )
@@ -24,6 +26,7 @@ set( ${PROJECT_NAME}_SOURCES
 	Grid.cpp
 	Item.cpp
 	ItemVisitor.cpp
+    ReferencedObject.cpp
 	Topology.cpp
 )
 

@@ -1,20 +1,26 @@
 
-# serial HDF dataset test program
-add_executable( HdfDataset HdfDataset.cpp )
-target_link_libraries( HdfDataset xdm )
-add_test( HdfDataset HdfDataset )
+# Add a serial test
+macro( xdm_test_serial test_name )
+    add_executable( ${test_name} ${ARGN} )
+    target_link_libraries( ${test_name} xdm )
+    add_test( ${test_name} ${test_name} )
+endmacro()
 
-find_package( MPI )
-if( MPI_FOUND )
-    include_directories( ${MPI_INCLUDE_PATH} )
+# add a parallel test
+macro( xdm_test_parallel test_name num_procs )
+    find_package( MPI )
+    if( MPI_FOUND )
+        include_directories( ${MPI_INCLUDE_PATH} )
+        add_executable( ${test_name} ${ARGN} )
+        target_link_libraries( ${test_name} xdm ${MPI_LIBRARIES} )
+        add_test( ${test_name} ${MPIEXEC}
+            ${MPIEXEC_NUMPROC_FLAG} ${num_procs}
+            ${MPIEXEC_PREFLAGS}
+            ${test_name}
+            ${MPIEXEC_POSTFLAGS} )
+    endif( MPI_FOUND )
+endmacro()
 
-    # MPI HDF output via serial io and communication test program
-    add_executable( HdfDatasetMPI HdfDatasetMPI.cpp )
-    target_link_libraries( HdfDatasetMPI xdm ${MPI_LIBRARIES} )
-    add_test( HdfDatasetMPI ${MPIEXEC} 
-        ${MPIEXEC_NUMPROC_FLAG} 4
-        ${MPIEXEC_PREFLAGS}
-        HdfDatasetMPI 
-        ${MPIEXEC_POSTFLAGS} )
+xdm_test_serial( HdfDatasetSerial HdfDataset.cpp )
+# xdm_test_parallel( HdfDatasetMPI 4 HdfDatasetMPI.cpp )
 
-endif( MPI_FOUND )
