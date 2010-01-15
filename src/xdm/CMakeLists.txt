@@ -17,6 +17,7 @@ set( ${PROJECT_NAME}_HEADERS
 	ObjectCompositionMixin.hpp
     ReferencedObject.hpp
     RefPtr.hpp
+    SelectableDataMixin.hpp
     StructuredArray.hpp
     TemplateStructuredArray.hpp
     UniformDataItem.hpp
@@ -35,6 +36,7 @@ set( ${PROJECT_NAME}_SOURCES
     Item.cpp
     ItemVisitor.cpp
     ReferencedObject.cpp
+    SelectableDataMixin.cpp
     StructuredArray.cpp
     UniformDataItem.cpp
     XmlObject.cpp
