@@ -24,6 +24,7 @@ set( ${PROJECT_NAME}_HEADERS
     StructuredArray.hpp
     TemplateStructuredArray.hpp
     UniformDataItem.hpp
+    VectorStructuredArray.hpp
     XmlObject.hpp
     XmlOutputStream.hpp
 )

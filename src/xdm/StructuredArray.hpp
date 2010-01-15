@@ -61,6 +61,12 @@ public:
     mShape = shape;
   }
 
+protected:
+  /// Allow subclasses to set the data pointer, but no one else.
+  void setData( void* ptr ) {
+    mData = ptr;
+  }
+
 private:
   primitiveType::Value mType;
   size_t mArrayElementSize;

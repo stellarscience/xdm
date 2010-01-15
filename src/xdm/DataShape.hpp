@@ -24,22 +24,18 @@ public:
   typedef typename std::vector< T >::const_iterator ConstDimensionIterator;
 
 private:
-  size_type mRank;
   Index mDimensions;
 
 public:
 
-
   /// Default constructor initializes to empty shape (rank 0).
   DataShape() :
-    mRank( 0 ),
     mDimensions() {
   }
 
   /// Constructor initializes from a rank.  Allocates the array of dimensions
   /// corresponding to the rank.
   explicit DataShape( size_type rank ) :
-    mRank( rank ),
     mDimensions( rank ) {
   }
  
@@ -50,8 +46,7 @@ public:
   /// Initialize from a DataShape with a different size representation.
   template< typename U >
   DataShape( const DataShape< U >& other ) :
-    mRank( other.mRank ),
-    mDimensions( other.mRank ) {
+    mDimensions( other.mDimensions.size() ) {
     std::copy( 
       other.mDimensions.begin(), 
       other.mDimensions.end(),
@@ -63,12 +58,11 @@ public:
   }
 
   void setRank( size_type rank ) {
-    mRank = rank;
     mDimensions.resize( rank );
   }
 
   size_type rank() const {
-    return mRank;
+    return mDimensions.size();
   }
 
   DimensionIterator begin() {
@@ -87,14 +81,19 @@ public:
 
   /// Get the dimension of the data at the specified index.
   size_type& operator[]( size_type i ) {
-    assert( i < mRank );
+    assert( i < mDimensions.size() );
     return mDimensions[i];
   }
 
   /// Get the const dimension of the data at the specified index.
   const size_type& operator[]( size_type i ) const {
-    assert( i < mRank );
+    assert( i < mDimensions.size() );
     return mDimensions[i];
+  }
+
+  /// Push a dimension onto the shape, increasing the rank by 1.
+  void push_back( size_type i ) {
+    mDimensions.push_back( i );
   }
 };
 

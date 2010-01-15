@@ -34,8 +34,9 @@ public:
   const Dataset* dataset() const;
   void setDataset( Dataset* ds );
 
-  DataShape<>& dataspace();
+  /// Get the shape of this data. 
   const DataShape<>& dataspace() const;
+  /// Set the dataspace for this data item.
   void setDataspace( const DataShape<>& dataspace );
 
   const DataSelectionMap& selectionMap() const;

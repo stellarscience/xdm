@@ -5,6 +5,8 @@
 #include <xdm/RefPtr.hpp>
 #include <xdm/StructuredArray.hpp>
 
+#include <cassert>
+
 #include <xdm/NamespaceMacro.hpp>
 
 XDM_NAMESPACE_BEGIN
@@ -51,6 +53,17 @@ public:
     return static_cast< const T* >( data() ) + size();
   }
 
+  /// Index the ith element of the array.
+  value_type& operator[]( size_t i ) {
+    assert( i < size() );
+    return *(static_cast< T* >( data() ) + i);
+  }
+
+  /// Index the const ith element of the array.
+  const value_type& operator[] ( size_t i ) const {
+    assert( i < size() );
+    return *(static_cast< const T* >( data() ) + i);
+  }
 };
 
 /// Convenience template to construct a StructuredArray with the right type

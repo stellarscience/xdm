@@ -44,16 +44,16 @@ void UniformDataItem::setDataset( Dataset* ds ) {
   mDataset = ds;
 }
 
-DataShape<>& UniformDataItem::dataspace() {
-  return mDataspace;
-}
-
 const DataShape<>& UniformDataItem::dataspace() const {
   return mDataspace;
 }
 
 void UniformDataItem::setDataspace( const DataShape<>& dataspace ) {
-  mDataspace = dataspace;
+  typedef DataShape<>::ConstDimensionIterator iterator;
+  mDataspace.setRank( 0 );
+  for ( iterator it = dataspace.begin(); it != dataspace.end(); ++it ) {
+    if ( *it > 0 ) mDataspace.push_back( *it );
+  }
 }
 
 void UniformDataItem::writeMetadata( XmlMetadataWrapper& xml ) {
