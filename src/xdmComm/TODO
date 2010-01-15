@@ -1,0 +1,4 @@
+- Make BinaryStreamBuffer inherit std::streambuf properly.
+- Implement stream state management in BinaryStreamBuffer.
+- Implement error checking and MPI specific stream state queries in
+  CoalescingStreamBuffer.

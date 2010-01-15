@@ -1,5 +1,8 @@
 #include <xdmComm/MpiDatasetProxy.hpp>
 
+#include <xdmComm/BinaryIOStream.hpp>
+#include <xdmComm/BinaryStreamBuffer.hpp>
+
 #include <xdm/AllDataSelection.hpp>
 #include <xdm/DataSelection.hpp>
 #include <xdm/DataSelectionMap.hpp>

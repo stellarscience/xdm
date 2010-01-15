@@ -35,7 +35,7 @@ public:
     mData( mAlloc.allocate( size ) ),
     mLocation( mData ) {}
 
-  ~BasicBinaryStreamBuffer() {
+  virtual ~BasicBinaryStreamBuffer() {
     mAlloc.deallocate( mData, mSize );
   }
 
@@ -76,6 +76,11 @@ public:
 
   /// Reset the location pointer to the beginning of the buffer.
   void pubsync() {
+    sync();
+  }
+
+protected:
+  virtual void sync() {
     mLocation = mData;
   }
 };
