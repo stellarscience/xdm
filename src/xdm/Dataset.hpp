@@ -10,9 +10,40 @@
 #include <xdm/SelectableDataMixin.hpp>
 #include <xdm/XmlTextContent.hpp>
 
+#include <stdexcept>
+
 #include <xdm/NamespaceMacro.hpp>
+#include <xdm/ThrowMacro.hpp>
 
 XDM_NAMESPACE_BEGIN
+
+class Dataset;
+
+/// Callback class for updating a dataset before the operations of
+/// initializing and reading or writing.
+class BasicDatasetUpdateCallback : public ReferencedObject {
+public:
+  virtual void update( Dataset* dataset ) = 0;
+};
+
+/// UpdateCallback subclass that uses the input template argument to pass a
+/// concrete subclass of Dataset into the update call.  This can be used to
+/// define a type safe callback that will apply only to a concrete subclass of
+/// Dataset.
+template< typename T >
+class DatasetUpdateCallback : public BasicDatasetUpdateCallback {
+public:
+  void update( Dataset* dataset ) {
+    T* typedDataset = dynamic_cast< T* >( dataset );
+    if ( typedDataset ) {
+      this->update( typedDataset );
+    } else {
+      XDM_THROW( std::runtime_error( "Invalid Dataset type for callback." ) );
+    }
+  }
+
+  virtual void update( T* dataset ) = 0;
+};
 
 /// Base class for all dataset access.
 ///
@@ -25,6 +56,16 @@ class Dataset : public ReferencedObject {
 public:
   Dataset();
   virtual ~Dataset();
+
+  /// Get the update callback that will be executed at update time.
+  BasicDatasetUpdateCallback* updateCallback();
+  /// Get the const update callback that will be executed at update time.
+  const BasicDatasetUpdateCallback* updateCallback() const;
+  /// Set the callback to be executed at dataset update time.
+  void setUpdateCallback( BasicDatasetUpdateCallback* callback );
+  
+  /// Virtual method to invoke the Dataset's update callback (if it has one).
+  virtual void update();
   
   //-- Dataset metadata functions --//
 
@@ -76,7 +117,8 @@ protected:
   /// should be called only by callbacks.
   virtual void finalizeImplementation() = 0;
 
-private: 
+private:
+  RefPtr< BasicDatasetUpdateCallback > mUpdateCallback;
 };
 
 XDM_NAMESPACE_END

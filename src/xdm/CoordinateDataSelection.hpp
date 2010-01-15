@@ -50,6 +50,7 @@ public:
     mValues = rhs.mValues;
     mRank = rhs.mRank;
     mNumberOfElements = rhs.mNumberOfElements;
+    return *this;
   }
 
   const size_type* values() const { return mValues; }

@@ -31,6 +31,9 @@ public:
 
   virtual ~MpiDatasetProxy();
 
+  /// Update call to update myself and the real dataset.
+  virtual void update();
+
   /// Pass-through to get the format of the underlying dataset.
   virtual const char* format();
   /// Pass-through to get the real dataset to write it's text content.

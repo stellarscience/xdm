@@ -6,6 +6,7 @@
 #include <xdm/SerializeDataOperation.hpp>
 #include <xdm/ReferencedObject.hpp>
 #include <xdm/RefPtr.hpp>
+#include <xdm/UpdateVisitor.hpp>
 #include <xdm/XmlObject.hpp>
 #include <xdm/XmlOutputStream.hpp>
 
@@ -39,6 +40,10 @@ void VirtualDataset::writeTimestepGrid( xdm::RefPtr< xdmGrid::Grid > grid )
   // add the grid to a new domain for a valid layout
   xdm::RefPtr< xdmGrid::Domain > domain( new xdmGrid::Domain );
   domain->addGrid( grid );
+
+  // update the grid for the new timestep.
+  xdm::UpdateVisitor update;
+  grid->accept( update );
 
   // serialize the heavy data
   xdm::SerializeDataOperation serializer;

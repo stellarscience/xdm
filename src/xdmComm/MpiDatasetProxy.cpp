@@ -31,6 +31,11 @@ MpiDatasetProxy::MpiDatasetProxy(
 MpiDatasetProxy::~MpiDatasetProxy() {
 }
 
+void MpiDatasetProxy::update() {
+  mDataset->update();
+  Dataset::update();
+}
+
 const char* MpiDatasetProxy::format() {
   return mDataset->format();
 }

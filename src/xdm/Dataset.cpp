@@ -2,10 +2,30 @@
 
 XDM_NAMESPACE_BEGIN
 
-Dataset::Dataset() {
+Dataset::Dataset() :
+  mUpdateCallback() {
 }
 
 Dataset::~Dataset() {
+}
+
+BasicDatasetUpdateCallback* Dataset::updateCallback() {
+  return mUpdateCallback;
+}
+
+const BasicDatasetUpdateCallback* Dataset::updateCallback() const {
+  return mUpdateCallback;
+}
+
+void Dataset::setUpdateCallback( BasicDatasetUpdateCallback* callback ) {
+  mUpdateCallback = callback;
+}
+  
+
+void Dataset::update() {
+  if ( mUpdateCallback.valid() ) {
+    mUpdateCallback->update( this );
+  }
 }
 
 void Dataset::initialize(

@@ -44,7 +44,9 @@ void SelectionVisitor::apply( const xdm::CoordinateDataSelection& selection ) {
   xdm::CoordinateArray<>::size_type rank = coords.rank();
   sPointerBuffer.resize( numberOfElements );
   int count = 0;
-  for ( int index = 0; index < numberOfElements; index += rank ) {
+  for ( xdm::CoordinateArray<>::size_type index = 0; 
+    index < numberOfElements; 
+    index += rank ) {
     sPointerBuffer[count++] = reinterpret_cast< const hsize_t* >( &coords.values()[index] );
   }
 

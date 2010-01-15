@@ -19,7 +19,7 @@ StructuredArray::~StructuredArray() {
 }
 
 size_t StructuredArray::elementSize() const {
-  typeSize( mType );
+  return typeSize( mType );
 }
 
 size_t StructuredArray::size() const {

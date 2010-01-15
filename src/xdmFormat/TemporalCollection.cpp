@@ -6,6 +6,7 @@
 #include <xdm/SerializeDataOperation.hpp>
 #include <xdm/ReferencedObject.hpp>
 #include <xdm/RefPtr.hpp>
+#include <xdm/UpdateVisitor.hpp>
 #include <xdm/XmlObject.hpp>
 
 #include <xdmGrid/Domain.hpp>
@@ -40,6 +41,10 @@ void TemporalCollection::open()
 
 void TemporalCollection::writeTimestepGrid( xdm::RefPtr< xdmGrid::Grid > grid )
 {
+  // update the data tree for a new timestep.
+  xdm::UpdateVisitor update;
+  grid->accept( update );
+
   // serialize the heavy data
   xdm::SerializeDataOperation serializer;
   grid->accept( serializer );
