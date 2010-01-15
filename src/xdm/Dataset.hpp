@@ -11,6 +11,30 @@
 
 XDM_NAMESPACE_BEGIN
 
+class Dataset;
+
+class InitializeCallback {
+public:
+  virtual void initializeImplementation(
+    Dataset* ds,
+    const DataShape<>& shape,
+    std::iostream& content ) = 0;
+};
+
+class SerializeCallback {
+public:
+  virtual void serializeImplementation(
+    Dataset* ds,
+    const Array& data,
+    const SlabMap<>& slabMap,
+    std::iostream& content ) = 0;
+};
+
+class FinalizeCallback {
+public:
+  virtual void finalizeImplementation( Dataset* ds ) = 0;
+};
+
 class Dataset {
 public:
   Dataset();
@@ -23,6 +47,10 @@ public:
     std::iostream& content );
   void finalize();
 
+  void setInitializeCallback( InitializeCallback* icb );
+  void setSerializeCallback( SerializeCallback* scb );
+  void setFinalizeCallback( FinalizeCallback* fcb );
+
   virtual void initializeImplementation( 
     const DataShape<>& shape, 
     std::iostream& content ) = 0;
@@ -31,6 +59,10 @@ public:
     const SlabMap<>& slabMap, 
     std::iostream& content ) = 0;
   virtual void finalizeImplementation() = 0;
+private:
+  InitializeCallback* mInitializeCallback;
+  SerializeCallback* mSerializeCallback;
+  FinalizeCallback* mFinalizeCallback;
 };
 
 XDM_NAMESPACE_END

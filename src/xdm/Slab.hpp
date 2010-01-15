@@ -54,6 +54,10 @@ public:
 
   ~Slab() {}
 
+  const DataShape< T >& shape() const {
+    return mDataShape;
+  }
+
   void setStart( size_type dim, size_type start ) {
     mStart[dim] = start;
   }
@@ -83,6 +87,11 @@ private:
   Slab<T> mTo;
 
 public:
+  SlabMap() :
+    mFrom(),
+    mTo()
+  {}
+
   SlabMap( const Slab<T>& from, const Slab<T>& to ) :
     mFrom( from ),
     mTo( to )

@@ -15,12 +15,9 @@ int main( int argc, char* argv[] ) {
   }
 
   // initialize the dataset on disk
-  xdm::HdfDataset* dataset = new xdm::HdfDataset();
   xdm::DataShape<> fileshape( 2 );
   fileshape[0] = 4;
   fileshape[1] = 4;
-  std::stringstream init( "HdfDataset.h5:/testdata" );
-  dataset->initialize( fileshape, init );
 
   // set up the mapping from memory space to file space
   xdm::Slab<> memorySlab( arrayShape );
@@ -36,12 +33,15 @@ int main( int argc, char* argv[] ) {
   fileSlab.setCount( 1, 4 );
   xdm::SlabMap<> mapping( memorySlab, fileSlab );
 
-  // write the data to disk
-  std::stringstream content;
-  dataset->serialize( data, mapping, content );
+  // create the dataset
+  xdm::HdfDataset* dataset = new xdm::HdfDataset();
 
-  // finalize the process
+  // write the data to disk
+  std::stringstream content( "HdfDataset.h5:/testdata" );
+  dataset->initialize( fileshape, content );
+  dataset->serialize( data, mapping, content );
   dataset->finalize();
+  
   return 0;
 }
 

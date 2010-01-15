@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <ostream>
 #include <vector>
 
 #include <xdm/NamespaceMacro.hpp>
@@ -62,6 +63,16 @@ public:
     return mDimensions[i];
   }
 };
+
+template< typename T >
+std::ostream& operator<<( std::ostream& ostr, const DataShape< T >& shape ) {
+  typedef DataShape< T > TypedDataShape;
+  ostr << shape.rank() << ": ";
+  for ( typename TypedDataShape::size_type i = 0; i < shape.rank(); ++i ) {
+    ostr << shape[i] << " ";
+  }
+  return ostr;
+}
 
 XDM_NAMESPACE_END
 
