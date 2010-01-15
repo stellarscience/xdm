@@ -23,6 +23,9 @@ namespace primitiveType {
   };
 } // namespace primitiveType
 
+/// Function to provide size information for a primitive type.
+size_t typeSize( primitiveType::Value type );
+
 /// Structure to provide static type information for values of the
 /// primitiveType::Value enumeration.
 template< typename T > struct PrimitiveTypeInfo {

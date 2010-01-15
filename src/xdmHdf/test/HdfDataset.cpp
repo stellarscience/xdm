@@ -17,7 +17,7 @@ int main( int argc, char* argv[] ) {
   
   xdm::DataShape<> arrayShape( 1 );
   arrayShape[0] = 16;
-  xdm::StructuredArray array( xdm::primitiveType::kFloat, sizeof(float), 
+  xdm::StructuredArray array( xdm::primitiveType::kFloat,  
     &data[0], arrayShape );
 
   // initialize the dataset on disk

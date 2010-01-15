@@ -97,6 +97,14 @@ public:
   }
 };
 
+template< typename T >
+bool operator==( const DataShape<T>& lhs, const DataShape<T>& rhs ) {
+  if ( lhs.rank() != rhs.rank() ) {
+    return false;
+  }
+  return std::equal( lhs.begin(), lhs.end(), rhs.begin() );
+}
+
 /// Make a DataShape given a space separated string with the dimensions.
 DataShape<> makeShape( const std::string& dimensions );
 

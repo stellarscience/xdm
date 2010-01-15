@@ -43,6 +43,7 @@ set( ${PROJECT_NAME}_SOURCES
     DataShape.cpp
     Item.cpp
     ItemVisitor.cpp
+    PrimitiveType.cpp
     ReferencedObject.cpp
     SelectableDataMixin.cpp
     SerializeDataOperation.cpp

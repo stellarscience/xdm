@@ -27,6 +27,7 @@ xdmComm_test_serial( BinaryStreamBuffer BinaryStreamBuffer.cpp )
 xdmComm_test_serial( BinaryOStream BinaryOStream.cpp )
 xdmComm_test_serial( BinaryIStream BinaryIStream.cpp )
 xdmComm_test_serial( BinaryIOStream BinaryIOStream.cpp )
+xdmComm_test_serial( BinaryStreamOperations BinaryStreamOperations.cpp )
 
 xdmComm_test_parallel( MpiDatasetProxy 4 MpiDatasetProxy.cpp )
 xdmComm_test_parallel( CoalescingStreamBuffer 4 CoalescingStreamBuffer.cpp )

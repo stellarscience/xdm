@@ -36,10 +36,19 @@ public:
   BinaryOStream& operator<<( bool n );
 
   BinaryOStream& flush();
+
+  /// Insertion operator that takes a function pointer and invokes it on the
+  /// stream.  This allows the stream to support manipulators.
+  BinaryOStream& operator<<( BinaryOStream& (*f)( BinaryOStream& ) ) {
+    return f( *this );
+  }
 };
 
 BinaryOStream& operator<<( BinaryOStream& ostr, char c );
 BinaryOStream& operator<<( BinaryOStream& ostr, unsigned char c );
+
+/// Stream manipulator that flushes the stream.
+inline BinaryOStream& flush( BinaryOStream& ostr ) { return ostr.flush(); }
 
 XDM_COMM_NAMESPACE_END
 

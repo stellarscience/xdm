@@ -7,6 +7,9 @@
 
 #include <mpi.h>
 
+#include <memory>
+#include <vector>
+
 #include <xdmComm/NamespaceMacro.hpp>
 
 XDM_COMM_NAMESPACE_BEGIN
@@ -53,7 +56,8 @@ protected:
 private:
   MPI_Comm mCommunicator;
   xdm::RefPtr< xdm::Dataset > mDataset;
-  xdmComm::BinaryStreamBuffer mCommBuffer;
+  std::auto_ptr< xdmComm::BinaryStreamBuffer > mCommBuffer;
+  std::vector< char > mArrayBuffer;
 };
 
 XDM_COMM_NAMESPACE_END

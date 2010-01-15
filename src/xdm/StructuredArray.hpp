@@ -29,7 +29,6 @@ public:
   /// @param shape The shape of the data in memory.
   StructuredArray(
     const primitiveType::Value& type,
-    size_t arrayElementSize,
     void* data,
     const DataShape<>& shape );
   
@@ -40,11 +39,19 @@ public:
     return mType;
   }
 
+  /// Set the type of the data.
+  void setDataType( primitiveType::Value type ) {
+    mType = type;
+  }
+
   /// Get the size of the array elements in bytes.
   size_t elementSize() const;
 
   /// Get the number of data elements.
   size_t size() const;
+
+  /// Get the size of the array in memory in bytes.
+  size_t memorySize() const { return elementSize() * size(); }
 
   /// Get a pointer to the actual data.
   void* data();
@@ -62,14 +69,14 @@ public:
   }
 
 protected:
-  /// Allow subclasses to set the data pointer, but no one else.
-  void setData( void* ptr ) {
-    mData = ptr;
-  }
+  /// Set the pointer to the array data.
+  ///
+  /// Protected so that subclasses can choose to manage data while clients have
+  /// no access unless a specific subclass chooses to provide it.
+  void setData( void* ptr );
 
 private:
   primitiveType::Value mType;
-  size_t mArrayElementSize;
   void* mData;
   DataShape<> mShape;
 };

@@ -1,7 +1,8 @@
 #include <xdmComm/MpiDatasetProxy.hpp>
 
 #include <xdmComm/BinaryIOStream.hpp>
-#include <xdmComm/BinaryStreamBuffer.hpp>
+#include <xdmComm/BinaryStreamOperations.hpp>
+#include <xdmComm/CoalescingStreamBuffer.hpp>
 
 #include <xdm/AllDataSelection.hpp>
 #include <xdm/DataSelection.hpp>
@@ -23,7 +24,8 @@ MpiDatasetProxy::MpiDatasetProxy(
   size_t bufSizeHint ) :
   mCommunicator( communicator ),
   mDataset( dataset ),
-  mCommBuffer( bufSizeHint ) {
+  mCommBuffer( new CoalescingStreamBuffer( bufSizeHint, communicator ) ),
+  mArrayBuffer( bufSizeHint ) {
 }
 
 MpiDatasetProxy::~MpiDatasetProxy() {
@@ -50,6 +52,46 @@ void MpiDatasetProxy::initializeImplementation(
 void MpiDatasetProxy::serializeImplementation(
   const xdm::StructuredArray* array,
   const xdm::DataSelectionMap& selectionMap ) {
+
+  int localRank;
+  MPI_Comm_rank( mCommunicator, &localRank );
+
+  // prepare a stream for sending and receiving data.
+  BinaryIOStream dataStream( mCommBuffer.get() );
+
+  // if I'm not rank 0 in the communicator, pack my data and send it.
+  if ( localRank != 0 ) {
+    
+    dataStream << *array;
+    dataStream << selectionMap;
+    dataStream.flush();
+  
+  } else {
+    
+    // first, write rank 0 local process data to the dataset.
+    mDataset->serialize( array, selectionMap );
+
+    // receive data from everyone else in the communicator.
+    int totalProcesses;
+    MPI_Comm_size( mCommunicator, &totalProcesses );
+    int received = 1;
+    while( received < totalProcesses ) {
+      // synchronize the stream to receive from a single process.
+      dataStream.sync();
+
+      // reconstruct the information from the message
+      xdm::StructuredArray processArray( 
+        xdm::primitiveType::kChar, 
+        &mArrayBuffer[0],
+        xdm::DataShape<>() );
+      xdm::DataSelectionMap processSelectionMap;
+      dataStream >> processArray;
+      dataStream >> processSelectionMap;
+
+      // write the process data to the dataset.
+      mDataset->serialize( &processArray, processSelectionMap );
+    }
+  }
 }
 
 void MpiDatasetProxy::finalizeImplementation() {

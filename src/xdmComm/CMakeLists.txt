@@ -8,6 +8,7 @@ set( ${PROJECT_NAME}_HEADERS
     BinaryIOStream.hpp
     BinaryOStream.hpp
     BinaryStreamBuffer.hpp
+    BinaryStreamOperations.hpp
     CoalescingStreamBuffer.hpp
     MpiDatasetProxy.hpp
     NamespaceMacro.hpp
@@ -17,6 +18,7 @@ set( ${PROJECT_NAME}_SOURCES
     BinaryIStream.cpp
     BinaryIOStream.cpp
     BinaryOStream.cpp
+    BinaryStreamOperations.cpp
     CoalescingStreamBuffer.cpp
     MpiDatasetProxy.cpp
 )

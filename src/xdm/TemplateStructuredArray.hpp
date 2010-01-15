@@ -27,7 +27,6 @@ public:
   TemplateStructuredArray( T* data, const DataShape<>& shape ) :
     StructuredArray( 
       static_cast< primitiveType::Value >( PrimitiveTypeInfo< T >::kValue ),
-      PrimitiveTypeInfo< T >::kSize,
       data,
       shape ) {}
 

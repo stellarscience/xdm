@@ -2,3 +2,4 @@
 - Implement stream state management in BinaryStreamBuffer.
 - Implement error checking and MPI specific stream state queries in
   CoalescingStreamBuffer.
+- Fix the StructuredArray stream extractor to not required pre-allocated buffer.

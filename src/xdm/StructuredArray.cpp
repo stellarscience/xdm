@@ -8,11 +8,9 @@ XDM_NAMESPACE_BEGIN
 
 StructuredArray::StructuredArray( 
   const primitiveType::Value& type,
-  size_t arrayElementSize,
   void* data,
   const DataShape<>& shape ) :
   mType( type ),
-  mArrayElementSize( arrayElementSize ),
   mData( data ),
   mShape( shape ) {
 }
@@ -21,7 +19,7 @@ StructuredArray::~StructuredArray() {
 }
 
 size_t StructuredArray::elementSize() const {
-  return mArrayElementSize;
+  typeSize( mType );
 }
 
 size_t StructuredArray::size() const {
@@ -35,6 +33,10 @@ void* StructuredArray::data() {
 
 const void* StructuredArray::data() const {
   return mData;
+}
+
+void StructuredArray::setData( void* data ) {
+  mData = data;
 }
 
 XDM_NAMESPACE_END
