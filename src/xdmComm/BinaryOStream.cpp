@@ -71,6 +71,11 @@ BinaryOStream& BinaryOStream::operator<<( bool n ) {
   return output( *this, n );
 }
 
+BinaryOStream& BinaryOStream::flush() {
+  rdbuf()->pubsync();
+  return *this;
+}
+
 BinaryOStream& operator<<( BinaryOStream& ostr, char c ) {
   return ostr.put( c );
 }

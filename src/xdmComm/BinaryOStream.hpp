@@ -35,6 +35,7 @@ public:
   
   BinaryOStream& operator<<( bool n );
 
+  BinaryOStream& flush();
 };
 
 BinaryOStream& operator<<( BinaryOStream& ostr, char c );
