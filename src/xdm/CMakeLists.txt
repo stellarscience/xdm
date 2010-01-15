@@ -2,18 +2,22 @@ project( xdm )
 
 find_package( HDF5 )
 
-set( ${PROJECT_NAME}_HEADERS 
+set( ${PROJECT_NAME}_HEADERS
+    DataNode.hpp
     Dataset.hpp
 	NamespaceMacro.hpp
+    Node.hpp
     ReferencedObject.hpp
     RefPtr.hpp
     StructuredArray.hpp
     HyperSlab.hpp
 )
-set( ${PROJECT_NAME}_SOURCES 
+set( ${PROJECT_NAME}_SOURCES
+    DataNode.cpp
     Dataset.cpp
-    StructuredArray.cpp
+    Node.hpp
     ReferencedObject.cpp
+    StructuredArray.cpp
 )
 
 if( HDF5_FOUND )
