@@ -23,6 +23,10 @@ public:
 
   virtual ~CoalescingStreamBuffer();
 
+  /// Poll for messages from a CoalescingStreamBuffer on a remote machine.
+  /// Returns true if a message is available, false otherwise.
+  bool poll() const;
+  
 protected:
   /// Implementation of virtual sync from BinaryStreamBuffer.  Passes data
   /// between processes with send/receive depending upon process rank within an

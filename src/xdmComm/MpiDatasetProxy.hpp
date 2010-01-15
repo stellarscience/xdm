@@ -1,8 +1,6 @@
 #ifndef xdmComm_MpiDatasetProxy_hpp
 #define xdmComm_MpiDatasetProxy_hpp
 
-#include <xdmComm/BinaryStreamBuffer.hpp>
-
 #include <xdm/Dataset.hpp>
 
 #include <mpi.h>
@@ -12,7 +10,13 @@
 
 #include <xdmComm/NamespaceMacro.hpp>
 
+namespace xdm {
+  class StructuredArray;
+}
+
 XDM_COMM_NAMESPACE_BEGIN
+
+class CoalescingStreamBuffer;
 
 /// Dataset proxy that uses MPI to communicate data between processes before
 /// actually writing the data to a dataset.  The communication procedures assume
@@ -59,8 +63,8 @@ protected:
 private:
   MPI_Comm mCommunicator;
   xdm::RefPtr< xdm::Dataset > mDataset;
-  std::auto_ptr< xdmComm::BinaryStreamBuffer > mCommBuffer;
-  std::vector< char > mArrayBuffer;
+  std::auto_ptr< xdmComm::CoalescingStreamBuffer > mCommBuffer;
+  xdm::RefPtr< xdm::StructuredArray > mArrayBuffer; 
 };
 
 XDM_COMM_NAMESPACE_END

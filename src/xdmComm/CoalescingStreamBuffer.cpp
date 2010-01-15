@@ -1,4 +1,5 @@
 #include <xdmComm/CoalescingStreamBuffer.hpp>
+#include <xdmComm/MpiMessageTag.hpp>
 
 XDM_COMM_NAMESPACE_BEGIN
 
@@ -12,6 +13,20 @@ CoalescingStreamBuffer::CoalescingStreamBuffer(
 CoalescingStreamBuffer::~CoalescingStreamBuffer() {
 }
 
+bool CoalescingStreamBuffer::poll() const {
+  MPI_Status status;
+  int flag;
+
+  MPI_Iprobe( 
+    MPI_ANY_SOURCE, 
+    MpiMessageTag::kWriteData, 
+    mCommunicator,
+    &flag,
+    &status );
+
+  return flag;
+}
+
 void CoalescingStreamBuffer::sync() {
   // get the process rank to decide what to do
   int localRank;
@@ -19,11 +34,23 @@ void CoalescingStreamBuffer::sync() {
 
   if ( localRank != 0 ) {
     // non-zero ranks send to rank 0
-    MPI_Ssend( pointer(), size(), MPI_BYTE, 0, 0, mCommunicator );
+    MPI_Ssend( 
+      pointer(), 
+      size(), 
+      MPI_BYTE, 
+      0, 
+      MpiMessageTag::kWriteData, 
+      mCommunicator );
   } else {
     // rank 0 receives.
-    MPI_Recv( pointer(), size(), MPI_BYTE, MPI_ANY_SOURCE, 
-      0, mCommunicator, 0 );
+    MPI_Recv( 
+      pointer(), 
+      size(), 
+      MPI_BYTE, 
+      MPI_ANY_SOURCE, 
+      MpiMessageTag::kWriteData, 
+      mCommunicator, 
+      0 );
   }
 
   // call the base class sync to prepare for reading, writing.

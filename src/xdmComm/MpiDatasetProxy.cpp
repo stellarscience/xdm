@@ -1,8 +1,10 @@
 #include <xdmComm/MpiDatasetProxy.hpp>
 
-#include <xdmComm/BinaryIOStream.hpp>
+#include <xdmComm/BinaryIStream.hpp>
+#include <xdmComm/BinaryOStream.hpp>
 #include <xdmComm/BinaryStreamOperations.hpp>
 #include <xdmComm/CoalescingStreamBuffer.hpp>
+#include <xdmComm/MpiMessageTag.hpp>
 
 #include <xdm/AllDataSelection.hpp>
 #include <xdm/DataSelection.hpp>
@@ -11,10 +13,32 @@
 #include <xdm/DataShape.hpp>
 #include <xdm/HyperslabDataSelection.hpp>
 #include <xdm/StructuredArray.hpp>
+#include <xdm/VectorStructuredArray.hpp>
 
 XDM_COMM_NAMESPACE_BEGIN
 
 namespace {
+
+// receive and write off core data to a dataset.
+// Precondition: There must be a message available to receive.
+void receiveAndWriteProcessData( 
+  BinaryStreamBuffer* commBuf, 
+  xdm::Dataset* dataset,
+  xdm::StructuredArray* arrayBuffer ) { 
+
+  BinaryIStream dataStream( commBuf );
+
+  // synchronize the stream to receive from a single process.
+  dataStream.sync();
+
+  // reconstruct the information from the message
+  xdm::DataSelectionMap processSelectionMap;
+  dataStream >> *arrayBuffer;
+  dataStream >> processSelectionMap;
+
+  // write the process data to the dataset.
+  dataset->serialize( arrayBuffer, processSelectionMap );
+}
 
 } // namespace anon
 
@@ -25,7 +49,7 @@ MpiDatasetProxy::MpiDatasetProxy(
   mCommunicator( communicator ),
   mDataset( dataset ),
   mCommBuffer( new CoalescingStreamBuffer( bufSizeHint, communicator ) ),
-  mArrayBuffer( bufSizeHint ) {
+  mArrayBuffer( new xdm::VectorStructuredArray<char>( bufSizeHint ) ) {
 }
 
 MpiDatasetProxy::~MpiDatasetProxy() {
@@ -47,6 +71,9 @@ void MpiDatasetProxy::writeTextContent( xdm::XmlTextContent& text ) {
 void MpiDatasetProxy::initializeImplementation(
   xdm::primitiveType::Value type,
   const xdm::DataShape<>& shape ) {
+  
+  MPI_Barrier( mCommunicator );
+
   int rank;
   MPI_Comm_rank( mCommunicator, &rank );
   if ( rank == 0 ) {
@@ -61,12 +88,10 @@ void MpiDatasetProxy::serializeImplementation(
   int localRank;
   MPI_Comm_rank( mCommunicator, &localRank );
 
-  // prepare a stream for sending and receiving data.
-  BinaryIOStream dataStream( mCommBuffer.get() );
-
-  // if I'm not rank 0 in the communicator, pack my data and send it.
+  // Rank 0 in the communicator writes local data and polls for messages from
+  // other processes.
   if ( localRank != 0 ) {
-    
+    BinaryOStream dataStream( mCommBuffer.get() );
     dataStream << *array;
     dataStream << selectionMap;
     dataStream.flush();
@@ -76,38 +101,59 @@ void MpiDatasetProxy::serializeImplementation(
     // write local process data to the dataset.
     mDataset->serialize( array, selectionMap );
 
-    // receive data from everyone else in the communicator.
-    int totalProcesses;
-    MPI_Comm_size( mCommunicator, &totalProcesses );
-    // loop through processes starts at 1 since local data has been written
-    for ( int received = 1; received < totalProcesses; received++ ) {
-      // synchronize the stream to receive from a single process.
-      dataStream.sync();
-
-      // reconstruct the information from the message
-      xdm::StructuredArray processArray( 
-        xdm::primitiveType::kChar, 
-        &mArrayBuffer[0],
-        xdm::DataShape<>() );
-      xdm::DataSelectionMap processSelectionMap;
-      dataStream >> processArray;
-      dataStream >> processSelectionMap;
-
-      // write the process data to the dataset.
-      mDataset->serialize( &processArray, processSelectionMap );
+    // Check for any messages that may have come from other processes.
+    while ( mCommBuffer->poll() ) {
+      receiveAndWriteProcessData( 
+        mCommBuffer.get(), 
+        mDataset.get(),
+        mArrayBuffer.get() );
     }
   }
-
-  // Block until all processes have completed writing their data.  This is
-  // necessary in order to avoid mixing messages from different datasets.
-  MPI_Barrier( mCommunicator );
 }
 
 void MpiDatasetProxy::finalizeImplementation() {
+  int size;
+  MPI_Comm_size( mCommunicator, &size );
   int rank;
   MPI_Comm_rank( mCommunicator, &rank );
+
+  char datasetCompleteSignalBuffer[1];
+  datasetCompleteSignalBuffer[0] = 1;
+
   if ( rank == 0 ) {
+    
+    // wait for all processes to signal that they are done with this dataset
+    int processesCompleted = 1;
+    while ( processesCompleted < size ) {
+      MPI_Status status;
+      int flag;
+      MPI_Iprobe(
+        MPI_ANY_SOURCE, 
+        MpiMessageTag::kProcessCompleted,
+        mCommunicator,
+        &flag,
+        &status );
+      
+      // if a process signalled complete, swallow the message and increment
+      if ( flag ) {
+        MPI_Recv( datasetCompleteSignalBuffer, 1, MPI_BYTE, MPI_ANY_SOURCE,
+          MpiMessageTag::kProcessCompleted, mCommunicator, &status );
+        processesCompleted++;
+      }
+
+      // poll and process any new messages
+      while ( mCommBuffer->poll() ) {
+        receiveAndWriteProcessData(
+          mCommBuffer.get(),
+          mDataset.get(),
+          mArrayBuffer.get() );
+      }
+    }
     mDataset->finalize();
+  } else {
+    // Not rank 0 and local process is done with current dataset.  Signal.
+    MPI_Ssend( datasetCompleteSignalBuffer, 1, MPI_BYTE, 0, 
+      MpiMessageTag::kProcessCompleted, mCommunicator );
   }
 }
 
