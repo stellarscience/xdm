@@ -90,6 +90,9 @@ void MpiDatasetProxy::serializeImplementation(
 
       // write the process data to the dataset.
       mDataset->serialize( &processArray, processSelectionMap );
+      
+      // completed a process
+      received++;
     }
   }
 }

@@ -74,6 +74,11 @@ public:
     return mData;
   }
 
+  /// Seek to an absolute position in the buffer
+  size_t pubseekpos( size_t position ) {
+    mLocation = mData + position;
+  }
+
   /// Reset the location pointer to the beginning of the buffer.
   void pubsync() {
     sync();

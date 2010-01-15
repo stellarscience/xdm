@@ -23,10 +23,11 @@ public:
   typedef StreamBufT stream_buffer;
 
   /// The constructor takes a reference to the underlying stream buffer to use.
-  /// The input buffer is synced upon construction.
+  /// The buffer's position pointer is reset to the beginning of the buffer upon
+  /// construction.
   BasicBinaryIosBase( StreamBufT* buffer ) :
     mStreamBuffer( buffer ) {
-    buffer->pubsync();
+    buffer->pubseekpos( 0 );
   }
 
   ~BasicBinaryIosBase() {}
