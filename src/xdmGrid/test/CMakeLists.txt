@@ -17,6 +17,3 @@ xdmGrid_test_serial( TensorProductGeometry TensorProductGeometry.cpp )
 xdmGrid_test_serial( Topology Topology.cpp )
 xdmGrid_test_serial( Time Time.cpp )
 
-xdmGrid_test_serial( XdmfGridCompatibility XdmfGridCompatibility.cpp ) 
-target_link_libraries( xdmGrid.XdmfGridCompatibility.test xdmHdf )
-
