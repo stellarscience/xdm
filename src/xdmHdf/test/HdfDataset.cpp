@@ -1,6 +1,7 @@
 #include <xdm/StructuredArray.hpp>
-#include <xdm/HdfDataset.hpp>
 #include <xdm/RefPtr.hpp>
+
+#include <xdmHdf/HdfDataset.hpp>
 
 #include <sstream>
 
@@ -37,7 +38,7 @@ int main( int argc, char* argv[] ) {
   xdm::HyperSlabMap<> mapping( memorySlab, fileSlab );
 
   // create the dataset
-  xdm::RefPtr< xdm::HdfDataset > dataset = new xdm::HdfDataset();
+  xdm::RefPtr< xdmHdf::HdfDataset > dataset = new xdmHdf::HdfDataset();
   dataset->setFile( "HdfDataset.h5" );
   dataset->setGroup( "" );
   dataset->setDataset( "testdata" );

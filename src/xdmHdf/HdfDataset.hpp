@@ -1,16 +1,16 @@
-#ifndef xdm_HdfDataset_hpp
-#define xdm_HdfDataset_hpp
+#ifndef xdmHdf_HdfDataset_hpp
+#define xdmHdf_HdfDataset_hpp
 
 #include <xdm/Dataset.hpp>
 
 #include <memory>
 #include <string>
 
-#include <xdm/NamespaceMacro.hpp>
+#include <xdmHdf/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+XDM_HDF_NAMESPACE_BEGIN
 
-class HdfDataset : public Dataset {
+class HdfDataset : public xdm::Dataset {
 public:
   /// Default constructor does not associate with a file.
   HdfDataset();
@@ -38,13 +38,13 @@ public:
 
   //-- Dataset Implementations --//
   virtual const char* format() { return "HDF"; }
-  virtual void writeTextContent( XmlTextContent& text );
+  virtual void writeTextContent( xdm::XmlTextContent& text );
   virtual void initializeImplementation(
-    primitiveType::Value type,
-    const DataShape<>& shape );
+    xdm::primitiveType::Value type,
+    const xdm::DataShape<>& shape );
   virtual void serializeImplementation(
-    const StructuredArray& data,
-    const HyperSlabMap<>& memory_map );
+    const xdm::StructuredArray& data,
+    const xdm::HyperSlabMap<>& memory_map );
   virtual void finalizeImplementation();
 
 private:
@@ -52,7 +52,7 @@ private:
   std::auto_ptr< Private > imp;
 };
 
-XDM_NAMESPACE_END
+XDM_HDF_NAMESPACE_END
 
-#endif // xdm_HdfDataset_hpp
+#endif // xdmHdf_HdfDataset_hpp
 

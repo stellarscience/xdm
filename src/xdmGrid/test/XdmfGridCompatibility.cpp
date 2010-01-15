@@ -4,7 +4,6 @@
 #include <gtest/gtest.h>
 
 #include <xdm/CollectMetadataOperation.hpp>
-#include <xdm/HdfDataset.hpp>
 #include <xdm/StructuredArray.hpp>
 #include <xdm/TemplateStructuredArray.hpp>
 #include <xdm/UniformDataItem.hpp>
@@ -14,6 +13,8 @@
 #include <xdmGrid/UniformGrid.hpp>
 #include <xdmGrid/TensorProductGeometry.hpp>
 #include <xdmGrid/RectilinearMesh.hpp>
+
+#include <xdmHdf/HdfDataset.hpp>
 
 #include <algorithm>
 #include <sstream>
@@ -47,7 +48,7 @@ TEST( XdmfGridCompatibility, staticGrid ) {
     = xdm::createStructuredArray( vertices, arrayShape );
 
   // dataset on disk
-  xdm::RefPtr< xdm::HdfDataset > dataset( new xdm::HdfDataset );
+  xdm::RefPtr< xdmHdf::HdfDataset > dataset( new xdmHdf::HdfDataset );
   dataset->setFile( "XdmfGridCompatibility.h5" );
   dataset->setDataset( "staticGrid" );
   xdm::DataShape<> fileShape(1);

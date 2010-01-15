@@ -1,5 +1,6 @@
 
-#include <xdm/HdfDataset.hpp>
+#include <xdmHdf/HdfDataset.hpp>
+
 #include <xdm/PrimitiveType.hpp>
 
 #include <algorithm>
@@ -9,7 +10,7 @@
 
 #include <hdf5.h>
 
-XDM_NAMESPACE_BEGIN
+XDM_HDF_NAMESPACE_BEGIN
 
 namespace {
 
@@ -24,21 +25,21 @@ struct HdfLocation {
 };
 
 struct HdfTypeMapping {
-  std::map< primitiveType::Value, int > mTypeMap;
+  std::map< xdm::primitiveType::Value, int > mTypeMap;
   HdfTypeMapping() {
-    mTypeMap[primitiveType::kChar] = H5T_NATIVE_CHAR;
-    mTypeMap[primitiveType::kShort] = H5T_NATIVE_SHORT;
-    mTypeMap[primitiveType::kInt] = H5T_NATIVE_INT;
-    mTypeMap[primitiveType::kLongInt] = H5T_NATIVE_LONG;
-    mTypeMap[primitiveType::kUnsignedChar] = H5T_NATIVE_UCHAR;
-    mTypeMap[primitiveType::kUnsignedShort] = H5T_NATIVE_USHORT;
-    mTypeMap[primitiveType::kUnsignedInt] = H5T_NATIVE_UINT;
-    mTypeMap[primitiveType::kLongUnsignedInt] = H5T_NATIVE_ULLONG;
-    mTypeMap[primitiveType::kFloat] = H5T_NATIVE_FLOAT;
-    mTypeMap[primitiveType::kDouble] = H5T_NATIVE_DOUBLE;
+    mTypeMap[xdm::primitiveType::kChar] = H5T_NATIVE_CHAR;
+    mTypeMap[xdm::primitiveType::kShort] = H5T_NATIVE_SHORT;
+    mTypeMap[xdm::primitiveType::kInt] = H5T_NATIVE_INT;
+    mTypeMap[xdm::primitiveType::kLongInt] = H5T_NATIVE_LONG;
+    mTypeMap[xdm::primitiveType::kUnsignedChar] = H5T_NATIVE_UCHAR;
+    mTypeMap[xdm::primitiveType::kUnsignedShort] = H5T_NATIVE_USHORT;
+    mTypeMap[xdm::primitiveType::kUnsignedInt] = H5T_NATIVE_UINT;
+    mTypeMap[xdm::primitiveType::kLongUnsignedInt] = H5T_NATIVE_ULLONG;
+    mTypeMap[xdm::primitiveType::kFloat] = H5T_NATIVE_FLOAT;
+    mTypeMap[xdm::primitiveType::kDouble] = H5T_NATIVE_DOUBLE;
   }
   
-  int operator[]( primitiveType::Value v ) const {
+  int operator[]( xdm::primitiveType::Value v ) const {
     return (mTypeMap.find( v )->second);
   }
 };
@@ -103,15 +104,15 @@ const std::string& HdfDataset::dataset() const {
   return imp->mDataset;
 }
 
-void HdfDataset::writeTextContent( XmlTextContent& text ) {
+void HdfDataset::writeTextContent( xdm::XmlTextContent& text ) {
   std::stringstream out;
   out << imp->mFile << ":" << imp->mGroup << "/" << imp->mDataset;
   text.appendContentLine( out.str() );
 }
 
 void HdfDataset::initializeImplementation(
-  primitiveType::Value type,
-  const DataShape<>& shape ) {
+  xdm::primitiveType::Value type,
+  const xdm::DataShape<>& shape ) {
   
   // open the HDF file for writing
   imp->file_identifier = H5Fcreate( 
@@ -120,7 +121,7 @@ void HdfDataset::initializeImplementation(
 
   // construct the file space to correspond to the requested shape
   // convert between size type
-  DataShape< hsize_t > file_shape( shape );
+  xdm::DataShape< hsize_t > file_shape( shape );
   imp->filespace_identifier = H5Screate_simple( file_shape.rank(), &file_shape[0], NULL );
 
   // construct the dataset in the file
@@ -137,19 +138,19 @@ void HdfDataset::initializeImplementation(
 }
 
 void HdfDataset::serializeImplementation(
-  const StructuredArray& data,
-  const HyperSlabMap<>& memory_map ) {
+  const xdm::StructuredArray& data,
+  const xdm::HyperSlabMap<>& memory_map ) {
 
   // create the memory space to match the shape of the array
   // convert between types for size representation
-  DataShape< hsize_t > memory_shape( data.shape() );
+  xdm::DataShape< hsize_t > memory_shape( data.shape() );
   hid_t memory_space = H5Screate_simple( 
     memory_shape.rank(),
     &memory_shape[0],
     NULL );
 
   // select the hyperslab of the data in memory
-  HyperSlab< hsize_t > domain( memory_map.domain() );
+  xdm::HyperSlab< hsize_t > domain( memory_map.domain() );
   H5Sselect_hyperslab( 
     memory_space,
     H5S_SELECT_SET, 
@@ -159,7 +160,7 @@ void HdfDataset::serializeImplementation(
     NULL );
 
   // select the hyperslab of the data on disk
-  HyperSlab< hsize_t > range( memory_map.range() );
+  xdm::HyperSlab< hsize_t > range( memory_map.range() );
   H5Sselect_hyperslab(
     imp->filespace_identifier,
     H5S_SELECT_SET,
@@ -184,5 +185,5 @@ void HdfDataset::finalizeImplementation() {
   H5Fclose( imp->file_identifier );
 }
 
-XDM_NAMESPACE_END
+XDM_HDF_NAMESPACE_END
 
