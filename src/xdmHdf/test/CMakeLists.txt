@@ -5,6 +5,6 @@ macro( xdmHdf_serial_test test_name )
     add_test( xdmHdf.${test_name} xdmHdf.${test_name}.test )
 endmacro()
 
-xdmHdf_serial_test( HdfDataset HdfDataset.cpp )
-xdmHdf_serial_test( SelectionVisitor SelectionVisitor.cpp )
+xdmHdf_serial_test( HdfDataset TestHdfDataset.cpp )
+xdmHdf_serial_test( SelectionVisitor TestSelectionVisitor.cpp )
 
