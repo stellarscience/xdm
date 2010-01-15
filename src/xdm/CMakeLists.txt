@@ -3,7 +3,8 @@ project( xdm )
 find_package( HDF5 )
 
 set( ${PROJECT_NAME}_HEADERS
-    DataNode.hpp
+    ArrayData.hpp
+    Data.hpp
     Dataset.hpp
 	NamespaceMacro.hpp
     Node.hpp
@@ -13,7 +14,8 @@ set( ${PROJECT_NAME}_HEADERS
     HyperSlab.hpp
 )
 set( ${PROJECT_NAME}_SOURCES
-    DataNode.cpp
+    ArrayData.cpp
+    Data.cpp
     Dataset.cpp
     Node.hpp
     ReferencedObject.cpp

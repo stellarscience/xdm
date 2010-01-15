@@ -1,5 +1,5 @@
-#ifndef xdm_DataNode_hpp
-#define xdm_DataNode_hpp
+#ifndef xdm_ArrayData_hpp
+#define xdm_ArrayData_hpp
 
 #include <xdm/Dataset.hpp>
 #include <xdm/HyperSlab.hpp>
@@ -10,13 +10,13 @@
 
 XDM_NAMESPACE_BEGIN
 
-/// Terminal node containing the actual heavy data sets.  A DataNode contains
+/// Terminal node containing the actual heavy data sets.  A ArrayData contains
 /// all of the information required to map a StructuredArray in memory to a
 /// Dataset in a file. 
-class DataNode : public Node {
+class ArrayData : public Node {
 public:
-  explicit DataNode( const DataShape<>& dataspace );
-  virtual ~DataNode();
+  explicit ArrayData( const DataShape<>& dataspace );
+  virtual ~ArrayData();
 
   StructuredArray* array();
   const StructuredArray* array() const;
@@ -38,5 +38,5 @@ private:
 
 XDM_NAMESPACE_END
 
-#endif // xdm_DataNode_hpp
+#endif // xdm_ArrayData_hpp
 
