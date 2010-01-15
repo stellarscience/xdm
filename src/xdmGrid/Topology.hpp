@@ -20,6 +20,8 @@ public:
   virtual ~Topology();
 
   XDM_META_ITEM( Topology );
+
+  virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
 };
 
 XDM_GRID_NAMESPACE_END

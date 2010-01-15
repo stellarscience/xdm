@@ -17,5 +17,10 @@ unsigned int Geometry::dimension() const {
   return mDimension;
 }
 
+void Geometry::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
+  xdm::CompositeDataItem::writeMetadata( xml );
+  xml.setTag( "Geometry" );
+}
+
 XDM_GRID_NAMESPACE_END
 

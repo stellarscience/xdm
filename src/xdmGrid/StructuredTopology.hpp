@@ -25,6 +25,7 @@ public:
   /// Get the shape defined by the cells in the topology.
   const xdm::DataShape<>& shape() const;
 
+  virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
 private:
   xdm::DataShape<> mShape;
 };

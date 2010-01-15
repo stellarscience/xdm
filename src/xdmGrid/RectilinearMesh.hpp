@@ -15,6 +15,8 @@ public:
   virtual ~RectilinearMesh();
 
   XDM_META_ITEM( RectilinearMesh );
+
+  virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
 };
 
 XDM_GRID_NAMESPACE_END

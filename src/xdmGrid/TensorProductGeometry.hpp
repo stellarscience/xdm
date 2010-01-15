@@ -30,6 +30,9 @@ public:
   /// @param dim The axis of the coordinate represented by the data.
   /// @param data The data representing the coordinate values on the axis.
   void setCoordinateValues( unsigned int dim, xdm::RefPtr< xdm::DataItem > data );
+
+  virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
+
 };
 
 XDM_GRID_NAMESPACE_END

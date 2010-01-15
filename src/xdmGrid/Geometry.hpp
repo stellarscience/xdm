@@ -25,6 +25,9 @@ public:
   /// Get the dimension of the space.
   unsigned int dimension() const;
 
+  /// Write geometry metadata.
+  virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
+
 private:
   unsigned int mDimension;
 };

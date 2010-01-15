@@ -5,6 +5,8 @@
 
 #include <xdm/RefPtr.hpp>
 
+#include <vector>
+
 #include <xdm/NamespaceMacro.hpp>
 #include <xdmGrid/NamespaceMacro.hpp>
 
@@ -14,12 +16,13 @@ XDM_NAMESPACE_END
 
 XDM_GRID_NAMESPACE_BEGIN
 
+class Attribute;
 class Geometry;
 class Topology;
 
 /// Grid type containing the actual geometry and topology for a grid.  This is a
 /// terminal grid node that contains the geometric and topological properties of
-/// a Grid.
+/// a Grid along with any attributes defined on the grid.
 class UniformGrid : public Grid {
 public:
   UniformGrid();
@@ -38,9 +41,13 @@ public:
   /// Redefinition of visitor traversal from xdm::Item.
   virtual void traverse( xdm::ItemVisitor& iv );
 
+  /// Redefinition of metadata from Grid.
+  virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
+
 private:
   xdm::RefPtr< Geometry > mGeometry;
   xdm::RefPtr< Topology > mTopology;
+  std::vector< xdm::RefPtr< Attribute > > mAttributes;
 };
 
 XDM_GRID_NAMESPACE_END

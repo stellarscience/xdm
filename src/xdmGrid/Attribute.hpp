@@ -32,6 +32,8 @@ public:
 
   XDM_META_ITEM( Attribute );
 
+  virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
+
 private:
   Type mType;
   Center mCenter;

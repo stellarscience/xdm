@@ -9,6 +9,7 @@ DataItem::~DataItem() {
 }
 
 void DataItem::writeMetadata( XmlMetadataWrapper& xml ) {
+  Item::writeMetadata( xml );
   xml.setTag( "DataItem" );
 }
 

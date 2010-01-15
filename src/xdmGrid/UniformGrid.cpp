@@ -1,9 +1,12 @@
 #include <xdmGrid/UniformGrid.hpp>
 
+#include <xdmGrid/Attribute.hpp>
 #include <xdmGrid/Geometry.hpp>
 #include <xdmGrid/Topology.hpp>
 
 #include <xdm/ItemVisitor.hpp>
+
+#include <algorithm>
 
 XDM_GRID_NAMESPACE_BEGIN
 
@@ -42,6 +45,15 @@ void UniformGrid::traverse( xdm::ItemVisitor& iv ) {
   // apply the visitor to my internal geometry and topology items
   mTopology->accept( iv );
   mGeometry->accept( iv );
+  std::for_each( mAttributes.begin(), mAttributes.end(), 
+    xdm::ApplyVisitor( iv ) );
+}
+
+void UniformGrid::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
+  Grid::writeMetadata( xml );
+
+  // write Uniform grid type
+  xml.setAttribute( "GridType", "Uniform" );
 }
 
 XDM_GRID_NAMESPACE_END

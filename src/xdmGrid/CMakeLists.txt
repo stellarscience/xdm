@@ -20,7 +20,7 @@ set( ${PROJECT_NAME}_SOURCES
     Domain.cpp
     Geometry.cpp
     Grid.cpp
-    RectilinearMesh.hpp
+    RectilinearMesh.cpp
     StructuredTopology.cpp
     TensorProductGeometry.cpp
     Topology.cpp

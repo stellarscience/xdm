@@ -40,6 +40,8 @@ public:
   /// Definition of visitor traversal.
   virtual void traverse( xdm::ItemVisitor& iv );
 
+  /// Definition of metadata output.
+  virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
 private:
   CollectionType mType;
   std::vector< xdm::RefPtr< Grid > > mChildren;
