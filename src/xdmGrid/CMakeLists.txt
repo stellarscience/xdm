@@ -1,6 +1,7 @@
 project( xdmGrid )
 
 set( ${PROJECT_NAME}_HEADERS 
+    CollectionGrid.hpp
     Domain.hpp
     Geometry.hpp
     Grid.hpp
@@ -9,9 +10,11 @@ set( ${PROJECT_NAME}_HEADERS
     StructuredTopology.hpp
     TensorProductGeometry.hpp
     Topology.hpp
+    UniformGrid.hpp
 )
 
 set( ${PROJECT_NAME}_SOURCES
+    CollectionGrid.cpp
     Domain.cpp
     Geometry.cpp
     Grid.cpp
@@ -19,6 +22,7 @@ set( ${PROJECT_NAME}_SOURCES
     StructuredTopology.cpp
     TensorProductGeometry.cpp
     Topology.cpp
+    UniformGrid.cpp
 )
 
 add_library( ${PROJECT_NAME} STATIC 
