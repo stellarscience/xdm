@@ -12,6 +12,7 @@ set( ${PROJECT_NAME}_HEADERS
     Dataset.hpp
     DataShape.hpp
     HyperSlab.hpp
+    HyperSlabBlockIterator.hpp
     HyperslabDataSelection.hpp
     Item.hpp
     ItemVisitor.hpp

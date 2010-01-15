@@ -150,6 +150,12 @@ public:
     std::reverse( beginStride(), endStride() );
     std::reverse( beginCount(), endCount() );
   }
+
+  /// Determine the final index of a HyperSlab.
+  size_type finalIndex( size_type dimension ) const {
+    assert( dimension < mDataShape.rank() );
+    return mStart[dimension] + mStride[dimension]*mCount[dimension];
+  }
 };
 
 template< typename T >

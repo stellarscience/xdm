@@ -85,12 +85,14 @@ constructFunctionGrid( const GridBounds& bounds, const std::string& hdfFile ) {
 FunctionData::FunctionData( 
   const GridBounds& grid, 
   const xdm::HyperSlab<>& region,
-  Function* function ) :
+  Function* function,
+  const xdm::DataShape<>& blockSize ) :
   mGrid( grid ),
   mRegionOfInterest( region ),
   mStorage(),
   mStructuredArray(),
-  mFunction( function ) {
+  mFunction( function ),
+  mBlockSize( blockSize ) {
 
   mStorage.resize( 
     mRegionOfInterest.count( 0 ) *
