@@ -10,7 +10,7 @@ XDM_NAMESPACE_BEGIN
 template< typename T >
 class RefPtr {
 public:
-  typedef T object_type;
+  typedef T value_type;
 
   RefPtr() : mPtr( 0 ) {}
   RefPtr( T* ptr ) : mPtr( ptr ) { 
@@ -29,6 +29,11 @@ public:
       mPtr->removeReference();
     }
     mPtr = 0;
+  }
+
+  RefPtr& operator=( const RefPtr& rhs ) {
+    assign( rhs.mPtr );
+    return *this;
   }
 
   template< typename U >

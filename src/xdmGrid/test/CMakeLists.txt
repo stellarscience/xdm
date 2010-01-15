@@ -1,8 +1,8 @@
 
 macro( xdmGrid_test_serial test_name )
-    add_executable( ${test_name} ${ARGN} )
-    target_link_libraries( ${test_name} xdmGrid gtest )
-    add_test( ${test_name} ${test_name} )
+    add_executable( xdmGrid.${test_name}.test ${ARGN} )
+    target_link_libraries( xdmGrid.${test_name}.test xdmGrid gtest )
+    add_test( xdmGrid.${test_name} xdmGrid.${test_name}.test )
 endmacro()
 
 xdmGrid_test_serial( Grid Grid.cpp )

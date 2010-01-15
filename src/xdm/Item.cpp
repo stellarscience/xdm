@@ -32,7 +32,9 @@ void Item::traverse( ItemVisitor& ) {
 
 void Item::writeMetadata( XmlMetadataWrapper& xml ) {
   xml.setTag( className() );
-  xml.setAttribute( "Name", mName );
+  if ( !mName.empty() ) {
+    xml.setAttribute( "Name", mName );
+  }
 }
 
 XDM_NAMESPACE_END

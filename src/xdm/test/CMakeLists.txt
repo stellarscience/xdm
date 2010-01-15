@@ -1,9 +1,9 @@
 
 # Add a serial test
 macro( xdm_test_serial test_name )
-    add_executable( ${test_name} ${ARGN} )
-    target_link_libraries( ${test_name} xdm gtest )
-    add_test( ${test_name} ${test_name} )
+    add_executable( xdm.${test_name}.test ${ARGN} )
+    target_link_libraries( xdm.${test_name}.test xdm gtest )
+    add_test( xdm.${test_name} xdm.${test_name}.test )
 endmacro()
 
 # add a parallel test
@@ -30,6 +30,8 @@ xdm_test_serial( DataShape DataShape.cpp )
 xdm_test_serial( ThrowMacro ThrowMacro.cpp )
 xdm_test_serial( UniformDataItem UniformDataItem.cpp )
 xdm_test_serial( CompositeDataItem CompositeDataItem.cpp )
+xdm_test_serial( CollectMetadataOperation CollectMetadataOperation.cpp )
+xdm_test_serial( RefPtr RefPtr.cpp )
 
 # xdm_test_parallel( HdfDatasetMPI 4 HdfDatasetMPI.cpp )
 

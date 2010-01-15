@@ -21,9 +21,11 @@ public:
   void removeReference();
   /// Remove a reference without checking the reference count.
   void removeReferenceWithoutDelete();
+  /// Get the current reference count for an object.
+  int referenceCount() const;
 
 private:
-  std::size_t mReferenceCount;
+  int mReferenceCount;
 };
 
 XDM_NAMESPACE_END

@@ -3,6 +3,7 @@ project( xdm )
 find_package( HDF5 )
 
 set( ${PROJECT_NAME}_HEADERS
+    CollectMetadataOperation.hpp
     CompositeDataItem.hpp
     DataItem.hpp
     Dataset.hpp
@@ -20,6 +21,7 @@ set( ${PROJECT_NAME}_HEADERS
 )
 
 set( ${PROJECT_NAME}_SOURCES
+    CollectMetadataOperation.cpp
     CompositeDataItem.cpp
     DataItem.cpp
     Dataset.cpp

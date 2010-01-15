@@ -30,5 +30,9 @@ void ReferencedObject::removeReferenceWithoutDelete() {
   mReferenceCount--;
 }
 
+int ReferencedObject::referenceCount() const {
+  return mReferenceCount;
+}
+
 XDM_NAMESPACE_END
 
