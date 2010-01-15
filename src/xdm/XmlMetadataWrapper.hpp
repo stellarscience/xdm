@@ -31,7 +31,7 @@ public:
   /// Set an attribute with the given name to the given value.
   template< typename T >
   void setAttribute( const std::string& key, const T& value ) {
-    appendAttribute( mXml, key, value );
+    appendAttribute( *mXml, key, value );
   }
   /// Get a named attribute for the underlying XmlObject.
   const std::string& attribute( const std::string& key ) const {

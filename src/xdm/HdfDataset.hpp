@@ -15,6 +15,7 @@ public:
   virtual ~HdfDataset();
 
   //-- Dataset Implementations --//
+  virtual const char* format() { return "HDF"; }
   virtual void initializeImplementation(
     primitiveType::Value type,
     const DataShape<>& shape, 

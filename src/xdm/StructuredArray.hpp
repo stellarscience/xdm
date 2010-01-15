@@ -19,9 +19,16 @@ XDM_NAMESPACE_BEGIN
 class StructuredArray : public ReferencedObject {
 public:
   /// Construct an array given a primitive type, a pointer to the data, and a
-  /// shape.
+  /// shape.  Generally clients will want to use TemplateStructuredArray to
+  /// ensure this class is constructed with the correct parameters.
+  ///
+  /// @param type Enumerated value for the type of array.
+  /// @param arrayElementSize The size of a single array element in bytes.
+  /// @param data A pointer to the actual data in memory.
+  /// @param shape The shape of the data in memory.
   StructuredArray(
     const primitiveType::Value& type,
+    size_t arrayElementSize,
     void* data,
     const DataShape<>& shape );
   
@@ -31,6 +38,9 @@ public:
   primitiveType::Value dataType() const {
     return mType;
   }
+
+  /// Get the size of the array elements in bytes.
+  size_t arrayElementSize() const;
 
   /// Get the number of data elements.
   size_t dataSize() const;
@@ -47,6 +57,7 @@ public:
 
 private:
   primitiveType::Value mType;
+  size_t mArrayElementSize;
   void* mData;
   DataShape<> mShape;
 };

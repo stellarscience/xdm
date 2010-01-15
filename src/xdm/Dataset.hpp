@@ -93,6 +93,10 @@ public:
 
   //-- Virtual Implementation Functions --//
 
+  /// Pure virtual function to return a string that contains the string
+  /// identifiying the dataset's format for identification in XML metadata.
+  virtual const char* format() = 0;
+
   /// Pure virtual function to initialize the dataset.  Inheritors should
   /// implement this function to provide the necessary calls required to
   /// initialize a dataset with the given shape from the content provided via

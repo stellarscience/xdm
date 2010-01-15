@@ -8,14 +8,20 @@ XDM_NAMESPACE_BEGIN
 
 StructuredArray::StructuredArray( 
   const primitiveType::Value& type,
+  size_t arrayElementSize,
   void* data,
   const DataShape<>& shape ) :
   mType( type ),
+  mArrayElementSize( arrayElementSize ),
   mData( data ),
   mShape( shape ) {
 }
 
 StructuredArray::~StructuredArray() {
+}
+
+size_t StructuredArray::arrayElementSize() const {
+  return mArrayElementSize;
 }
 
 size_t StructuredArray::dataSize() const {

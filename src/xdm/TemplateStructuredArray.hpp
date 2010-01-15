@@ -39,9 +39,10 @@ private:
   /// arguments.
   TemplateStructuredArray(
     primitiveType::Value type,
+    size_t arrayElementSize,
     T* data,
     const DataShape<>& shape ) :
-    StructuredArray( type, data, shape ) {
+    StructuredArray( type, arrayElementSize, data, shape ) {
   }
 };
 
@@ -65,7 +66,8 @@ createStructuredArray( T* data, const DataShape<>& shape ) {
   template<> \
   TemplateStructuredArray< type >* \
   createStructuredArray< type >( type* data, const DataShape<>& shape ) { \
-    return new TemplateStructuredArray< type >( (value), data, shape ); \
+    return new TemplateStructuredArray< type >( (value), sizeof(type), \
+      data, shape ); \
   }
 
 XDM_CREATE_STRUCTURED_ARRAY_DEFINITION( char, primitiveType::kChar )

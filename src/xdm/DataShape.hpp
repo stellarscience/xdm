@@ -101,9 +101,15 @@ public:
 template< typename T >
 std::ostream& operator<<( std::ostream& ostr, const DataShape< T >& shape ) {
   typedef DataShape< T > TypedDataShape;
-  ostr << shape.rank() << ": ";
-  for ( typename TypedDataShape::size_type i = 0; i < shape.rank(); ++i ) {
-    ostr << shape[i] << " ";
+  typename TypedDataShape::size_type rank = shape.rank();
+  if ( rank == 0 ) {
+    return ostr;
+  }
+  typename TypedDataShape::ConstDimensionIterator begin = shape.begin();
+  ostr << *begin++;
+  typename TypedDataShape::ConstDimensionIterator current;
+  for ( current = begin; current != shape.end(); ++current ) {
+    ostr << " " << *current;
   }
   return ostr;
 }

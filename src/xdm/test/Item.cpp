@@ -2,14 +2,20 @@
 
 #include <xdm/Item.hpp>
 
-TEST( Item, writeMetadata ) {
+TEST( Item, writeMetadataTag ) {
   xdm::RefPtr< xdm::Item > i( new xdm::Item );
+  i->setName( "Fred" );
+
   xdm::XmlMetadataWrapper xml( new xdm::XmlObject );
   i->writeMetadata( xml );
 
-  char const * const answer = "Item";
-  std::string result = xml.tag();
-  ASSERT_EQ( answer, result );
+  char const * const tagAnswer = "Item";
+  std::string tagResult = xml.tag();
+  ASSERT_EQ( tagAnswer, tagResult );
+
+  char const * const nameAnswer = "Fred";
+  std::string nameResult = xml.attribute( "Name" );
+  ASSERT_EQ( nameAnswer, nameResult );
 }
 
 int main( int argc, char* argv[] ) {

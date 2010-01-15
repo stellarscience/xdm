@@ -16,6 +16,8 @@ public:
   virtual ~DataItem();
 
   XDM_META_ITEM( DataItem );
+
+  virtual void writeMetadata( XmlMetadataWrapper& xml );
 };
 
 XDM_NAMESPACE_END

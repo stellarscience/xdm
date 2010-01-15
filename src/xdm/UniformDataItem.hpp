@@ -15,7 +15,7 @@ XDM_NAMESPACE_BEGIN
 /// Dataset in a file. 
 class UniformDataItem : public DataItem {
 public:
-  explicit UniformDataItem( const DataShape<>& dataspace );
+  explicit UniformDataItem( const DataShape<>& dataspace = DataShape<>() );
   virtual ~UniformDataItem();
 
   XDM_META_ITEM( UniformDataItem );
@@ -31,6 +31,8 @@ public:
   DataShape<>& dataspace();
   const DataShape<>& dataspace() const;
   void setDataspace( const DataShape<>& dataspace );
+
+  virtual void writeMetadata( XmlMetadataWrapper& xml );
 
 private:
   DataShape<> mDataspace;

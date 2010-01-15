@@ -3,6 +3,8 @@
 #include <sstream>
 #include <stdexcept>
 
+#include <xdm/RaiseMacro.hpp>
+
 XDM_NAMESPACE_BEGIN
 
 namespace {
@@ -94,7 +96,7 @@ const std::string& XmlObject::attribute( const std::string& key ) const {
   if ( it == mAttributeMap.end() ) {
     std::stringstream msg( "No such attribute: " );
     msg << key;
-    throw std::runtime_error( msg.str() );
+    XDM_RAISE( std::runtime_error, msg.str() );
   }
   return it->second;
 }
@@ -103,7 +105,7 @@ const std::string& XmlObject::contentLine( unsigned int line ) const {
   if ( line >= mTextContent.size() ) {
     std::stringstream msg( "Content line out of range: " );
     msg << line;
-    throw std::runtime_error( msg.str() );
+    XDM_RAISE( std::runtime_error, msg.str() );
   }
   return mTextContent[line];
 }
@@ -114,7 +116,7 @@ const std::string& XmlObject::contentLine( unsigned int line ) const {
 void XmlObject::printHeader( std::ostream& ostr, int indentLevel ) const {
   // raise an exception if the XmlObject has an empty tag.
   if ( mTag.empty() ) {
-    throw std::runtime_error( "XmlObject is empty" );
+    XDM_RAISE( std::runtime_error, "XmlObject is empty" );
   }
   indentLine( ostr, indentLevel );
   ostr << "<" << mTag;
@@ -138,7 +140,7 @@ void XmlObject::printBody( std::ostream& ostr, int indentLevel ) const {
 
 void XmlObject::printFooter( std::ostream& ostr, int indentLevel ) const {
   if ( mTag.empty() ) { 
-    throw std::runtime_error( "XmlObject is empty" );
+    XDM_RAISE( std::runtime_error, "XmlObject is empty" );
   }
   indentLine( ostr, indentLevel );
   ostr << "</" << mTag << ">" << std::endl;
