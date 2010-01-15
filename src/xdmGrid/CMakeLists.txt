@@ -13,6 +13,7 @@ set( ${PROJECT_NAME}_HEADERS
     Time.hpp
     Topology.hpp
     UniformGrid.hpp
+    UnstructuredTopology.hpp
 )
 
 set( ${PROJECT_NAME}_SOURCES
@@ -27,6 +28,7 @@ set( ${PROJECT_NAME}_SOURCES
     Time.cpp
     Topology.cpp
     UniformGrid.cpp
+    UnstructuredTopology.cpp
 )
 
 add_library( ${PROJECT_NAME} STATIC 
