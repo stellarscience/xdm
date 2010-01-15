@@ -22,5 +22,7 @@ macro( xdm_test_parallel test_name num_procs )
 endmacro()
 
 xdm_test_serial( HdfDatasetSerial HdfDataset.cpp )
+xdm_test_serial( TemplateStructuredArray TemplateStructuredArray.cpp )
+
 # xdm_test_parallel( HdfDatasetMPI 4 HdfDatasetMPI.cpp )
 
