@@ -10,6 +10,7 @@
 XDM_NAMESPACE_BEGIN
 
 UniformDataItem::UniformDataItem( const DataShape<>& dataspace ) :
+  mIsDynamic( false ),
   mDataspace( dataspace ),
   mArray(),
   mDataset(),

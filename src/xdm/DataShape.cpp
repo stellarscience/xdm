@@ -53,5 +53,18 @@ DataShape<> makeShape(
   return result;
 }
 
+DataShape<> makeShape( 
+  DataShape<>::size_type i,
+  DataShape<>::size_type j,
+  DataShape<>::size_type k,
+  DataShape<>::size_type l ) {
+  DataShape<> result( 4 );
+  result[0] = i;
+  result[1] = j;
+  result[2] = k;
+  result[3] = l;
+  return result;
+}
+
 XDM_NAMESPACE_END
 

@@ -113,6 +113,13 @@ DataShape<> makeShape(
   DataShape<>::size_type j,
   DataShape<>::size_type k );
 
+/// Make a DataShape of rank 4 with the given dimensions.
+DataShape<> makeShape(
+  DataShape<>::size_type i,
+  DataShape<>::size_type j,
+  DataShape<>::size_type k,
+  DataShape<>::size_type l );
+
 /// Print a DataShape to an ostream.
 template< typename T >
 std::ostream& operator<<( std::ostream& ostr, const DataShape< T >& shape ) {

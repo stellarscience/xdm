@@ -21,6 +21,11 @@ public:
 
   XDM_META_ITEM( UniformDataItem );
 
+  /// Determine if the DataItem changes over time.
+  bool isDynamic() const { return mIsDynamic; }
+  /// Specify whether or not a DataItem changes over time.
+  void setIsDynamic( bool isDynamic ) { mIsDynamic = isDynamic; }
+
   StructuredArray* array();
   const StructuredArray* array() const;
   void setArray( StructuredArray* array );
@@ -39,10 +44,12 @@ public:
   virtual void writeMetadata( XmlMetadataWrapper& xml );
 
   /// Virtual function to serialize the data contained in the item.  Inheritors
-  /// should reimplement this function to write data to a Dataset.
+  /// should reimplement this function to specify what data should be written to
+  /// a dataset.
   virtual void serializeData();
 
 private:
+  bool mIsDynamic;
   DataShape<> mDataspace;
   RefPtr< StructuredArray > mArray;
   RefPtr< Dataset > mDataset;

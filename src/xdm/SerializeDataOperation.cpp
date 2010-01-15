@@ -11,11 +11,7 @@ SerializeDataOperation::~SerializeDataOperation() {
 }
 
 void SerializeDataOperation::apply( UniformDataItem& udi ) {
-  Dataset* dataset = udi.dataset();
-  StructuredArray* array = udi.array();
-  dataset->initialize( array->dataType(), udi.dataspace() );
-  dataset->serialize( array, udi.selectionMap() );
-  dataset->finalize();
+  udi.serializeData();
 }
 
 XDM_NAMESPACE_END

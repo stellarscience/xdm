@@ -1,1 +1,3 @@
-add_subdirectory( gtest )
+if ( UNIT_TEST_XDM )
+    add_subdirectory( gtest )
+endif()

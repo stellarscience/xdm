@@ -56,6 +56,11 @@ public:
     return mShape;
   }
 
+  /// Set the shape of the data.
+  void setShape( const DataShape<>& shape ) {
+    mShape = shape;
+  }
+
 private:
   primitiveType::Value mType;
   size_t mArrayElementSize;

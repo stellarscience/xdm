@@ -56,5 +56,7 @@ add_library( ${PROJECT_NAME}
 
 target_link_libraries( ${PROJECT_NAME} )
 
-add_subdirectory( test )
+if( UNIT_TEST_XDM )
+    add_subdirectory( test )
+endif()
 

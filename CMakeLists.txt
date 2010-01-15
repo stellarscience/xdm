@@ -4,11 +4,12 @@ list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules )
 
 enable_testing()
 
-set( MEMORYCHECK_COMMAND /usr/bin/valgrind CACHE FILEPATH 
-    "Command to use for memory checking xdm" )
+option( UNIT_TEST_XDM "Enable unit tests for the XDM library" ${UNIT_TEST_XDM} )
 
-# add the unit test include directory
-include_directories( third_party/gtest/include )
+if( UNIT_TEST_XDM )
+    # add the unit test include directory
+    include_directories( third_party/gtest/include )
+endif()
 
 add_subdirectory( third_party )
 add_subdirectory( src )

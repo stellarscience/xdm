@@ -40,5 +40,7 @@ target_link_libraries( ${PROJECT_NAME}
     ${HDF5_LIBRARIES}
 )
 
-add_subdirectory( test )
+if( UNIT_TEST_XDM )
+    add_subdirectory( test )
+endif()
 
