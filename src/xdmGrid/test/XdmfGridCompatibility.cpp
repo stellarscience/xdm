@@ -4,6 +4,7 @@
 #include <gtest/gtest.h>
 
 #include <xdm/CollectMetadataOperation.hpp>
+#include <xdm/SerializeDataOperation.hpp>
 #include <xdm/StructuredArray.hpp>
 #include <xdm/TemplateStructuredArray.hpp>
 #include <xdm/UniformDataItem.hpp>
@@ -17,6 +18,7 @@
 #include <xdmHdf/HdfDataset.hpp>
 
 #include <algorithm>
+#include <fstream>
 #include <sstream>
 
 TEST( XdmfGridCompatibility, staticGrid ) {
@@ -65,14 +67,20 @@ TEST( XdmfGridCompatibility, staticGrid ) {
     geometry->setCoordinateValues( i, sharedData.get() );
   }
 
-  // write the tree's metadata
+  // write the tree's data to disk
+  xdm::SerializeDataOperation serializer;
+  domain->accept( serializer );
+
+  // collect the tree's metadata
   xdm::CollectMetadataOperation collector;
   domain->accept( collector );
-  xdm::RefPtr< xdm::XmlObject > xml = collector.result();
-  std::stringstream result;
-  result << *xml;
+  xdm::RefPtr< xdm::XmlObject > xml( new xdm::XmlObject( "Xdmf" ) );
+  xml->appendAttribute( "Version", "2.1" );
+  xml->appendChild( collector.result() );
 
-  ASSERT_EQ( "", result.str() );
+  std::ofstream xdmfFile("XdmfGridCompatibility.staticGrid.xmf");
+  xdmfFile << *xml;
+  xdmfFile.close();
 }
 
 int main( int argc, char* argv[] ) {

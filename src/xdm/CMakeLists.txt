@@ -18,6 +18,7 @@ set( ${PROJECT_NAME}_HEADERS
     ReferencedObject.hpp
     RefPtr.hpp
     SelectableDataMixin.hpp
+    SerializeDataOperation.hpp
     StructuredArray.hpp
     TemplateStructuredArray.hpp
     UniformDataItem.hpp
@@ -37,6 +38,7 @@ set( ${PROJECT_NAME}_SOURCES
     ItemVisitor.cpp
     ReferencedObject.cpp
     SelectableDataMixin.cpp
+    SerializeDataOperation.cpp
     StructuredArray.cpp
     UniformDataItem.cpp
     XmlObject.cpp
