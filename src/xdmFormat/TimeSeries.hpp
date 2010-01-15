@@ -24,11 +24,9 @@
 #include <xdm/ReferencedObject.hpp>
 #include <xdm/RefPtr.hpp>
 
-#include <xdmFormat/NamespaceMacro.hpp>
+#include <xdmGrid/Grid.hpp>
 
-namespace xdmGrid {
-  class Grid;
-}
+#include <xdmFormat/NamespaceMacro.hpp>
 
 XDM_FORMAT_NAMESPACE_BEGIN
 

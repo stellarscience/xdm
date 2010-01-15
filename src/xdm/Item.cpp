@@ -50,6 +50,24 @@ void Item::traverse( ItemVisitor& ) {
   // No-op
 }
 
+BasicItemUpdateCallback* Item::updateCallback() {
+  return mUpdateCallback.get();
+}
+
+const BasicItemUpdateCallback* Item::updateCallback() const {
+  return mUpdateCallback.get();
+}
+
+void Item::setUpdateCallback( BasicItemUpdateCallback* callback ) {
+  mUpdateCallback = callback;
+}
+
+void Item::update() {
+  if ( mUpdateCallback.valid() ) {
+    mUpdateCallback->update( this );
+  }
+}
+
 void Item::writeMetadata( XmlMetadataWrapper& xml ) {
   xml.setTag( className() );
   if ( !mName.empty() ) {

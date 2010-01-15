@@ -33,6 +33,7 @@ XDM_NAMESPACE_BEGIN
 class UpdateVisitor : public xdm::ItemVisitor {
 public:
 
+  virtual void apply( Item& item );
   virtual void apply( UniformDataItem& item );
 
 };

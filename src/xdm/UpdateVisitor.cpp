@@ -25,11 +25,22 @@
 
 XDM_NAMESPACE_BEGIN
 
+void UpdateVisitor::apply( Item& item ) {
+  item.update();
+  traverse( item );
+}
+
 void UpdateVisitor::apply( UniformDataItem& item ) {
+  // Call the Item's own update callback.
+  item.update();
+
+  // If the Item has been assigned a dataset, call its callback too.
   xdm::Dataset* itemDataset = item.dataset();
   if ( itemDataset ) {
     itemDataset->update();
   }
+
+  traverse( item );
 }
 
 XDM_NAMESPACE_END

@@ -54,7 +54,7 @@ public:
   virtual xdm::primitiveType::Value dataType() const { return mType; }
   virtual size_t elementSize() const { return xdm::typeSize( mType ); }
   virtual size_t size() const { return mSize; }
-  virtual const void* data() const { return mBuffer.data(); }
+  virtual const void* data() const { return &mBuffer[0]; }
 
   //-- Accessors for describing type and size information --//
 
@@ -69,8 +69,8 @@ public:
   }
 
   //-- Safe Buffer Access --//
-  char* buffer() { return mBuffer.data(); }
-  const char* buffer() const { return mBuffer.data(); }
+  char* buffer() { return &mBuffer[0]; }
+  const char* buffer() const { return &mBuffer[0]; }
 
 };
 

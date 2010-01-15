@@ -86,7 +86,7 @@ public:
     return mVector.size();
   }
   virtual const void* data() const {
-    return mVector.data();
+    return &mVector[0];
   }
 
 };
