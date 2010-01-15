@@ -5,7 +5,7 @@ find_package( HDF5 )
 set( ${PROJECT_NAME}_HEADERS
     ArrayData.hpp
     CompositeData.hpp
-    Data.hpp
+    DataItem.hpp
     Dataset.hpp
     Item.hpp
 	NamespaceMacro.hpp
@@ -18,7 +18,7 @@ set( ${PROJECT_NAME}_HEADERS
 set( ${PROJECT_NAME}_SOURCES
     ArrayData.cpp
     CompositeData.cpp
-    Data.cpp
+    DataItem.cpp
     Dataset.cpp
     Item.cpp
     ReferencedObject.cpp

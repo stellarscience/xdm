@@ -3,7 +3,7 @@
 
 #include <xdm/Dataset.hpp>
 #include <xdm/HyperSlab.hpp>
-#include <xdm/Item.hpp>
+#include <xdm/DataItem.hpp>
 #include <xdm/StructuredArray.hpp>
 
 #include <xdm/NamespaceMacro.hpp>
@@ -13,7 +13,7 @@ XDM_NAMESPACE_BEGIN
 /// Terminal node containing the actual heavy data sets.  A ArrayData contains
 /// all of the information required to map a StructuredArray in memory to a
 /// Dataset in a file. 
-class ArrayData : public Item {
+class ArrayData : public DataItem {
 public:
   explicit ArrayData( const DataShape<>& dataspace );
   virtual ~ArrayData();

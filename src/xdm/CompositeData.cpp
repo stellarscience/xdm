@@ -11,18 +11,18 @@ CompositeData::CompositeData() :
 CompositeData::~CompositeData() {
 }
 
-void CompositeData::appendChild( Data* child ) {
+void CompositeData::appendChild( DataItem* child ) {
   mChildData.push_back( child );
 }
 
-const Data* CompositeData::child( unsigned int i ) const {
+const DataItem* CompositeData::child( unsigned int i ) const {
   assert( i < mChildData.size() );
   return mChildData[i];
 }
 
-Data* CompositeData::child( unsigned int i ) {
+DataItem* CompositeData::child( unsigned int i ) {
   // call the const version to minimize code duplication.
-  return const_cast< Data* >( 
+  return const_cast< DataItem* >( 
     (static_cast< const CompositeData* >(this))->child(i));
 }
 
