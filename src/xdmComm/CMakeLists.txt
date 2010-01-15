@@ -5,6 +5,7 @@ find_package( MPI REQUIRED )
 set( ${PROJECT_NAME}_HEADERS 
     BinaryIosBase.hpp
     BinaryIStream.hpp
+    BinaryIOStream.hpp
     BinaryOStream.hpp
     BinaryStreamBuffer.hpp
     MpiDatasetProxy.hpp
@@ -13,6 +14,7 @@ set( ${PROJECT_NAME}_HEADERS
 
 set( ${PROJECT_NAME}_SOURCES
     BinaryIStream.cpp
+    BinaryIOStream.cpp
     BinaryOStream.cpp
     MpiDatasetProxy.cpp
 )
