@@ -7,6 +7,7 @@ set( ${PROJECT_NAME}_HEADERS
     Geometry.hpp
     Grid.hpp
     NamespaceMacro.hpp
+    Polyvertex.hpp
     RectilinearMesh.hpp
     StructuredTopology.hpp
     TensorProductGeometry.hpp
@@ -22,6 +23,7 @@ set( ${PROJECT_NAME}_SOURCES
     Domain.cpp
     Geometry.cpp
     Grid.cpp
+    Polyvertex.cpp
     RectilinearMesh.cpp
     StructuredTopology.cpp
     TensorProductGeometry.cpp
