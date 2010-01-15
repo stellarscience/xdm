@@ -18,7 +18,7 @@ double Time::value() const {
 }
 
 void Time::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
-  xdm::CompositeDataItem::writeMetadata( xml );
+  xdm::Item::writeMetadata( xml );
   xml.setTag( "Time" );
   xml.setAttribute( "Value", mValue );
 }

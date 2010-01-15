@@ -7,46 +7,20 @@
 XDM_NAMESPACE_BEGIN
 
 CompositeDataItem::CompositeDataItem() :
-  mChildData() {
+  DataItem(),
+  ObjectCompositionMixin< DataItem >() {
 }
 
 CompositeDataItem::CompositeDataItem( unsigned int n ) :
-  mChildData( n ) {
+  DataItem(),
+  ObjectCompositionMixin< DataItem >( n ) {
 }
 
 CompositeDataItem::~CompositeDataItem() {
 }
 
-void CompositeDataItem::setNumberOfChildren( unsigned int n ) {
-  mChildData.resize( n );
-}
-
-unsigned int CompositeDataItem::numberOfChildren() const {
-  return mChildData.size();
-}
-
-void CompositeDataItem::appendChild( DataItem* child ) {
-  mChildData.push_back( child );
-}
-
-void CompositeDataItem::setChild( unsigned int i, RefPtr< DataItem > data ) {
-  assert( i < mChildData.size() );
-  mChildData[i] = data;
-}
-
-const DataItem* CompositeDataItem::child( unsigned int i ) const {
-  assert( i < mChildData.size() );
-  return mChildData[i];
-}
-
-DataItem* CompositeDataItem::child( unsigned int i ) {
-  // call the const version to minimize code duplication.
-  return const_cast< DataItem* >( 
-    (static_cast< const CompositeDataItem* >(this))->child(i));
-}
-
 void CompositeDataItem::traverse( ItemVisitor& iv ) {
-  std::for_each( mChildData.begin(), mChildData.end(), ApplyVisitor( iv ) );
+  std::for_each( begin(), end(), ApplyVisitor( iv ) );
 }
 
 void CompositeDataItem::writeMetadata( XmlMetadataWrapper& xml ) {

@@ -1,14 +1,24 @@
 #include <xdmGrid/Domain.hpp>
 
+#include <algorithm>
+
 XDM_GRID_NAMESPACE_BEGIN
 
 void Domain::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
-  xdm::CompositeDataItem::writeMetadata( xml );
+  xdm::Item::writeMetadata( xml );
   xml.setTag( "Domain" );
 }
 
 void Domain::traverse( xdm::ItemVisitor& iv ) {
-  applyGridFunctor( xdm::ApplyVisitor( iv ) );
+  Item::traverse( iv );
+  std::for_each(
+    xdm::begin< xdm::DataItem >( *this ),
+    xdm::end< xdm::DataItem >( *this ),
+    xdm::ApplyVisitor( iv ) );
+  std::for_each( 
+    xdm::begin< Grid >( *this ),
+    xdm::end< Grid >( *this ),
+    xdm::ApplyVisitor( iv ) );
 }
 
 XDM_GRID_NAMESPACE_END

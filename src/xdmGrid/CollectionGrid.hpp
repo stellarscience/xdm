@@ -2,11 +2,9 @@
 #define xdmGrid_CollectionGrid_hpp
 
 #include <xdmGrid/Grid.hpp>
-#include <xdmGrid/GridCompositionMixin.hpp>
 
+#include <xdm/ObjectCompositionMixin.hpp>
 #include <xdm/RefPtr.hpp>
-
-#include <vector>
 
 #include <xdmGrid/NamespaceMacro.hpp>
 
@@ -18,7 +16,7 @@ XDM_GRID_NAMESPACE_BEGIN
 /// time.
 class CollectionGrid : 
   public Grid,
-  public GridCompositionMixin {
+  public xdm::ObjectCompositionMixin< Grid > {
 public:
 
   /// Enumeration of collection type.  Spatial or temporal.

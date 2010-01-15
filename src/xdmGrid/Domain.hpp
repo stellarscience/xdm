@@ -1,20 +1,26 @@
 #ifndef xdmGrid_Domain_hpp
 #define xdmGrid_Domain_hpp
 
-#include <xdmGrid/GridCompositionMixin.hpp>
+#include <xdmGrid/Grid.hpp>
 
-#include <xdm/CompositeDataItem.hpp>
+#include <xdm/DataItem.hpp>
+#include <xdm/Item.hpp>
+#include <xdm/ObjectCompositionMixin.hpp>
 
 #include <xdmGrid/NamespaceMacro.hpp>
 
 XDM_GRID_NAMESPACE_BEGIN
 
 class Domain : 
-  public xdm::CompositeDataItem,
-  public GridCompositionMixin {
+  public xdm::Item,
+  public xdm::ObjectCompositionMixin< xdm::DataItem >,
+  public xdm::ObjectCompositionMixin< Grid > {
 public:
 
   XDM_META_ITEM( Domain );
+
+  /// Add a grid to this Domain.
+  void addGrid( Grid* g ) { xdm::appendChild< Grid >( *this, g ); }
 
   virtual void traverse( xdm::ItemVisitor& iv );
 

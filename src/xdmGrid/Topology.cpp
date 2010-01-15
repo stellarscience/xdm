@@ -1,16 +1,22 @@
 #include <xdmGrid/Topology.hpp>
 
+#include <algorithm>
+
 XDM_GRID_NAMESPACE_BEGIN
 
 Topology::Topology() :
-  xdm::CompositeDataItem() {
+  xdm::Item() {
 }
 
 Topology::~Topology() {
 }
 
+void Topology::traverse( xdm::ItemVisitor& iv ) {
+  std::for_each( begin(), end(), xdm::ApplyVisitor( iv ) );
+}
+
 void Topology::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
-  xdm::CompositeDataItem::writeMetadata( xml );
+  xdm::Item::writeMetadata( xml );
   xml.setTag( "Topology" );
 }
 

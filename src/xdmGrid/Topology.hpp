@@ -1,8 +1,10 @@
 #ifndef xdmGrid_Topology_hpp
 #define xdmGrid_Topology_hpp
 
-#include <xdm/CompositeDataItem.hpp>
+#include <xdm/DataItem.hpp>
+#include <xdm/Item.hpp>
 #include <xdm/DataShape.hpp>
+#include <xdm/ObjectCompositionMixin.hpp>
 
 #include <xdmGrid/NamespaceMacro.hpp>
 
@@ -14,12 +16,16 @@ XDM_GRID_NAMESPACE_BEGIN
 /// property.
 ///
 /// A Grid consists of elements (or cells) and nodes.
-class Topology : public xdm::CompositeDataItem {
+class Topology : 
+  public xdm::Item,
+  public xdm::ObjectCompositionMixin< xdm::DataItem > {
 public:
   Topology();
   virtual ~Topology();
 
   XDM_META_ITEM( Topology );
+
+  virtual void traverse( xdm::ItemVisitor& iv );
 
   virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
 };

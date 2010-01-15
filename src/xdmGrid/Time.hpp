@@ -1,13 +1,13 @@
 #ifndef xdmGrid_Time_hpp
 #define xdmGrid_Time_hpp
 
-#include <xdm/CompositeDataItem.hpp>
+#include <xdm/DataItem.hpp>
 
 #include <xdmGrid/NamespaceMacro.hpp>
 
 XDM_GRID_NAMESPACE_BEGIN
 
-class Time : public xdm::CompositeDataItem {
+class Time : public xdm::Item {
 public:
   explicit Time( double value = 0.0 );
   virtual ~Time();

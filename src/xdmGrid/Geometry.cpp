@@ -1,5 +1,7 @@
 #include <xdmGrid/Geometry.hpp>
 
+#include <algorithm>
+
 XDM_GRID_NAMESPACE_BEGIN
 
 Geometry::Geometry( unsigned int dimension ) :
@@ -17,8 +19,12 @@ unsigned int Geometry::dimension() const {
   return mDimension;
 }
 
+void Geometry::traverse( xdm::ItemVisitor& iv ) {
+  std::for_each( begin(), end(), xdm::ApplyVisitor( iv ) );
+}
+
 void Geometry::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
-  xdm::CompositeDataItem::writeMetadata( xml );
+  xdm::Item::writeMetadata( xml );
   xml.setTag( "Geometry" );
 }
 

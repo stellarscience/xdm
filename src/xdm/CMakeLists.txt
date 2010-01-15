@@ -10,7 +10,8 @@ set( ${PROJECT_NAME}_HEADERS
     HyperSlab.hpp
     Item.hpp
     ItemVisitor.hpp
-	NamespaceMacro.hpp
+	  NamespaceMacro.hpp
+	  ObjectCompositionMixin.hpp
     ReferencedObject.hpp
     RefPtr.hpp
     StructuredArray.hpp

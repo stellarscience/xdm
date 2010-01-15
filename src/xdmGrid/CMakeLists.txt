@@ -6,7 +6,6 @@ set( ${PROJECT_NAME}_HEADERS
     Domain.hpp
     Geometry.hpp
     Grid.hpp
-    GridCompositionMixin.hpp
     NamespaceMacro.hpp
     RectilinearMesh.hpp
     StructuredTopology.hpp

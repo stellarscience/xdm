@@ -25,7 +25,10 @@ CollectionGrid::CollectionType CollectionGrid::type() const {
 
 void CollectionGrid::traverse( xdm::ItemVisitor& iv ) {
   Grid::traverse( iv );
-  applyGridFunctor( xdm::ApplyVisitor( iv ) );
+  std::for_each(
+    xdm::begin< Grid >( *this ),
+    xdm::end< Grid >( *this ),
+    xdm::ApplyVisitor( iv ) );
 }
 
 void CollectionGrid::writeMetadata( xdm::XmlMetadataWrapper& xml ) {

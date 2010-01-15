@@ -1,13 +1,17 @@
 #ifndef xdmGrid_Attribute_hpp
 #define xdmGrid_Attribute_hpp
 
-#include <xdm/CompositeDataItem.hpp>
+#include <xdm/DataItem.hpp>
+#include <xdm/Item.hpp>
+#include <xdm/ObjectCompositionMixin.hpp>
 
 #include <xdmGrid/NamespaceMacro.hpp>
 
 XDM_GRID_NAMESPACE_BEGIN
 
-class Attribute : public xdm::CompositeDataItem {
+class Attribute : 
+  public xdm::Item,
+  public xdm::ObjectCompositionMixin< xdm::DataItem > {
 public:
   /// Enumeration of attribute types.
   enum Type {
@@ -31,6 +35,8 @@ public:
   virtual ~Attribute();
 
   XDM_META_ITEM( Attribute );
+
+  virtual void traverse( xdm::ItemVisitor& iv );
 
   virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
 

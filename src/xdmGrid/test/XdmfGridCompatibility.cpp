@@ -23,7 +23,7 @@ TEST( XdmfGridCompatibility, staticGrid ) {
 
   // build the grid for the domain
   xdm::RefPtr< xdmGrid::UniformGrid > grid( new xdmGrid::UniformGrid );
-  domain->appendChildGrid( grid );
+  domain->addGrid( grid );
 
   // build the topology for the grid.
   xdm::RefPtr< xdmGrid::RectilinearMesh > topology( 

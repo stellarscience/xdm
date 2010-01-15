@@ -1,5 +1,6 @@
 #include <xdmGrid/Attribute.hpp>
 
+#include <algorithm>
 #include <map>
 #include <string>
 
@@ -41,8 +42,12 @@ Attribute::Attribute( Type t, Center c ) :
 Attribute::~Attribute() {
 }
 
+void Attribute::traverse( xdm::ItemVisitor& iv ) {
+  std::for_each( begin(), end(), xdm::ApplyVisitor( iv ) );
+}
+
 void Attribute::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
-  xdm::CompositeDataItem::writeMetadata( xml );
+  xdm::Item::writeMetadata( xml );
 
   xml.setTag( "Attribute" );
 
