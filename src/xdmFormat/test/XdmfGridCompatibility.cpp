@@ -11,6 +11,8 @@
 #include <xdm/XmlObject.hpp>
 #include <xdm/XmlOutputStream.hpp>
 
+#include <xdmFormat/TemporalCollection.hpp>
+#include <xdmFormat/TimeSeries.hpp>
 #include <xdmFormat/XdmfHelpers.hpp>
 
 #include <xdmGrid/CollectionGrid.hpp>
@@ -130,26 +132,10 @@ TEST( XdmfGridCompatibility, staticGrid ) {
 }
 
 TEST( XdmfGridCompatibility, timeSeries ) {
-  // open an XML stream for incremental output.
-  std::ofstream xdmfFile("XdmfGridCompatibility.timeSeries.xmf");
-  xdm::XmlOutputStream xmlStream( xdmfFile );
-  
-  {
-    // domain for the simulation
-    xdm::RefPtr< xdmGrid::Domain > domain( new xdmGrid::Domain );
-
-    // the temporal collection grid for the full simulation.
-    xdm::RefPtr< xdmGrid::CollectionGrid > temporalGrid( 
-      new xdmGrid::CollectionGrid( xdmGrid::CollectionGrid::kTemporal ) );
-    domain->addGrid( temporalGrid );
-
-    // write the beginning of the grid specification to the stream.
-    xdm::CollectMetadataOperation collector;
-    domain->accept( collector );
-    xdm::RefPtr< xdm::XmlObject > xdmf = xdmFormat::createXdmfRoot();
-    xdmf->appendChild( collector.result() );
-    xmlStream.openContext( xdmf );
-  } // leave scope, freeing all objects allocated above
+  xdm::RefPtr< xdmFormat::TimeSeries > temporalCollection (
+    new xdmFormat::TemporalCollection(
+      "XdmfGridCompatibility.temporalCollection.xmf" ) );
+  temporalCollection->open();
 
   // since the geometry and topology of the grid will remain constant throughout
   // the simulation, we make a single object here to share.
@@ -212,16 +198,11 @@ TEST( XdmfGridCompatibility, timeSeries ) {
     attrData->setArray( attrArray.get() );
     attrData->setDataset( attrDataset.get() );
     attribute->appendChild( attrData );
-
-    // the grid definition is complete, write to the XML output stream
-    xdm::CollectMetadataOperation collector;
-    grid->accept( collector );
-    xmlStream.writeObject( collector.result() );
-
-    // finally, serialize all datasets that need it
-    xdm::SerializeDataOperation serializer;
-    grid->accept( serializer );
+    
+    // write the grid for this step to the TimeSeries file
+    temporalCollection->writeTimestepGrid( grid.get() );
   }
+  temporalCollection->close();
 }
 
 int main( int argc, char* argv[] ) {

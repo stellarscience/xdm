@@ -1,11 +1,14 @@
 project( xdmFormat )
 
 set( ${PROJECT_NAME}_HEADERS 
+    NamespaceMacro.hpp
+    TemporalCollection.hpp
+    TimeSeries.hpp
     XdmfHelpers.hpp
 )
 
 set( ${PROJECT_NAME}_SOURCES
-    NamespaceMacro.hpp
+    TemporalCollection.cpp
     XdmfHelpers.cpp
 )
 
