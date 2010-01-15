@@ -3,7 +3,7 @@
 #include <sstream>
 #include <stdexcept>
 
-#include <xdm/RaiseMacro.hpp>
+#include <xdm/ThrowMacro.hpp>
 
 XDM_NAMESPACE_BEGIN
 
@@ -83,7 +83,7 @@ void UniformDataItem::writeMetadata( XmlMetadataWrapper& xml ) {
     xml.setAttribute( "NumberType", "Float" );
     break;
   default:
-    XDM_RAISE( std::invalid_argument, "Unrecognized dataset number type" );
+    XDM_THROW( std::invalid_argument( "Unrecognized dataset number type" ) );
     break;
   }
 

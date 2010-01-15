@@ -27,7 +27,7 @@ xdm_test_serial( XmlObject XmlObject.cpp )
 xdm_test_serial( XmlOutputStream XmlOutputStream.cpp )
 xdm_test_serial( Item Item.cpp )
 xdm_test_serial( DataShape DataShape.cpp )
-xdm_test_serial( RaiseMacro RaiseMacro.cpp )
+xdm_test_serial( ThrowMacro ThrowMacro.cpp )
 xdm_test_serial( UniformDataItem UniformDataItem.cpp )
 xdm_test_serial( CompositeDataItem CompositeDataItem.cpp )
 

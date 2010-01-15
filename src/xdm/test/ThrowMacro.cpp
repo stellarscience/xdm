@@ -1,11 +1,11 @@
 #include <gtest/gtest.h>
 
-#include <xdm/RaiseMacro.hpp>
+#include <xdm/ThrowMacro.hpp>
 
 #include <stdexcept>
 
 TEST( RaiseMacro, throws ) {
-  ASSERT_THROW( XDM_RAISE( std::runtime_error, "Test exception" ), 
+  ASSERT_THROW( XDM_THROW( std::runtime_error( "Test exception" ) ), 
     std::runtime_error );
 }
 
