@@ -42,6 +42,9 @@ public:
 
   /// Redefinition of visitor traversal from Item.
   virtual void traverse( ItemVisitor& iv );
+
+  /// Write the metadata for a collection of dataitems.
+  virtual void writeMetadata( XmlMetadataWrapper& xml );
 private:
   std::vector< RefPtr< DataItem > > mChildData;
 };

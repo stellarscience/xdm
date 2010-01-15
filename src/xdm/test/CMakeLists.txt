@@ -29,6 +29,7 @@ xdm_test_serial( Item Item.cpp )
 xdm_test_serial( DataShape DataShape.cpp )
 xdm_test_serial( RaiseMacro RaiseMacro.cpp )
 xdm_test_serial( UniformDataItem UniformDataItem.cpp )
+xdm_test_serial( CompositeDataItem CompositeDataItem.cpp )
 
 # xdm_test_parallel( HdfDatasetMPI 4 HdfDatasetMPI.cpp )
 

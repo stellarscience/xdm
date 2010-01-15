@@ -49,5 +49,12 @@ void CompositeDataItem::traverse( ItemVisitor& iv ) {
   std::for_each( mChildData.begin(), mChildData.end(), ApplyVisitor( iv ) );
 }
 
+void CompositeDataItem::writeMetadata( XmlMetadataWrapper& xml ) {
+  DataItem::writeMetadata( xml );
+
+  // write my ItemType as a collection.
+  xml.setAttribute( "ItemType", "Tree" );
+}
+
 XDM_NAMESPACE_END
 
