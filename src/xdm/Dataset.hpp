@@ -116,9 +116,9 @@ public:
   virtual void finalizeImplementation() = 0;
 
 private: 
-  InitializeCallback* mInitializeCallback;
-  SerializeCallback* mSerializeCallback;
-  FinalizeCallback* mFinalizeCallback;
+  xdm::RefPtr< InitializeCallback > mInitializeCallback;
+  xdm::RefPtr< SerializeCallback > mSerializeCallback;
+  xdm::RefPtr< FinalizeCallback > mFinalizeCallback;
 };
 
 XDM_NAMESPACE_END

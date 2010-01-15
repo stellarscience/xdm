@@ -1,6 +1,7 @@
 
 #include <xdm/StructuredArray.hpp>
 
+#include <numeric>
 #include <vector>
 
 XDM_NAMESPACE_BEGIN
@@ -18,11 +19,8 @@ StructuredArray::~StructuredArray() {
 }
 
 size_t StructuredArray::dataSize() const {
-  size_t size = 1;
-  for ( int i = 0; i < mShape.rank(); ++i ) {
-    size *= mShape[i];
-  }
-  return size;
+  return std::accumulate( mShape.begin(), mShape.end(),
+    1, std::multiplies< size_t >() );
 }
 
 void* StructuredArray::data() {

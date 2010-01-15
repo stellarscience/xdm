@@ -19,6 +19,8 @@ class DataShape {
 public:
   typedef T size_type;
   typedef std::vector< T > Index;
+  typedef typename std::vector< T >::iterator DimensionIterator;
+  typedef typename std::vector< T >::const_iterator ConstDimensionIterator;
 
 private:
   size_type mRank;
@@ -66,6 +68,20 @@ public:
 
   size_type rank() const {
     return mRank;
+  }
+
+  DimensionIterator begin() {
+    return mDimensions.begin();
+  }
+  ConstDimensionIterator begin() const {
+    return mDimensions.begin();
+  }
+
+  DimensionIterator end() {
+    return mDimensions.end();
+  }
+  ConstDimensionIterator end() const {
+    return mDimensions.end();
   }
 
   /// Get the dimension of the data at the specified index.
