@@ -1,5 +1,6 @@
 #include <xdm/XmlObject.hpp>
 
+#include <algorithm>
 #include <sstream>
 #include <stdexcept>
 

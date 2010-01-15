@@ -57,6 +57,8 @@ public:
     mOStr << kHyperslabDataSelection;
     mOStr << selection;
   }
+
+  using xdm::DataSelectionVisitor::apply;
 };
 
 // Proxy DataSelection that holds a DataSelection and forwards visitation calls

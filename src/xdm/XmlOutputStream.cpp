@@ -43,7 +43,8 @@ void XmlOutputStream::openContext( RefPtr< XmlObject > obj ) {
 
   if( obj->hasChildren() ) {
     // write the complete body of all but the final child to the stream
-    XmlObject::ChildIterator finalChild = --(obj->endChildren());
+    XmlObject::ChildIterator finalChild = obj->endChildren();
+    --finalChild;
     std::for_each( obj->beginChildren(), finalChild, 
       WriteFormattedXml( mOutput, mContextStack.size() ) );
 
