@@ -15,7 +15,8 @@ public:
   virtual ~HdfDataset();
 
   //-- Dataset Implementations --//
-  virtual void initializeImplementation( 
+  virtual void initializeImplementation(
+    primitiveType::Value type,
     const DataShape<>& shape, 
     std::iostream& content );
   virtual void serializeImplementation(

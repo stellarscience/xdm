@@ -1,11 +1,15 @@
 
 #include <xdm/HdfDataset.hpp>
+#include <xdm/PrimitiveType.hpp>
 
 #include <algorithm>
+#include <map>
 #include <sstream>
 #include <string>
 
 #include <hdf5.h>
+
+XDM_NAMESPACE_BEGIN
 
 namespace {
 
@@ -19,9 +23,28 @@ struct HdfLocation {
   }
 };
 
-} // namespace anon
+struct HdfTypeMapping {
+  std::map< primitiveType::Value, int > mTypeMap;
+  HdfTypeMapping() {
+    mTypeMap[primitiveType::kChar] = H5T_NATIVE_CHAR;
+    mTypeMap[primitiveType::kShort] = H5T_NATIVE_SHORT;
+    mTypeMap[primitiveType::kInt] = H5T_NATIVE_INT;
+    mTypeMap[primitiveType::kLongInt] = H5T_NATIVE_LONG;
+    mTypeMap[primitiveType::kUnsignedChar] = H5T_NATIVE_UCHAR;
+    mTypeMap[primitiveType::kUnsignedShort] = H5T_NATIVE_USHORT;
+    mTypeMap[primitiveType::kUnsignedInt] = H5T_NATIVE_UINT;
+    mTypeMap[primitiveType::kLongUnsignedInt] = H5T_NATIVE_ULLONG;
+    mTypeMap[primitiveType::kFloat] = H5T_NATIVE_FLOAT;
+    mTypeMap[primitiveType::kDouble] = H5T_NATIVE_DOUBLE;
+  }
+  
+  int operator[]( primitiveType::Value v ) const {
+    return (mTypeMap.find( v )->second);
+  }
+};
+static const HdfTypeMapping sHdfTypeMapping;
 
-XDM_NAMESPACE_BEGIN
+} // namespace anon
 
 struct HdfDataset::Private {
   hid_t file_identifier;
@@ -36,7 +59,8 @@ HdfDataset::HdfDataset() :
 HdfDataset::~HdfDataset() {
 }
 
-void HdfDataset::initializeImplementation( 
+void HdfDataset::initializeImplementation(
+  primitiveType::Value type,
   const DataShape<>& shape, 
   std::iostream& content ) {
   
@@ -60,7 +84,7 @@ void HdfDataset::initializeImplementation(
   imp->dataset_identifier = H5Dcreate(
     imp->file_identifier,
     locator.mDatasetPath.c_str(),
-    H5T_NATIVE_FLOAT,
+    sHdfTypeMapping[type],
     imp->filespace_identifier,
     H5P_DEFAULT,
     H5P_DEFAULT,
@@ -103,7 +127,7 @@ void HdfDataset::serializeImplementation(
   // write the array to disk
   H5Dwrite( 
     imp->dataset_identifier, 
-    H5T_NATIVE_FLOAT, 
+    sHdfTypeMapping[data.dataType()], 
     memory_space, 
     imp->filespace_identifier,
     H5P_DEFAULT,

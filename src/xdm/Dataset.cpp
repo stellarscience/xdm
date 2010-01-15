@@ -11,11 +11,14 @@ Dataset::Dataset() :
 Dataset::~Dataset() {
 }
 
-void Dataset::initialize( const DataShape<>& shape, std::iostream& content ) {
+void Dataset::initialize(
+  primitiveType::Value type,
+  const DataShape<>& shape, 
+  std::iostream& content ) {
   if ( mInitializeCallback ) {
-    mInitializeCallback->initializeImplementation( this, shape, content );
+    mInitializeCallback->initializeImplementation( this, type, shape, content );
   } else {
-    initializeImplementation( shape, content );
+    initializeImplementation( type, shape, content );
   }
 }
 

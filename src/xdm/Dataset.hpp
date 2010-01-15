@@ -4,6 +4,7 @@
 #include <xdm/StructuredArray.hpp>
 #include <xdm/DataShape.hpp>
 #include <xdm/HyperSlab.hpp>
+#include <xdm/PrimitiveType.hpp>
 #include <xdm/ReferencedObject.hpp>
 
 #include <xdm/NamespaceMacro.hpp>
@@ -11,7 +12,6 @@
 #include <iostream>
 
 XDM_NAMESPACE_BEGIN
-
 
 /// Base class for all dataset access.  A dataset is an interface to writing
 /// arrays to disk.  This class should be implemented by inheritors to write an
@@ -34,6 +34,7 @@ public:
 	public:
 	  virtual void initializeImplementation(
 	    Dataset* ds,
+      primitiveType::Value type,
 	    const DataShape<>& shape,
 	    std::iostream& content ) = 0;
 	};
@@ -62,7 +63,10 @@ public:
   /// content.
   /// @param shape the shape of the data on disk.
   /// @param content stream with content to initialize the dataset from.
-  void initialize( const DataShape<>& shape, std::iostream& content );
+  void initialize( 
+    primitiveType::Value type, 
+    const DataShape<>& shape, 
+    std::iostream& content );
 
   /// Serialize an array.  Maps a hyper-slab in an array to a hyper-slab on
   /// disk.  Manipulating the stream is optional.
@@ -93,7 +97,8 @@ public:
   /// implement this function to provide the necessary calls required to
   /// initialize a dataset with the given shape from the content provided via
   /// the input stream.  No one should call this except callbacks.
-  virtual void initializeImplementation( 
+  virtual void initializeImplementation(
+    primitiveType::Value type,
     const DataShape<>& shape, 
     std::iostream& content ) = 0;
 

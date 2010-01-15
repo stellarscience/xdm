@@ -40,7 +40,7 @@ int main( int argc, char* argv[] ) {
 
   // write the data to disk
   std::stringstream content( "HdfDataset.h5:/testdata" );
-  dataset->initialize( fileshape, content );
+  dataset->initialize( xdm::primitiveType::kFloat, fileshape, content );
   dataset->serialize( array, mapping, content );
   dataset->finalize();
   
