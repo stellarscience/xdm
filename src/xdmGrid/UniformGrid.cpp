@@ -46,7 +46,10 @@ void UniformGrid::traverse( xdm::ItemVisitor& iv ) {
   // apply the visitor to my internal geometry and topology items
   mTopology->accept( iv );
   mGeometry->accept( iv );
-  std::for_each( mAttributes.begin(), mAttributes.end(), xdm::ApplyVisitor( iv ) );
+  std::for_each( 
+    xdm::begin< Attribute >( *this ), 
+    xdm::end< Attribute >( *this ), 
+    xdm::ApplyVisitor( iv ) );
 }
 
 void UniformGrid::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
