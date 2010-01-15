@@ -8,6 +8,8 @@
 
 XDM_GRID_NAMESPACE_BEGIN
 
+class Time;
+
 class Grid : public xdm::Item {
 public:
   Grid();
@@ -15,8 +17,15 @@ public:
 
   XDM_META_ITEM( Grid );
 
+  Time* time();
+  const Time* time() const;
+  void setTime( Time* time );
+
   /// Write grid metadata.
   virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
+
+public:
+  xdm::RefPtr< xdm::Time > mTime;
 };
 
 XDM_GRID_NAMESPACE_END

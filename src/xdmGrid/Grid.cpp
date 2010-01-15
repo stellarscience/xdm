@@ -1,4 +1,5 @@
 #include <xdmGrid/Grid.hpp>
+#include <xdmGrid/Time.hpp>
 
 XDM_GRID_NAMESPACE_BEGIN
 
@@ -7,6 +8,18 @@ Grid::Grid() :
 }
 
 Grid::~Grid() {
+}
+
+Time* Grid::time() {
+  return mTime.get();
+}
+
+const Time* Grid::time() const {
+  return mTime.get();
+}
+
+void Grid::setTime( Time* time ) {
+  mTime = time;
 }
 
 void Grid::writeMetadata( xdm::XmlMetadataWrapper& xml ) {

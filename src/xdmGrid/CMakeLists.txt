@@ -10,6 +10,7 @@ set( ${PROJECT_NAME}_HEADERS
     RectilinearMesh.hpp
     StructuredTopology.hpp
     TensorProductGeometry.hpp
+    Time.hpp
     Topology.hpp
     UniformGrid.hpp
 )
@@ -23,6 +24,7 @@ set( ${PROJECT_NAME}_SOURCES
     RectilinearMesh.cpp
     StructuredTopology.cpp
     TensorProductGeometry.cpp
+    Time.cpp
     Topology.cpp
     UniformGrid.cpp
 )
