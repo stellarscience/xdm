@@ -14,7 +14,7 @@
 XDM_FORMAT_NAMESPACE_BEGIN
 
 TemporalCollection::TemporalCollection( const std::string& metadataFile ) :
-  mFileStream( metadataFile.c_str(), std::ios::out ),
+  mFileStream( (metadataFile + ".xmf").c_str(), std::ios::out ),
   mXmlStream( mFileStream )
 {
 }

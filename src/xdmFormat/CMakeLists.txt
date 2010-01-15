@@ -4,11 +4,13 @@ set( ${PROJECT_NAME}_HEADERS
     NamespaceMacro.hpp
     TemporalCollection.hpp
     TimeSeries.hpp
+    VirtualDataset.hpp
     XdmfHelpers.hpp
 )
 
 set( ${PROJECT_NAME}_SOURCES
     TemporalCollection.cpp
+    VirtualDataset.cpp
     XdmfHelpers.cpp
 )
 

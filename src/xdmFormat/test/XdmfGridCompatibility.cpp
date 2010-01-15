@@ -13,6 +13,7 @@
 
 #include <xdmFormat/TemporalCollection.hpp>
 #include <xdmFormat/TimeSeries.hpp>
+#include <xdmFormat/VirtualDataset.hpp>
 #include <xdmFormat/XdmfHelpers.hpp>
 
 #include <xdmGrid/CollectionGrid.hpp>
@@ -132,10 +133,15 @@ TEST( XdmfGridCompatibility, staticGrid ) {
 }
 
 TEST( XdmfGridCompatibility, timeSeries ) {
+  // write this as both a temporal collection and as a virtual dataset
   xdm::RefPtr< xdmFormat::TimeSeries > temporalCollection (
     new xdmFormat::TemporalCollection(
-      "XdmfGridCompatibility.temporalCollection.xmf" ) );
+      "XdmfGridCompatibility.temporalCollection" ) );
   temporalCollection->open();
+
+  xdm::RefPtr< xdmFormat::TimeSeries > virtualDataset(
+    new xdmFormat::VirtualDataset( "XdmfGridCompatibility.virtualDataset" ) );
+  virtualDataset->open();
 
   // since the geometry and topology of the grid will remain constant throughout
   // the simulation, we make a single object here to share.
@@ -199,10 +205,12 @@ TEST( XdmfGridCompatibility, timeSeries ) {
     attrData->setDataset( attrDataset.get() );
     attribute->appendChild( attrData );
     
-    // write the grid for this step to the TimeSeries file
+    // write the grid for this step to the TimeSeries files
     temporalCollection->writeTimestepGrid( grid.get() );
+    virtualDataset->writeTimestepGrid( grid.get() );
   }
   temporalCollection->close();
+  virtualDataset->close();
 }
 
 int main( int argc, char* argv[] ) {
