@@ -12,6 +12,7 @@ set( ${PROJECT_NAME}_HEADERS
     CoalescingStreamBuffer.hpp
     MpiDatasetProxy.hpp
     NamespaceMacro.hpp
+    ParallelizeTreeVisitor.hpp
 )
 
 set( ${PROJECT_NAME}_SOURCES
@@ -21,6 +22,7 @@ set( ${PROJECT_NAME}_SOURCES
     BinaryStreamOperations.cpp
     CoalescingStreamBuffer.cpp
     MpiDatasetProxy.cpp
+    ParallelizeTreeVisitor.cpp
 )
 
 add_definitions( 
