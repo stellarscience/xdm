@@ -20,9 +20,15 @@ XDM_NAMESPACE_BEGIN
 class Dataset;
 
 /// Callback class for updating a dataset before the operations of
-/// initializing and reading or writing.
+/// initializing and reading or writing.  This callback has no knowledge of the
+/// underlying subclass of dataset that it is operating on, it receives a
+/// generic Dataset.  For a callback with knowledge of specific Dataset
+/// subclasses, see DatasetUpdateCallback.
+/// @see DatasetUpdateCallback
 class BasicDatasetUpdateCallback : public ReferencedObject {
 public:
+  /// Update a dataset.  This method provides a customization point for library
+  /// clients to specify custom behavior when updating a dataset.
   virtual void update( Dataset* dataset ) = 0;
 };
 
@@ -30,9 +36,14 @@ public:
 /// concrete subclass of Dataset into the update call.  This can be used to
 /// define a type safe callback that will apply only to a concrete subclass of
 /// Dataset.
+///
+/// @param T The subclass of Dataset that the callback should operate on.
 template< typename T >
 class DatasetUpdateCallback : public BasicDatasetUpdateCallback {
 public:
+  /// Update the visitor if it is a subclass of the template parameter,
+  /// otherwise raise an error.
+  /// @throw std::runtime_error If the input dataset is not a subclass of T.
   void update( Dataset* dataset ) {
     T* typedDataset = dynamic_cast< T* >( dataset );
     if ( typedDataset ) {
@@ -42,16 +53,22 @@ public:
     }
   }
 
+  /// Update the specific subclass of Dataset that the callback is designed to
+  /// operate on.
   virtual void update( T* dataset ) = 0;
 };
 
-/// Base class for all dataset access.
+/// @brief Interface for writing array data to disk.
 ///
-/// This class controls the writing of arrays to disk.  Subclasses should
-/// implement the process of writing for the database type they support.  In
-/// addition, further subclassing of this object can accomplish further
-/// customization in the data writing process, for example a proxy object that
-/// uses MPI to pass data between processes.
+/// This class provides the interface for defining services that write array
+/// based data to disk.  The interface provides methods for initializing,
+/// writing, and finalizing data.  The interface should be subclassed to define
+/// new databases for arrays.
+///
+/// This is a virtual base class. it is left to subclasses to define the virtual
+/// protected members that define initialization, serialization and
+/// finalization.  The public interface of the class provides non-virtual
+/// methods that call the protected virtual members.
 class Dataset : public ReferencedObject {
 public:
   Dataset();
@@ -64,57 +81,59 @@ public:
   /// Set the callback to be executed at dataset update time.
   void setUpdateCallback( BasicDatasetUpdateCallback* callback );
   
-  /// Virtual method to invoke the Dataset's update callback (if it has one).
+  /// Invoke the update callback for the dataset.
+  /// @see BasicDatasetUpdateCallback
   virtual void update();
   
   //-- Dataset metadata functions --//
 
-  /// Pure virtual function to return a string that contains the string
-  /// identifiying the dataset's format for identification in XML metadata.
+  /// Return a string that identifies the database type used by the dataset.
   virtual const char* format() = 0;
 
-  /// Pure virtual function to write the dataset's text content (the light
-  /// portion of the dataset).
+  /// Write any text required to locate the dataset.
   virtual void writeTextContent( XmlTextContent& text ) = 0;
   
   //-- Dataset access functions --//
 
-  /// Initialize a dataset given a shape for the data on disk and initialization
-  /// content.
+  /// Initialize a dataset.  Calls the protected virtual
+  /// initializeImplementation to provide a point of customization.
+  /// @param type Type information for the data to be written to disk.
   /// @param shape the shape of the data on disk.
-  /// @param content stream with content to initialize the dataset from.
   void initialize( primitiveType::Value type, const DataShape<>& shape );
 
-  /// Serialize an array.  Maps a hyper-slab in an array to a hyper-slab on
-  /// disk.  Manipulating the stream is optional.
-  /// @param data The data to be written.
-  /// @param slabMap The mapping from memory space to file space
-  /// @param content A stream from which to pull/push content that is generated
+  /// Serialize an array to disk.  Maps a subset of the input array to a subset
+  /// of the output space on disk.  Uses the virtual protected member
+  /// serializeImplementation to defer the process of writing the data to
+  /// subclasses.
+  /// @param data The array to be written to disk.
+  /// @param selectionMap A map that specifies the subset of the data in memory
+  /// and on disk.
   void serialize( const StructuredArray* data, 
     const DataSelectionMap& selectionMap );
 
-  /// Complete writing the dataset.
+  /// Complete the process of writing a dataset.  Calls the protected virtual
+  /// finalizeImplementation to defer the process of completing the write to
+  /// subclasses.
   void finalize();
 
 protected:
   //-- Virtual Implementation Functions --//
 
-  /// Pure virtual function to initialize the dataset.  Inheritors should
-  /// implement this function to provide the necessary calls required to
-  /// initialize a dataset with the given shape from the content provided via
-  /// the input stream.  No one should call this except callbacks.
+  /// Implementation method to define how a dataset is to be initialized.
+  /// Inheritors should implement this function to provide the necessary calls
+  /// required to initialize a dataset with the given type and shape.
   virtual void initializeImplementation( primitiveType::Value type, 
     const DataShape<>& shape ) = 0;
 
-  /// Pure virtual function to serialize an array.  Inheritors should implement
-  /// this function to provide the necessary calls to write an array to disk or
-  /// to the input stream, depending on the needs of the underlying dataset
-  /// type. No one should call this except for callbacks.
+  /// Implementation method to define array serialization. Inheritors should
+  /// implement this method to provide the necessary calls for mapping a subset
+  /// of the input array to a subset of the dataset on disk. 
   virtual void serializeImplementation( const StructuredArray* data,
     const DataSelectionMap& selectionMap ) = 0;
 
-  /// Pure virtual function to complete the process of writing a dataset. This
-  /// should be called only by callbacks.
+  /// Definition of the finalization process for a dataset.  Inheritors should
+  /// implement this method to provide the necessary calls for completing the
+  /// write of a dataset.
   virtual void finalizeImplementation() = 0;
 
 private:
