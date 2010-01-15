@@ -193,7 +193,7 @@ void HdfDataset::serializeImplementation(
   // create the memory space to match the shape of the array
   // convert between types for size representation
   xdm::RefPtr< DataspaceIdentifier > memorySpace =
-    createDataspaceIdentifier( data->shape() );
+    createDataspaceIdentifier( xdm::makeShape( data->size() ) );
 
   SelectionVisitor memspaceSelector( memorySpace->get() );
   selectionMap.domain()->accept( memspaceSelector );

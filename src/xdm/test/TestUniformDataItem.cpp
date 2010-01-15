@@ -38,10 +38,8 @@ public:
     data(),
     testItem() {
     std::fill( data, data + 4, 0.0 );
-    xdm::DataShape<> arrayShape(1);
-    arrayShape[0] = 4;
     xdm::RefPtr< xdm::StructuredArray > array( 
-      createStructuredArray( data, arrayShape ) );
+      xdm::createStructuredArray( data, 4 ) );
     xdm::RefPtr< xdm::Dataset > dataset( new DummyDataset );
 
     xdm::DataShape<> datasetShape(2);

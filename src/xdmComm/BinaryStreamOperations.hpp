@@ -7,6 +7,7 @@
 
 #include <xdmComm/BinaryIStream.hpp>
 #include <xdmComm/BinaryOStream.hpp>
+#include <xdmComm/ReceiveBufferArray.hpp>
 
 #include <xdm/AllDataSelection.hpp>
 #include <xdm/DataSelection.hpp>
@@ -41,7 +42,7 @@ BinaryOStream& operator<<( BinaryOStream& ostr, const xdm::primitiveType::Value&
 
 /// This inserter assumes that the output StructuredArray already has at least
 /// enough space allocated to hold the data.
-BinaryIStream& operator>>( BinaryIStream& istr, xdm::StructuredArray& v );
+BinaryIStream& operator>>( BinaryIStream& istr, xdmComm::ReceiveBufferArray& v );
 BinaryOStream& operator<<( BinaryOStream& ostr, const xdm::StructuredArray& v );
 
 XDM_COMM_NAMESPACE_END

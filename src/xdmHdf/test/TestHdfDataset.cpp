@@ -5,7 +5,7 @@
 #define BOOST_TEST_MODULE TestHdfDataset
 #include <boost/test/unit_test.hpp>
 
-#include <xdm/StructuredArray.hpp>
+#include <xdm/TemplateStructuredArray.hpp>
 #include <xdm/RefPtr.hpp>
 
 #include <xdm/DataSelection.hpp>
@@ -24,10 +24,8 @@ BOOST_AUTO_TEST_CASE( write ) {
     data[i] = i;
   }
   
-  xdm::DataShape<> arrayShape( 1 );
-  arrayShape[0] = 16;
-  xdm::StructuredArray array( xdm::primitiveType::kFloat,  
-    &data[0], arrayShape );
+  xdm::RefPtr< xdm::StructuredArray > array = xdm::createStructuredArray(
+    &data[0], 16 );
 
   // initialize the dataset on disk
   xdm::DataShape<> fileshape( 2 );
@@ -41,7 +39,7 @@ BOOST_AUTO_TEST_CASE( write ) {
 
   // write the data to disk
   dataset->initialize( xdm::primitiveType::kFloat, fileshape );
-  dataset->serialize( &array, xdm::DataSelectionMap() );
+  dataset->serialize( array, xdm::DataSelectionMap() );
   dataset->finalize();
   
   BOOST_CHECK( true );

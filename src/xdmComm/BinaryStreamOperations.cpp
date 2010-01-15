@@ -218,20 +218,20 @@ BinaryOStream& operator<<( BinaryOStream& ostr, const xdm::primitiveType::Value&
 }
 
 //-----------------------------------------------------------------------------
-BinaryIStream& operator>>( BinaryIStream& istr, xdm::StructuredArray& v ) {
+BinaryIStream& operator>>( BinaryIStream& istr, xdmComm::ReceiveBufferArray& v ) {
   // type - shape - data
   xdm::primitiveType::Value type;
-  xdm::DataShape<> shape;
-  istr >> type >> shape;
+  size_t size;
+  istr >> type >> size;
   v.setDataType( type );
-  v.setShape( shape );
-  istr.read( reinterpret_cast< char* >( v.data() ), v.memorySize() );
+  v.setSize( size );
+  istr.read( v.buffer(), v.memorySize() );
   return istr;
 }
 
 BinaryOStream& operator<<( BinaryOStream& ostr, const xdm::StructuredArray& v ) {
   // type - shape - data...
-  ostr << v.dataType() << v.shape();
+  ostr << v.dataType() << v.size();
   ostr.write( reinterpret_cast< const char * >( v.data() ), v.memorySize() );
   return ostr;
 }

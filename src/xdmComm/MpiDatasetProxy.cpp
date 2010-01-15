@@ -9,6 +9,7 @@
 #include <xdmComm/BinaryStreamOperations.hpp>
 #include <xdmComm/CoalescingStreamBuffer.hpp>
 #include <xdmComm/MpiMessageTag.hpp>
+#include <xdmComm/ReceiveBufferArray.hpp>
 
 #include <xdm/AllDataSelection.hpp>
 #include <xdm/DataSelection.hpp>
@@ -28,7 +29,7 @@ namespace {
 void receiveAndWriteProcessData( 
   BinaryStreamBuffer* commBuf, 
   xdm::Dataset* dataset,
-  xdm::StructuredArray* arrayBuffer ) { 
+  xdmComm::ReceiveBufferArray* arrayBuffer ) {
 
   BinaryIStream dataStream( commBuf );
 
@@ -53,7 +54,7 @@ MpiDatasetProxy::MpiDatasetProxy(
   mCommunicator( communicator ),
   mDataset( dataset ),
   mCommBuffer( new CoalescingStreamBuffer( bufSizeHint, communicator ) ),
-  mArrayBuffer( new xdm::VectorStructuredArray<char>( bufSizeHint ) ) {
+  mArrayBuffer( new xdmComm::ReceiveBufferArray( bufSizeHint ) ) {
 }
 
 MpiDatasetProxy::~MpiDatasetProxy() {

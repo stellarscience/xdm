@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE( writeDataset1D ) {
   xdm::RefPtr< xdm::StructuredArray > processArray( 
     xdm::createStructuredArray( 
       &processData[0], 
-      xdm::makeShape( processData.size() ) ) );
+      processData.size() ) );
 
   xdm::DataSelectionMap selectionMap(
     new xdm::AllDataSelection,

@@ -14,6 +14,10 @@
 
 #include <xdmComm/NamespaceMacro.hpp>
 
+namespace xdmComm {
+  class ReceiveBufferArray;
+}
+
 namespace xdm {
   class StructuredArray;
 }
@@ -68,7 +72,7 @@ private:
   MPI_Comm mCommunicator;
   xdm::RefPtr< xdm::Dataset > mDataset;
   std::auto_ptr< xdmComm::CoalescingStreamBuffer > mCommBuffer;
-  xdm::RefPtr< xdm::StructuredArray > mArrayBuffer; 
+  xdm::RefPtr< xdmComm::ReceiveBufferArray > mArrayBuffer;
 };
 
 XDM_COMM_NAMESPACE_END

@@ -88,10 +88,8 @@ BOOST_AUTO_TEST_CASE( staticGrid ) {
   
   // data in memory
   std::vector< double > vertices = createGridPoints( 10 );
-  xdm::DataShape<> arrayShape(1);
-  arrayShape[0] = 10;
   xdm::RefPtr< xdm::StructuredArray > array 
-    = xdm::createStructuredArray( &vertices[0], arrayShape );
+    = xdm::createStructuredArray( &vertices[0], 10 );
 
   // the data item to map the array in memory to the file
   // since the coordinates are the same in x, y, and z we will share the
@@ -116,7 +114,7 @@ BOOST_AUTO_TEST_CASE( staticGrid ) {
   xdm::RefPtr< xdm::UniformDataItem > attributeDataItem(
     new xdm::UniformDataItem( xdm::primitiveType::kFloat, xdm::makeShape( "10 10 10" ) ) );
   xdm::RefPtr< xdm::StructuredArray > attrvalues 
-    = xdm::createStructuredArray( &data[0], xdm::makeShape( "1000" ) );
+    = xdm::createStructuredArray( &data[0], 1000 );
   attributeDataItem->appendData( new xdm::WritableArray( attrvalues ) );
   attribute->setDataItem( attributeDataItem );
 
@@ -157,7 +155,7 @@ BOOST_AUTO_TEST_CASE( timeSeries ) {
     new xdmGrid::TensorProductGeometry( 3 ) );
   std::vector< double > vertexData = createGridPoints( 10 );
   xdm::RefPtr< xdm::StructuredArray > geometryArray =
-    xdm::createStructuredArray( &vertexData[0], xdm::makeShape( 10 ) );
+    xdm::createStructuredArray( &vertexData[0], 10 );
   xdm::RefPtr< xdmHdf::HdfDataset > geometryDataset( new xdmHdf::HdfDataset );
   geometryDataset->setFile( "XdmfGridCompatibility.timeSeries.h5" );
   geometryDataset->setDataset( "gridValues" );
@@ -200,7 +198,7 @@ BOOST_AUTO_TEST_CASE( timeSeries ) {
     xdm::RefPtr< xdm::StructuredArray > attrArray = 
       xdm::createStructuredArray( 
         &attrvalues[0], 
-        xdm::makeShape( 9*9*9 ) );
+        9*9*9 );
     xdm::RefPtr< xdmHdf::HdfDataset > attrDataset( new xdmHdf::HdfDataset );
     attrDataset->setFile( "XdmfGridCompatibility.timeSeries.h5" );
     attrDataset->setGroupPath( xdmHdf::GroupPath( 1, "FunctionValues" ) );

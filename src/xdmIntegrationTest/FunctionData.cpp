@@ -110,8 +110,8 @@ FunctionData::FunctionData(
       mBlockSize.end(),
       1,
       MultiplySize() ) );
-  mStructuredArray = xdm::createStructuredArray( 
-    &mStorage[0], xdm::makeShape( mStorage.size() ) );
+  mStructuredArray = new xdm::TemplateStructuredArray< double >(
+    &mStorage[0], mStorage.size() );
 }
 
 FunctionData::~FunctionData() {
@@ -146,7 +146,7 @@ void FunctionData::writeImplementation( xdm::Dataset* dataset ) {
 
     xdm::DataShape<>::size_type blockSize = accumulate(
       block->beginCount(), block->endCount(), 1, MultiplySize() );
-    mStructuredArray->setShape( xdm::makeShape( blockSize ) );
+    mStructuredArray->setSize( blockSize );
 
     xdm::HyperSlab<> fileSelectionSlab( *block );
     reverseDimensionOrder( fileSelectionSlab );

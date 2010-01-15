@@ -5,6 +5,8 @@
 #define BOOST_TEST_MODULE 
 #include <boost/test/unit_test.hpp>
 
+#include <xdm/TemplateStructuredArray.hpp>
+
 #include <xdmComm/BinaryIOStream.hpp>
 #include <xdmComm/BinaryStreamOperations.hpp>
 
@@ -77,19 +79,20 @@ BOOST_AUTO_TEST_CASE( StructuredArrayRoundtrip ) {
 
   std::vector< int > inData( 10 );
   std::generate( inData.begin(), inData.end(), rand );
-  xdm::StructuredArray answer( xdm::primitiveType::kInt, &inData[0],
-    xdm::makeShape( 10 ) );
+  xdm::TemplateStructuredArray< int > answer( &inData[0], 10 );
 
   test.stream << answer << xdmComm::flush;
 
   std::vector< int > outData( 10 );
-  xdm::StructuredArray result( xdm::primitiveType::kChar, &outData[0],
-    xdm::DataShape<>() );
+  xdmComm::ReceiveBufferArray result( 128 );
   test.stream >> result;
   
   BOOST_CHECK_EQUAL( answer.dataType(), result.dataType() );
-  BOOST_CHECK_EQUAL( answer.shape(), result.shape() );
-  BOOST_CHECK( std::equal( inData.begin(), inData.end(), outData.begin() ) );
+  BOOST_CHECK_EQUAL( answer.size(), result.size() );
+
+  const int * answerArray = reinterpret_cast< const int * >( answer.data() );
+  const int * resultArray = reinterpret_cast< const int* >( result.data() );
+  BOOST_CHECK( std::equal( answerArray, answerArray + 10, resultArray ) );
 }
 
 BOOST_AUTO_TEST_CASE( HyperSlabRoundtrip ) {

@@ -12,6 +12,7 @@
 #include <xdm/AllDataSelection.hpp>
 #include <xdm/DataSelectionVisitor.hpp>
 #include <xdm/HyperslabDataSelection.hpp>
+#include <xdm/TemplateStructuredArray.hpp>
 
 #include <mpi.h>
 
@@ -135,8 +136,7 @@ BOOST_AUTO_TEST_CASE( coalesce ) {
 
   // the local structured array consists of the pointer to the local rank
   // variable
-  xdm::StructuredArray array( xdm::primitiveType::kInt, &rank, 
-    xdm::makeShape( 1 ) );
+  xdm::TemplateStructuredArray< int > array( &rank, 1 );
 
   dataset->initialize( xdm::primitiveType::kInt, shape );
   dataset->serialize( &array, map );

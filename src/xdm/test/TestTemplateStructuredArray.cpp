@@ -13,11 +13,9 @@ namespace {
 
 template< typename T > 
 void test() {
-  xdm::DataShape<> shape(1);
-  shape[0] = 1;
   T value = T();
   xdm::RefPtr< xdm::TemplateStructuredArray< T > > array( 
-    new xdm::TemplateStructuredArray< T >( &value, shape ) );
+    new xdm::TemplateStructuredArray< T >( &value, 1 ) );
   T* result = array->begin();
   BOOST_CHECK_EQUAL( result, &value );
 }

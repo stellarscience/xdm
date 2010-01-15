@@ -42,8 +42,8 @@ template< typename T > struct PrimitiveTypeInfo {
 
 #define XDM_PRIMITIVE_TYPE_DEFINE_INFO( type, value ) \
   template<> struct PrimitiveTypeInfo< type > { \
-    enum { kValue = value }; \
-    enum { kSize = sizeof( type ) }; \
+    static const primitiveType::Value kValue = value; \
+    static const size_t kSize = sizeof( type ); \
   };
 
 XDM_PRIMITIVE_TYPE_DEFINE_INFO( char, primitiveType::kChar )

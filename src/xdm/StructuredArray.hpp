@@ -17,72 +17,49 @@
 
 XDM_NAMESPACE_BEGIN
 
-/// Array class that holds a multi-dimensional structured array.  The data has
-/// an associated shape and selection.  This class does not own the data, it
-/// merely holds a pointer to it.  This is to allow client applications to
-/// choose their own memory arrangements.
+/// Array class for holding multiple types of data. This class represents a
+/// contiguous array of data in memory.  It does not own the data it holds, it
+/// merely presents an interface for querying information about an array that is
+/// useful when reading or writing data.  The TemplateStructuredArray subclass
+/// implements a type safe interface for providing this information.
+///
+/// This class does not own the data it references, it is up to subclasses to
+/// to manage (or not manage) memory. This is to allow applications to wrap
+/// a StructuredArray around existing memory structures.
+///
+/// @see TemplateStructuredArray
+/// @see VectorStructuredArray
 class StructuredArray : public ReferencedObject {
 public:
-  /// Construct an array given a primitive type, a pointer to the data, and a
-  /// shape.  Generally clients will want to use TemplateStructuredArray to
-  /// ensure this class is constructed with the correct parameters.
-  ///
-  /// @param type Enumerated value for the type of array.
-  /// @param arrayElementSize The size of a single array element in bytes.
-  /// @param data A pointer to the actual data in memory.
-  /// @param shape The shape of the data in memory.
-  StructuredArray(
-    const primitiveType::Value& type,
-    void* data,
-    const DataShape<>& shape );
   
+  StructuredArray();
   virtual ~StructuredArray();
 
   /// Get the type of the data.
-  primitiveType::Value dataType() const {
-    return mType;
-  }
-
-  /// Set the type of the data.
-  void setDataType( primitiveType::Value type ) {
-    mType = type;
-  }
+  virtual primitiveType::Value dataType() const = 0;
 
   /// Get the size of the array elements in bytes.
-  size_t elementSize() const;
+  virtual size_t elementSize() const = 0;
 
   /// Get the number of data elements.
-  size_t size() const;
+  virtual size_t size() const = 0;
+
+  /// Get a const pointer to the actual data.
+  virtual const void* data() const = 0;
+
+  /// Get a pointer to the array data. The default implementation uses the
+  /// const qualified version, although it is virtual in case subclasses need
+  /// another implementation.
+  ///
+  /// The non-const version calling the const version is an idiom described in
+  /// Myers' Effective C++ Third Edition p. 24. It is very important that the
+  /// non-const version call the const version and not the other way around.
+  virtual void* data() {
+    return const_cast< void* >( static_cast< StructuredArray& >(*this).data());
+  }
 
   /// Get the size of the array in memory in bytes.
-  size_t memorySize() const { return elementSize() * size(); }
-
-  /// Get a pointer to the actual data.
-  void* data();
-  /// Get a const pointer to the actual data.
-  const void* data() const;
-
-  /// Get the shape of the data.
-  const DataShape<>& shape() const {  
-    return mShape;
-  }
-
-  /// Set the shape of the data.
-  void setShape( const DataShape<>& shape ) {
-    mShape = shape;
-  }
-
-protected:
-  /// Set the pointer to the array data.
-  ///
-  /// Protected so that subclasses can choose to manage data while clients have
-  /// no access unless a specific subclass chooses to provide it.
-  void setData( void* ptr );
-
-private:
-  primitiveType::Value mType;
-  void* mData;
-  DataShape<> mShape;
+  size_t memorySize() const;
 };
 
 XDM_NAMESPACE_END

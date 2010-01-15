@@ -13,6 +13,7 @@ set( ${PROJECT_NAME}_HEADERS
     MpiDatasetProxy.hpp
     NamespaceMacro.hpp
     ParallelizeTreeVisitor.hpp
+    ReceiveBufferArray.hpp
 )
 
 set( ${PROJECT_NAME}_SOURCES
