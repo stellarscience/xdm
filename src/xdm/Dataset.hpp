@@ -14,48 +14,28 @@
 
 XDM_NAMESPACE_BEGIN
 
-/// Base class for all dataset access.  A dataset is an interface to writing
-/// arrays to disk.  This class should be implemented by inheritors to write an
-/// array to disk as simply as possible.  Decorators (callbacks) should be used
-/// to customize the data flow for different application environments.
+/// Base class for all dataset access.
+///
+/// This class controls the writing of arrays to disk.  Subclasses should
+/// implement the process of writing for the database type they support.  In
+/// addition, further subclassing of this object can accomplish further
+/// customization in the data writing process, for example a proxy object that
+/// uses MPI to pass data between processes.
 class Dataset : public ReferencedObject {
 public:
   Dataset();
   virtual ~Dataset();
   
-  //-- Decorators --//
+  //-- Dataset metadata functions --//
 
-	/// Initialization callback function.  The purpose of this class is to provide
-	/// client applications with the ability to decorate the initialization process
-	/// of datasets without specific knowledge of the underlying dataset.  An
-	/// example of where this is useful is in a parallel application that needs to
-	/// communicate all of the relevant data to a certain process in a communicator
-	/// to handle the actual file output of the data.
-	class InitializeCallback : public ReferencedObject {
-	public:
-	  virtual void initializeImplementation(
-	    Dataset* ds,
-      primitiveType::Value type,
-	    const DataShape<>& shape ) = 0;
-	};
-	
-	/// Serialization callback function.  Decorates the serialization process to
-	/// customize data flow.
-	class SerializeCallback : public ReferencedObject {
-	public:
-	  virtual void serializeImplementation( 
-      Dataset* ds, 
-      const StructuredArray* data,
-      const DataSelectionMap& selectionMap ) = 0;
-	};
-	
-	/// Finalization Callback function.  Decorates the finalization process to
-	/// customize the data flow.
-	class FinalizeCallback : public ReferencedObject {
-	public:
-	  virtual void finalizeImplementation( Dataset* ds ) = 0;
-	};
+  /// Pure virtual function to return a string that contains the string
+  /// identifiying the dataset's format for identification in XML metadata.
+  virtual const char* format() = 0;
 
+  /// Pure virtual function to write the dataset's text content (the light
+  /// portion of the dataset).
+  virtual void writeTextContent( XmlTextContent& text ) = 0;
+  
   //-- Dataset access functions --//
 
   /// Initialize a dataset given a shape for the data on disk and initialization
@@ -75,25 +55,8 @@ public:
   /// Complete writing the dataset.
   void finalize();
 
-  /// Set the initialization callback decorator function.  This allows run-time
-  /// customization of the initialization data flow.
-  void setInitializeCallback( InitializeCallback* icb );
-  /// Set the serialization callback decorator function.  This allows run-time
-  /// customization of the serialization data flow.
-  void setSerializeCallback( SerializeCallback* scb );
-  /// Set the finalization callback decorator function.  This allows run-time
-  /// customization of the finalization data flow.
-  void setFinalizeCallback( FinalizeCallback* fcb );
-
+protected:
   //-- Virtual Implementation Functions --//
-
-  /// Pure virtual function to return a string that contains the string
-  /// identifiying the dataset's format for identification in XML metadata.
-  virtual const char* format() = 0;
-
-  /// Pure virtual function to write the dataset's text content (the light
-  /// portion of the dataset).
-  virtual void writeTextContent( XmlTextContent& text ) = 0;
 
   /// Pure virtual function to initialize the dataset.  Inheritors should
   /// implement this function to provide the necessary calls required to
@@ -114,9 +77,6 @@ public:
   virtual void finalizeImplementation() = 0;
 
 private: 
-  xdm::RefPtr< InitializeCallback > mInitializeCallback;
-  xdm::RefPtr< SerializeCallback > mSerializeCallback;
-  xdm::RefPtr< FinalizeCallback > mFinalizeCallback;
 };
 
 XDM_NAMESPACE_END

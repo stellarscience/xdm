@@ -6,21 +6,6 @@ macro( xdm_test_serial test_name )
     add_test( xdm.${test_name} xdm.${test_name}.test )
 endmacro()
 
-# add a parallel test
-macro( xdm_test_parallel test_name num_procs )
-    find_package( MPI )
-    if( MPI_FOUND )
-        include_directories( ${MPI_INCLUDE_PATH} )
-        add_executable( ${test_name} ${ARGN} )
-        target_link_libraries( ${test_name} xdm ${MPI_LIBRARIES} )
-        add_test( ${test_name} ${MPIEXEC}
-            ${MPIEXEC_NUMPROC_FLAG} ${num_procs}
-            ${MPIEXEC_PREFLAGS}
-            ${test_name}
-            ${MPIEXEC_POSTFLAGS} )
-    endif( MPI_FOUND )
-endmacro()
-
 xdm_test_serial( TemplateStructuredArray TemplateStructuredArray.cpp )
 xdm_test_serial( XmlObject XmlObject.cpp )
 xdm_test_serial( XmlOutputStream XmlOutputStream.cpp )
@@ -34,6 +19,4 @@ xdm_test_serial( RefPtr RefPtr.cpp )
 xdm_test_serial( ObjectCompositionMixin ObjectCompositionMixin.cpp )
 xdm_test_serial( DataSelectionVisitor DataSelectionVisitor.cpp )
 xdm_test_serial( WritableData WritableData.cpp )
-
-# xdm_test_parallel( HdfDatasetMPI 4 HdfDatasetMPI.cpp )
 
