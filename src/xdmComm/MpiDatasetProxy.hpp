@@ -30,6 +30,10 @@
 
 #include <xdmComm/NamespaceMacro.hpp>
 
+// Code Review Matter (open): Merging forward declarations
+// Did you consider merging these forward declarations since they are in the same namespace? 
+// -- Birch Polega on 2009-01-18
+
 namespace xdm {
   class ByteArray;
 }
