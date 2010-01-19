@@ -52,6 +52,9 @@ public:
   /// @param communicator Communicator with relevant processes.
   /// @param dataset The actual dataset that will handle writing.
   /// @param bufSizeHint Suggested size for communication buffer.
+  // Code Review Matter (open): Naming conventions.
+  // Did you consider not abbreviating "buffer" in the parameter name below?
+  // Will Dicharry 2010-01-19
   MpiDatasetProxy( 
     MPI_Comm communicator, 
     xdm::Dataset* dataset,
