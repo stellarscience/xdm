@@ -34,6 +34,10 @@ XDM_HDF_NAMESPACE_BEGIN
 /// Path of groups identifying a location in the HDF file.
 typedef std::vector< std::string > GroupPath;
 
+// Code Review Matter (open): Doxygen comment.
+// Did you consider providing documentation for this class so that others may
+// gain understanding of the class interface and caveats of use?
+// Will Dicharry 2010-01-19
 class HdfDataset : public xdm::Dataset {
 public:
   /// Default constructor does not associate with a file.
