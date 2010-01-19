@@ -21,6 +21,11 @@
 #ifndef xdm_Dataset_hpp
 #define xdm_Dataset_hpp
 
+// Code Review Matter (open): #include order
+// Is there an #include order dependence? Could these be arranged
+// in alphabetical order?
+// -- K. R. Walker on 2010-01-19
+
 #include <xdm/StructuredArray.hpp>
 #include <xdm/DataSelectionMap.hpp>
 #include <xdm/DataShape.hpp>
@@ -74,6 +79,12 @@ public:
     if ( typedDataset ) {
       this->update( typedDataset );
     } else {
+
+      // Code Review Matter (open): XDM_THROW disabled?
+      // How does a client check for an error condition if XDM_THROW
+      // is disabled? Did you consider a system similar to errno?
+      // -- K. R. Walker on 2010-01-19
+
       XDM_THROW( std::runtime_error( "Invalid Dataset type for callback." ) );
     }
   }
@@ -82,6 +93,17 @@ public:
   /// operate on.
   virtual void update( T* dataset ) = 0;
 };
+
+// Code Review Matter (open): Database Definition
+// Did you consider defining "database" in the context of the 
+// Dataset documentation?
+// -- K. R. Walker on 2010-01-19
+
+// Code Review Matter (open): Pure Virtual
+// The class is described as a virtual base class, but there are pure virtual
+// member functions. Should the documentation be updated to reflect this, or
+// is the distinction so minor that it doesn't need to be called out?
+// -- K. R. Walker on 2010-01-19
 
 /// @brief Interface for writing array data to disk.
 ///
@@ -99,6 +121,13 @@ public:
   Dataset();
   virtual ~Dataset();
 
+  // Code Review Matter (open): updateCallback() return constness
+  // Are there invariants within BasicDatasetUpdateCallback that must
+  // protected (via constness) when the Dataset is const. Could a client
+  // conceivably wish to modify the update callback independently of the
+  // dataset?
+  // -- K. R. Walker on 2010-01-19
+
   /// Get the update callback that will be executed at update time.
   BasicDatasetUpdateCallback* updateCallback();
   /// Get the const update callback that will be executed at update time.
@@ -110,7 +139,16 @@ public:
   /// @see BasicDatasetUpdateCallback
   virtual void update();
   
+  // Code Review Matter (open): Doxygen groups
+  // Did you consider using Doxygen documentation groups to aid in the
+  // grouping of member functions?
+  // -- K. R. Walker on 2010-01-19
+
   //-- Dataset metadata functions --//
+
+  // Code Review Matter (open): C-string
+  // Did you consider using a std::string as the return value for format()?
+  // -- K. R. Walker on 2010-01-19
 
   /// Return a string that identifies the database type used by the dataset.
   virtual const char* format() = 0;
@@ -119,6 +157,39 @@ public:
   virtual void writeTextContent( XmlTextContent& text ) = 0;
   
   //-- Dataset access functions --//
+
+  // Code Review Matter (open): initialize
+  // What does it mean to 'initialize' a dataset? Is a dataset "opened"
+  // and prepared for writing? Is there more elaborate
+  // documentation available elsewhere for the following member functions?
+  // -- K. R. Walker on 2010-01-19
+
+  // Code Review Matter (open): pre/post-conditions
+  // Did you consider adding preconditions and postconditions to the
+  // member functions?
+  // -- K. R. Walker on 2010-01-19
+
+  // Code Review Matter (open): namespaced enum standard
+  // Stellar doesn't have an official standard for namespaced enumerations,
+  // though de-facto standard appears to be similar to:
+  //
+  // namespace Primitive {
+  //   enum Type {
+  //     kInvalid = 0,
+  //     kInt,
+  //     kDouble
+  // } // namespace Primitive
+  //
+  // This would make your initialize interface appear as:
+  //   void initialize( Primitive::Type type, ... );
+  //
+  // Should this be added to our software standards?
+  // -- K. R. Walker on 2010-01-19
+
+  // Code Review Matter (open): const 'type'
+  // Does the implementation ever change 'type'? Did you consider 
+  // making 'type' const?
+  // -- K. R. Walker on 2010-01-19
 
   /// Initialize a dataset.  Calls the protected virtual
   /// initializeImplementation to provide a point of customization.
@@ -131,6 +202,16 @@ public:
   // for reuse?
   // Will Dicharry 2010-01-19
   void initialize( primitiveType::Value type, const DataShape<>& shape );
+
+  // Code Review Matter (open): serialize vs serializeImplementation
+  // The documentation for serialize and serializeImplemenation appear to
+  // contradict each other. serialize says it does the mapping while
+  // serializeImplementation does the writing, but serializeImplementation
+  // says that implementors should provide a mapping. 
+  // Did you consider consolidating much of this documentatation in the
+  // class description while giving the members very brief summaries and
+  // referring to the class?
+  // -- K. R. Walker on 2010-01-19
 
   /// Serialize an array to disk.  Maps a subset of the input array to a subset
   /// of the output space on disk.  Uses the virtual protected member

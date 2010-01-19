@@ -72,6 +72,13 @@ struct HdfTypeMapping {
     mTypeMap[xdm::primitiveType::kDouble] = H5T_NATIVE_DOUBLE;
   }
   
+  // Code Review Matter (open): indexing map
+  // Did you consider using a named member function instead of the indexing
+  // operator for the mapping. This would leave open the possibility of
+  // clearly mapping from XDM->HDF or HDF->XDM. e.g.,
+  // sHdfTypeMapping.toHdf( xdm::primitiveType::kInt );
+  // sHdfTypeMapping.toXdm( H5T_NATIVE_INT );
+  // -- K. R. Walker on 2010-01-19
   int operator[]( xdm::primitiveType::Value v ) const {
     return (mTypeMap.find( v )->second);
   }
@@ -160,6 +167,12 @@ const std::string& HdfDataset::dataset() const {
 void HdfDataset::writeTextContent( xdm::XmlTextContent& text ) {
   std::stringstream out;
   out << imp->mFile << ":";
+
+  // Code Review Matter (open): GroupPath to HDF representation
+  // Did you consider making a nonmember nonfriend (NMNF) function 
+  // that converts from a GroupPath to an HDF group path
+  // representation?
+  // -- K. R. Walker on 2010-01-19
   std::for_each( imp->mGroupPath.begin(), imp->mGroupPath.end(), 
     AppendGroup( out ) );
   out << "/" << imp->mDataset;
@@ -169,6 +182,10 @@ void HdfDataset::writeTextContent( xdm::XmlTextContent& text ) {
 void HdfDataset::initializeImplementation(
   xdm::primitiveType::Value type,
   const xdm::DataShape<>& shape ) {
+
+  // Code Review Matter (open): Loc
+  // Is Loc short for lock or location?
+  // -- K. R. Walker on 2010-01-19
   
   // open the HDF file for writing
   imp->mFileId = createFileIdentifier( imp->mFile );
@@ -177,6 +194,13 @@ void HdfDataset::initializeImplementation(
   // construct the group in the file.
   if ( !imp->mGroupPath.empty() ) {
     hid_t parentIdentifier = imp->mFileId->get();
+
+    // Code Review Matter (open): make groups function
+    // Did you consider making a function that woulc create a group from
+    // its parent to the final leaf? e.g.,
+    // hid_t location = createGroupsInPath( parentIdentifier, groupPath )
+    // -- K. R. Walker on 2010-01-19
+
     for ( 
       GroupPath::iterator group = imp->mGroupPath.begin();
       group != imp->mGroupPath.end();
@@ -202,6 +226,13 @@ void HdfDataset::initializeImplementation(
     imp->mDataspaceId->get() );
 }
 
+// Code Review Matter (open): RefPtr vs Raw Pointers
+// Is there a pattern in this library where raw pointers are assumed
+// to be managed elsewhere by RefPtrs? If not, should RefPtrs always
+// be used or should it be documented when/where ownership is passed
+// or retained?
+// -- K. R. Walker on 2010-01-19
+
 void HdfDataset::serializeImplementation(
   const xdm::StructuredArray* data,
   const xdm::DataSelectionMap& selectionMap ) {
@@ -219,6 +250,14 @@ void HdfDataset::serializeImplementation(
   hssize_t datasetNumpoints = H5Sget_select_npoints( imp->mDataspaceId->get() );
   hssize_t arrayNumpoints = H5Sget_select_npoints( memorySpace->get() );
   if ( datasetNumpoints != arrayNumpoints ) {
+
+    // Code Review Matter (open): Exception what()
+    // Did you consider constructing this exception message only when
+    // a client calls the what() function? This would require an exception
+    // subclass and would provide a way to access the data members used
+    // to make the message without having to resort to string parsing.
+    // -- K. R. Walker on 2010-01-19
+
     std::stringstream ss;
     ss << "Data size mismatch: ";
     ss << "dataset, " << datasetNumpoints;

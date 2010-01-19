@@ -42,6 +42,25 @@ class HdfDataset : public xdm::Dataset {
 public:
   /// Default constructor does not associate with a file.
   HdfDataset();
+
+  // Code Review Matter (open): argument documentation
+  // Did you consider documenting the nature of file, groupPath,
+  // and dataset? i.e., What is a GroupPath? Could you provide an
+  // example of what one "looks" like? Are there helper methods
+  // that construct them?
+  // For what is a dataset name used? Are there limitations to its
+  // content or structure (spaces, punctuation, etc.)?
+  // -- K. R. Walker on 2010-01-19
+
+  // Code Review Matter (open): file path
+  // Did you consider using a class to represent a file path?
+  // -- K. R. Walker on 2010-01-19
+
+  // Code Review Matter (open): file path
+  // Did you consider using a class to represent a dataset name
+  // (assuming it has constraints or invariants)?
+  // -- K. R. Walker on 2010-01-19
+
   /// Constructor takes file, group, and dataset names.
   HdfDataset( 
     const std::string& file, 
@@ -66,6 +85,16 @@ public:
 
   //-- Dataset Implementations --//
   virtual const char* format() { return "HDF"; }
+
+  // Code Review Matter (open): Namespace Macros
+  // There are macros that optionally create namespaces. If the namespaces
+  // are not used, then the following member functions should fail to
+  // compile because they explicitly use those namespaces. Did you consider
+  // creating a namespace macro instances like these? e.g.,
+  // #define XDM_NAMESPACE xdm
+  // XDM_NAMESPACE::primitiveType::Value
+  // -- K. R. Walker on 2010-01-19
+
   virtual void writeTextContent( xdm::XmlTextContent& text );
   virtual void initializeImplementation(
     xdm::primitiveType::Value type,
@@ -76,6 +105,10 @@ public:
   virtual void finalizeImplementation();
 
 private:
+
+  // Code Review Matter (open): imp vs mImp
+  // The Stellar software standards doesn't call this out specifically,
+  // but did you consider using the defacto standard mImp over imp.
   struct Private;
   std::auto_ptr< Private > imp;
 };
