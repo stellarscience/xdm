@@ -64,6 +64,11 @@ public:
   /// Update the visitor if it is a subclass of the template parameter,
   /// otherwise raise an error.
   /// @throw std::runtime_error If the input dataset is not a subclass of T.
+  // Code Review Matter (open): Typed exceptions. Errors should be identifiable
+  // from the type of exception thrown, not the content of the exception. In the
+  // unmerged branch that implements dataset input, exceptions are broken into
+  // an identifiable hierarchy.
+  // -- Will Dicharry 2010-01-19
   void update( Dataset* dataset ) {
     T* typedDataset = dynamic_cast< T* >( dataset );
     if ( typedDataset ) {
