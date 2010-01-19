@@ -124,6 +124,12 @@ public:
   /// initializeImplementation to provide a point of customization.
   /// @param type Type information for the data to be written to disk.
   /// @param shape the shape of the data on disk.
+  // Code Review Matter (open): Strategy pattern.
+  // Currently the public methods are simple pass throughs to the protected
+  // virtual implementation methods. Did you consider moving logic that can be
+  // shared among all subclasses (such as validating inputs) to the base class
+  // for reuse?
+  // Will Dicharry 2010-01-19
   void initialize( primitiveType::Value type, const DataShape<>& shape );
 
   /// Serialize an array to disk.  Maps a subset of the input array to a subset
