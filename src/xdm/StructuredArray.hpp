@@ -71,7 +71,8 @@ public:
   /// Myers' Effective C++ Third Edition p. 24. It is very important that the
   /// non-const version call the const version and not the other way around.
   virtual void* data() {
-    return const_cast< void* >( static_cast< StructuredArray& >(*this).data());
+    return const_cast< void* >( 
+      static_cast< const StructuredArray& >(*this).data() );
   }
 
   /// Get the size of the array in memory in bytes.

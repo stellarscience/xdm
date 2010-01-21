@@ -26,6 +26,7 @@
 #include <xdmHdf/HdfDataset.hpp>
 #include <xdmHdf/SelectionVisitor.hpp>
 
+#include <xdm/DatasetExcept.hpp>
 #include <xdm/PrimitiveType.hpp>
 #include <xdm/RefPtr.hpp>
 #include <xdm/ThrowMacro.hpp>
@@ -181,7 +182,8 @@ void HdfDataset::writeTextContent( xdm::XmlTextContent& text ) {
 
 void HdfDataset::initializeImplementation(
   xdm::primitiveType::Value type,
-  const xdm::DataShape<>& shape ) {
+  const xdm::DataShape<>& shape,
+  const xdm::Dataset::InitializeMode& mode ) {
 
   // Code Review Matter (open): Loc
   // Is Loc short for lock or location?
@@ -223,7 +225,8 @@ void HdfDataset::initializeImplementation(
     datasetLocId,
     imp->mDataset,
     sHdfTypeMapping[type],
-    imp->mDataspaceId->get() );
+    imp->mDataspaceId->get(),
+    mode );
 }
 
 // Code Review Matter (open): RefPtr vs Raw Pointers
@@ -247,22 +250,12 @@ void HdfDataset::serializeImplementation(
   SelectionVisitor filespaceSelector( imp->mDataspaceId->get() );
   selectionMap.range()->accept( filespaceSelector );
 
+  // make sure the arrays are the same size.
   hssize_t datasetNumpoints = H5Sget_select_npoints( imp->mDataspaceId->get() );
   hssize_t arrayNumpoints = H5Sget_select_npoints( memorySpace->get() );
   if ( datasetNumpoints != arrayNumpoints ) {
-
-    // Code Review Matter (open): Exception what()
-    // Did you consider constructing this exception message only when
-    // a client calls the what() function? This would require an exception
-    // subclass and would provide a way to access the data members used
-    // to make the message without having to resort to string parsing.
-    // -- K. R. Walker on 2010-01-19
-
-    std::stringstream ss;
-    ss << "Data size mismatch: ";
-    ss << "dataset, " << datasetNumpoints;
-    ss << " array, " << arrayNumpoints;
-    XDM_THROW( std::runtime_error( ss.str() ) );
+    XDM_THROW( xdm::DataSizeMismatch( 
+      imp->mDataset, datasetNumpoints, arrayNumpoints ) );
   }
 
   // write the array to disk
@@ -270,6 +263,45 @@ void HdfDataset::serializeImplementation(
     imp->mDatasetId->get(), 
     sHdfTypeMapping[data->dataType()], 
     memorySpace->get(), 
+    imp->mDataspaceId->get(),
+    H5P_DEFAULT,
+    data->data() );
+}
+
+void HdfDataset::deserializeImplementation( 
+  xdm::StructuredArray* data,
+  const xdm::DataSelectionMap& selectionMap ) {
+
+  // Ensure the array has a valid pointer.
+  // FIXME It would be nice to make sure the space is allocated properly
+  if ( data->data() == NULL ) {
+    XDM_THROW( std::runtime_error( "Null array passed for dataset read" ) );
+  }
+
+  // create the memory space to match the shape of the array
+  xdm::RefPtr< DataspaceIdentifier > memorySpace = 
+    createDataspaceIdentifier( xdm::makeShape( data->size() ) );
+
+  // Apply the input selections. The domain is the data on disk, the range is
+  // the array.
+  SelectionVisitor filespaceSelector( imp->mDataspaceId->get() );
+  selectionMap.domain()->accept( filespaceSelector );
+  SelectionVisitor memspaceSelector( memorySpace->get() );
+  selectionMap.range()->accept( memspaceSelector );
+
+  // make sure the arrays are the same size
+  hssize_t datasetNumpoints = H5Sget_select_npoints( imp->mDataspaceId->get() );
+  hssize_t arrayNumpoints = H5Sget_select_npoints( memorySpace->get() );
+  if ( datasetNumpoints != arrayNumpoints ) {
+    XDM_THROW( xdm::DataSizeMismatch(
+      imp->mDataset, datasetNumpoints, arrayNumpoints ) );
+  }
+
+  // read the data into the array
+  H5Dread(
+    imp->mDatasetId->get(),
+    sHdfTypeMapping[data->dataType()],
+    memorySpace->get(),
     imp->mDataspaceId->get(),
     H5P_DEFAULT,
     data->data() );

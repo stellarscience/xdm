@@ -118,6 +118,16 @@ public:
 /// methods that call the protected virtual members.
 class Dataset : public ReferencedObject {
 public:
+  
+  /// Enumeration of values to determine how to open the dataset.
+  enum InitializeMode {
+    kInvalid = 0,
+    kRead,
+    kCreate,
+    kModify
+  };
+
+public:
   Dataset();
   virtual ~Dataset();
 
@@ -190,18 +200,27 @@ public:
   // Does the implementation ever change 'type'? Did you consider 
   // making 'type' const?
   // -- K. R. Walker on 2010-01-19
-
-  /// Initialize a dataset.  Calls the protected virtual
-  /// initializeImplementation to provide a point of customization.
-  /// @param type Type information for the data to be written to disk.
-  /// @param shape the shape of the data on disk.
+  
   // Code Review Matter (open): Strategy pattern.
   // Currently the public methods are simple pass throughs to the protected
   // virtual implementation methods. Did you consider moving logic that can be
   // shared among all subclasses (such as validating inputs) to the base class
   // for reuse?
   // Will Dicharry 2010-01-19
-  void initialize( primitiveType::Value type, const DataShape<>& shape );
+
+  /// Initialize a dataset.  Calls the protected virtual
+  /// initializeImplementation to provide a point of customization.
+  /// @param type Type information for the data to be written to disk.
+  /// @param shape the shape of the data on disk.
+  /// @param mode Choose to read, create, or modify.
+  ///
+  /// @throw DatasetNotFound A dataset opened for reading could not be found.
+  /// @throw DataspaceMismatch The requested space and the space on disk differ.
+  /// @throw DatatypeMismatch The requested type and the type on disk differ.
+  void initialize( 
+    primitiveType::Value type, 
+    const DataShape<>& shape, 
+    const InitializeMode& mode );
 
   // Code Review Matter (open): serialize vs serializeImplementation
   // The documentation for serialize and serializeImplemenation appear to
@@ -220,7 +239,23 @@ public:
   /// @param data The array to be written to disk.
   /// @param selectionMap A map that specifies the subset of the data in memory
   /// and on disk.
+  ///
+  /// @throw DataSizeMismatch The number of selected elements in the array and
+  /// the number of selected elements in the dataset differ.
   void serialize( const StructuredArray* data, 
+    const DataSelectionMap& selectionMap );
+
+  /// Deserialize an array from disk. Maps a subset of the dataset on disk to a
+  /// subset of the output array passed in.  Uses the virtual protected member
+  /// serializeImplementation to defer the process of writing the data to
+  /// subclasses.
+  /// @param data An already allocated array to hold the data.
+  /// @param selectionMap A map that specifies the subset of the data on disk to
+  /// map to the array in memory.
+  ///
+  /// @throw DataSizeMismatch The number of selected elements in the array and
+  /// the number of selected elements in the dataset differ.
+  void deserialize( StructuredArray* data, 
     const DataSelectionMap& selectionMap );
 
   /// Complete the process of writing a dataset.  Calls the protected virtual
@@ -234,14 +269,23 @@ protected:
   /// Implementation method to define how a dataset is to be initialized.
   /// Inheritors should implement this function to provide the necessary calls
   /// required to initialize a dataset with the given type and shape.
-  virtual void initializeImplementation( primitiveType::Value type, 
-    const DataShape<>& shape ) = 0;
+  virtual void initializeImplementation( 
+    primitiveType::Value type, 
+    const DataShape<>& shape,
+    const InitializeMode& mode ) = 0;
 
   /// Implementation method to define array serialization. Inheritors should
   /// implement this method to provide the necessary calls for mapping a subset
   /// of the input array to a subset of the dataset on disk. 
   virtual void serializeImplementation( 
     const StructuredArray* data,
+    const DataSelectionMap& selectionMap ) = 0;
+
+  /// Implementation method to define array deserialization. Inheritors should
+  /// implement this method to provide the necessary calls for mapping a subset
+  /// of a dataset on disk to the specified, allocated output array.
+  virtual void deserializeImplementation(
+    StructuredArray* data,
     const DataSelectionMap& selectionMap ) = 0;
 
   /// Definition of the finalization process for a dataset.  Inheritors should

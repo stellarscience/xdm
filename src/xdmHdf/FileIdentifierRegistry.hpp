@@ -45,6 +45,14 @@ public:
   xdm::RefPtr< FileIdentifier > findOrCreateIdentifier( 
     const std::string& key );
 
+  /// Force the registry to close all open files. A particular file will be
+  /// closed only if there are no other objects holding a reference to its
+  /// identifier. If any other object is holding a reference to an identifier,
+  /// the identifier will remain valid for the lifetime of that object. When all
+  /// objects holding the identifier have been destroyed, then the file will be
+  /// closed.
+  void closeAllIdentifiers();
+
 private:
   FileIdentifierRegistry();
 

@@ -101,7 +101,7 @@ BOOST_AUTO_TEST_CASE( writeDataset1D ) {
       hdfDataset.get(),
       processData.size() * sizeof(int) + 1024 ) );
 
-  dataset->initialize( xdm::primitiveType::kInt, shape );
+  dataset->initialize( xdm::primitiveType::kInt, shape, xdm::Dataset::kCreate );
   dataset->serialize( processArray, selectionMap );
   dataset->finalize();
 }

@@ -23,6 +23,7 @@
 
 #include <xdmHdf/ResourceIdentifier.hpp>
 
+#include <xdm/Dataset.hpp>
 #include <xdm/RefPtr.hpp>
 
 #include <hdf5.h>
@@ -46,7 +47,8 @@ xdm::RefPtr< DatasetIdentifier > createDatasetIdentifier(
   hid_t parent,
   const std::string& name,
   int type,
-  hid_t dataspace );
+  hid_t dataspace,
+  const xdm::Dataset::InitializeMode& mode );
 
 XDM_HDF_NAMESPACE_END
 

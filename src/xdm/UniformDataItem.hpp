@@ -67,16 +67,27 @@ public:
 
   virtual void writeMetadata( XmlMetadataWrapper& xml );
 
-  /// Virtual function to serialize the data contained in the item.  Inheritors
-  /// should reimplement this function to specify what data should be written to
-  /// a dataset.
+  /// Instruct this data item to initialize it's dataset with the given mode.
+  /// @param mode Access mode for the Dataset.
+  void initializeDataset( const Dataset::InitializeMode& mode );
+
+  /// Serialize this item's WritableData to it's dataset.
+  /// @pre The item's Dataset has been initialized.
   void serializeData();
+
+  /// Instruct this data item to finalize it's dataset.
+  void finalizeDataset();
+
+  /// Determine if this item currently requires serialization . This will return
+  /// true if any of the item's WritableData's is in need of an update.
+  bool serializationRequired() const;
 
 private:
   primitiveType::Value mDataType;
   DataShape<> mDataspace;
   RefPtr< Dataset > mDataset;
-  std::list< RefPtr< WritableData > > mWritables;
+  typedef std::list< RefPtr< WritableData > > DataList;
+  DataList mWritables;
 };
 
 XDM_NAMESPACE_END

@@ -24,14 +24,19 @@
 
 XDM_NAMESPACE_BEGIN
 
-SerializeDataOperation::SerializeDataOperation() {
+SerializeDataOperation::SerializeDataOperation( const Dataset::InitializeMode& mode ) :
+  mMode( mode ) {
 }
 
 SerializeDataOperation::~SerializeDataOperation() {
 }
 
 void SerializeDataOperation::apply( UniformDataItem& udi ) {
-  udi.serializeData();
+  if ( udi.serializationRequired() ) {
+    udi.initializeDataset( mMode );
+    udi.serializeData();
+    udi.finalizeDataset();
+  }
 }
 
 XDM_NAMESPACE_END

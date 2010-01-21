@@ -8,4 +8,5 @@ endmacro()
 
 xdmHdf_serial_test( HdfDataset TestHdfDataset.cpp )
 xdmHdf_serial_test( SelectionVisitor TestSelectionVisitor.cpp )
+xdmHdf_serial_test( DatasetIdentifier TestDatasetIdentifier.cpp )
 

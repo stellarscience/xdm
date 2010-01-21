@@ -21,44 +21,79 @@
 #define BOOST_TEST_MODULE TestHdfDataset
 #include <boost/test/unit_test.hpp>
 
-#include <xdm/TemplateStructuredArray.hpp>
+#include <xdm/StructuredArray.hpp>
+#include <xdm/VectorStructuredArray.hpp>
 #include <xdm/RefPtr.hpp>
 
 #include <xdm/DataSelection.hpp>
 
+#include <xdmHdf/FileIdentifierRegistry.hpp>
 #include <xdmHdf/HdfDataset.hpp>
 
+#include <algorithm>
 #include <sstream>
+
+#include <cstdlib>
 
 namespace {
 
-BOOST_AUTO_TEST_CASE( write ) {
-  
+BOOST_AUTO_TEST_CASE( roundtrip ) {
+    
   // set up the input data
-  std::vector< float > data(16);
-  for( int i = 0; i < 16; ++i ) {
-    data[i] = i;
-  }
+  xdm::VectorStructuredArray< int > data(16);
+  srand( 42 );
+  std::generate( data.begin(), data.end(), &rand );
   
-  xdm::RefPtr< xdm::StructuredArray > array = xdm::createStructuredArray(
-    &data[0], 16 );
+  // put the write code in its own scope so we can ensure that the file is
+  // actually closed and reopened later.
+  {
+    
+    // initialize the dataset on disk
+    xdm::DataShape<> fileshape( 2 );
+    fileshape[0] = 4;
+    fileshape[1] = 4;
 
-  // initialize the dataset on disk
-  xdm::DataShape<> fileshape( 2 );
-  fileshape[0] = 4;
-  fileshape[1] = 4;
+    // create the dataset
+    xdm::RefPtr< xdmHdf::HdfDataset > dataset = new xdmHdf::HdfDataset();
+    dataset->setFile( "HdfDataset.h5" );
+    dataset->setDataset( "testdata" );
 
-  // create the dataset
-  xdm::RefPtr< xdmHdf::HdfDataset > dataset = new xdmHdf::HdfDataset();
-  dataset->setFile( "HdfDataset.h5" );
-  dataset->setDataset( "testdata" );
-
-  // write the data to disk
-  dataset->initialize( xdm::primitiveType::kFloat, fileshape );
-  dataset->serialize( array, xdm::DataSelectionMap() );
-  dataset->finalize();
+    // write the data to disk
+    dataset->initialize( xdm::primitiveType::kInt, fileshape,
+      xdm::Dataset::kCreate );
+    dataset->serialize( &data, xdm::DataSelectionMap() );
+    dataset->finalize();
   
-  BOOST_CHECK( true );
+  } // end of writing
+  
+  // make sure that all files are closed
+  xdmHdf::FileIdentifierRegistry::instance()->closeAllIdentifiers();
+
+  xdm::VectorStructuredArray< int > result( 16 );
+  { // begin reading
+
+    // specify the expected size of the dataset on disk
+    xdm::DataShape<> fileshape( 2 );
+    fileshape[0] = 4;
+    fileshape[1] = 4;
+
+    // open the dataset
+    xdm::RefPtr< xdmHdf::HdfDataset > dataset = new xdmHdf::HdfDataset();
+    dataset->setFile( "HdfDataset.h5" );
+    dataset->setDataset( "testdata" );
+
+    // read the data from disk into the array
+    dataset->initialize( xdm::primitiveType::kInt, fileshape,
+      xdm::Dataset::kRead );
+    dataset->deserialize( &result, xdm::DataSelectionMap() );
+    dataset->finalize();
+
+  } // end of reading
+
+  // make sure the result data matches the input data
+  BOOST_CHECK_EQUAL_COLLECTIONS( 
+    result.begin(), result.end(), 
+    data.begin(), data.end() );
 }
 
 } // namespace

@@ -1,0 +1,2 @@
+- Define an interface in StructuredArray to determine whether or not the array
+  is allocated for it's specified shape.

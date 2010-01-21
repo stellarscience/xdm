@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
     new TestCaseFunction ) );
   
   xdm::RefPtr< xdmFormat::TimeSeries > timeSeries( 
-    new xdmFormat::TemporalCollection( "FunctionData.serial" ) );
+    new xdmFormat::TemporalCollection( "FunctionData.serial.xmf" ) );
   
   timeSeries->open();
   xdmFormat::writeTimestepGrid( timeSeries, problem.first );

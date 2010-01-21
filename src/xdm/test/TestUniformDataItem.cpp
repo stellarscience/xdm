@@ -37,9 +37,13 @@ class DummyDataset : public xdm::Dataset {
   }
   void initializeImplementation(
     xdm::primitiveType::Value,
-    const xdm::DataShape<>& ) {}
+    const xdm::DataShape<>&,
+    const Dataset::InitializeMode& ) {}
   void serializeImplementation(
     const xdm::StructuredArray*,
+    const xdm::DataSelectionMap& ) {}
+  void deserializeImplementation(
+    xdm::StructuredArray*,
     const xdm::DataSelectionMap& ) {}
   void finalizeImplementation() {}
 };

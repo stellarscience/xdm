@@ -21,6 +21,7 @@
 #ifndef xdm_SerializeDataOperation_hpp
 #define xdm_SerializeDataOperation_hpp
 
+#include <xdm/Dataset.hpp>
 #include <xdm/ItemVisitor.hpp>
 
 #include <xdm/NamespaceMacro.hpp>
@@ -34,11 +35,16 @@ class UniformDataItem;
 /// UniformDataItems in the tree and serialize their heavy datasets.
 class SerializeDataOperation : public ItemVisitor {
 public:
-  SerializeDataOperation();
+  /// Initialize using the given mode for Dataset access.
+  /// @param mode Read, Create, or Modify Datasets during serialization.
+  SerializeDataOperation( const Dataset::InitializeMode& mode = Dataset::kCreate );
   virtual ~SerializeDataOperation();
 
   /// Serialize a UniformDataItem's array into its dataset.
   virtual void apply( UniformDataItem& udi );
+
+private:
+  Dataset::InitializeMode mMode;
 };
 
 XDM_NAMESPACE_END

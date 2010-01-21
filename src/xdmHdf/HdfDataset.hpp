@@ -96,12 +96,20 @@ public:
   // -- K. R. Walker on 2010-01-19
 
   virtual void writeTextContent( xdm::XmlTextContent& text );
+  
   virtual void initializeImplementation(
     xdm::primitiveType::Value type,
-    const xdm::DataShape<>& shape );
+    const xdm::DataShape<>& shape,
+    const xdm::Dataset::InitializeMode& mode );
+
   virtual void serializeImplementation( 
     const xdm::StructuredArray* data,
     const xdm::DataSelectionMap& selectionMap );
+
+  virtual void deserializeImplementation(
+    xdm::StructuredArray* data,
+    const xdm::DataSelectionMap& selectionMap );
+
   virtual void finalizeImplementation();
 
 private:

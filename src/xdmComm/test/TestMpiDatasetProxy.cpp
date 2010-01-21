@@ -77,7 +77,8 @@ public:
 
   virtual void initializeImplementation( 
     xdm::primitiveType::Value,
-    const xdm::DataShape<>& shape )
+    const xdm::DataShape<>& shape,
+    const xdm::Dataset::InitializeMode& )
   {
     mValues.resize( shape[0] );
   }
@@ -98,6 +99,11 @@ public:
     const int* inputArray = reinterpret_cast< const int* >( data->data() );
 
     mValues[rangeIndex] = inputArray[domainIndex];
+  }
+
+  virtual void deserializeImplementation(
+    xdm::StructuredArray*,
+    const xdm::DataSelectionMap& ) {
   }
 
   virtual void finalizeImplementation() {}
@@ -154,7 +160,7 @@ BOOST_AUTO_TEST_CASE( coalesce ) {
   // variable
   xdm::TemplateStructuredArray< int > array( &rank, 1 );
 
-  dataset->initialize( xdm::primitiveType::kInt, shape );
+  dataset->initialize( xdm::primitiveType::kInt, shape, xdm::Dataset::kCreate );
   dataset->serialize( &array, map );
   dataset->finalize();
 

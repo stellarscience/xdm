@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
     new TestCaseFunction ) );
 
   xdm::RefPtr< xdmFormat::TimeSeries > timeSeries(
-    new xdmFormat::TemporalCollection( baseName.str() ) );
+    new xdmFormat::TemporalCollection( baseName.str() + ".xmf" ) );
 
   xdmComm::ParallelizeTreeVisitor parallelize( 
     localRegion.size() * sizeof( double ) + 1024 );

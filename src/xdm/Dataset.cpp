@@ -50,8 +50,9 @@ void Dataset::update() {
 
 void Dataset::initialize(
   primitiveType::Value type,
-  const DataShape<>& shape ) {
-  initializeImplementation( type, shape );
+  const DataShape<>& shape,
+  const InitializeMode& mode ) {
+  initializeImplementation( type, shape, mode );
 }
 
 void Dataset::serialize(
@@ -59,6 +60,13 @@ void Dataset::serialize(
   const DataSelectionMap& selectionMap )
 {
   serializeImplementation( data, selectionMap );
+}
+
+void Dataset::deserialize(
+  StructuredArray* data,
+  const DataSelectionMap& selectionMap )
+{
+  deserializeImplementation( data, selectionMap );
 }
 
 void Dataset::finalize() {

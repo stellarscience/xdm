@@ -79,12 +79,19 @@ protected:
   /// process is rank 0 within the communicator.
   virtual void initializeImplementation( 
     xdm::primitiveType::Value type,
-    const xdm::DataShape<>& shape );
+    const xdm::DataShape<>& shape,
+    const xdm::Dataset::InitializeMode& mode );
 
   /// Serialization process packs and sends the array and selection data to rank
   /// 0 in the communicator for writing.
   virtual void serializeImplementation( 
     const xdm::StructuredArray* data,
+    const xdm::DataSelectionMap& selectionMap );
+
+  /// Deserialization will read the entire dataset into the output array. No
+  /// communication is performed.
+  virtual void deserializeImplementation(
+    xdm::StructuredArray* data,
     const xdm::DataSelectionMap& selectionMap );
 
   /// Finalization calls underlying dataset finalization only if this process is

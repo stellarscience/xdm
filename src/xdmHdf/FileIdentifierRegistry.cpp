@@ -20,7 +20,13 @@
 //------------------------------------------------------------------------------
 #include <xdmHdf/FileIdentifierRegistry.hpp>
 
+#include <xdm/ThrowMacro.hpp>
+
 #include <hdf5.h>
+
+#include <stdexcept>
+
+#include <sys/stat.h>
 
 XDM_HDF_NAMESPACE_BEGIN
 
@@ -45,16 +51,37 @@ xdm::RefPtr< FileIdentifier > FileIdentifierRegistry::findOrCreateIdentifier(
     return it->second;
   }
 
-  // no such file opened yet, we create it here
-  hid_t fileId = H5Fcreate( 
-    key.c_str(), 
-    H5F_ACC_TRUNC,
-    H5P_DEFAULT,
-    H5P_DEFAULT );
+  // file not yet opened, check if it exists on disk.
+  struct stat buf;
+  hid_t fileId;
+  if ( stat( key.c_str(), &buf ) == 0 ) {
+    // file exists open it
+    fileId = H5Fopen(
+      key.c_str(),
+      H5F_ACC_RDWR,
+      H5P_DEFAULT );
+  } else {
+    // file does not exist, create it
+    fileId = H5Fcreate( 
+      key.c_str(), 
+      H5F_ACC_TRUNC,
+      H5P_DEFAULT,
+      H5P_DEFAULT );
+  }
 
+  // if the identifier is still bad, then something is wrong
+  if ( fileId < 0 ) {
+    XDM_THROW( std::runtime_error( "Failed to create file" ) );
+  }
+
+  // we have a good identifier, return the reference counted resource. 
   xdm::RefPtr< FileIdentifier > result( new FileIdentifier( fileId ) );
   mIdentifierMapping[key] = result;
   return result;
+}
+
+void FileIdentifierRegistry::closeAllIdentifiers() {
+  mIdentifierMapping.clear();
 }
 
 XDM_HDF_NAMESPACE_END

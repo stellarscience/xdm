@@ -33,11 +33,17 @@ public:
   DatasetTestImplementation() : xdm::Dataset(), dataWritten(false) {}
   
   void initializeImplementation( 
-    xdm::primitiveType::Value, const xdm::DataShape<>& )
+    xdm::primitiveType::Value, 
+    const xdm::DataShape<>&, 
+    const Dataset::InitializeMode& )
   {}
 
   void serializeImplementation( 
     const xdm::StructuredArray*, const xdm::DataSelectionMap& )
+  {}
+  
+  void deserializeImplementation( 
+    xdm::StructuredArray*, const xdm::DataSelectionMap& )
   {}
 
   void finalizeImplementation() {}

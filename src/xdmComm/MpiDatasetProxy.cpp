@@ -91,14 +91,15 @@ void MpiDatasetProxy::writeTextContent( xdm::XmlTextContent& text ) {
 
 void MpiDatasetProxy::initializeImplementation(
   xdm::primitiveType::Value type,
-  const xdm::DataShape<>& shape ) {
+  const xdm::DataShape<>& shape,
+  const xdm::Dataset::InitializeMode& mode ) {
   
   MPI_Barrier( mCommunicator );
 
   int rank;
   MPI_Comm_rank( mCommunicator, &rank );
   if ( rank == 0 ) {
-    mDataset->initialize( type, shape );
+    mDataset->initialize( type, shape, mode );
   }
 }
 
@@ -130,6 +131,14 @@ void MpiDatasetProxy::serializeImplementation(
         mArrayBuffer.get() );
     }
   }
+}
+
+void MpiDatasetProxy::deserializeImplementation(
+  xdm::StructuredArray *data,
+  const xdm::DataSelectionMap &selectionMap ) {
+
+  mDataset->deserialize( data, selectionMap );
+
 }
 
 void MpiDatasetProxy::finalizeImplementation() {

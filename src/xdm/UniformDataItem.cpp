@@ -143,11 +143,27 @@ void UniformDataItem::writeMetadata( XmlMetadataWrapper& xml ) {
   mDataset->writeTextContent( xml );
 }
 
+void UniformDataItem::initializeDataset( const Dataset::InitializeMode& mode ) {
+  mDataset->initialize( mDataType, mDataspace, mode );
+}
+
 void UniformDataItem::serializeData() {
-  mDataset->initialize( mDataType, mDataspace );
   std::for_each( mWritables.begin(), mWritables.end(),
     WriteData( mDataset.get() ) );
+}
+
+void UniformDataItem::finalizeDataset() {
   mDataset->finalize();
+}
+
+bool UniformDataItem::serializationRequired() const {
+  for ( DataList::const_iterator data = mWritables.begin();
+    data != mWritables.end(); ++data ) {
+    if ( (*data)->needsUpdate() ) {
+      return true;
+    }
+  }
+  return false;
 }
 
 XDM_NAMESPACE_END
