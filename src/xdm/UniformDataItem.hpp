@@ -45,9 +45,9 @@ public:
 
   XDM_META_ITEM( UniformDataItem );
 
-  Dataset* dataset();
-  const Dataset* dataset() const;
-  void setDataset( Dataset* ds );
+  RefPtr< Dataset > dataset();
+   RefPtr< const Dataset > dataset() const;
+  void setDataset( RefPtr< Dataset > ds );
 
   /// Set the type for this data.
   void setDataType( primitiveType::Value dataType );
@@ -61,7 +61,7 @@ public:
 
   /// Append a data object to the list of data objects that will make up my
   /// space.
-  void appendData( WritableData* data );
+  void appendData( RefPtr< WritableData > data );
   /// Clear all of my writable data.
   void clearData();
 

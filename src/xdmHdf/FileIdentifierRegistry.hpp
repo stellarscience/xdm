@@ -39,7 +39,7 @@ XDM_HDF_NAMESPACE_BEGIN
 /// files indexed by filename.
 class FileIdentifierRegistry : public xdm::ReferencedObject {
 public:
-  static FileIdentifierRegistry* instance();
+  static xdm::RefPtr< FileIdentifierRegistry > instance();
   
   /// Get or create an identifier for a given file name.
   xdm::RefPtr< FileIdentifier > findOrCreateIdentifier( 

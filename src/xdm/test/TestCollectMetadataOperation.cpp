@@ -31,7 +31,7 @@ namespace {
 
 struct AggregateItem : xdm::Item {
   std::vector< xdm::RefPtr< Item > > mItems;
-  void appendChild( xdm::Item* i ) { mItems.push_back( i ); }
+  void appendChild( xdm::RefPtr< xdm::Item > i ) { mItems.push_back( i ); }
   virtual void traverse( xdm::ItemVisitor& iv ) {
     std::for_each( mItems.begin(), mItems.end(), xdm::ApplyVisitor( iv ) );
   }

@@ -60,11 +60,11 @@ public:
   XDM_META_ITEM( Attribute );
 
   /// Set the attribute's data structure and type.
-  void setDataItem( xdm::UniformDataItem* item );
+  void setDataItem( xdm::RefPtr< xdm::UniformDataItem > item );
   /// Get the attribute's data structure and type.
-  xdm::UniformDataItem* dataItem();
+  xdm::RefPtr< xdm::UniformDataItem > dataItem();
   /// Get the attribute's const data structure and type.
-  const xdm::UniformDataItem* dataItem() const;
+  xdm::RefPtr< const xdm::UniformDataItem > dataItem() const;
   
 
   virtual void traverse( xdm::ItemVisitor& iv );

@@ -35,7 +35,7 @@ namespace {
   struct WriteData {
     Dataset* mDataset;
     WriteData( Dataset* dataset ) : mDataset(dataset) {}
-    void operator()( WritableData* writable ) {
+    void operator()( RefPtr< WritableData > writable ) {
       writable->write( mDataset );
     }
   };
@@ -54,15 +54,15 @@ UniformDataItem::UniformDataItem(
 UniformDataItem::~UniformDataItem() {
 }
 
-Dataset* UniformDataItem::dataset() {
-  return mDataset.get();
+RefPtr< Dataset > UniformDataItem::dataset() {
+  return mDataset;
 }
 
-const Dataset* UniformDataItem::dataset() const {  
-  return mDataset.get();
+RefPtr< const Dataset > UniformDataItem::dataset() const {
+  return mDataset;
 }
 
-void UniformDataItem::setDataset( Dataset* ds ) {
+void UniformDataItem::setDataset( RefPtr< Dataset > ds ) {
   mDataset = ds;
 }
 
@@ -86,7 +86,7 @@ void UniformDataItem::setDataspace( const DataShape<>& dataspace ) {
   }
 }
 
-void UniformDataItem::appendData( WritableData* data ) {
+void UniformDataItem::appendData( RefPtr< WritableData > data ) {
   mWritables.push_back( data );
 }
 

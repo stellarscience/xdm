@@ -29,15 +29,15 @@ Dataset::Dataset() :
 Dataset::~Dataset() {
 }
 
-BasicDatasetUpdateCallback* Dataset::updateCallback() {
+RefPtr< BasicDatasetUpdateCallback > Dataset::updateCallback() {
   return mUpdateCallback;
 }
 
-const BasicDatasetUpdateCallback* Dataset::updateCallback() const {
+RefPtr< const BasicDatasetUpdateCallback > Dataset::updateCallback() const {
   return mUpdateCallback;
 }
 
-void Dataset::setUpdateCallback( BasicDatasetUpdateCallback* callback ) {
+void Dataset::setUpdateCallback( RefPtr< BasicDatasetUpdateCallback > callback ) {
   mUpdateCallback = callback;
 }
   

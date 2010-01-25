@@ -61,7 +61,7 @@ public:
   // Will Dicharry 2010-01-19
   MpiDatasetProxy( 
     MPI_Comm communicator, 
-    xdm::Dataset* dataset,
+    xdm::RefPtr< xdm::Dataset > dataset,
     size_t bufSizeHint );
 
   virtual ~MpiDatasetProxy();

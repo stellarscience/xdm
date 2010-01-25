@@ -70,24 +70,24 @@ public:
 
   /// Set the ith child, possibly overwriting (and therefore unreferencing) an
   /// existing child.
-  void setChild( unsigned int i, T* child ) {
+  void setChild( unsigned int i, RefPtr< T > child ) {
     assert( i < mChildObjects.size() );
     mChildObjects[i] = child;
   }
 
   /// Append a child to the end of the list.
-  void appendChild( T* object ) {
+  void appendChild( RefPtr< T > object ) {
     mChildObjects.push_back( object );
   }
 
   /// Get the i'th child of the object.
-  T* child( unsigned int i ) {
+  RefPtr< T > child( unsigned int i ) {
   	assert( i < mChildObjects.size() );
   	return mChildObjects[i];
   }
 
   /// Get the const i'th child of the object.
-  const T* child( unsigned int i ) const {
+  RefPtr< const T > child( unsigned int i ) const {
   	assert( i < mChildObjects.size() );
   	return mChildObjects[i];
   }
@@ -134,25 +134,25 @@ end( const ObjectCompositionMixin< T >& obj ) {
 
 /// Get the i'th child of an object.
 template< typename T >
-T* child( ObjectCompositionMixin< T >& obj, unsigned int i ) {
+RefPtr< T > child( ObjectCompositionMixin< T >& obj, unsigned int i ) {
 	return obj.child( i );
 }
 
 /// Get the const i'th child of an object.
 template< typename T >
-const T* child( const ObjectCompositionMixin< T >& obj, unsigned int i ) {
+const RefPtr< T > child( const ObjectCompositionMixin< T >& obj, unsigned int i ) {
 	return obj.child( i );
 }
 
 /// Set the i'th child of the given object.
 template< typename T > 
-void setChildObject( ObjectCompositionMixin< T >& obj, unsigned int i, T* child ) {
+void setChildObject( ObjectCompositionMixin< T >& obj, unsigned int i, RefPtr< T > child ) {
 	obj.setChildObject( i, child );
 }
 
 /// Append a child to the given object.
 template< typename T >
-void appendChild( ObjectCompositionMixin< T >& obj, T* child ) {
+void appendChild( ObjectCompositionMixin< T >& obj, RefPtr< T > child ) {
   obj.appendChild( child );
 } 
 

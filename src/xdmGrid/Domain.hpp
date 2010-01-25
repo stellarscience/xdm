@@ -40,7 +40,9 @@ public:
   XDM_META_ITEM( Domain );
 
   /// Add a grid to this Domain.
-  void addGrid( Grid* g ) { xdm::appendChild< Grid >( *this, g ); }
+  void addGrid( xdm::RefPtr< Grid > g ) {
+    xdm::appendChild< Grid >( *this, g );
+  }
 
   virtual void traverse( xdm::ItemVisitor& iv );
 

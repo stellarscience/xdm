@@ -26,7 +26,7 @@
 
 XDM_NAMESPACE_BEGIN
 
-WritableArray::WritableArray( StructuredArray* array, bool isDynamic ) :
+WritableArray::WritableArray( RefPtr< StructuredArray > array, bool isDynamic ) :
   WritableData( isDynamic ),
   mArray( array ),
   mSelectionMap()
@@ -37,15 +37,15 @@ WritableArray::~WritableArray()
 {
 }
 
-StructuredArray* WritableArray::array() {
-  return mArray.get();
+RefPtr< StructuredArray > WritableArray::array() {
+  return mArray;
 }
 
-const StructuredArray* WritableArray::array() const {
-  return mArray.get();
+RefPtr< const StructuredArray > WritableArray::array() const {
+  return mArray;
 }
 
-void WritableArray::setArray( StructuredArray* array ) {
+void WritableArray::setArray( RefPtr< StructuredArray > array ) {
   mArray = array;
 }
 
@@ -58,7 +58,7 @@ void WritableArray::setSelectionMap( const DataSelectionMap& selectionMap ) {
 }
 
 void WritableArray::writeImplementation( Dataset* dataset ) {
-  dataset->serialize( mArray, mSelectionMap );
+  dataset->serialize( mArray.get(), mSelectionMap );
 }
 
 XDM_NAMESPACE_END

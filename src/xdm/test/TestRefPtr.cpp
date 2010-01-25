@@ -27,6 +27,7 @@
 namespace {
 
 class Derived : public xdm::ReferencedObject {};
+class AlsoDerived : public xdm::ReferencedObject {};
 
 BOOST_AUTO_TEST_CASE( templateAssignmentOperator ) {
   xdm::RefPtr< Derived > a( new Derived );
@@ -44,6 +45,15 @@ BOOST_AUTO_TEST_CASE( assignmentOperator ) {
   BOOST_CHECK_EQUAL( a.get(), b.get() );
   BOOST_CHECK_EQUAL( 2, a->referenceCount() );
   BOOST_CHECK_EQUAL( 2, b->referenceCount() );
+}
+
+BOOST_AUTO_TEST_CASE( dynamicCast ) {
+  xdm::RefPtr< xdm::ReferencedObject > ptr( new Derived );
+  xdm::RefPtr< Derived > derived = xdm::dynamic_pointer_cast< Derived >( ptr );
+  BOOST_CHECK( derived.valid() );
+
+  xdm::RefPtr< AlsoDerived > alsoDerived = xdm::dynamic_pointer_cast< AlsoDerived >( ptr );
+  BOOST_CHECK( !alsoDerived.valid() );
 }
 
 } // namespace

@@ -41,31 +41,31 @@ UniformGrid::UniformGrid() :
 UniformGrid::~UniformGrid() {
 }
 
-void UniformGrid::setGeometry( Geometry* geo ) {
+void UniformGrid::setGeometry( xdm::RefPtr< Geometry > geo ) {
   mGeometry = geo;
 }
 
-const Geometry* UniformGrid::geometry() const {
+xdm::RefPtr< const Geometry > UniformGrid::geometry() const {
   return mGeometry;
 }
 
-Geometry* UniformGrid::geometry() {
+xdm::RefPtr< Geometry > UniformGrid::geometry() {
   return mGeometry;
 }
 
-void UniformGrid::setTopology( Topology* topo ) {
+void UniformGrid::setTopology( xdm::RefPtr< Topology > topo ) {
   mTopology = topo;
 }
 
-Topology* UniformGrid::topology() {
+xdm::RefPtr< Topology > UniformGrid::topology() {
   return mTopology;
 }
 
-const Topology* UniformGrid::topology() const {
+xdm::RefPtr< const Topology > UniformGrid::topology() const {
   return mTopology;
 }
 
-void UniformGrid::addAttribute( Attribute* attribute ) {
+void UniformGrid::addAttribute( xdm::RefPtr< Attribute > attribute ) {
   appendChild( attribute );
 }
 
@@ -89,7 +89,7 @@ void UniformGrid::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
 
 xdm::RefPtr< xdmGrid::Attribute >
 createAttribute( 
-  const UniformGrid* grid, 
+  xdm::RefPtr< const UniformGrid > grid,
   Attribute::Center center,
   Attribute::Type type,
   const std::string& name,
@@ -99,12 +99,12 @@ createAttribute(
   attribute->setName( name );
 
   // construct a UniformDataItem to hold the attribute data
-  const Topology* topology = grid->topology();
+  xdm::RefPtr< const Topology > topology = grid->topology();
 
   // Determine the type of topology in order to determine what it's shape
   // information looks like.
-  const StructuredTopology* structuredTopology = 
-    dynamic_cast< const StructuredTopology* >( topology );
+  xdm::RefPtr< const StructuredTopology > structuredTopology =
+    xdm::dynamic_pointer_cast< const StructuredTopology >( topology );
   if ( structuredTopology ) {
     xdm::DataShape<> attributeSpace;
     

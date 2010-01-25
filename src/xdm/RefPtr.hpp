@@ -21,6 +21,8 @@
 #ifndef xdm_RefPtr_hpp
 #define xdm_RefPtr_hpp
 
+#include <iostream>
+
 #include <xdm/NamespaceMacro.hpp>
 
 XDM_NAMESPACE_BEGIN
@@ -46,7 +48,7 @@ public:
   RefPtr() : mPtr( 0 ) {}
 
   /// Initialize given a raw pointer to manage.
-  RefPtr( T* ptr ) : mPtr( ptr ) { 
+  explicit RefPtr( T* ptr ) : mPtr( ptr ) {
     if ( mPtr ) {
       mPtr->addReference();
     }
@@ -54,6 +56,15 @@ public:
 
   /// Initialize from a reference counted pointer to the same type.
   RefPtr( const RefPtr& other ) : mPtr( other.mPtr ) {
+    if ( mPtr ) {
+      mPtr->addReference();
+    }
+  }
+
+  /// Initialize from a reference counted pointer to a different type. The
+  /// other pointer type must be convertible to a T pointer.
+  template< typename U >
+  RefPtr( const RefPtr< U >& other ) : mPtr( other.mPtr ) {
     if ( mPtr ) {
       mPtr->addReference();
     }
@@ -99,17 +110,22 @@ public:
   T* operator->() const { return mPtr; }
   /// Get access to the raw pointer.
   T* get() const { return mPtr; }
-  /// Implicit conversion to T*.
-  /// @deprecated Do not rely on this, it is dangerous and will be going away.
-  operator T*() { return mPtr; }
-  /// Implicit conversion to const T*.
-  /// @deprecated Do not rely on this, it is dangerous and will be going away.
-  operator const T*() const { return mPtr; }
 
   /// Use the reference counter pointer in boolean expressions.
   bool operator!() const { return mPtr == 0; }
   /// Determine if a null pointer is held.
   bool valid() const { return mPtr != 0; }
+
+private:
+  typedef T* RefPtr::*unspecified_bool_type;
+public:
+  /// Conversion to boolean type so the pointer can be used in boolean contexts.
+  /// This is an implementation of the safe bool idiom. For information, see
+  /// http://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Safe_bool
+  operator unspecified_bool_type() const {
+    return valid() ? &RefPtr::mPtr : 0;
+  }
+
 
   /// Release the pointer without deleting the object. To unreference the
   /// object, use reset() instead.  This is potentially unsafe: while it is
@@ -148,6 +164,43 @@ private:
     if ( tmp ) tmp->removeReference();
   }
 };
+
+/// Convenience function to construct a RefPtr given a raw pointer.
+template< typename T >
+RefPtr< T > makeRefPtr( T* ptr ) {
+  return RefPtr< T >( ptr );
+}
+
+/// Dynamic cast operator.
+template< typename T, typename U >
+RefPtr< T > dynamic_pointer_cast( const RefPtr< U >& p ) {
+  return RefPtr< T >( dynamic_cast< T* >( p.get() ) );
+}
+
+/// Determine if two RefPtr's point at the same object.
+template< typename T, typename U >
+bool operator==( const RefPtr< T >& lhs, const RefPtr< U >& rhs ) {
+  return lhs.get() == rhs.get();
+}
+
+/// Determine if two RefPtr's do not point at the same object.
+template< typename T, typename U >
+bool operator!=( const RefPtr< T >& lhs, const RefPtr< U >& rhs ) {
+  return lhs.get() != rhs.get();
+}
+
+/// Less than comparison for pointers.
+template< typename T, typename U >
+bool operator<( const RefPtr< T >& lhs, const RefPtr< U >& rhs ) {
+  return lhs.get() < rhs.get();
+}
+
+/// Print a RefPtr to a std ostream.
+template< typename T >
+std::ostream& operator<<( std::ostream& ostr, const RefPtr< T >& p ) {
+  ostr << p.get();
+  return ostr;
+}
 
 XDM_NAMESPACE_END
 

@@ -35,7 +35,7 @@ xdm::RefPtr< XmlObject > buildTree() {
   xdm::RefPtr< XmlObject > baz( new XmlObject( "baz" ) );
   foo->appendChild( baz );
   baz->appendContent( "quack" );
-  baz->appendChild( new XmlObject( "quux" ) );
+  baz->appendChild( makeRefPtr( new XmlObject( "quux" ) ) );
   return foo;
 }
 
@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_CASE( operatorNotEqualDifferentChild ) {
   xdm::RefPtr< xdm::XmlObject > lhs( buildTree() );
   xdm::RefPtr< xdm::XmlObject > rhs( buildTree() );
 
-  rhs->appendChild( new xdm::XmlObject( "badchild" ) );
+  rhs->appendChild( makeRefPtr( new xdm::XmlObject( "badchild" ) ) );
   BOOST_CHECK( *lhs != *rhs );
 }
 

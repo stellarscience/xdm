@@ -35,12 +35,12 @@ class StructuredArray;
 /// Writes an Array with a given selection to a selection within a dataset.
 class WritableArray : public WritableData {
 public:
-  WritableArray( StructuredArray* array, bool isDynamic = false );
+  WritableArray( RefPtr< StructuredArray > array, bool isDynamic = false );
   virtual ~WritableArray();
 
-  StructuredArray* array();
-  const StructuredArray* array() const;
-  void setArray( StructuredArray* array );
+  RefPtr< StructuredArray > array();
+  RefPtr< const StructuredArray > array() const;
+  void setArray( RefPtr< StructuredArray > array );
 
   const DataSelectionMap& selectionMap() const;
   void setSelectionMap( const DataSelectionMap& selectionMap );

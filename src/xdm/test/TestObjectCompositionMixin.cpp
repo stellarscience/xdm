@@ -18,7 +18,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.       
 //                                                                             
 //------------------------------------------------------------------------------
-#define BOOST_TEST_MODULE ObjectCompositionMixin 
+#define BOOST_TEST_MODULE ObjectCompositionMixin
 #include <boost/test/unit_test.hpp>
 
 #include <xdm/ObjectCompositionMixin.hpp>

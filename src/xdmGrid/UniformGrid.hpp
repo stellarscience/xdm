@@ -55,16 +55,16 @@ public:
 
   XDM_META_ITEM( UniformGrid );
 
-  void setGeometry( Geometry* geo );
-  Geometry* geometry();
-  const Geometry* geometry() const;
+  void setGeometry( xdm::RefPtr< Geometry > geo );
+  xdm::RefPtr< Geometry > geometry();
+  xdm::RefPtr< const Geometry > geometry() const;
 
-  void setTopology( Topology* topo );
-  Topology* topology();
-  const Topology* topology() const;
+  void setTopology( xdm::RefPtr< Topology > topo );
+  xdm::RefPtr< Topology > topology();
+  xdm::RefPtr< const Topology > topology() const;
 
   /// Add an attribute definition to the grid.
-  void addAttribute( Attribute* attribute );
+  void addAttribute( xdm::RefPtr< Attribute > attribute );
 
   /// Redefinition of visitor traversal from xdm::Item.
   virtual void traverse( xdm::ItemVisitor& iv );
@@ -84,7 +84,7 @@ private:
 /// not automatically added to the grid, it is up to clients to do that.
 xdm::RefPtr< xdmGrid::Attribute >
 createAttribute( 
-  const UniformGrid* grid, 
+  xdm::RefPtr< const UniformGrid > grid,
   Attribute::Center center,
   Attribute::Type type,
   const std::string& name,

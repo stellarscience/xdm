@@ -64,15 +64,15 @@ Attribute::Attribute( Type t, Center c ) :
 Attribute::~Attribute() {
 }
 
-void Attribute::setDataItem( xdm::UniformDataItem* item ) {
+void Attribute::setDataItem( xdm::RefPtr< xdm::UniformDataItem > item ) {
   mDataItem = item;
 }
 
-xdm::UniformDataItem* Attribute::dataItem() {
+xdm::RefPtr< xdm::UniformDataItem > Attribute::dataItem() {
   return mDataItem;
 }
 
-const xdm::UniformDataItem* Attribute::dataItem() const {
+xdm::RefPtr< const xdm::UniformDataItem > Attribute::dataItem() const {
   return mDataItem;
 }
 

@@ -35,7 +35,7 @@ void UpdateVisitor::apply( UniformDataItem& item ) {
   item.update();
 
   // If the Item has been assigned a dataset, call its callback too.
-  xdm::Dataset* itemDataset = item.dataset();
+  RefPtr< Dataset > itemDataset = item.dataset();
   if ( itemDataset ) {
     itemDataset->update();
   }

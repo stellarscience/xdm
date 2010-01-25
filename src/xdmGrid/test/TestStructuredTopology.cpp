@@ -27,7 +27,7 @@ namespace {
 
 BOOST_AUTO_TEST_CASE( writeMetadata ) {
   xdmGrid::StructuredTopology t;
-  xdm::XmlMetadataWrapper xml( new xdm::XmlObject );
+  xdm::XmlMetadataWrapper xml( xdm::makeRefPtr( new xdm::XmlObject ) );
 
   xdm::DataShape<> shape(3);
   shape[0] = 1;

@@ -84,7 +84,7 @@ public:
   void appendContent( const std::string& text );
   
   /// Append another XmlObject as a child of this object.
-  void appendChild( XmlObject* child );
+  void appendChild( RefPtr< XmlObject > child );
 
   //-- Methods for querying an XML object --//
 

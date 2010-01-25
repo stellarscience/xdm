@@ -92,17 +92,17 @@ BOOST_AUTO_TEST_CASE( writeDataset1D ) {
       processData.size() ) );
 
   xdm::DataSelectionMap selectionMap(
-    new xdm::AllDataSelection,
-    new xdm::HyperslabDataSelection( processSlab ) );
+    xdm::makeRefPtr( new xdm::AllDataSelection ),
+    xdm::makeRefPtr( new xdm::HyperslabDataSelection( processSlab ) ) );
 
   xdm::RefPtr< xdm::Dataset > dataset( 
     new xdmComm::MpiDatasetProxy( 
       MPI_COMM_WORLD, 
-      hdfDataset.get(),
+      hdfDataset,
       processData.size() * sizeof(int) + 1024 ) );
 
   dataset->initialize( xdm::primitiveType::kInt, shape, xdm::Dataset::kCreate );
-  dataset->serialize( processArray, selectionMap );
+  dataset->serialize( processArray.get(), selectionMap );
   dataset->finalize();
 }
 

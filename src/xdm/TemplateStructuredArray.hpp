@@ -140,7 +140,7 @@ private:
 template< typename T >
 RefPtr< StructuredArray >
 createStructuredArray( T* data, size_t size ) {
-  return new TemplateStructuredArray< T >( data, size );
+  return makeRefPtr( new TemplateStructuredArray< T >( data, size ) );
 }
 
 XDM_NAMESPACE_END

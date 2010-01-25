@@ -39,14 +39,16 @@ public:
   /// Default constructor selects all points in both domain and range spaces.
   DataSelectionMap();
   /// Initialize the domain and range selections.
-  DataSelectionMap( DataSelection* domain, DataSelection* range );
+  DataSelectionMap(
+    RefPtr< DataSelection > domain,
+    RefPtr< DataSelection > range );
   ~DataSelectionMap();
 
-  const DataSelection* domain() const;
-  void setDomain( DataSelection* domain );
+  RefPtr< const DataSelection > domain() const;
+  void setDomain( RefPtr< DataSelection > domain );
 
-  const DataSelection* range() const;
-  void setRange( DataSelection* range );
+  RefPtr< const DataSelection > range() const;
+  void setRange( RefPtr< DataSelection > range );
 };
 
 XDM_NAMESPACE_END

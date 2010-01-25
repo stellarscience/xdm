@@ -139,11 +139,11 @@ public:
   // -- K. R. Walker on 2010-01-19
 
   /// Get the update callback that will be executed at update time.
-  BasicDatasetUpdateCallback* updateCallback();
+  RefPtr< BasicDatasetUpdateCallback > updateCallback();
   /// Get the const update callback that will be executed at update time.
-  const BasicDatasetUpdateCallback* updateCallback() const;
+  RefPtr< const BasicDatasetUpdateCallback > updateCallback() const;
   /// Set the callback to be executed at dataset update time.
-  void setUpdateCallback( BasicDatasetUpdateCallback* callback );
+  void setUpdateCallback( RefPtr< BasicDatasetUpdateCallback > callback );
   
   /// Invoke the update callback for the dataset.
   /// @see BasicDatasetUpdateCallback

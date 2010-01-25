@@ -112,9 +112,9 @@ BOOST_AUTO_TEST_CASE( staticGrid ) {
   // dataitem.
   xdm::RefPtr< xdm::UniformDataItem > sharedData( 
     new xdm::UniformDataItem( xdm::primitiveType::kDouble, xdm::makeShape( 10 ) ) );
-  sharedData->appendData( new xdm::WritableArray( array ) );
+  sharedData->appendData( xdm::makeRefPtr( new xdm::WritableArray( array ) ) );
   for ( int i = 0; i < 3; ++i ) {
-    geometry->setCoordinateValues( i, sharedData.get() );
+    geometry->setCoordinateValues( i, sharedData );
   }
 
   // add a node centered scalar attribute
@@ -131,7 +131,8 @@ BOOST_AUTO_TEST_CASE( staticGrid ) {
     new xdm::UniformDataItem( xdm::primitiveType::kFloat, xdm::makeShape( "10 10 10" ) ) );
   xdm::RefPtr< xdm::StructuredArray > attrvalues 
     = xdm::createStructuredArray( &data[0], 1000 );
-  attributeDataItem->appendData( new xdm::WritableArray( attrvalues ) );
+  attributeDataItem->appendData( xdm::makeRefPtr(
+    new xdm::WritableArray( attrvalues ) ) );
   attribute->setDataItem( attributeDataItem );
 
   // attach an HDF dataset to all UniformDataItems
@@ -177,10 +178,10 @@ BOOST_AUTO_TEST_CASE( timeSeries ) {
   geometryDataset->setDataset( "gridValues" );
   xdm::RefPtr< xdm::UniformDataItem > geodata( 
     new xdm::UniformDataItem( xdm::primitiveType::kFloat, xdm::makeShape( 10 ) ) );
-  geodata->appendData( new xdm::WritableArray( geometryArray ) );
+  geodata->appendData( xdm::makeRefPtr( new xdm::WritableArray( geometryArray ) ) );
   geodata->setDataset( geometryDataset );
   for ( int i = 0; i < 3; ++i ) {
-    sharedGeometry->setCoordinateValues( i, geodata.get() );
+    sharedGeometry->setCoordinateValues( i, geodata );
   }
 
   xdm::RefPtr< xdmGrid::RectilinearMesh > sharedTopology( 
@@ -193,8 +194,8 @@ BOOST_AUTO_TEST_CASE( timeSeries ) {
 
     // create a grid and set it up to use the shared geometry and topology
     xdm::RefPtr< xdmGrid::UniformGrid > grid( new xdmGrid::UniformGrid );
-    grid->setTopology( sharedTopology.get() );
-    grid->setGeometry( sharedGeometry.get() );
+    grid->setTopology( sharedTopology );
+    grid->setGeometry( sharedGeometry );
 
     // construct the time element for this time step.
     xdm::RefPtr< xdmGrid::Time > time( new xdmGrid::Time );
@@ -224,13 +225,13 @@ BOOST_AUTO_TEST_CASE( timeSeries ) {
     xdm::RefPtr< xdm::UniformDataItem > attrData( new xdm::UniformDataItem( 
       xdm::primitiveType::kFloat, 
       xdm::makeShape( 9, 9, 9 ) ) );
-    attrData->appendData( new xdm::WritableArray( attrArray.get() ) );
-    attrData->setDataset( attrDataset.get() );
+    attrData->appendData( xdm::makeRefPtr( new xdm::WritableArray( attrArray ) ) );
+    attrData->setDataset( attrDataset );
     attribute->setDataItem( attrData );
     
     // write the grid for this step to the TimeSeries files
-    xdmFormat::writeTimestepGrid( temporalCollection, grid.get() );
-    xdmFormat::writeTimestepGrid( virtualDataset, grid.get() );
+    xdmFormat::writeTimestepGrid( temporalCollection, grid );
+    xdmFormat::writeTimestepGrid( virtualDataset, grid );
   }
   temporalCollection->close();
   virtualDataset->close();

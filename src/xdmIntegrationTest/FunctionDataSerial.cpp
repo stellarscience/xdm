@@ -55,10 +55,10 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
 
   // add the data for the slab of interest to the grid attribute
   xdm::RefPtr< xdmGrid::Attribute > attribute = problem.second;
-  attribute->dataItem()->appendData( new FunctionData( 
+  attribute->dataItem()->appendData( xdm::makeRefPtr( new FunctionData(
     problemBounds, 
     slab, 
-    new TestCaseFunction ) );
+    xdm::makeRefPtr( new TestCaseFunction ) ) ) );
   
   xdm::RefPtr< xdmFormat::TimeSeries > timeSeries( 
     new xdmFormat::TemporalCollection( "FunctionData.serial.xmf" ) );

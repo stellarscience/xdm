@@ -37,10 +37,10 @@ ParallelizeTreeVisitor::~ParallelizeTreeVisitor() {
 }
 
 void ParallelizeTreeVisitor::apply( xdm::UniformDataItem& item ) {
-  xdm::Dataset* itemDataset = item.dataset();
+  xdm::RefPtr< xdm::Dataset > itemDataset = item.dataset();
   xdm::RefPtr< MpiDatasetProxy > proxy( new MpiDatasetProxy(
     MPI_COMM_WORLD, itemDataset, mBufferSize ) );
-  item.setDataset( proxy.get() );
+  item.setDataset( proxy );
 }
 
 XDM_COMM_NAMESPACE_END

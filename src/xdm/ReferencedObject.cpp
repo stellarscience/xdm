@@ -35,18 +35,19 @@ ReferencedObject::ReferencedObject() :
 ReferencedObject::~ReferencedObject() {
 }
 
-void ReferencedObject::addReference() {
+void ReferencedObject::addReference() const {
   mReferenceCount++;
 }
 
-void ReferencedObject::removeReference() {
+void ReferencedObject::removeReference() const {
   mReferenceCount--;
   if ( mReferenceCount <= 0 ) {
-    deleteReferencedObject( this );
+    // when deleting the object, cast away it's constness.
+    deleteReferencedObject( const_cast< ReferencedObject* >( this ) );
   }
 }
 
-void ReferencedObject::removeReferenceWithoutDelete() {
+void ReferencedObject::removeReferenceWithoutDelete() const {
   mReferenceCount--;
 }
 

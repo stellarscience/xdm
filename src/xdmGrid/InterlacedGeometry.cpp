@@ -35,7 +35,7 @@ InterlacedGeometry::InterlacedGeometry( unsigned int dimension ) :
 InterlacedGeometry::~InterlacedGeometry() {
 }
 
-void InterlacedGeometry::setCoordinateValues( xdm::DataItem* data ) {
+void InterlacedGeometry::setCoordinateValues( xdm::RefPtr< xdm::DataItem > data ) {
   appendChild( data );
 }
 

@@ -82,10 +82,11 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
   localRegion.setCount( 2, problemBounds.size(2) );
 
   // add the data for the region of interest to the grid attribute
-  attribute->dataItem()->appendData( new FunctionData( 
-    problemBounds, 
-    localRegion, 
-    new TestCaseFunction ) );
+  attribute->dataItem()->appendData( xdm::makeRefPtr(
+    new FunctionData(
+      problemBounds,
+      localRegion,
+      xdm::makeRefPtr( new TestCaseFunction ) ) ) );
 
   xdm::RefPtr< xdmFormat::TimeSeries > timeSeries(
     new xdmFormat::TemporalCollection( baseName.str() + ".xmf" ) );

@@ -188,7 +188,7 @@ BOOST_AUTO_TEST_CASE( XmlObjectRoundtrip ) {
 
   xdm::XmlObject answer( "test-object" );
   answer.appendAttribute( "name", "test" );
-  answer.appendChild( new xdm::XmlObject( "test-child" ) );
+  answer.appendChild( xdm::makeRefPtr( new xdm::XmlObject( "test-child" ) ) );
   answer.appendContent( "line1" );
   answer.appendContent( "line2" );
 

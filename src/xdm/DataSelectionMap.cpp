@@ -31,8 +31,8 @@ DataSelectionMap::DataSelectionMap() :
 }
 
 DataSelectionMap::DataSelectionMap( 
-  DataSelection* domain, 
-  DataSelection* range ) :
+  RefPtr< DataSelection > domain,
+  RefPtr< DataSelection > range ) :
   mDomain( domain ),
   mRange( range ) {
 }
@@ -40,19 +40,19 @@ DataSelectionMap::DataSelectionMap(
 DataSelectionMap::~DataSelectionMap() {
 }
 
-const DataSelection* DataSelectionMap::domain() const {
+RefPtr< const DataSelection > DataSelectionMap::domain() const {
   return mDomain;
 }
 
-void DataSelectionMap::setDomain( DataSelection* domain ) {
+void DataSelectionMap::setDomain( RefPtr< DataSelection > domain ) {
   mDomain = domain;
 }
 
-const DataSelection* DataSelectionMap::range() const {
+RefPtr< const DataSelection > DataSelectionMap::range() const {
   return mRange;
 }
 
-void DataSelectionMap::setRange( DataSelection* range ) {
+void DataSelectionMap::setRange( RefPtr< DataSelection > range ) {
   mRange = range;
 }
 

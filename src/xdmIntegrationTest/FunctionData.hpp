@@ -131,7 +131,7 @@ public:
   FunctionData( 
     const GridBounds& grid, 
     const xdm::HyperSlab<>& region,
-    Function* function,
+    xdm::RefPtr< Function > function,
     const xdm::DataShape<>& blockSize = xdm::makeShape( 14, 14, 14 ) );
   virtual ~FunctionData();
 

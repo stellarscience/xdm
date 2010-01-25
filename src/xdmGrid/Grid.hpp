@@ -37,9 +37,9 @@ public:
 
   XDM_META_ITEM( Grid );
 
-  Time* time();
-  const Time* time() const;
-  void setTime( Time* time );
+  xdm::RefPtr< Time > time();
+  xdm::RefPtr< const Time > time() const;
+  void setTime( xdm::RefPtr< Time > time );
 
   virtual void traverse( xdm::ItemVisitor& iv );
 

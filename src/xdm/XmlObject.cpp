@@ -50,7 +50,15 @@ namespace {
     int mIndent;
     PrintXmlObjectFunctor( std::ostream& ostr, int indent ) :
       mOstr( ostr ), mIndent( indent ) {}
-    void operator()( const XmlObject* obj ) {
+
+    void operator()( const XmlObject& obj ) {
+      obj.printHeader( mOstr, mIndent );
+      obj.printTextContent( mOstr, mIndent + 1 );
+      obj.printChildren( mOstr, mIndent + 1 );
+      obj.printFooter( mOstr, mIndent );
+    }
+
+    void operator()( RefPtr< const XmlObject > obj ) {
       obj->printHeader( mOstr, mIndent );
       obj->printTextContent( mOstr, mIndent + 1 );
       obj->printChildren( mOstr, mIndent + 1 );
@@ -99,7 +107,7 @@ void XmlObject::appendContent( const std::string& text ) {
   mTextContent.push_back( text );
 }
 
-void XmlObject::appendChild( XmlObject* child ) {
+void XmlObject::appendChild( RefPtr< XmlObject > child ) {
   mChildren.push_back( child );
 }
 
@@ -171,7 +179,7 @@ void XmlObject::printFooter( std::ostream& ostr, int indentLevel ) const {
 std::ostream& writeIndent( std::ostream& ostr, const XmlObject& obj,
   int indentLevel ) {
   PrintXmlObjectFunctor print( ostr, indentLevel );
-  print( &obj );
+  print( obj );
   return ostr;
 }
 

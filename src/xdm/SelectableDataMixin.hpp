@@ -37,11 +37,11 @@ class SelectableDataMixin {
 public:
 
   /// Set the selection for the data.
-  void setSelection( DataSelection* selection );
+  void setSelection( RefPtr< DataSelection > selection );
   /// Get the const data selection.
-  const DataSelection* selection() const;
+  RefPtr< const DataSelection > selection() const;
   /// Get the data selection.
-  DataSelection* selection();
+  RefPtr< DataSelection > selection();
 
   /// Convenience method to select an entire dataset.
   void selectAll();

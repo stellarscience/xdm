@@ -140,7 +140,7 @@ bool compareRankAttribute(
 
 BOOST_AUTO_TEST_CASE( distributedCollection ) {
   xdm::RefPtr< ItemCollection > item( new ItemCollection );
-  item->mItems.push_back( new ProcessDescriptionItem );
+  item->mItems.push_back( xdm::makeRefPtr( new ProcessDescriptionItem ) );
 
   // put the proxy in place
   xdm::RefPtr< xdmComm::DistributedItemCollectionProxy > proxy(
@@ -177,7 +177,7 @@ BOOST_AUTO_TEST_CASE( distributedCollection ) {
 
 BOOST_AUTO_TEST_CASE( visitsAll ) {
   xdm::RefPtr< ItemCollection > item( new ItemCollection );
-  item->mItems.push_back( new ProcessDescriptionItem );
+  item->mItems.push_back( xdm::makeRefPtr( new ProcessDescriptionItem ) );
 
   xdm::RefPtr< xdmComm::DistributedItemCollectionProxy > proxy(
     new xdmComm::DistributedItemCollectionProxy(

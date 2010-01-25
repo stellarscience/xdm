@@ -45,7 +45,7 @@ public:
   XDM_META_ITEM( InterlacedGeometry );
 
   /// Set the DataItem representing the node values.
-  void setCoordinateValues( xdm::DataItem* data );
+  void setCoordinateValues( xdm::RefPtr< xdm::DataItem > data );
 
   virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
 

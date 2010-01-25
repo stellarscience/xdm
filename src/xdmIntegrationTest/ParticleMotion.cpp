@@ -133,18 +133,18 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
 
   // build the dynamic grid tree
   xdm::RefPtr< xdmGrid::UniformGrid > grid( new xdmGrid::UniformGrid() );
-  grid->setTime( new xdmGrid::Time );
+  grid->setTime( xdm::makeRefPtr( new xdmGrid::Time ) );
 
   // topology is polyvertex
   xdm::RefPtr< xdmGrid::Polyvertex > topology( new xdmGrid::Polyvertex() );
   topology->setNumberOfElements( 1 );
   topology->setNodesPerElement( kParticleCount );
-  grid->setTopology( topology.get() );
+  grid->setTopology( topology );
 
   // geometry is interlaced with a dynamic array data item
   xdm::RefPtr< xdmGrid::InterlacedGeometry > geometry(
     new xdmGrid::InterlacedGeometry( 3 ) );
-  grid->setGeometry( geometry.get() );
+  grid->setGeometry( geometry );
 
   // define the shape of the data as it will be output on disk, an array of
   // three values each.
@@ -157,9 +157,9 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
 
   // WritableData for the geometry coordinate values
   xdm::RefPtr< xdm::WritableArray > geometryMemory( new xdm::WritableArray(
-    mPositions.get() ) );
+    mPositions ) );
   geometryMemory->setIsDynamic( true ); // changes throughout the simulation
-  geometryData->appendData( geometryMemory.get() );
+  geometryData->appendData( geometryMemory );
 
   // put the geometry memory in an HDF dataset
   xdm::RefPtr< xdmHdf::HdfDataset > geometryDataset( new xdmHdf::HdfDataset );
@@ -167,8 +167,8 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
   geometryDataset->setFile( baseName.str() + ".h5" );
   geometryDataset->setGroupPath( datasetPath );
   // install the callback to set a new dataset name every timestep
-  geometryDataset->setUpdateCallback( new NameDataset );
-  geometryData->setDataset( geometryDataset.get() );
+  geometryDataset->setUpdateCallback( xdm::makeRefPtr( new NameDataset ) );
+  geometryData->setDataset( geometryDataset );
 
   // create a vector attribute for the velocity.
   xdm::RefPtr< xdmGrid::Attribute > velocityAttribute( 
@@ -178,19 +178,19 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
   // create the data item for the velocity attribute.
   xdm::RefPtr< xdm::UniformDataItem > velocityData( new xdm::UniformDataItem(
     xdm::primitiveType::kFloat, outputShape ) );
-  velocityAttribute->setDataItem( velocityData.get() );
+  velocityAttribute->setDataItem( velocityData );
   // create dynamic data for the velocity values.
   xdm::RefPtr< xdm::WritableArray > velocityMemory( new xdm::WritableArray(
-    mVelocities.get() ) );
+    mVelocities ) );
   velocityMemory->setIsDynamic( true );
-  velocityData->appendData( velocityMemory.get() );
+  velocityData->appendData( velocityMemory );
   // put the velocities in an HDF dataset.
   xdm::RefPtr< xdmHdf::HdfDataset > velocityDataset( new xdmHdf::HdfDataset );
   xdmHdf::GroupPath velGroup( 1, "velocities" );
   velocityDataset->setFile( baseName.str() + ".h5" );
   velocityDataset->setGroupPath( velGroup );
-  velocityDataset->setUpdateCallback( new NameDataset );
-  velocityData->setDataset( velocityDataset.get() );
+  velocityDataset->setUpdateCallback( xdm::makeRefPtr( new NameDataset ) );
+  velocityData->setDataset( velocityDataset );
 
   
   // Set up the memory's data selection to map from the entire array to the
@@ -204,8 +204,8 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
   datasetSlab.setStride( 1, 1 );
   datasetSlab.setCount( 1, 3 );
   xdm::DataSelectionMap mapping(
-    new xdm::AllDataSelection, // select the entire array
-    new xdm::HyperslabDataSelection( datasetSlab ) ); // only the portion I own
+    xdm::makeRefPtr( new xdm::AllDataSelection ), // select the entire array
+    xdm::makeRefPtr( new xdm::HyperslabDataSelection( datasetSlab ) ) ); // only the portion I own
   // The selection map applies to both the positions and velocities of the
   // particles, so we can use it for both memory mappings.
   geometryMemory->setSelectionMap( mapping );
@@ -232,7 +232,7 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
   series->open();
 
   // write the first timestep
-  writeTimestepGrid( series, grid.get() );
+  writeTimestepGrid( series, grid );
 
   // evolve the particles
   float t = 0.0f;
@@ -248,7 +248,7 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
     }
 
     // write the data for this timestep to disk.
-    writeTimestepGrid( series, grid.get() );
+    writeTimestepGrid( series, grid );
   }
 
   series->close();

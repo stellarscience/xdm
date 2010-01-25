@@ -29,7 +29,7 @@ BOOST_AUTO_TEST_CASE( writeMetadataTag ) {
   xdm::RefPtr< xdm::Item > i( new xdm::Item );
   i->setName( "Fred" );
 
-  xdm::XmlMetadataWrapper xml( new xdm::XmlObject );
+  xdm::XmlMetadataWrapper xml( xdm::makeRefPtr( new xdm::XmlObject ) );
   i->writeMetadata( xml );
 
   char const * const tagAnswer = "Item";

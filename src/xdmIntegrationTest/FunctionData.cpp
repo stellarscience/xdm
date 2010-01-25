@@ -60,12 +60,12 @@ constructFunctionGrid( const GridBounds& bounds, const std::string& hdfFile ) {
     bounds.size(2) + 1, 
     bounds.size(1) + 1,
     bounds.size(0) + 1 ) );
-  grid->setTopology( topology.get() );
+  grid->setTopology( topology );
 
   // Geometry
   xdm::RefPtr< xdmGrid::TensorProductGeometry > geometry( 
     new xdmGrid::TensorProductGeometry( 3 ) );
-  grid->setGeometry( geometry.get() );
+  grid->setGeometry( geometry );
 
   // assign geometry values
   for ( int i = 0; i < 3 ; i++ ) {
@@ -80,8 +80,8 @@ constructFunctionGrid( const GridBounds& bounds, const std::string& hdfFile ) {
     }
     // fill the final point
     (*values)[ bounds.size(i) ] = bounds.bounds(i).second;
-    dataItem->appendData( new xdm::WritableArray( values.get() ) );
-    geometry->setCoordinateValues( i, dataItem.get() );
+    dataItem->appendData( xdm::makeRefPtr( new xdm::WritableArray( values ) ) );
+    geometry->setCoordinateValues( i, dataItem );
     xdm::RefPtr< xdmHdf::HdfDataset > dataset( new xdmHdf::HdfDataset );
     dataset->setFile( hdfFile.c_str() );
     dataset->setDataset( axisNames[i] );
@@ -108,7 +108,7 @@ constructFunctionGrid( const GridBounds& bounds, const std::string& hdfFile ) {
 FunctionData::FunctionData( 
   const GridBounds& grid, 
   const xdm::HyperSlab<>& region,
-  Function* function,
+  xdm::RefPtr< Function > function,
   const xdm::DataShape<>& blockSize ) :
   mGrid( grid ),
   mRegionOfInterest( region ),
@@ -167,9 +167,9 @@ void FunctionData::writeImplementation( xdm::Dataset* dataset ) {
     xdm::HyperSlab<> fileSelectionSlab( *block );
     reverseDimensionOrder( fileSelectionSlab );
     xdm::DataSelectionMap selectionMap(
-      new xdm::AllDataSelection,
-      new xdm::HyperslabDataSelection( fileSelectionSlab ) );
-    dataset->serialize( mStructuredArray, selectionMap );
+      xdm::makeRefPtr( new xdm::AllDataSelection ),
+      xdm::makeRefPtr( new xdm::HyperslabDataSelection( fileSelectionSlab ) ) );
+    dataset->serialize( mStructuredArray.get(), selectionMap );
   }
 }
 

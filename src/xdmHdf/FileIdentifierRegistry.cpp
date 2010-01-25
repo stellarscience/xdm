@@ -32,7 +32,7 @@ XDM_HDF_NAMESPACE_BEGIN
 
 xdm::RefPtr< FileIdentifierRegistry > FileIdentifierRegistry::sInstance;
 
-FileIdentifierRegistry* FileIdentifierRegistry::instance() {
+xdm::RefPtr< FileIdentifierRegistry > FileIdentifierRegistry::instance() {
   if ( ! sInstance.valid() ) {
     sInstance = new FileIdentifierRegistry;
   }

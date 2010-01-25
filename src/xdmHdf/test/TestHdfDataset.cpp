@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE( roundtrip ) {
     fileshape[1] = 4;
 
     // create the dataset
-    xdm::RefPtr< xdmHdf::HdfDataset > dataset = new xdmHdf::HdfDataset();
+    xdm::RefPtr< xdmHdf::HdfDataset > dataset( new xdmHdf::HdfDataset() );
     dataset->setFile( "HdfDataset.h5" );
     dataset->setDataset( "testdata" );
 
@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE( roundtrip ) {
     fileshape[1] = 4;
 
     // open the dataset
-    xdm::RefPtr< xdmHdf::HdfDataset > dataset = new xdmHdf::HdfDataset();
+    xdm::RefPtr< xdmHdf::HdfDataset > dataset( new xdmHdf::HdfDataset() );
     dataset->setFile( "HdfDataset.h5" );
     dataset->setDataset( "testdata" );
 

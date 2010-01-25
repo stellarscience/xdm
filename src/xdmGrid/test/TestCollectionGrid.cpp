@@ -30,7 +30,7 @@ struct Fixture {
   xdm::XmlMetadataWrapper xml;
   Fixture() : 
     grid( new xdmGrid::CollectionGrid ),
-    xml( new xdm::XmlObject ) {}
+    xml( xdm::makeRefPtr( new xdm::XmlObject ) ) {}
 };
 
 BOOST_AUTO_TEST_CASE( writeMetadataSpatial ) {

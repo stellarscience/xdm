@@ -140,7 +140,7 @@ BOOST_AUTO_TEST_CASE( coalesce ) {
   // communication
   xdm::RefPtr< TestDataset > testDataset( new TestDataset );
   xdm::RefPtr< xdm::Dataset > dataset( new xdmComm::MpiDatasetProxy( 
-    MPI_COMM_WORLD, testDataset.get(), 1024 ) );
+    MPI_COMM_WORLD, testDataset, 1024 ) );
 
   // set up the data selection for the local process.  We select the hyperslab
   // consisting of one element which starts at the global array location
@@ -154,7 +154,9 @@ BOOST_AUTO_TEST_CASE( coalesce ) {
     new xdm::HyperslabDataSelection( slab ) );
   // define the selection map to select all the input data (for this test case a
   // single integer) and map it to the rank'th location in the global structure
-  xdm::DataSelectionMap map( new xdm::AllDataSelection, localSelection.get() );
+  xdm::DataSelectionMap map(
+    xdm::makeRefPtr( new xdm::AllDataSelection ),
+    localSelection );
 
   // the local structured array consists of the pointer to the local rank
   // variable

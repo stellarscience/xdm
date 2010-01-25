@@ -27,25 +27,29 @@
 
 XDM_NAMESPACE_BEGIN
 
-/// Base class for all reference counted objects.
+/// Base class for all reference counted objects. Operations that affect only
+/// the reference count for subclasses of ReferencedObject are considered to
+/// be const.
 class ReferencedObject {
 public:
   ReferencedObject();
   virtual ~ReferencedObject();
 
   /// Add a reference to this object.
-  void addReference();
+  void addReference() const;
 
   /// Remove a reference from this object.  When the reference count goes to
   /// zero, the object will be deleted.
-  void removeReference();
+  void removeReference() const;
   /// Remove a reference without checking the reference count.
-  void removeReferenceWithoutDelete();
+  void removeReferenceWithoutDelete() const;
   /// Get the current reference count for an object.
   int referenceCount() const;
 
 private:
-  int mReferenceCount;
+  // the reference count is mutable so that reference counted pointers to
+  // constant objects can exist.
+  mutable int mReferenceCount;
 };
 
 XDM_NAMESPACE_END

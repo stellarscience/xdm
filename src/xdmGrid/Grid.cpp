@@ -30,15 +30,15 @@ Grid::Grid() :
 Grid::~Grid() {
 }
 
-Time* Grid::time() {
-  return mTime.get();
+xdm::RefPtr< Time > Grid::time() {
+  return mTime;
 }
 
-const Time* Grid::time() const {
-  return mTime.get();
+xdm::RefPtr< const Time > Grid::time() const {
+  return mTime;
 }
 
-void Grid::setTime( Time* time ) {
+void Grid::setTime( xdm::RefPtr< Time > time ) {
   mTime = time;
 }
 

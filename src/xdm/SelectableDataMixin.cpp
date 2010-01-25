@@ -35,15 +35,15 @@ SelectableDataMixin::SelectableDataMixin() :
 SelectableDataMixin::~SelectableDataMixin() {
 }
 
-void SelectableDataMixin::setSelection( DataSelection* selection ) {
+void SelectableDataMixin::setSelection( RefPtr< DataSelection > selection ) {
   mSelection = selection;
 }
 
-const DataSelection* SelectableDataMixin::selection() const {
+RefPtr< const DataSelection > SelectableDataMixin::selection() const {
   return mSelection;
 }
 
-DataSelection* SelectableDataMixin::selection() {
+RefPtr< DataSelection > SelectableDataMixin::selection() {
   return mSelection;
 }
 
