@@ -163,7 +163,7 @@ BOOST_AUTO_TEST_CASE( timeSeries ) {
   temporalCollection->open();
 
   xdm::RefPtr< xdmFormat::TimeSeries > virtualDataset(
-    new xdmFormat::VirtualDataset( "XdmfGridCompatibility.virtualDataset.xmf" ) );
+    new xdmFormat::VirtualDataset( "XdmfGridCompatibility.virtualDataset" ) );
   virtualDataset->open();
 
   // since the geometry and topology of the grid will remain constant throughout
