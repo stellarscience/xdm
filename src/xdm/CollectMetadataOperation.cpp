@@ -77,9 +77,18 @@ void CollectMetadataOperation::restoreState( BinaryIStream& istr ) {
   RefPtr< XmlObject > resultXml( new XmlObject );
   istr >> *resultXml;
 
-  if ( ! mContextStack.empty() ) {
+  if ( !mContextStack.empty() ) {
     mContextStack.top()->appendChild( resultXml );
+  } else {
+    mResult->appendChild( resultXml );
   }
+}
+
+void CollectMetadataOperation::reset() {
+  while ( !mContextStack.empty() ) {
+    mContextStack.pop();
+  }
+  mResult.reset();
 }
 
 RefPtr< XmlObject > CollectMetadataOperation::result() {

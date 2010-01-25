@@ -51,11 +51,15 @@ void ItemVisitor::apply( UniformDataItem& item ) {
 }
 
 void ItemVisitor::captureState( BinaryOStream& ) {
-  XDM_THROW( MethodNotImplemented( "ItemVisitor::captureState" ) );
+  // no-op
 }
 
 void ItemVisitor::restoreState( BinaryIStream& ) {
-  XDM_THROW( MethodNotImplemented( "ItemVisitor::restoreState" ) );
+  // no-op
+}
+
+void ItemVisitor::reset() {
+  // no-op
 }
 
 XDM_NAMESPACE_END

@@ -3,6 +3,7 @@ project( xdmComm )
 find_package( MPI REQUIRED )
 
 set( ${PROJECT_NAME}_HEADERS 
+    BarrierOnExit.hpp
     CoalescingStreamBuffer.hpp
     DistributedItemCollectionProxy.hpp
     MpiDatasetProxy.hpp
@@ -11,6 +12,7 @@ set( ${PROJECT_NAME}_HEADERS
 )
 
 set( ${PROJECT_NAME}_SOURCES
+    BarrierOnExit.cpp
     CoalescingStreamBuffer.cpp
     DistributedItemCollectionProxy.cpp
     MpiDatasetProxy.cpp

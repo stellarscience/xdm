@@ -275,7 +275,7 @@ BinaryIStream& operator>>( BinaryIStream& istr, xdm::XmlObject& v ) {
   ptrdiff_t childCount;
   istr >> childCount;
   for ( int i = 0; i < childCount; i++ ) {
-    xdm::RefPtr< xdm::XmlObject > child( new xdm::XmlObject );
+    xdm::RefPtr< xdm::XmlObject > child( new XmlObject );
     istr >> *child;
     v.appendChild( child );
   }
@@ -297,9 +297,10 @@ BinaryOStream& operator<<( BinaryOStream& ostr, const xdm::XmlObject& v ) {
   std::for_each( v.beginTextContent(), v.endTextContent(),
     OutputObject< std::string >( ostr ) );
 
-  ostr << std::distance( v.beginAttributes(), v.endAttributes() );
+  ostr << std::distance( v.beginChildren(), v.endChildren() );
   std::for_each( v.beginChildren(), v.endChildren(),
     OutputObject< xdm::RefPtr< xdm::XmlObject > >( ostr ) );
+
   return ostr;
 }
 

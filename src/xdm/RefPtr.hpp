@@ -93,14 +93,18 @@ public:
     other.mPtr = tmp;
   }
 
-  /// Conversion to raw pointer.
-  operator T*() const { return mPtr; }
   /// Pointer dereference.
   T& operator*() const { return *mPtr; }
   /// Member access.
   T* operator->() const { return mPtr; }
   /// Get access to the raw pointer.
   T* get() const { return mPtr; }
+  /// Implicit conversion to T*.
+  /// @deprecated Do not rely on this, it is dangerous and will be going away.
+  operator T*() { return mPtr; }
+  /// Implicit conversion to const T*.
+  /// @deprecated Do not rely on this, it is dangerous and will be going away.
+  operator const T*() const { return mPtr; }
 
   /// Use the reference counter pointer in boolean expressions.
   bool operator!() const { return mPtr == 0; }

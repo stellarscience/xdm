@@ -20,12 +20,61 @@
 //------------------------------------------------------------------------------
 #include <xdmComm/DistributedItemCollectionProxy.hpp>
 
+#include <xdmComm/BarrierOnExit.hpp>
+
 #include <xdm/BinaryIOStream.hpp>
 #include <xdm/BinaryStreamOperations.hpp>
-
-#include <xdm/CollectMetadataOperation.hpp>
+#include <xdm/CompositeDataItem.hpp>
+#include <xdm/DataItem.hpp>
+#include <xdm/ItemVisitor.hpp>
+#include <xdm/UniformDataItem.hpp>
 
 XDM_COMM_NAMESPACE_BEGIN
+
+namespace {
+
+class VisitorWrapper : public xdm::ItemVisitor {
+public:
+  VisitorWrapper( ItemVisitor& iv, xdm::BinaryOStream& ostr ) :
+    mWrappedVisitor( iv ),
+    mOStr( ostr ) {
+  }
+
+  virtual ~VisitorWrapper() {
+  }
+
+  virtual void apply( xdm::Item& item ) {
+    resetApplyAndCommunicate( item );
+  }
+  virtual void apply( xdm::DataItem& item ) {
+    resetApplyAndCommunicate( item );
+  }
+  virtual void apply( xdm::CompositeDataItem& item ) {
+    resetApplyAndCommunicate( item );
+  }
+  virtual void apply( xdm::UniformDataItem& item ) {
+    resetApplyAndCommunicate( item );
+  }
+
+private:
+  xdm::ItemVisitor & mWrappedVisitor;
+  xdm::BinaryOStream & mOStr;
+
+  template< typename ItemT >
+  void resetApplyAndCommunicate( ItemT & item ) {
+    // reset and prepare to traverse the item
+    mWrappedVisitor.reset();
+
+    // apply the wrapped visitor to the item.
+    item.accept( mWrappedVisitor );
+
+    // capture the state and stream it
+    mWrappedVisitor.captureState( mOStr );
+    mOStr << xdm::flush;
+  }
+};
+
+} // namespace
 
 DistributedItemCollectionProxy::DistributedItemCollectionProxy(
   xdm::Item* item, MPI_Comm communicator, size_t bufferSizeHint ) :
@@ -38,6 +87,10 @@ DistributedItemCollectionProxy::~DistributedItemCollectionProxy() {
 }
 
 void DistributedItemCollectionProxy::accept( xdm::ItemVisitor& iv ) {
+
+  // block on exit so that messages don't get reordered.
+  BarrierOnExit barrier( mCommunicator );
+
   int processes;
   MPI_Comm_size( mCommunicator, &processes );
   int rank;
@@ -56,10 +109,11 @@ void DistributedItemCollectionProxy::accept( xdm::ItemVisitor& iv ) {
     while ( processCount < processes ) {
 
       // Poll for messages from other processes.
-      while( mCommBuffer->poll() ) {
+      while ( mCommBuffer->poll() ) {
         // A process is reporting. Update the visitor state to accumulate the
         // results from the distributed Item.
         xdm::BinaryIStream input( mCommBuffer.get() );
+        input.sync();
         iv.restoreState( input );
         processCount++;
       }
@@ -67,15 +121,12 @@ void DistributedItemCollectionProxy::accept( xdm::ItemVisitor& iv ) {
     }
 
   } else {
-
-    // gather the results for the local children.
-    traverse( iv );
-
-    // send the results to rank 0.
+    // create a stream for the children of this object to write to
     xdm::BinaryOStream output( mCommBuffer.get() );
-    iv.captureState( output );
-    output << xdm::flush;
-
+    // Wrap the visitor so that the results of each child are reported
+    // individually.
+    VisitorWrapper wrapper( iv, output );
+    traverse( wrapper );
   }
 }
 

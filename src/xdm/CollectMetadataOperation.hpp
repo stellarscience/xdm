@@ -50,6 +50,7 @@ public:
 
   virtual void captureState( BinaryOStream& ostr );
   virtual void restoreState( BinaryIStream& istr );
+  virtual void reset();
 
   /// Get the result of applying this operation to a data tree.  This method
   /// will return the XmlObject for last completed item.

@@ -34,12 +34,18 @@
 #include <xdm/StructuredArray.hpp>
 #include <xdm/XmlObject.hpp>
 
+#include <stdexcept>
 #include <string>
 #include <utility>
 
 #include <xdm/NamespaceMacro.hpp>
+#include <xdm/ThrowMacro.hpp>
 
 XDM_NAMESPACE_BEGIN
+
+class NullPointerException : public std::runtime_error {
+  NullPointerException() : std::runtime_error( "Null pointer exception" ) {}
+};
 
 BinaryIStream& operator>>( BinaryIStream& istr, std::string& v );
 BinaryOStream& operator<<( BinaryOStream& ostr, const std::string& v );
@@ -50,6 +56,7 @@ BinaryIStream& operator>>( BinaryIStream& istr, std::pair< T, U >& v ) {
   istr >> v.second;
   return istr;
 }
+
 template< typename T, typename U >
 BinaryOStream& operator<<( BinaryOStream& ostr, const std::pair< T, U >& v ) {
   ostr << v.first;
@@ -93,12 +100,12 @@ struct OutputObject {
   }
 };
 
-/// Convenience functor to write a pointer out to a BinaryOStream.
+/// Convenience functor to write a RefPtr to a BinaryOStream.
 template< typename T >
-struct OutputObject< xdm::RefPtr< T > > {
+struct OutputObject< RefPtr< T > > {
   BinaryOStream& mOStr;
   OutputObject( BinaryOStream& ostr ) : mOStr( ostr ) {}
-  void operator()( const xdm::RefPtr< T >& object ) {
+  void operator()( const RefPtr< T >& object ) {
     mOStr << *object;
   }
 };

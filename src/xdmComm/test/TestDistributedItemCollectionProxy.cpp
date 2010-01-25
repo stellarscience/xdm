@@ -38,14 +38,41 @@ namespace {
 
 xdmComm::test::MpiTestFixture globalFixture;
 
-typedef std::pair< int, std::string > ProcessItemPair;
+struct ProcessItemPair {
+  int process;
+  std::string item;
+
+  ProcessItemPair() : process(), item() {}
+  ProcessItemPair( int process_, const std::string& item_ ) :
+    process( process_ ),
+    item( item_ ) {}
+};
 
 bool operator!=( const ProcessItemPair& lhs, const ProcessItemPair& rhs ) {
-  return ( lhs.first != rhs.first ) || ( lhs.second != rhs.second );
+  return ( lhs.process != rhs.process ) || ( lhs.item != rhs.item );
 }
 
-std::ostream& operator<<( std::ostream& ostr, const ProcessItemPair& pair ) {
-  ostr << pair.first << " -- " << pair.second;
+bool operator<( const ProcessItemPair& lhs, const ProcessItemPair& rhs ) {
+  if ( lhs.process < rhs.process ) {
+    return true;
+  }
+  return false;
+}
+
+std::ostream& operator<<( std::ostream& ostr, const ProcessItemPair & pair ) {
+  ostr << pair.process << " -- " << pair.item;
+  return ostr;
+}
+
+xdm::BinaryIStream& operator>>( xdm::BinaryIStream& istr, ProcessItemPair & pair ) {
+  istr >> pair.process;
+  istr >> pair.item;
+  return istr;
+}
+
+xdm::BinaryOStream& operator<<( xdm::BinaryOStream& ostr, const ProcessItemPair & pair ) {
+  ostr << pair.process;
+  ostr << pair.item;
   return ostr;
 }
 
@@ -55,7 +82,8 @@ public:
 
   virtual void apply( xdm::Item& item ) {
     mVisitedObjects.push_back(
-      std::make_pair( globalFixture.localRank(), item.className() ) );
+      ProcessItemPair( globalFixture.localRank(), item.className() ) );
+    traverse( item );
   }
 
   virtual void captureState( xdm::BinaryOStream& ostr ) {
@@ -102,7 +130,15 @@ public:
   }
 };
 
-/*BOOST_AUTO_TEST_CASE( distributedCollection ) {
+// Compare two Xml objects by querying for a 'rank' attribute with a number in
+// it. Return true if the lhs rank is less than the rhs rank.
+bool compareRankAttribute(
+  const xdm::RefPtr< xdm::XmlObject >& lhs,
+  const xdm::RefPtr< xdm::XmlObject >& rhs ) {
+  return xdm::attribute< int >( *lhs, "rank" ) < xdm::attribute< int >( *rhs, "rank" );
+}
+
+BOOST_AUTO_TEST_CASE( distributedCollection ) {
   xdm::RefPtr< ItemCollection > item( new ItemCollection );
   item->mItems.push_back( new ProcessDescriptionItem );
 
@@ -117,12 +153,28 @@ public:
   proxy->accept( collect );
   xdm::RefPtr< xdm::XmlObject > result = collect.result();
 
-  xdm::RefPtr< xdm::XmlObject > answer( new xdm::XmlObject( "answer" ) );
+  xdm::RefPtr< xdm::XmlObject > answer;
+  if ( globalFixture.localRank() == 0 ) {
+    answer = new xdm::XmlObject( "ItemCollection" );
+
+    // rank 0 should contain a child for every process
+    for ( int i = 0; i < globalFixture.processes(); i++ ) {
+      xdm::RefPtr< xdm::XmlObject > child(
+        new xdm::XmlObject( "ProcessDescriptionItem" ) );
+      appendAttribute( *child, "rank", i );
+      answer->appendChild( child );
+    }
+
+    // sort the result children in process order so a comparison can be made.
+    std::sort( result->beginChildren(), result->endChildren(), &compareRankAttribute );
+  } else {
+    answer = new xdm::XmlObject( "ProcessDescriptionItem" );
+    appendAttribute( *answer, "rank", globalFixture.localRank() );
+  }
 
   BOOST_CHECK_EQUAL( *answer, *result );
-}*/
+}
 
-/*
 BOOST_AUTO_TEST_CASE( visitsAll ) {
   xdm::RefPtr< ItemCollection > item( new ItemCollection );
   item->mItems.push_back( new ProcessDescriptionItem );
@@ -144,16 +196,18 @@ BOOST_AUTO_TEST_CASE( visitsAll ) {
                        globalFixture.processes() + 1 );
 
     std::vector< ProcessItemPair > answer;
-    answer.push_back( std::make_pair( 0, std::string( "ItemCollection" ) ) );
+    answer.push_back( ProcessItemPair( 0, std::string( "ItemCollection" ) ) );
     for ( int i = 0; i < globalFixture.processes(); i++ ) {
-      answer.push_back( std::make_pair( i, std::string( "ProcessDescriptionItem" ) ) );
+      answer.push_back( ProcessItemPair( i, std::string( "ProcessDescriptionItem" ) ) );
     }
+
+    // sort the list for comparison.
+    std::sort( visitor.mVisitedObjects.begin(), visitor.mVisitedObjects.end() );
 
     BOOST_CHECK_EQUAL_COLLECTIONS(
         answer.begin(), answer.end(),
         visitor.mVisitedObjects.begin(), visitor.mVisitedObjects.end() );
   }
 }
-*/
 
 } // namespace

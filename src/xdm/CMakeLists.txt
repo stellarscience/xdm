@@ -18,6 +18,7 @@ set( ${PROJECT_NAME}_HEADERS
     DataSelectionMap.hpp
     DataSelectionVisitor.hpp
     Dataset.hpp
+    DatasetExcept.hpp
     DataShape.hpp
     HyperSlab.hpp
     HyperSlabBlockIterator.hpp
@@ -37,6 +38,7 @@ set( ${PROJECT_NAME}_HEADERS
     VectorStructuredArray.hpp
     WritableArray.hpp
     WritableData.hpp
+    XmlExcept.hpp
     XmlMetadataWrapper.hpp
     XmlObject.hpp
     XmlOutputStream.hpp

@@ -28,5 +28,5 @@ endmacro()
 
 xdmComm_test_parallel( MpiDatasetProxy 4 TestMpiDatasetProxy.cpp )
 xdmComm_test_parallel( CoalescingStreamBuffer 4 TestCoalescingStreamBuffer.cpp )
-#xdmComm_test_parallel( DistributedItemCollectionProxy 4 TestDistributedItemCollectionProxy.cpp )
+xdmComm_test_parallel( DistributedItemCollectionProxy 4 TestDistributedItemCollectionProxy.cpp )
 

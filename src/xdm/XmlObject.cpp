@@ -118,9 +118,7 @@ bool XmlObject::hasAttribute( const std::string& key ) const {
 const std::string& XmlObject::attribute( const std::string& key ) const {
   AttributeMap::const_iterator it = mAttributeMap.find( key );
   if ( it == mAttributeMap.end() ) {
-    std::stringstream msg( "No such attribute: " );
-    msg << key;
-    XDM_THROW( std::runtime_error( msg.str() ) );
+    XDM_THROW( AttributeDoesNotExist( tag(), key ) );
   }
   return it->second;
 }

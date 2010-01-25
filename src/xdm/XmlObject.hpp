@@ -23,6 +23,7 @@
 
 #include <xdm/ReferencedObject.hpp>
 #include <xdm/RefPtr.hpp>
+#include <xdm/XmlExcept.hpp>
 
 #include <list>
 #include <map>
@@ -32,6 +33,7 @@
 #include <vector>
 
 #include <xdm/NamespaceMacro.hpp>
+#include <xdm/ThrowMacro.hpp>
 
 XDM_NAMESPACE_BEGIN
 
@@ -143,6 +145,23 @@ void appendAttribute( XmlObject& obj, const std::string& name, const T& value ) 
   std::stringstream ss;
   ss << value;
   obj.appendAttribute( name, ss.str() );
+}
+
+/// Helper function for retrieving an attribute as a specified type. This
+/// function should succeed as long as the input type has the stream extraction
+/// operator overloaded and the string can be converted to the specified type
+/// with that operator.
+/// @throw AttributeTypeError The attribute value could not be converted to the
+/// specified type.
+template< typename T >
+T attribute( XmlObject& obj, const std::string& key ) {
+  std::stringstream ss( obj.attribute( key ) );
+  T output;
+  ss >> output;
+  if ( ss.fail() ) {
+    XDM_THROW( AttributeTypeError( obj.tag(), key ) );
+  }
+  return output;
 }
 
 /// Non-member function to write an xml object at a given indent level.

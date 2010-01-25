@@ -76,6 +76,11 @@ public:
   virtual void captureState( BinaryOStream& );
   /// Restore from a state snapshot contained in a BinaryIStream.
   virtual void restoreState( BinaryIStream& );
+
+  /// Reset an ItemVisitor for a clean traversal. This method should be
+  /// implemented by inheritors to clear any state that may be accumulated
+  /// during a tree traversal. The default implementation does nothing.
+  virtual void reset();
 };
 
 /// Convenience functor for applying a visitor to an Item.
