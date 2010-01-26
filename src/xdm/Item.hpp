@@ -75,7 +75,7 @@ public:
 
   /// Update the specific subclass of Dataset that the callback is designed to
   /// operate upon.
-  virtual void update( ItemT* dataset ) = 0;
+  virtual void update( ItemT& dataset ) = 0;
 };
 
 /// Base class for all elements of the data hierarchy.
