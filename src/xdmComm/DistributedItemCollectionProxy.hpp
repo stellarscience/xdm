@@ -36,11 +36,9 @@ XDM_COMM_NAMESPACE_BEGIN
 /// Proxy object to represent a collection of items in a distributed
 /// environment. This is a proxy class that wraps around any xdm Item that may
 /// contain children. The proxy allows the children of an item to reside on
-/// another machine in a distributed environment, but allows the metadata for
-/// the child to be collected and written from rank 0 within a user specified
-/// communicator. This is useful when defining a composite item in which
-/// multiple processes contain child items. The proxy allows the metadata to
-/// be collected and stored as if the distributed children were local.
+/// another machine in a distributed environment, but defines traversal so that
+/// children of the corresponding node on another process are visible from
+/// rank 0 in the specified communicator.
 class DistributedItemCollectionProxy : public xdm::Item {
 public:
 
@@ -60,11 +58,9 @@ public:
 
   /// Visitor accept forwards to the wrapped Item.
   virtual void accept( xdm::ItemVisitor& iv );
-  /// Visitor traversal traverses local children only. Distributed children
-  /// are unaffected by this call.
+  /// Visitor traversal traverses local children and corresponding distributed
+  /// children.
   virtual void traverse( xdm::ItemVisitor& iv );
-  /// Update applies to the proxy Item as well as the wrapped Item.
-  virtual void update();
   /// Write the metadata for the collection Item and collect the metadata for
   /// the remote children. This method will write the metadata for the wrapped
   /// item, and then use MPI to collect the complete XmlObject representation

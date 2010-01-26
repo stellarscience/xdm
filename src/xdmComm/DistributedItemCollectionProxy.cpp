@@ -135,13 +135,6 @@ void DistributedItemCollectionProxy::traverse( xdm::ItemVisitor& iv ) {
   mItem->traverse( iv );
 }
 
-void DistributedItemCollectionProxy::update() {
-  // update this
-  xdm::Item::update();
-  // update the wrapped object
-  mItem->update();
-}
-
 void DistributedItemCollectionProxy::writeMetadata(
   xdm::XmlMetadataWrapper& metadata ) {
   // write the metadata for the wrapped Item first

@@ -51,7 +51,7 @@ public:
   /// Update the Item during an update traversal. This method provides a
   /// customization point for library clients to define custom update behavior
   /// for an object.
-  virtual void update( Item* item ) = 0;
+  virtual void update( Item& item ) = 0;
 };
 
 /// BasicItemUpdateCallback that uses the template argument to pass a concrete
@@ -64,12 +64,12 @@ public:
   /// Update the Item if it is a subclass of both Item and the template
   /// parameter. If the Item is not a subclass of the template parameter, an
   /// exception will be thrown.
-  void update( Item* item ) {
-    ItemT* typedItem = dynamic_cast< ItemT* >( item );
-    if ( typedItem ) {
+  void update( Item& item ) {
+    try {
+      ItemT& typedItem = dynamic_cast< ItemT& >( item );
       this->update( typedItem );
-    } else {
-      XDM_THROW( std::runtime_error( "Invalid Item type for callback." ) );
+    } catch ( std::bad_cast ) {
+      XDM_THROW( std::runtime_error( "Invalid Item type for callback" ) );
     }
   }
 
@@ -101,13 +101,11 @@ public:
   //-- End Visitor Traversal Interface --//
 
   /// Get the Item's update callback.
-  BasicItemUpdateCallback* updateCallback();
+  RefPtr< BasicItemUpdateCallback > updateCallback();
   /// Get the Item's const update callback.
-  const BasicItemUpdateCallback* updateCallback() const;
+  RefPtr< const BasicItemUpdateCallback > updateCallback() const;
   /// Set the Item's update callback.
-  void setUpdateCallback( BasicItemUpdateCallback* callback );
-  /// Invoke the Item's update callback.
-  virtual void update();
+  void setUpdateCallback( RefPtr< BasicItemUpdateCallback > callback );
 
   /// Write an Item's metadata to an XmlObject.  NOTE: implementors should *NOT*
   /// write data for child objects to the input XmlObject.  That responsibility

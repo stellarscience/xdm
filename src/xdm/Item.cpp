@@ -50,22 +50,16 @@ void Item::traverse( ItemVisitor& ) {
   // No-op
 }
 
-BasicItemUpdateCallback* Item::updateCallback() {
-  return mUpdateCallback.get();
+RefPtr< BasicItemUpdateCallback > Item::updateCallback() {
+  return mUpdateCallback;
 }
 
-const BasicItemUpdateCallback* Item::updateCallback() const {
-  return mUpdateCallback.get();
+RefPtr< const BasicItemUpdateCallback > Item::updateCallback() const {
+  return mUpdateCallback;
 }
 
-void Item::setUpdateCallback( BasicItemUpdateCallback* callback ) {
+void Item::setUpdateCallback( RefPtr< BasicItemUpdateCallback > callback ) {
   mUpdateCallback = callback;
-}
-
-void Item::update() {
-  if ( mUpdateCallback.valid() ) {
-    mUpdateCallback->update( this );
-  }
 }
 
 void Item::writeMetadata( XmlMetadataWrapper& xml ) {

@@ -26,13 +26,15 @@
 XDM_NAMESPACE_BEGIN
 
 void UpdateVisitor::apply( Item& item ) {
-  item.update();
+  if ( RefPtr< BasicItemUpdateCallback > callback = item.updateCallback() ) {
+    callback->update( item );
+  }
   traverse( item );
 }
 
 void UpdateVisitor::apply( UniformDataItem& item ) {
   // Call the Item's own update callback.
-  item.update();
+  apply( static_cast< Item& >( item ) );
 
   // If the Item has been assigned a dataset, call its callback too.
   RefPtr< Dataset > itemDataset = item.dataset();
