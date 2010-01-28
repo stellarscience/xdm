@@ -16,6 +16,7 @@ set( ${PROJECT_NAME}_HEADERS
     Topology.hpp
     UniformGrid.hpp
     UnstructuredTopology.hpp
+    UnstructuredTopologyConventions.hpp
 )
 
 set( ${PROJECT_NAME}_SOURCES
