@@ -74,6 +74,7 @@ public:
   }
 
   const size_type* values() const { return mValues; }
+  size_type* values() { return mValues; }
   size_type rank() const { return mRank; }
   size_type numberOfElements() const { return mNumberOfElements; }
 };

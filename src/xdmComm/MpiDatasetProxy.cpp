@@ -67,26 +67,13 @@ MpiDatasetProxy::MpiDatasetProxy(
   MPI_Comm communicator, 
   xdm::RefPtr< xdm::Dataset > dataset,
   size_t bufSizeHint ) :
+  xdm::ProxyDataset( dataset ),
   mCommunicator( communicator ),
-  mDataset( dataset ),
   mCommBuffer( new CoalescingStreamBuffer( bufSizeHint, communicator ) ),
   mArrayBuffer( new xdm::ByteArray( bufSizeHint ) ) {
 }
 
 MpiDatasetProxy::~MpiDatasetProxy() {
-}
-
-void MpiDatasetProxy::update() {
-  mDataset->update();
-  Dataset::update();
-}
-
-const char* MpiDatasetProxy::format() {
-  return mDataset->format();
-}
-
-void MpiDatasetProxy::writeTextContent( xdm::XmlTextContent& text ) {
-  mDataset->writeTextContent( text );
 }
 
 void MpiDatasetProxy::initializeImplementation(
@@ -99,7 +86,7 @@ void MpiDatasetProxy::initializeImplementation(
   int rank;
   MPI_Comm_rank( mCommunicator, &rank );
   if ( rank == 0 ) {
-    mDataset->initialize( type, shape, mode );
+    xdm::ProxyDataset::initializeImplementation( type, shape, mode );
   }
 }
 
@@ -121,13 +108,13 @@ void MpiDatasetProxy::serializeImplementation(
   } else {
     
     // write local process data to the dataset.
-    mDataset->serialize( array, selectionMap );
+    xdm::ProxyDataset::serializeImplementation( array, selectionMap );
 
     // Check for any messages that may have come from other processes.
     while ( mCommBuffer->poll() ) {
       receiveAndWriteProcessData( 
         mCommBuffer.get(), 
-        mDataset.get(),
+        innerDataset().get(),
         mArrayBuffer.get() );
     }
   }
@@ -137,7 +124,7 @@ void MpiDatasetProxy::deserializeImplementation(
   xdm::StructuredArray *data,
   const xdm::DataSelectionMap &selectionMap ) {
 
-  mDataset->deserialize( data, selectionMap );
+  xdm::ProxyDataset::deserializeImplementation( data, selectionMap );
 
 }
 
@@ -175,11 +162,11 @@ void MpiDatasetProxy::finalizeImplementation() {
       while ( mCommBuffer->poll() ) {
         receiveAndWriteProcessData(
           mCommBuffer.get(),
-          mDataset.get(),
+          innerDataset().get(),
           mArrayBuffer.get() );
       }
     }
-    mDataset->finalize();
+    xdm::ProxyDataset::finalizeImplementation();
   } else {
     // Not rank 0 and local process is done with current dataset.  Signal.
     MPI_Ssend( datasetCompleteSignalBuffer, 1, MPI_BYTE, 0, 

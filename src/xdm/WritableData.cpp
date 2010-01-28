@@ -55,9 +55,13 @@ void WritableData::setNeedsUpdate( bool needsUpdate )
   mNeedsUpdate = needsUpdate;
 }
 
+bool WritableData::requiresWrite() const {
+  return ( mIsDynamic || mNeedsUpdate );
+}
+
 void WritableData::write( Dataset* dataset )
 {
-  if ( mIsDynamic || mNeedsUpdate ) {
+  if ( requiresWrite() ) {
     writeImplementation( dataset );
     mNeedsUpdate = false;
   }

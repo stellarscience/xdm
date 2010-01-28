@@ -9,6 +9,7 @@ set( ${PROJECT_NAME}_HEADERS
     MpiDatasetProxy.hpp
     NamespaceMacro.hpp
     ParallelizeTreeVisitor.hpp
+    RankOrderedDistributedDataset.hpp
 )
 
 set( ${PROJECT_NAME}_SOURCES
@@ -17,6 +18,7 @@ set( ${PROJECT_NAME}_SOURCES
     DistributedItemCollectionProxy.cpp
     MpiDatasetProxy.cpp
     ParallelizeTreeVisitor.cpp
+    RankOrderedDistributedDataset.cpp
 )
 
 add_definitions( 

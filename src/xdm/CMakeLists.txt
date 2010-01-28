@@ -27,6 +27,8 @@ set( ${PROJECT_NAME}_HEADERS
     ItemVisitor.hpp
 	  NamespaceMacro.hpp
 	  ObjectCompositionMixin.hpp
+    PrimitiveType.hpp
+    ProxyDataset.hpp
     ReferencedObject.hpp
     RefPtr.hpp
     SelectableDataMixin.hpp
@@ -62,6 +64,7 @@ set( ${PROJECT_NAME}_SOURCES
     Item.cpp
     ItemVisitor.cpp
     PrimitiveType.cpp
+    ProxyDataset.cpp
     ReferencedObject.cpp
     SelectableDataMixin.cpp
     SerializeDataOperation.cpp

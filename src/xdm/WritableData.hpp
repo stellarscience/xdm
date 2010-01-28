@@ -51,6 +51,9 @@ public:
   /// Specify that the data needs an update.
   void setNeedsUpdate( bool needsUpdate );
 
+  /// Determine if the data currently requires writing.
+  bool requiresWrite() const;
+
   /// Write the data to the specified dataset.
   void write( Dataset* dataset ); 
 

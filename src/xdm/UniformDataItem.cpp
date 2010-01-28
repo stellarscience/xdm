@@ -159,7 +159,7 @@ void UniformDataItem::finalizeDataset() {
 bool UniformDataItem::serializationRequired() const {
   for ( DataList::const_iterator data = mWritables.begin();
     data != mWritables.end(); ++data ) {
-    if ( (*data)->needsUpdate() ) {
+    if ( (*data)->requiresWrite() ) {
       return true;
     }
   }

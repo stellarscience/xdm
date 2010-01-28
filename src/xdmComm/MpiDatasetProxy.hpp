@@ -21,7 +21,7 @@
 #ifndef xdmComm_MpiDatasetProxy_hpp
 #define xdmComm_MpiDatasetProxy_hpp
 
-#include <xdm/Dataset.hpp>
+#include <xdm/ProxyDataset.hpp>
 
 #include <mpi.h>
 
@@ -50,7 +50,7 @@ class CoalescingStreamBuffer;
 /// actually writing the data to a dataset.  The communication procedures assume
 /// that the cluster is heterogeneous and the objects to be sent are bitwise
 /// serializable.
-class MpiDatasetProxy : public xdm::Dataset {
+class MpiDatasetProxy : public xdm::ProxyDataset {
 public:
   /// Construct a proxy for the input dataset.
   /// @param communicator Communicator with relevant processes.
@@ -65,14 +65,6 @@ public:
     size_t bufSizeHint );
 
   virtual ~MpiDatasetProxy();
-
-  /// Update call to update myself and the real dataset.
-  virtual void update();
-
-  /// Pass-through to get the format of the underlying dataset.
-  virtual const char* format();
-  /// Pass-through to get the real dataset to write it's text content.
-  virtual void writeTextContent( xdm::XmlTextContent& text );
 
 protected:
   /// Initialization calls underlying dataset initialization only if this
@@ -100,7 +92,6 @@ protected:
 
 private:
   MPI_Comm mCommunicator;
-  xdm::RefPtr< xdm::Dataset > mDataset;
   std::auto_ptr< xdmComm::CoalescingStreamBuffer > mCommBuffer;
   xdm::RefPtr< xdm::ByteArray > mArrayBuffer;
 };
