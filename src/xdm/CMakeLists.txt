@@ -30,6 +30,7 @@ set( ${PROJECT_NAME}_HEADERS
     PrimitiveType.hpp
     ProxyDataset.hpp
     ReferencedObject.hpp
+    ReferenceVector.hpp
     RefPtr.hpp
     SelectableDataMixin.hpp
     SerializeDataOperation.hpp
@@ -66,6 +67,7 @@ set( ${PROJECT_NAME}_SOURCES
     PrimitiveType.cpp
     ProxyDataset.cpp
     ReferencedObject.cpp
+    ReferenceVector.cpp
     SelectableDataMixin.cpp
     SerializeDataOperation.cpp
     StructuredArray.cpp
