@@ -24,7 +24,7 @@ if( BUILD_TESTING )
   
   # Use Boost for testing. Currently, the test executables require a static
   # link to the Boost unit test framework library.
-  set( Boost_USE_STATIC_LIBS TRUE CACHE BOOL 
+  set( Boost_USE_STATIC_LIBS ON CACHE BOOL 
     "Prefer a static link to the Boost libraries." )
   mark_as_advanced( Boost_USE_STATIC_LIBS )
   find_package( Boost REQUIRED COMPONENTS unit_test_framework )
