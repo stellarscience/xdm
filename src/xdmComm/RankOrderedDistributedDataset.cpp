@@ -25,8 +25,11 @@
 #include <xdm/DataSelection.hpp>
 #include <xdm/DataSelectionVisitor.hpp>
 #include <xdm/HyperslabDataSelection.hpp>
+#include <xdm/StaticAssert.hpp>
 
 #include <algorithm>
+
+#include <climits>
 
 XDM_COMM_NAMESPACE_BEGIN
 
@@ -120,6 +123,10 @@ void RankOrderedDistributedDataset::initializeImplementation(
   // allocate a working buffer for the communication.
   typedef std::vector< xdm::DataShape<>::size_type > SizeVector;
   SizeVector commBuffer( processes, 0 );
+
+  // The gather and scatter calls below assume that a byte and a char are the
+  // same size. Fail to compile if they aren't.
+  XDM_STATIC_ASSERT( CHAR_BIT == 8 );
 
   // Gather the first dimension from all participating processes.
   mStartLocation = shape[0];

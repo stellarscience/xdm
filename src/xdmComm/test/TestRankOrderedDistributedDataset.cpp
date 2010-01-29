@@ -65,8 +65,12 @@ protected:
     BOOST_REQUIRE( diskSlab );
 
     std::size_t startIndex = diskSlab->hyperslab().start( 0 );
+    std::size_t stride = diskSlab->hyperslab().stride( 0 );
+    std::size_t count = diskSlab->hyperslab().count( 0 );
 
-    std::fill( &data[startIndex], &data[startIndex] + 4, 'a' );
+    for ( size_t i = 0; i < count; i++ ) {
+      data[startIndex + i * stride] = 'a';
+    }
   }
 
   virtual void deserializeImplementation(
@@ -101,6 +105,40 @@ BOOST_AUTO_TEST_CASE( selectAllShift ) {
   std::fill( answer.begin(), answer.end(), 'x' );
   std::size_t start = globalFixture.localRank() * 4;
   std::fill( &answer[start], &answer[start] + 4, 'a' );
+
+  BOOST_CHECK_EQUAL( answer, result->data );
+}
+
+BOOST_AUTO_TEST_CASE( selectHyperslabShift ) {
+  xdm::RefPtr< TestDataset > result( new TestDataset );
+  xdm::RefPtr< xdmComm::RankOrderedDistributedDataset > test(
+    new xdmComm::RankOrderedDistributedDataset( result, MPI_COMM_WORLD ) );
+
+  test->initialize(
+    xdm::primitiveType::kChar,
+    xdm::makeShape( 4 ),
+    xdm::Dataset::kCreate );
+  // the proxy should have initialized with 8 elements per process for the
+  // gathered dataset.
+  BOOST_CHECK_EQUAL( result->data.size(), globalFixture.processes() * 4 );
+
+  xdm::HyperSlab<> selectionSlab( xdm::makeShape( 4 ) );
+  selectionSlab.setStart( 0, 0 );
+  selectionSlab.setStride( 0, 2 );
+  selectionSlab.setCount( 0, 2 );
+  xdm::DataSelectionMap selectionMap;
+  selectionMap.setRange( xdm::makeRefPtr(
+    new xdm::HyperslabDataSelection( selectionSlab ) ) );
+
+  test->serialize( 0, selectionMap );
+
+  // the answer should have x's except over the 4 positions for this process,
+  // having alternating a's and x's in those 4 places.
+  std::string answer;
+  answer.resize( globalFixture.processes() * 4 );
+  std::fill( answer.begin(), answer.end(), 'x' );
+  answer[globalFixture.localRank() * 4 + 0]  = 'a';
+  answer[globalFixture.localRank() * 4 + 2]  = 'a';
 
   BOOST_CHECK_EQUAL( answer, result->data );
 }

@@ -34,6 +34,7 @@ set( ${PROJECT_NAME}_HEADERS
     RefPtr.hpp
     SelectableDataMixin.hpp
     SerializeDataOperation.hpp
+    StaticAssert.hpp
     StructuredArray.hpp
     TemplateStructuredArray.hpp
     UniformDataItem.hpp

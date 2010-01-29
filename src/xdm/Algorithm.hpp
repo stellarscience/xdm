@@ -75,12 +75,14 @@ public:
   typedef T ValueType;
 };
 
+/// Determine the mutable type for a const qualified type.
 template< typename T >
 class MakeMutable< const T > {
 public:
   typedef typename MakeMutable< T >::ValueType ValueType;
 };
 
+/// Make a standard pair mutable.
 template< typename T, typename U >
 class MakeMutable< std::pair< T, U > > {
 public:
