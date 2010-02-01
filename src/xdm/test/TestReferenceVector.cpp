@@ -139,6 +139,79 @@ BOOST_AUTO_TEST_CASE( tensorProduct )
   }
 }
 
+BOOST_AUTO_TEST_CASE( copyConstruct )
+{
+  double data[20]; // to be indexed as [10][2], i.e. 10 2D vectors.
+  xdm::RefPtr< xdm::SingleArrayOfVectorsImpl< double > > imp(
+    new xdm::SingleArrayOfVectorsImpl< double >( data, 2 ) );
+
+  {
+    xdm::ReferenceVector< double > thinVector( imp, 5 );
+    thinVector[0] = 0.25;
+    thinVector[1] = 0.75;
+
+    // Now copy thinVector. The reference should point to the original data set.
+    xdm::ReferenceVector< double > copiedVector( thinVector );
+    BOOST_CHECK_EQUAL( 2, copiedVector.size() );
+    BOOST_CHECK_EQUAL( 0.25, copiedVector[0] );
+    BOOST_CHECK_EQUAL( 0.75, copiedVector[1] );
+
+    // Change some values before copiedVector goes out of scope.
+    copiedVector[0] = 1.0;
+    copiedVector[1] = 0.5;
+  }
+
+  {
+  // copiedVector is gone, but data remains. Make up a new vector and pass it the
+  // same shared imp.
+  xdm::ReferenceVector< double > thinVector( imp, 5 );
+
+    BOOST_CHECK_EQUAL( 1.0, thinVector[0] );
+    BOOST_CHECK_EQUAL( 0.5, thinVector[1] );
+  }
+}
+
+BOOST_AUTO_TEST_CASE( assignment )
+{
+  double data[20]; // to be indexed as [10][2], i.e. 10 2D vectors.
+  double garbage[20];
+  xdm::RefPtr< xdm::SingleArrayOfVectorsImpl< double > > imp(
+    new xdm::SingleArrayOfVectorsImpl< double >( data, 2 ) );
+  xdm::RefPtr< xdm::SingleArrayOfVectorsImpl< double > > dummyImp(
+    new xdm::SingleArrayOfVectorsImpl< double >( garbage, 2 ) );
+
+  {
+    xdm::ReferenceVector< double > thinVector( imp, 5 );
+    thinVector[0] = 0.25;
+    thinVector[1] = 0.75;
+
+    // This vector points to an array that hasn't been initialized. It should contain
+    // garbage.
+    xdm::ReferenceVector< double > assignedVector( dummyImp, 7 );
+    BOOST_CHECK_NE( 0.25, assignedVector[0] );
+    BOOST_CHECK_NE( 0.75, assignedVector[1] );
+
+    // Now assign thinVector. The reference should point to the original data set.
+    assignedVector = thinVector;
+    BOOST_CHECK_EQUAL( 2, assignedVector.size() );
+    BOOST_CHECK_EQUAL( 0.25, assignedVector[0] );
+    BOOST_CHECK_EQUAL( 0.75, assignedVector[1] );
+
+    // Change some values before assignedVector goes out of scope.
+    assignedVector[0] = 1.0;
+    assignedVector[1] = 0.5;
+  }
+
+  {
+  // assignedVector is gone, but data remains. Make up a new vector and pass it the
+  // same shared imp.
+  xdm::ReferenceVector< double > thinVector( imp, 5 );
+
+    BOOST_CHECK_EQUAL( 1.0, thinVector[0] );
+    BOOST_CHECK_EQUAL( 0.5, thinVector[1] );
+  }
+}
+
 BOOST_AUTO_TEST_CASE( dotProduct )
 {
   // First, a vector from a single array.

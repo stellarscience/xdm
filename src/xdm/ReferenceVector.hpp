@@ -50,7 +50,13 @@ public:
 /// operations could be performed on e.g. nodal xyz coordinates without resorting to dimension-
 /// by-dimension access in the case where x, y, and z are stored in separate arrays. The class
 /// provides a common interface for that case as well as arrays where node coordinates are
-/// stored as xyzxyzxyz...
+/// stored as xyzxyzxyzxyz, and so on.
+///
+/// Currently, ReferenceVector ALWAYS refers to persistent data, and there are no implementations
+/// of ReferenceVectorImpl that are self-contained. The copy constructor and assignment operator
+/// preserve these references so that the reference semantics of the class are preserved. Thus,
+/// if a self-contained vector is necessary, the user should copy the data out of the
+/// ReferenceVector into a more suitable vector.
 template< typename ValueType >
 class ReferenceVector
 {
@@ -58,6 +64,13 @@ public:
   /// @param imp The implementation instance that will be used for this vector.
   /// @param index The index of this particular vector in the underlying collection of vectors.
   ReferenceVector( RefPtr< ReferenceVectorImpl< ValueType > > imp, std::size_t index );
+
+  /// Copy constructor copies reference, so the new vector will keep the reference intact.
+  ReferenceVector( const ReferenceVector< ValueType >& copyMe );
+
+  /// Operator= copies the reference, so the lhs vector references the same data that the
+  /// rhs vector references.
+  ReferenceVector< ValueType >& operator=( const ReferenceVector< ValueType >& rhs );
 
   ValueType& operator[]( std::size_t i );
 
@@ -139,6 +152,24 @@ ReferenceVector< ValueType >::ReferenceVector(
     mImp( imp ),
     mIndex( index )
 {
+}
+
+template< typename ValueType >
+ReferenceVector< ValueType >::ReferenceVector( const ReferenceVector< ValueType >& copyMe ) :
+    mImp( copyMe.mImp ),
+    mIndex( copyMe.mIndex )
+{
+}
+
+template< typename ValueType >
+ReferenceVector< ValueType >& ReferenceVector< ValueType >::operator=(
+  const ReferenceVector< ValueType >& rhs )
+{
+  if ( &rhs != this ) {
+    mImp = rhs.mImp;
+    mIndex = rhs.mIndex;
+  }
+  return *this; // virtual
 }
 
 template< typename ValueType >
