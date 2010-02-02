@@ -41,11 +41,14 @@ BOOST_AUTO_TEST_CASE( elementAccess ) {
   xdm::RefPtr< const xdmGrid::UnstructuredTopology > topo =
     dynamic_pointer_cast< const xdmGrid::UnstructuredTopology >( grid.topology() );
   BOOST_REQUIRE_EQUAL( 3, geom->dimension() );
-  BOOST_REQUIRE_EQUAL( 4, topo->nodesPerElement() );
-  BOOST_REQUIRE_EQUAL( xdmGrid::NodeOrdering::ExodusII, topo->nodeOrderingConvention() );
-  BOOST_REQUIRE_EQUAL( xdmGrid::ElementType::Tetra, topo->elementType() );
+  BOOST_CHECK_EQUAL( 4, topo->nodesPerElement() );
+  BOOST_CHECK_EQUAL( xdmGrid::NodeOrderingConvention::ExodusII, topo->nodeOrdering() );
+  BOOST_CHECK_EQUAL( xdmGrid::ElementShape::Tetra, topo->elementShape() );
 
   for ( std::size_t elementIndex = 0; elementIndex < topo->numberOfElements(); ++elementIndex ) {
+    // Should we provide element iterators in UnstructuredTopology?
+    const xdmGrid::Element& element = topo->element( elementIndex );
+
     // element.getQuadraturePoints()
     // evaluate attributes at quad points
     // setup local siffness, forcing arrays
@@ -53,8 +56,8 @@ BOOST_AUTO_TEST_CASE( elementAccess ) {
       for( std::size_t shape0Index = 0; shape0Index < topo->nodesPerElement(); ++shape0Index ) {
         for( std::size_t shape1Index = 0; shape1Index < topo->nodesPerElement(); ++shape1Index ) {
           K( shape0Index, shape1Index ) += element->getJxW( quadIndex ) *
-            element->shapeGradient( quadIndex ) * conductivityTensor[ quadIndex ] *
-            element->shapeGradient( quadIndex );
+            element->shapeGradient( quadIndex, shape0Index ) * conductivityTensor[ quadIndex ] *
+            element->shapeGradient( quadIndex, shape1Index );
       }
       F( shape0Index ) += element->getJxW( quadIndex ) * source[ quadIndex ];
     }

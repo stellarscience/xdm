@@ -1,6 +1,6 @@
 //==============================================================================
 // This software developed by Stellar Science Ltd Co and the U.S. Government.
-// Copyright (C) 2009 Stellar Science. Government-purpose rights granted.
+// Copyright (C) 2010 Stellar Science. Government-purpose rights granted.
 //
 // This file is part of XDM
 //
@@ -18,44 +18,38 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //------------------------------------------------------------------------------
-#include <xdmGrid/Geometry.hpp>
+#include <xdmGrid/Node.hpp>
 
-#include <algorithm>
+#include <xdmGrid/NamespaceMacro.hpp>
 
 XDM_GRID_NAMESPACE_BEGIN
 
-Geometry::Geometry( unsigned int dimension ) :
-  mDimension( dimension ) {
-}
-
-Geometry::~Geometry() {
-}
-
-void Geometry::setDimension( unsigned int dimension ) {
-  mDimension = dimension;
-}
-
-unsigned int Geometry::dimension() const {
-  return mDimension;
-}
-
-void Geometry::setNumberOfNodes( std::size_t n )
+Node::Node( xdm::ReferenceVector< double > location ) :
+  mLocation( location )
 {
-  mNumberOfNodes = n;
 }
 
-std::size_t Geometry::numberOfNodes() const
+Node::Node( const Node& copyMe ) :
+  mLocation( copyMe.mLocation )
 {
-  return mNumberOfNodes;
 }
 
-void Geometry::traverse( xdm::ItemVisitor& iv ) {
-  std::for_each( begin(), end(), xdm::ApplyVisitor( iv ) );
+Node& Node::operator=( const Node& rhs )
+{
+  if ( &rhs != this ) {
+    mLocation = rhs.mLocation;
+  }
+  return *this;
 }
 
-void Geometry::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
-  xdm::Item::writeMetadata( xml );
-  xml.setTag( "Geometry" );
+xdm::ReferenceVector< double >& Node::location()
+{
+  return mLocation;
+}
+
+const xdm::ReferenceVector< double >& Node::location() const
+{
+  return mLocation;
 }
 
 XDM_GRID_NAMESPACE_END

@@ -4,10 +4,12 @@ set( ${PROJECT_NAME}_HEADERS
     Attribute.hpp
     CollectionGrid.hpp
     Domain.hpp
+    Element.hpp
     Geometry.hpp
     Grid.hpp
     InterlacedGeometry.hpp
     NamespaceMacro.hpp
+    Node.hpp
     Polyvertex.hpp
     RectilinearMesh.hpp
     StructuredTopology.hpp
@@ -16,16 +18,18 @@ set( ${PROJECT_NAME}_HEADERS
     Topology.hpp
     UniformGrid.hpp
     UnstructuredTopology.hpp
-#    UnstructuredTopologyConventions.hpp
+    UnstructuredTopologyConventions.hpp
 )
 
 set( ${PROJECT_NAME}_SOURCES
     Attribute.cpp
     CollectionGrid.cpp
     Domain.cpp
+    Element.cpp
     Geometry.cpp
     Grid.cpp
     InterlacedGeometry.cpp
+    Node.cpp
     Polyvertex.cpp
     RectilinearMesh.cpp
     StructuredTopology.cpp
