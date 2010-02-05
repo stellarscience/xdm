@@ -42,6 +42,7 @@ void InterlacedGeometry::setCoordinateValues( xdm::RefPtr< xdm::UniformDataItem 
   appendChild( data );
   double* nodeLocations;
   xdm::TypedDataIndexingVisitor< double > visitor( nodeLocations );
+  data->accept( visitor );
   mSharedVectorImp = new xdm::SingleArrayOfVectorsImpl< double >( nodeLocations, dimension() );
 }
 
