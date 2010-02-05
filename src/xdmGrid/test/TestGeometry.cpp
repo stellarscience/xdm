@@ -22,9 +22,9 @@
 #include <boost/test/unit_test.hpp>
 
 #include <xdmGrid/Geometry.hpp>
-#include <xdmGrid/Node.hpp>
+#include <xdmGrid/NodeRef.hpp>
 
-#include <xdm/ReferenceVector.hpp>
+#include <xdm/VectorRef.hpp>
 #include <xdm/RefPtr.hpp>
 
 namespace {
@@ -35,18 +35,18 @@ public:
     xdmGrid::Geometry( dimension )
   {}
 
-  virtual xdmGrid::Node node( std::size_t nodeIndex )
+  virtual xdmGrid::NodeRef node( std::size_t nodeIndex )
   {
-    xdm::RefPtr< xdm::ReferenceVectorImpl< double > > emptyPtr;
-    xdm::ReferenceVector< double > emptyVec( emptyPtr, 0 );
-    return xdmGrid::Node( emptyVec );
+    xdm::RefPtr< xdm::VectorRefImpl< double > > emptyPtr;
+    xdm::VectorRef< double > emptyVec( emptyPtr, 0 );
+    return xdmGrid::NodeRef( emptyVec );
   }
 
-  virtual const xdmGrid::Node node( std::size_t nodeIndex ) const
+  virtual const xdmGrid::NodeRef node( std::size_t nodeIndex ) const
   {
-    xdm::RefPtr< xdm::ReferenceVectorImpl< double > > emptyPtr;
-    xdm::ReferenceVector< double > emptyVec( emptyPtr, 0 );
-    return xdmGrid::Node( emptyVec );
+    xdm::RefPtr< xdm::VectorRefImpl< double > > emptyPtr;
+    xdm::VectorRef< double > emptyVec( emptyPtr, 0 );
+    return xdmGrid::NodeRef( emptyVec );
   }
 };
 

@@ -13,6 +13,7 @@ set( ${PROJECT_NAME}_HEADERS
     CollectMetadataOperation.hpp
     CompositeDataItem.hpp
     CoordinateDataSelection.hpp
+    DataIndexingVisitor.hpp
     DataItem.hpp
     DataSelection.hpp
     DataSelectionMap.hpp
@@ -30,15 +31,16 @@ set( ${PROJECT_NAME}_HEADERS
     PrimitiveType.hpp
     ProxyDataset.hpp
     ReferencedObject.hpp
-    ReferenceVector.hpp
     RefPtr.hpp
     SelectableDataMixin.hpp
     SerializeDataOperation.hpp
     StaticAssert.hpp
     StructuredArray.hpp
     TemplateStructuredArray.hpp
+    TypedDataIndexingVisitor.hpp
     UniformDataItem.hpp
     UpdateVisitor.hpp
+    VectorRef.hpp
     VectorStructuredArray.hpp
     WritableArray.hpp
     WritableData.hpp
@@ -57,6 +59,7 @@ set( ${PROJECT_NAME}_SOURCES
     CollectMetadataOperation.cpp
     CompositeDataItem.cpp
     CoordinateDataSelection.cpp
+    DataIndexingVisitor.cpp
     DataItem.cpp
     DataSelection.cpp
     DataSelectionMap.cpp
@@ -68,12 +71,12 @@ set( ${PROJECT_NAME}_SOURCES
     PrimitiveType.cpp
     ProxyDataset.cpp
     ReferencedObject.cpp
-    ReferenceVector.cpp
     SelectableDataMixin.cpp
     SerializeDataOperation.cpp
     StructuredArray.cpp
     UniformDataItem.cpp
     UpdateVisitor.cpp
+    VectorRef.cpp
     WritableArray.cpp
     WritableData.cpp
     XmlObject.cpp

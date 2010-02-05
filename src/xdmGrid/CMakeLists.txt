@@ -2,14 +2,14 @@ project( xdmGrid )
 
 set( ${PROJECT_NAME}_HEADERS 
     Attribute.hpp
+    CellRef.hpp
     CollectionGrid.hpp
     Domain.hpp
-    Element.hpp
     Geometry.hpp
     Grid.hpp
     InterlacedGeometry.hpp
     NamespaceMacro.hpp
-    Node.hpp
+    NodeRef.hpp
     Polyvertex.hpp
     RectilinearMesh.hpp
     StructuredTopology.hpp
@@ -23,13 +23,13 @@ set( ${PROJECT_NAME}_HEADERS
 
 set( ${PROJECT_NAME}_SOURCES
     Attribute.cpp
+    CellRef.cpp
     CollectionGrid.cpp
     Domain.cpp
-    Element.cpp
     Geometry.cpp
     Grid.cpp
     InterlacedGeometry.cpp
-    Node.cpp
+    NodeRef.cpp
     Polyvertex.cpp
     RectilinearMesh.cpp
     StructuredTopology.cpp

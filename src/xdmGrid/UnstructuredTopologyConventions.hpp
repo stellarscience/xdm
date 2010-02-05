@@ -27,21 +27,42 @@ XDM_GRID_NAMESPACE_BEGIN
 
 namespace NodeOrderingConvention {
   enum Type {
-    ExodusII
+    ExodusII = 0
   };
 }
 
-namespace ElementShape {
+namespace CellShape {
   enum Type {
-    Circle,
+    Default = 0,
     Hex,
     Quad,
-    Sphere,
     Tetra,
     Triangle,
-    Truss,
     Wedge
   };
+}
+
+class CellClass {
+  CellShape::Type mShape;
+  std::size_t mNodesPerCell;
+  std::string mShapeName;
+public:
+  CellClass( CellShape::Type sh, std::size_t nodes, const std::string& shapeName ) :
+    mShape( sh ), mNodesPerCell( nodes ), mShapeName( shapeName ) {}
+
+  inline CellShape::Type shape() const { return mShape; }
+  inline std::size_t nodesPerCell() const { return mNodesPerCell; }
+  inline std::string shapeName() const { return mShapeName; }
+};
+
+namespace CellType {
+  typedef CellClass Type;
+  const CellClass Default( CellShape::Default, 0, "Default" );
+  const CellClass Hex( CellShape::Hex, 8, "Hexahedron" );
+  const CellClass Quad( CellShape::Quad, 4, "Quadrilateral" );
+  const CellClass Tetra( CellShape::Tetra, 4, "Tetrahedron" );
+  const CellClass Triangle( CellShape::Triangle, 3, "Triangle" );
+  const CellClass Wedge( CellShape::Wedge, 6, "Wedge" );
 }
 
 XDM_GRID_NAMESPACE_END

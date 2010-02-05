@@ -18,23 +18,23 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //------------------------------------------------------------------------------
-#include <xdmGrid/Node.hpp>
+#include <xdmGrid/NodeRef.hpp>
 
 #include <xdmGrid/NamespaceMacro.hpp>
 
 XDM_GRID_NAMESPACE_BEGIN
 
-Node::Node( xdm::ReferenceVector< double > location ) :
+NodeRef::NodeRef( xdm::VectorRef< double > location ) :
   mLocation( location )
 {
 }
 
-Node::Node( const Node& copyMe ) :
+NodeRef::NodeRef( const NodeRef& copyMe ) :
   mLocation( copyMe.mLocation )
 {
 }
 
-Node& Node::operator=( const Node& rhs )
+NodeRef& NodeRef::operator=( const NodeRef& rhs )
 {
   if ( &rhs != this ) {
     mLocation = rhs.mLocation;
@@ -42,12 +42,12 @@ Node& Node::operator=( const Node& rhs )
   return *this;
 }
 
-xdm::ReferenceVector< double >& Node::location()
+xdm::VectorRef< double >& NodeRef::location()
 {
   return mLocation;
 }
 
-const xdm::ReferenceVector< double >& Node::location() const
+const xdm::VectorRef< double >& NodeRef::location() const
 {
   return mLocation;
 }

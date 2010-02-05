@@ -18,8 +18,10 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //------------------------------------------------------------------------------
-#include <xdmGrid/Element.hpp>
+#include <xdmGrid/CellRef.hpp>
 #include <xdmGrid/UnstructuredTopology.hpp>
+
+#include <xdm/TypedDataIndexingVisitor.hpp>
 
 #include <sstream>
 
@@ -27,38 +29,30 @@ XDM_GRID_NAMESPACE_BEGIN
 
 UnstructuredTopology::UnstructuredTopology() :
   Topology(),
-  mNumberOfElements(),
-  mNodesPerElement(),
-  mConnectivity() {
+  mCellSharedImp(),
+  mConnectivity(),
+  mCellType( CellType::Default ),
+  mNumberOfCells(),
+  mOrdering() {
 }
 
 UnstructuredTopology::~UnstructuredTopology() {
 }
 
-void UnstructuredTopology::setNumberOfElements( std::size_t numberOfElements ) {
-  mNumberOfElements = numberOfElements;
+void UnstructuredTopology::setNumberOfCells( std::size_t numberOfCells ) {
+  mNumberOfCells = numberOfCells;
 }
 
-std::size_t UnstructuredTopology::numberOfElements() const {
-  return mNumberOfElements;
+std::size_t UnstructuredTopology::numberOfCells() const {
+  return mNumberOfCells;
 }
 
-void UnstructuredTopology::setNodesPerElement( std::size_t nodesPerElement ) {
-  mNodesPerElement = nodesPerElement;
+void UnstructuredTopology::setCellType( const CellType::Type& type ) {
+  mCellType = type;
 }
 
-std::size_t UnstructuredTopology::nodesPerElement() const {
-  return mNodesPerElement;
-}
-
-void UnstructuredTopology::setElementShape( const ElementShape::Type& shape )
-{
-  mShape = shape;
-}
-
-ElementShape::Type UnstructuredTopology::elementShape() const
-{
-  return mShape;
+const CellType::Type& UnstructuredTopology::cellType() const {
+  return mCellType;
 }
 
 void UnstructuredTopology::setNodeOrdering( const NodeOrderingConvention::Type& order )
@@ -71,18 +65,21 @@ NodeOrderingConvention::Type UnstructuredTopology::nodeOrdering() const
   return mOrdering;
 }
 
-Element UnstructuredTopology::element( std::size_t elementIndex )
+CellRef UnstructuredTopology::cell( std::size_t cellIndex )
 {
-  return Element( mElementSharedImpl, elementIndex );
+  return CellRef( mCellSharedImp, cellIndex );
 }
 
-const Element UnstructuredTopology::element( std::size_t elementIndex ) const
+const CellRef UnstructuredTopology::cell( std::size_t cellIndex ) const
 {
-  return Element( mElementSharedImpl, elementIndex );
+  return CellRef( mCellSharedImp, cellIndex );
 }
 
-void UnstructuredTopology::setConnectivity( xdm::DataItem* connectivity ) {
+void UnstructuredTopology::setConnectivity( xdm::RefPtr< xdm::UniformDataItem > connectivity ) {
   mConnectivity = connectivity;
+  std::size_t* connectivityArray;
+  xdm::TypedDataIndexingVisitor< std::size_t > visitor( connectivityArray );
+//  mCellSharedImp = new xdm::SingleArrayOfVectorsImpl< double >(
 }
 
 void UnstructuredTopology::traverse( xdm::ItemVisitor& iv ) {
@@ -94,11 +91,14 @@ void UnstructuredTopology::traverse( xdm::ItemVisitor& iv ) {
 void UnstructuredTopology::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
   Topology::writeMetadata( xml );
 
-  // Write the number of elements
-  xml.setAttribute( "NumberOfElements", mNumberOfElements );
+  // Write the number of cells
+  xml.setAttribute( "NumberOfElements", mNumberOfCells );
 
-  // Write the nodes per element
-  xml.setAttribute( "NodesPerElement", mNodesPerElement );
+  // Write the cell type
+  xml.setAttribute( "ElementType", mCellType.shapeName() );
+
+  // Write the nodes per cell
+  xml.setAttribute( "NodesPerElement", mCellType.nodesPerCell() );
 }
 
 XDM_GRID_NAMESPACE_END

@@ -18,8 +18,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //------------------------------------------------------------------------------
-#ifndef xdm_ReferenceVector_hpp
-#define xdm_ReferenceVector_hpp
+#ifndef xdm_VectorRef_hpp
+#define xdm_VectorRef_hpp
 
 #include <xdm/RefPtr.hpp>
 #include <xdm/ReferencedObject.hpp>
@@ -30,9 +30,9 @@
 
 XDM_NAMESPACE_BEGIN
 
-/// The base implementation class held by ReferenceVectors.
+/// The base implementation class held by VectorRefs.
 template< typename ValueType >
-class ReferenceVectorImpl : public ReferencedObject
+class VectorRefImpl : public ReferencedObject
 {
 public:
   /// @param baseIndex The index of the vector in the underlying container of vectors.
@@ -44,7 +44,7 @@ public:
   virtual std::size_t size() const = 0;
 };
 
-/// A ReferenceVector is a thin object that refers to a set of data and provides vector-like
+/// A VectorRef is a thin object that refers to a set of data and provides vector-like
 /// data access semantics with operator[]. It provides a vector-like "view" of a set of
 /// data that may or may not be contiguous in memory. This class was designed so that vector
 /// operations could be performed on e.g. nodal xyz coordinates without resorting to dimension-
@@ -52,25 +52,25 @@ public:
 /// provides a common interface for that case as well as arrays where node coordinates are
 /// stored as xyzxyzxyzxyz, and so on.
 ///
-/// Currently, ReferenceVector ALWAYS refers to persistent data, and there are no implementations
-/// of ReferenceVectorImpl that are self-contained. The copy constructor and assignment operator
+/// Currently, VectorRef ALWAYS refers to persistent data, and there are no implementations
+/// of VectorRefImpl that are self-contained. The copy constructor and assignment operator
 /// preserve these references so that the reference semantics of the class are preserved. Thus,
 /// if a self-contained vector is necessary, the user should copy the data out of the
-/// ReferenceVector into a more suitable vector.
+/// VectorRef into a more suitable vector.
 template< typename ValueType >
-class ReferenceVector
+class VectorRef
 {
 public:
   /// @param imp The implementation instance that will be used for this vector.
   /// @param index The index of this particular vector in the underlying collection of vectors.
-  ReferenceVector( RefPtr< ReferenceVectorImpl< ValueType > > imp, std::size_t index );
+  VectorRef( RefPtr< VectorRefImpl< ValueType > > imp, std::size_t index );
 
   /// Copy constructor copies reference, so the new vector will keep the reference intact.
-  ReferenceVector( const ReferenceVector< ValueType >& copyMe );
+  VectorRef( const VectorRef< ValueType >& copyMe );
 
   /// Operator= copies the reference, so the lhs vector references the same data that the
   /// rhs vector references.
-  ReferenceVector< ValueType >& operator=( const ReferenceVector< ValueType >& rhs );
+  VectorRef< ValueType >& operator=( const VectorRef< ValueType >& rhs );
 
   ValueType& operator[]( std::size_t i );
 
@@ -78,7 +78,7 @@ public:
     std::size_t size() const;
 
 private:
-  RefPtr< ReferenceVectorImpl< ValueType > > mImp;
+  RefPtr< VectorRefImpl< ValueType > > mImp;
   std::size_t mIndex;
 };
 
@@ -88,7 +88,7 @@ private:
 /// Extrinsic state: index of specific location.
 /// Interlaced arrays xyzxyzxyzxyz...
 template< typename ValueType >
-class SingleArrayOfVectorsImpl : public ReferenceVectorImpl< ValueType >
+class SingleArrayOfVectorsImpl : public VectorRefImpl< ValueType >
 {
 public:
   SingleArrayOfVectorsImpl( ValueType* xyzArray, std::size_t elementsPerVector );
@@ -108,7 +108,7 @@ private:
 /// One array for each coordinate value of the nodes.
 /// x1x2x3x4.... y1y2y3y4.... z1z2z3z4....
 template< typename ValueType >
-class MultipleArraysOfVectorElementsImpl : public ReferenceVectorImpl< ValueType >
+class MultipleArraysOfVectorElementsImpl : public VectorRefImpl< ValueType >
 {
 public:
   MultipleArraysOfVectorElementsImpl( const std::vector< ValueType* >& arrays );
@@ -128,7 +128,7 @@ private:
 /// apparently dense access (e.g. by node index), but under the hood, the data is stored only on
 /// coordinate axes.
 template< typename ValueType >
-class TensorProductArraysImpl : public ReferenceVectorImpl< ValueType >
+class TensorProductArraysImpl : public VectorRefImpl< ValueType >
 {
 public:
   TensorProductArraysImpl(
@@ -147,23 +147,23 @@ private:
 
 //----------------------- Implementations --------------------------------------
 template< typename ValueType >
-ReferenceVector< ValueType >::ReferenceVector(
-  RefPtr< ReferenceVectorImpl< ValueType > > imp, std::size_t index ) :
+VectorRef< ValueType >::VectorRef(
+  RefPtr< VectorRefImpl< ValueType > > imp, std::size_t index ) :
     mImp( imp ),
     mIndex( index )
 {
 }
 
 template< typename ValueType >
-ReferenceVector< ValueType >::ReferenceVector( const ReferenceVector< ValueType >& copyMe ) :
+VectorRef< ValueType >::VectorRef( const VectorRef< ValueType >& copyMe ) :
     mImp( copyMe.mImp ),
     mIndex( copyMe.mIndex )
 {
 }
 
 template< typename ValueType >
-ReferenceVector< ValueType >& ReferenceVector< ValueType >::operator=(
-  const ReferenceVector< ValueType >& rhs )
+VectorRef< ValueType >& VectorRef< ValueType >::operator=(
+  const VectorRef< ValueType >& rhs )
 {
   if ( &rhs != this ) {
     mImp = rhs.mImp;
@@ -173,13 +173,13 @@ ReferenceVector< ValueType >& ReferenceVector< ValueType >::operator=(
 }
 
 template< typename ValueType >
-ValueType& ReferenceVector< ValueType >::operator[]( std::size_t i )
+ValueType& VectorRef< ValueType >::operator[]( std::size_t i )
 {
   return mImp->at( mIndex, i ); // virtual
 }
 
 template< typename ValueType >
-std::size_t ReferenceVector< ValueType >::size() const
+std::size_t VectorRef< ValueType >::size() const
 {
   return mImp->size(); // virtual
 }
@@ -256,4 +256,4 @@ std::size_t TensorProductArraysImpl< ValueType >::size() const
 
 XDM_NAMESPACE_END
 
-#endif // xdm_ReferenceVector_hpp
+#endif // xdm_VectorRef_hpp

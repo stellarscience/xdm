@@ -18,8 +18,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //------------------------------------------------------------------------------
-#ifndef xdm_Element_hpp
-#define xdm_Element_hpp
+#ifndef xdm_CellRef_hpp
+#define xdm_CellRef_hpp
 
 #include <xdm/ReferencedObject.hpp>
 #include <xdm/RefPtr.hpp>
@@ -30,38 +30,42 @@
 
 XDM_GRID_NAMESPACE_BEGIN
 
-class Node;
+class NodeRef;
 
-/// Shared implementation class for referencing element data that is not stored in a self-contained
-/// element structure.
-class ElementImpl : public xdm::ReferencedObject
+/// Shared implementation class for referencing Cell data that is not stored in a self-contained
+/// Cell structure. All Cells that use a given shared implementation should be of the same
+/// type, have the same number of nodes, etc.
+class CellSharedImp : public xdm::ReferencedObject
 {
 public:
-  /// Get a single node (the Node class is a reference class).
-  virtual const Node node( std::size_t nodeIndex, std::size_t elementIndex ) const;
+  /// Get a single node (the NodeRef class is a reference class).
+  virtual const NodeRef node( std::size_t nodeIndex, std::size_t CellIndex ) const;
 
-  /// The number of nodes for all elements that this shared implementation refers to.
+  /// The number of nodes for all Cells that this shared implementation refers to.
   virtual std::size_t numberOfNodes() const;
 };
 
-class Element
+class CellRef
 {
 public:
-  Element( xdm::RefPtr< ElementImpl > imp, std::size_t elementIndex );
+  CellRef( xdm::RefPtr< CellSharedImp > imp, std::size_t CellIndex );
+  CellRef( const CellRef& copyMe );
 
-  /// Get a single const node (the Node class is a reference class).
-  const Node node( std::size_t nodeIndex ) const;
-  /// Get a single node (the Node class is a reference class).
-  Node node( std::size_t nodeIndex );
+  CellRef& operator=( const CellRef& rhs );
 
-  /// The number of total nodes for this element.
+  /// Get a single const node (the NodeRef class is a reference class).
+  const NodeRef node( std::size_t nodeIndex ) const;
+  /// Get a single node (the NodeRef class is a reference class).
+  NodeRef node( std::size_t nodeIndex );
+
+  /// The number of total nodes for this Cell.
   std::size_t numberOfNodes() const;
 
 private:
-  xdm::RefPtr< ElementImpl > mImp;
+  xdm::RefPtr< CellSharedImp > mImp;
   std::size_t mIndex;
 };
 
 XDM_GRID_NAMESPACE_END
 
-#endif // xdm_Element_hpp
+#endif // xdm_CellRef_hpp

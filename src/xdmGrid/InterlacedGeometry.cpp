@@ -19,9 +19,10 @@
 //
 //------------------------------------------------------------------------------
 #include <xdmGrid/InterlacedGeometry.hpp>
-#include <xdmGrid/Node.hpp>
+#include <xdmGrid/NodeRef.hpp>
 
-#include <xdm/ReferenceVector.hpp>
+#include <xdm/TypedDataIndexingVisitor.hpp>
+#include <xdm/VectorRef.hpp>
 
 #include <stdexcept>
 #include <cassert>
@@ -37,18 +38,21 @@ InterlacedGeometry::InterlacedGeometry( unsigned int dimension ) :
 InterlacedGeometry::~InterlacedGeometry() {
 }
 
-void InterlacedGeometry::setCoordinateValues( xdm::RefPtr< xdm::DataItem > data ) {
+void InterlacedGeometry::setCoordinateValues( xdm::RefPtr< xdm::UniformDataItem > data ) {
   appendChild( data );
+  double* nodeLocations;
+  xdm::TypedDataIndexingVisitor< double > visitor( nodeLocations );
+  mSharedVectorImp = new xdm::SingleArrayOfVectorsImpl< double >( nodeLocations, dimension() );
 }
 
-Node InterlacedGeometry::node( std::size_t nodeIndex )
+NodeRef InterlacedGeometry::node( std::size_t nodeIndex )
 {
-  return Node( xdm::ReferenceVector< double >( mSharedVectorImp, nodeIndex ) );
+  return NodeRef( xdm::VectorRef< double >( mSharedVectorImp, nodeIndex ) );
 }
 
-const Node InterlacedGeometry::node( std::size_t nodeIndex ) const
+const NodeRef InterlacedGeometry::node( std::size_t nodeIndex ) const
 {
-  return Node( xdm::ReferenceVector< double >( mSharedVectorImp, nodeIndex ) );
+  return NodeRef( xdm::VectorRef< double >( mSharedVectorImp, nodeIndex ) );
 }
 
 void InterlacedGeometry::writeMetadata( xdm::XmlMetadataWrapper& xml ) {

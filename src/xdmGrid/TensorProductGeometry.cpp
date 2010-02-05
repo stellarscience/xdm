@@ -18,7 +18,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //------------------------------------------------------------------------------
-#include <xdmGrid/Node.hpp>
+#include <xdmGrid/NodeRef.hpp>
 #include <xdmGrid/TensorProductGeometry.hpp>
 
 #include <stdexcept>
@@ -43,14 +43,14 @@ void TensorProductGeometry::setCoordinateValues(
   setChild( dim, data );
 }
 
-Node TensorProductGeometry::node( std::size_t nodeIndex )
+NodeRef TensorProductGeometry::node( std::size_t nodeIndex )
 {
-  return Node( xdm::ReferenceVector< double >( mSharedVectorImp, nodeIndex ) );
+  return NodeRef( xdm::VectorRef< double >( mSharedVectorImp, nodeIndex ) );
 }
 
-const Node TensorProductGeometry::node( std::size_t nodeIndex ) const
+const NodeRef TensorProductGeometry::node( std::size_t nodeIndex ) const
 {
-  return Node( xdm::ReferenceVector< double >( mSharedVectorImp, nodeIndex ) );
+  return NodeRef( xdm::VectorRef< double >( mSharedVectorImp, nodeIndex ) );
 }
 
 void TensorProductGeometry::writeMetadata( xdm::XmlMetadataWrapper& xml ) {

@@ -18,35 +18,5 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //------------------------------------------------------------------------------
-#ifndef xdm_Node_hpp
-#define xdm_Node_hpp
 
-#include <xdm/ReferenceVector.hpp>
-
-#include <xdmGrid/NamespaceMacro.hpp>
-
-XDM_GRID_NAMESPACE_BEGIN
-
-/// A lightweight class that represents a single node in a geometry. The Node keeps
-/// track of its location, which is represented by a ReferenceVector. This means
-/// that the Node itself is a reference object, and thus, changes to a Node's location
-/// are propagated back through to the original dataset.
-class Node
-{
-public:
-  Node( xdm::ReferenceVector< double > location );
-  Node( const Node& copyMe );
-
-  Node& operator=( const Node& rhs );
-
-  xdm::ReferenceVector< double >& location();
-  const xdm::ReferenceVector< double >& location() const;
-
-private:
-  xdm::ReferenceVector< double > mLocation;
-};
-
-XDM_GRID_NAMESPACE_END
-
-#endif // xdm_Node_hpp
-
+#include <xdm/VectorRef.hpp>

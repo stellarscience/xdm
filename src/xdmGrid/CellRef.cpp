@@ -18,29 +18,43 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //------------------------------------------------------------------------------
-#include <xdmGrid/Element.hpp>
-#include <xdmGrid/Node.hpp>
+#include <xdmGrid/CellRef.hpp>
+#include <xdmGrid/NodeRef.hpp>
 
 #include <xdmGrid/NamespaceMacro.hpp>
 
 XDM_GRID_NAMESPACE_BEGIN
 
-Element::Element( xdm::RefPtr< ElementImpl > imp, std::size_t elementIndex ) :
-  mImp( imp ), mIndex( elementIndex )
+CellRef::CellRef( xdm::RefPtr< CellSharedImp > imp, std::size_t CellIndex ) :
+  mImp( imp ), mIndex( CellIndex )
 {
 }
 
-const Node Element::node( std::size_t nodeIndex ) const
+CellRef::CellRef( const CellRef& copyMe ) :
+  mImp( copyMe.mImp ), mIndex( copyMe.mIndex )
+{
+}
+
+CellRef& CellRef::operator=( const CellRef& rhs )
+{
+  if ( &rhs != this ) {
+    mImp = rhs.mImp;
+    mIndex = rhs.mIndex;
+  }
+  return *this;
+}
+
+const NodeRef CellRef::node( std::size_t nodeIndex ) const
 {
   return mImp->node( nodeIndex, mIndex );
 }
 
-Node Element::node( std::size_t nodeIndex )
+NodeRef CellRef::node( std::size_t nodeIndex )
 {
-  return static_cast< const Element& >(*this).mImp->node( nodeIndex, mIndex );
+  return static_cast< const CellRef& >(*this).mImp->node( nodeIndex, mIndex );
 }
 
-std::size_t Element::numberOfNodes() const
+std::size_t CellRef::numberOfNodes() const
 {
   return mImp->numberOfNodes();
 }

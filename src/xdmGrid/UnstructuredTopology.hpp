@@ -24,14 +24,15 @@
 #include <xdmGrid/Topology.hpp>
 #include <xdmGrid/UnstructuredTopologyConventions.hpp>
 
-#include <xdm/DataShape.hpp>
+#include <xdm/RefPtr.hpp>
+#include <xdm/UniformDataItem.hpp>
 
 #include <xdmGrid/NamespaceMacro.hpp>
 
 XDM_GRID_NAMESPACE_BEGIN
 
-class Element;
-class ElementImpl;
+class CellRef;
+class CellSharedImp;
 
 /// Base class for all unstructured topologies. If the connectivity is different
 /// from the standard, an order may be specified.
@@ -42,49 +43,43 @@ public:
 
   XDM_META_ITEM( UnstructuredTopology );
 
-  /// Set the number of elements in the topology.
-  void setNumberOfElements( std::size_t numberOfElements );
-  /// Get the number of elements in the topology.
-  std::size_t numberOfElements() const;
+  /// Set the number of cells in the topology.
+  void setNumberOfCells( std::size_t numberOfCells );
+  /// Get the number of cells in the topology.
+  std::size_t numberOfCells() const;
 
-  /// Define how many nodes make up a single element.
-  void setNodesPerElement( std::size_t nodesPerElement );
-  /// Determine how many nodes make up a single element.
-  std::size_t nodesPerElement() const;
+  /// Set the type of the cells.
+  void setCellType( const CellType::Type& type );
+  /// Get the type of the cells.
+  const CellType::Type& cellType() const;
 
-  /// Set the shape of the elements.
-  void setElementShape( const ElementShape::Type& shape );
-  /// Get the shape of the elements.
-  ElementShape::Type elementShape() const;
-
-  /// Set the node ordering convention for the shape of the elements. For example,
+  /// Set the node ordering convention for the shape of the Cells. For example,
   /// Exodus II orders the nodes of a linear tetrahedron differently than some
   /// other formats.
   void setNodeOrdering( const NodeOrderingConvention::Type& order );
-  /// Get the node odering for the shape of these elements.
+  /// Get the node odering for the shape of these Cells.
   NodeOrderingConvention::Type nodeOrdering() const;
 
-  /// Get an element by index.
-  Element element( std::size_t elementIndex );
-  /// Get a const element by index.
-  const Element element( std::size_t elementIndex ) const;
+  /// Get a cell by index.
+  CellRef cell( std::size_t cellIndex );
+  /// Get a const cell by index.
+  const CellRef cell( std::size_t cellIndex ) const;
 
   /// Set the connectivity values to the input DataItem. If the connectivity
   /// is not specified, then there is a default connectivity determined by the
   /// topology type.
-  void setConnectivity( xdm::DataItem* connectivity );
+  void setConnectivity( xdm::RefPtr< xdm::UniformDataItem > connectivity );
 
   virtual void traverse( xdm::ItemVisitor& iv );
 
   virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
 
 private:
-  xdm::RefPtr< xdm::DataItem > mConnectivity;
-  xdm::RefPtr< ElementImpl > mElementSharedImpl;
-  std::size_t mNumberOfElements;
-  std::size_t mNodesPerElement;
+  xdm::RefPtr< xdm::UniformDataItem > mConnectivity;
+  xdm::RefPtr< CellSharedImp > mCellSharedImp;
+  CellType::Type mCellType;
+  std::size_t mNumberOfCells;
   NodeOrderingConvention::Type mOrdering;
-  ElementShape::Type mShape;
 };
 
 XDM_GRID_NAMESPACE_END

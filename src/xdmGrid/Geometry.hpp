@@ -29,7 +29,7 @@
 
 XDM_GRID_NAMESPACE_BEGIN
 
-class Node;
+class NodeRef;
 
 /// Base class for descriptions of the geometric properties of a grid.  This
 /// class is intended to be a base class that all different types of geometric
@@ -57,8 +57,8 @@ public:
   std::size_t numberOfNodes() const;
 
   /// Grab a node by index.
-  virtual Node node( std::size_t nodeIndex ) = 0;
-  virtual const Node node( std::size_t nodeIndex ) const = 0;
+  virtual NodeRef node( std::size_t nodeIndex ) = 0;
+  virtual const NodeRef node( std::size_t nodeIndex ) const = 0;
 
   virtual void traverse( xdm::ItemVisitor& iv );
 

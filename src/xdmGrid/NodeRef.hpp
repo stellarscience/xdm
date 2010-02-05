@@ -1,6 +1,6 @@
 //==============================================================================
 // This software developed by Stellar Science Ltd Co and the U.S. Government.
-// Copyright (C) 2009 Stellar Science. Government-purpose rights granted.
+// Copyright (C) 2010 Stellar Science. Government-purpose rights granted.
 //
 // This file is part of XDM
 //
@@ -18,27 +18,35 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //------------------------------------------------------------------------------
-#define BOOST_TEST_MODULE Polyvertex
-#include <boost/test/unit_test.hpp>
+#ifndef xdm_NodeRef_hpp
+#define xdm_NodeRef_hpp
 
-#include <xdmGrid/Polyvertex.hpp>
+#include <xdm/VectorRef.hpp>
 
-namespace {
+#include <xdmGrid/NamespaceMacro.hpp>
 
-BOOST_AUTO_TEST_CASE( writeMetadata ) {
-  xdmGrid::Polyvertex t;
-  xdm::XmlMetadataWrapper xml( xdm::makeRefPtr( new xdm::XmlObject ) );
+XDM_GRID_NAMESPACE_BEGIN
 
-  t.setNumberOfCells( 12 );
-  t.setCellType( xdmGrid::CellType::Default );
+/// A lightweight class that represents a single node in a geometry. The Node keeps
+/// track of its location, which is represented by a VectorRef. This means
+/// that the Node itself is a reference object, and thus, changes to a Node's location
+/// are propagated back through to the original dataset.
+class NodeRef
+{
+public:
+  NodeRef( xdm::VectorRef< double > location );
+  NodeRef( const NodeRef& copyMe );
 
-  t.writeMetadata( xml );
+  NodeRef& operator=( const NodeRef& rhs );
 
-  BOOST_CHECK_EQUAL( "Topology", xml.tag() );
-  BOOST_CHECK_EQUAL( "Polyvertex", xml.attribute( "TopologyType" ) );
-  BOOST_CHECK_EQUAL( "12", xml.attribute( "NumberOfElements" ) );
-  BOOST_CHECK_EQUAL( "0", xml.attribute( "NodesPerElement" ) );
-}
+  xdm::VectorRef< double >& location();
+  const xdm::VectorRef< double >& location() const;
 
-} // namespace
+private:
+  xdm::VectorRef< double > mLocation;
+};
+
+XDM_GRID_NAMESPACE_END
+
+#endif // xdm_NodeRef_hpp
 

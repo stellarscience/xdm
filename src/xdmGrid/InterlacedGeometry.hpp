@@ -23,7 +23,8 @@
 
 #include <xdmGrid/Geometry.hpp>
 
-#include <xdm/ReferenceVector.hpp>
+#include <xdm/UniformDataItem.hpp>
+#include <xdm/VectorRef.hpp>
 #include <xdm/RefPtr.hpp>
 
 #include <xdmGrid/NamespaceMacro.hpp>
@@ -48,16 +49,16 @@ public:
   XDM_META_ITEM( InterlacedGeometry );
 
   /// Set the DataItem representing the node values.
-  void setCoordinateValues( xdm::RefPtr< xdm::DataItem > data );
+  void setCoordinateValues( xdm::RefPtr< xdm::UniformDataItem > data );
 
   /// Grab a node by index.
-  virtual Node node( std::size_t nodeIndex );
-  virtual const Node node( std::size_t nodeIndex ) const;
+  virtual NodeRef node( std::size_t nodeIndex );
+  virtual const NodeRef node( std::size_t nodeIndex ) const;
 
   virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
 
 private:
-  xdm::RefPtr< xdm::ReferenceVectorImpl< double > > mSharedVectorImp;
+  xdm::RefPtr< xdm::VectorRefImpl< double > > mSharedVectorImp;
 };
 
 XDM_GRID_NAMESPACE_END

@@ -18,5 +18,31 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //------------------------------------------------------------------------------
+#ifndef xdm_TypedDataIndexingVisitor_hpp
+#define xdm_TypedDataIndexingVisitor_hpp
 
-#include <xdm/ReferenceVector.hpp>
+#include <xdm/DataIndexingVisitor.hpp>
+#include <xdm/TemplateStructuredArray.hpp>
+
+#include <xdm/NamespaceMacro.hpp>
+
+XDM_NAMESPACE_BEGIN
+
+template< typename T >
+class TypedDataIndexingVisitor : public DataIndexingVisitor {
+public:
+  TypedDataIndexingVisitor( T*& arrayOrigin ) :
+    mArrayOrigin( arrayOrigin ) {}
+
+  virtual void apply( TemplateStructuredArray< T >& array ) {
+    mArrayOrigin = array.begin();
+  }
+
+private:
+  T*& mArrayOrigin;
+};
+
+XDM_NAMESPACE_END
+
+#endif // xdm_TypedDataIndexingVisitor_hpp
+

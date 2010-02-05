@@ -23,7 +23,7 @@
 
 #include <xdmGrid/Geometry.hpp>
 
-#include <xdm/ReferenceVector.hpp>
+#include <xdm/VectorRef.hpp>
 #include <xdm/RefPtr.hpp>
 
 #include <xdmGrid/NamespaceMacro.hpp>
@@ -55,13 +55,13 @@ public:
   void setCoordinateValues( unsigned int dim, xdm::RefPtr< xdm::DataItem > data );
 
   /// Grab a node by index.
-  virtual Node node( std::size_t nodeIndex );
-  virtual const Node node( std::size_t nodeIndex ) const;
+  virtual NodeRef node( std::size_t nodeIndex );
+  virtual const NodeRef node( std::size_t nodeIndex ) const;
 
   virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
 
 private:
-  xdm::RefPtr< xdm::ReferenceVectorImpl< double > > mSharedVectorImp;
+  xdm::RefPtr< xdm::VectorRefImpl< double > > mSharedVectorImp;
 };
 
 XDM_GRID_NAMESPACE_END
