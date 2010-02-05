@@ -42,11 +42,11 @@ BinaryIStream::~BinaryIStream() {
 }
 
 int BinaryIStream::get() {
-  return rdbuf()->sgetc();
+  return rdbuf()->sbumpc();
 }
 
 BinaryIStream& BinaryIStream::get( char& c ) {
-  c = rdbuf()->sgetc();
+  c = rdbuf()->sbumpc();
   return *this;
 }
 

@@ -34,7 +34,14 @@ public:
 
   XDM_META_ITEM( "Polyvertex" );
 
+  /// Speficy the number of points that make up the topology.
+  void setNumberOfPoints( size_t n );
+  /// Get the number of points that make up the topology.
+  size_t numberOfPoints() const;
+
   virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
+private:
+  size_t mNumberOfPoints;
 };
 
 XDM_GRID_NAMESPACE_END

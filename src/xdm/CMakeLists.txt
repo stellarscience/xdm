@@ -55,6 +55,7 @@ set( ${PROJECT_NAME}_SOURCES
     BinaryIStream.cpp
     BinaryIOStream.cpp
     BinaryOStream.cpp
+    BinaryStreamBuffer.cpp
     BinaryStreamOperations.cpp
     CollectMetadataOperation.cpp
     CompositeDataItem.cpp

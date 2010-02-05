@@ -23,7 +23,8 @@
 XDM_GRID_NAMESPACE_BEGIN
 
 Polyvertex::Polyvertex() :
-  UnstructuredTopology() {
+  UnstructuredTopology(),
+  mNumberOfPoints() {
 }
 
 Polyvertex::~Polyvertex() {
@@ -33,6 +34,17 @@ void Polyvertex::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
   UnstructuredTopology::writeMetadata( xml );
 
   xml.setAttribute( "TopologyType", "Polyvertex" );
+
+  xml.setAttribute( "NumberOfElements", 1 );
+  xml.setAttribute( "NodesPerElement", mNumberOfPoints );
+}
+
+void Polyvertex::setNumberOfPoints( size_t n ) {
+  mNumberOfPoints = n;
+}
+
+size_t Polyvertex::numberOfPoints() const {
+  return mNumberOfPoints;
 }
 
 XDM_GRID_NAMESPACE_END

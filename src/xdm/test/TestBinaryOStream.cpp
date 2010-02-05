@@ -42,7 +42,7 @@ template< typename T > void readValue() {
 
   test.mOstr << test.value;
   
-  T* result = reinterpret_cast< T* >( test.mBuf.pointer() );
+  T* result = reinterpret_cast< T* >( test.mBuf.bufferStart() );
   BOOST_CHECK_EQUAL( test.value, *result );
 }
 

@@ -50,15 +50,30 @@ class CoalescingStreamBuffer;
 /// actually writing the data to a dataset.  The communication procedures assume
 /// that the cluster is heterogeneous and the objects to be sent are bitwise
 /// serializable.
+///
+/// This class uses a CoalescingStreamBuffer to buffer interprocess
+/// communications. The constructor for this class takes a hint to control the
+/// size of the buffer used for communications. A poor choice for this size can
+/// greatly impact application performance. Using a buffer size that is too
+/// small can result in messages being overly buffered and therefore increase
+/// communication traffic. Clients with knowledge of their own array sizes can
+/// tune this parameter to ensure a minimum of communication is required when
+/// passing arrays with dataset contents between processes.
 class MpiDatasetProxy : public xdm::ProxyDataset {
 public:
-  /// Construct a proxy for the input dataset.
-  /// @param communicator Communicator with relevant processes.
-  /// @param dataset The actual dataset that will handle writing.
-  /// @param bufSizeHint Suggested size for communication buffer.
   // Code Review Matter (open): Naming conventions.
   // Did you consider not abbreviating "buffer" in the parameter name below?
   // Will Dicharry 2010-01-19
+
+  /// Construct a proxy for the input dataset. As described in the class
+  /// documentation, a poor choice for the buffer size hint can greatly impact
+  /// application performance.
+  /// @see MpiDatasetProxy
+  /// @see CoalescingStreamBuffer
+  /// @pre All processes in the communicator must use the same buffer size.
+  /// @param communicator Communicator with relevant processes.
+  /// @param dataset The actual dataset that will handle writing.
+  /// @param bufSizeHint Suggested size for communication buffer.
   MpiDatasetProxy( 
     MPI_Comm communicator, 
     xdm::RefPtr< xdm::Dataset > dataset,

@@ -91,8 +91,9 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
   xdm::RefPtr< xdmFormat::TimeSeries > timeSeries(
     new xdmFormat::TemporalCollection( baseName.str() + ".xmf" ) );
 
-  xdmComm::ParallelizeTreeVisitor parallelize( 
-    localRegion.size() * sizeof( double ) + 1024 );
+  // parallelize, choose a small buffer size to ensure data must be buffered
+  // between processes.
+  xdmComm::ParallelizeTreeVisitor parallelize( sizeof( double ) );
   grid->accept( parallelize );
 
   timeSeries->open();

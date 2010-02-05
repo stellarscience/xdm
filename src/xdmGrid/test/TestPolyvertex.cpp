@@ -29,15 +29,15 @@ BOOST_AUTO_TEST_CASE( writeMetadata ) {
   xdmGrid::Polyvertex t;
   xdm::XmlMetadataWrapper xml( xdm::makeRefPtr( new xdm::XmlObject ) );
 
-  t.setNumberOfCells( 12 );
+  t.setNumberOfPoints( 12 );
   t.setCellType( xdmGrid::CellType::Default );
 
   t.writeMetadata( xml );
 
   BOOST_CHECK_EQUAL( "Topology", xml.tag() );
   BOOST_CHECK_EQUAL( "Polyvertex", xml.attribute( "TopologyType" ) );
-  BOOST_CHECK_EQUAL( "12", xml.attribute( "NumberOfElements" ) );
-  BOOST_CHECK_EQUAL( "0", xml.attribute( "NodesPerElement" ) );
+  BOOST_CHECK_EQUAL( "1", xml.attribute( "NumberOfElements" ) );
+  BOOST_CHECK_EQUAL( "12", xml.attribute( "NodesPerElement" ) );
 }
 
 } // namespace

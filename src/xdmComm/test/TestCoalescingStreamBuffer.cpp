@@ -23,12 +23,14 @@
 #include <boost/test/results_reporter.hpp>
 #include <boost/test/unit_test_log.hpp>
 
+#include <xdmComm/BarrierOnExit.hpp>
 #include <xdmComm/CoalescingStreamBuffer.hpp>
 
 #include <xdmComm/test/MpiTestFixture.hpp>
 
 #include <mpi.h>
 
+#include <algorithm>
 #include <iostream>
 #include <sstream>
 
@@ -45,6 +47,7 @@ struct Fixture {
     result(0) 
   {
     result = new char[globalFixture.processes()];
+    std::fill( result, result + globalFixture.processes(), 0 );
   }
 
   ~Fixture() {
@@ -55,6 +58,7 @@ struct Fixture {
 
 BOOST_AUTO_TEST_CASE( synchronize ) {
   Fixture test;
+  xdmComm::BarrierOnExit barrier( MPI_COMM_WORLD );
 
   char message = globalFixture.localRank();
   test.buffer.sputc( message );
@@ -73,16 +77,58 @@ BOOST_AUTO_TEST_CASE( synchronize ) {
     // of rank to the result buffer.
     int received = 1;
     while( received < globalFixture.processes() ) {
-      test.buffer.pubsync();
-      char recvMessage = test.buffer.sgetc();
-      // order the messages by rank.
-      test.result[recvMessage] = recvMessage;
-      received++;
+      while ( test.buffer.poll() ) {
+        test.buffer.pubsync();
+        char recvMessage = test.buffer.sbumpc();
+        // order the messages by rank.
+        test.result[recvMessage] = recvMessage;
+        received++;
+      }
     }
 
     for ( char i = 0; i < globalFixture.processes(); i++ ) {
       BOOST_CHECK_EQUAL( i, test.result[i] );
     }
+
+  }
+}
+
+BOOST_AUTO_TEST_CASE( overflow ) {
+  xdmComm::BarrierOnExit barrier( MPI_COMM_WORLD );
+
+  // Test with a 3 byte buffer to make sure the messages don't align nicely.
+  xdmComm::CoalescingStreamBuffer test( 3, MPI_COMM_WORLD );
+  std::vector< int > result( globalFixture.processes() * 4, 0 );
+
+  // each process will send an array of ints with 4 copies of it's rank
+  int message[4];
+  std::fill( message, message + 4, globalFixture.localRank() );
+
+  if ( globalFixture.localRank() != 0 ) {
+    test.sputn( reinterpret_cast< char* >( message ), sizeof( int ) * 4 );
+    test.pubsync();
+  } else {
+    std::copy( message, message + 4, result.begin() );
+
+    int received = 1;
+    while ( received < globalFixture.processes() ) {
+      while ( test.poll() ) {
+        test.pubsync();
+        test.sgetn( reinterpret_cast< char* >( message ), sizeof( int ) * 4 );
+        int source = test.currentSource();
+        std::copy( message, message + 4, result.begin() + 4 * source );
+        received++;
+      }
+    }
+
+    std::vector< int > answer( globalFixture.processes() * 4 );
+    for ( int i = 0; i < globalFixture.processes(); i++ ) {
+      for ( int j = 4*i; j < 4*i + 4; j++ ) {
+        answer[j] = i;
+      }
+    }
+    BOOST_CHECK_EQUAL_COLLECTIONS( answer.begin(), answer.end(),
+      result.begin(), result.end() );
 
   }
 }

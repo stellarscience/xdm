@@ -103,7 +103,7 @@ void MpiDatasetProxy::serializeImplementation(
     xdm::BinaryOStream dataStream( mCommBuffer.get() );
     dataStream << *array;
     dataStream << selectionMap;
-    dataStream.flush();
+    dataStream << xdm::flush;
   
   } else {
     

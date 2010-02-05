@@ -21,11 +21,13 @@
 #ifndef xdm_BinaryStreamBuffer_hpp
 #define xdm_BinaryStreamBuffer_hpp
 
-#include <memory>
+#include <iostream>
+#include <locale>
 #include <stdexcept>
+#include <streambuf>
+#include <vector>
 
 #include <xdm/NamespaceMacro.hpp>
-#include <xdm/ThrowMacro.hpp>
 
 XDM_NAMESPACE_BEGIN
 
@@ -40,107 +42,131 @@ public:
     std::runtime_error( "Attempt to place object in a full binary buffer." ) {}
 };
 
-/// Class to handle reading and writing binary data to/from a buffer.  The I/O
-/// functions in this buffer handle the management of a buffer pointer so that
-/// items may be read/written incrementally to a stream.  The interface of this
-/// class is designed to mimic that of a std::streambuf so that we may use that
-/// someday.
+/// Exception signalling a buffer underrun error when getting characters from
+/// a BinaryStreamBuffer. By default, a BinaryStreamBuffer does not
+/// automatically sync to the source of characters. It is up to the specific
+/// subclasses of BinaryStreamBuffer to decide how to handle this situation.
+class BinaryStreamBufferUnderrun : public std::runtime_error {
+public:
+  BinaryStreamBufferUnderrun() :
+    std::runtime_error( "Attempt to read beyond binary buffer bounds." ) {}
+};
+
+/// Standard stream buffer subclass to handle reading and writing buffered data
+/// using standard streams. The purpose of this class is to provide default
+/// implementations of the streambuf's protected virtual members that can be
+/// reused by subclasses providing the actual buffering behavior. In addition
+/// to the default implementations of the protected virtual members, this class
+/// exposes a public interface for querying the underlying buffer.
 ///
-/// This class does not fill and output as a std::streambuf would.  An explicit
-/// call to sync() must be called to flush the buffer occasionally, or it will
-/// fill up.  Attempts to put new data into a full buffer will result in thrown
-/// exceptions.
-template< typename AllocT = std::allocator<char> >
-class BasicBinaryStreamBuffer {
-private:
-  size_t mSize;
-  char* mData;
-  char* mLocation;
-
-  AllocT mAlloc;
-
+/// This class does not manage its own buffer, but rather allows clients to
+/// customize and manage their own buffer for efficiency purposes. Thus, clients
+/// with knowledge of their own buffering requirements will be able to subclass
+/// BasicBinaryStreamBuffer to optimize their own buffering.
+class BasicBinaryStreamBuffer : public std::basic_streambuf< char > {
 public:
 
-  BasicBinaryStreamBuffer( size_t size ) :
-    mSize( size ),
-    mData( mAlloc.allocate( size ) ),
-    mLocation( mData ) {}
+  virtual ~BasicBinaryStreamBuffer();
 
-  virtual ~BasicBinaryStreamBuffer() {
-    mAlloc.deallocate( mData, mSize );
-  }
+  /// Get a pointer to the beginning of the underlying buffer.
+  char * bufferStart();
+  size_t bufferSize() const;
 
-  /// Put a single character into the buffer at the current location.
-  /// @throw BinaryStreamBufferOverrun The data to place in the buffer is larger
-  /// than the available buffer space.
-  void sputc( char c ) { 
-    if ( mData + mSize < mLocation + 1 ) {
-      XDM_THROW( BinaryStreamBufferOverrun() );
-    }
-    *mLocation++ = c; 
-  }
-
-  /// Put a character sequence into the buffer at the current location.
-  /// @throw BinaryStreamBufferOverrun The data to place in the buffer is larger
-  /// than the available buffer space.
-  void sputn( const char* in, size_t n ) {
-    if ( mData + mSize < mLocation + n ) {
-      XDM_THROW( BinaryStreamBufferOverrun() );
-    }
-    std::uninitialized_copy( in, in + n, mLocation );
-    mLocation += n;
-  }
-
-  /// Get a single character from the buffer at the current location.
-  /// @throw BinaryStreamBufferOverrun The data to place in the buffer is larger
-  /// than the available buffer space.
-  char sgetc() {
-    if ( mData + mSize < mLocation ) {
-      XDM_THROW( BinaryStreamBufferOverrun() );
-    }
-    return *mLocation++;
-  }
-
-  /// Get a sequence of characters from the buffer at the current location.
-  /// @throw BinaryStreamBufferOverrun The data to place in the buffer is larger
-  /// than the available buffer space.
-  void sgetn( char* out, size_t n ) {
-    if ( mData + mSize < mLocation + n ) {
-      XDM_THROW( BinaryStreamBufferOverrun() );
-    }
-    std::uninitialized_copy( mLocation, mLocation + n, out );
-    mLocation += n;
-  }
-
-  /// Get the allocated size of the buffer.
-  size_t size() const {
-    return mSize;
-  }
-
-  /// Get the raw pointer to the beginning of the buffer.
-  char* pointer() {
-    return mData;
-  }
-
-  /// Seek to an absolute position in the buffer
-  size_t pubseekpos( size_t position ) {
-    mLocation = mData + position;
-    return position;
-  }
-
-  /// Reset the location pointer to the beginning of the buffer.
-  void pubsync() {
-    sync();
+  /// Static member to return the EOF condition.
+  static std::char_traits< char >::int_type eof() {
+    return std::char_traits< char >::eof();
   }
 
 protected:
-  virtual void sync() {
-    mLocation = mData;
-  }
+  BasicBinaryStreamBuffer();
+
+  /// Imbue is a no-op since this streambuf is supposed to maintain a binary
+  /// representation.
+  virtual void imbue( const std::locale& );
+
+  /// Set the pointer and size of the controlled sequence buffer. A null pointer
+  /// or size of 0 will force the stream to become unbuffered.
+  /// @param buffer Pointer to the beginning of an allocated buffer.
+  /// @param size Size of the allocated buffer.
+  virtual std::streambuf * setbuf( char * buffer, std::streamsize size );
+
+  /// Seek to a position in the buffer relative to the beginning, end, or
+  /// current position.
+  /// @param offset Offset from position.
+  /// @param from Seek from beginning, end or current position.
+  /// @param mode Modify the input or output pointer.
+  /// @return New buffer location measured from the beginning on success, -1
+  /// upon failure.
+  virtual std::streampos seekoff(
+    std::streamoff offset,
+    std::ios::seekdir from,
+    std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out );
+
+  /// Seek to an absolute position measured from the beginning of the buffer.
+  /// @param position Distance from the beginning of the buffer.
+  /// @param mode Modify the input or output pointer.
+  /// @return New buffer location measure from the beginning on success, -1
+  /// upon failure.
+  virtual std::streampos seekpos(
+    std::streampos position,
+    std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out );
+
+  /// Synchronize the stream buffer with the controlled sequence (the actual
+  /// thing we are buffering access to). The default implementation just resets
+  /// the input and output pointers to the beginning of the buffers. It is up
+  /// subclasses to determine what to do with the buffer.
+  /// @return 0 upon success, any other value on failure.
+  virtual int sync();
+
+  /// Get a character in the case of an underflow without advancing the get
+  /// pointer. An underflow occurs when a character is requested, but the get
+  /// pointer has moved beyond the end of the underlying buffer. The default
+  /// implementation throws an exception.
+  /// @throw BinaryStreamBufferUnderrun
+  /// @return The new character available at the get pointer position upon
+  /// success, end of file otherwise.
+  virtual int underflow();
+
+  /// Get a character in the case of an underflow and advance the get pointer.
+  /// The default implementation throws an exception.
+  /// @throw BinaryStreamBufferUnderrun
+  /// @return The new character available at the get pointer position upon
+  /// success, end of file otherwise.
+  virtual int uflow();
+
+  /// Put a character back in the buffer in the case of backup underflow. This
+  /// happens when sputbackc or sungetc are called and the get pointer is at
+  /// the beginning of the internal buffer or when the character at the putback
+  /// position does not match the character passed to sputbackc. The default
+  /// implementation throws an exception.
+  /// @throw BinaryStreamBufferUnderrun
+  /// @return End of file on failure, something else on success
+  virtual int pbackfail( int c = std::char_traits< char >::eof() );
+
+  /// Write a character in the case of overflow. Overflow occurs when a write is
+  /// requested, but the put pointer is past the end of the underlying buffer.
+  /// The default implementation throws an exception.
+  /// @throw BinaryStreamBufferOverrun
+  /// @return End of file on failure, anything else on success.
+  virtual int overflow( int c = std::char_traits< char >::eof() );
+
 };
 
-/// BinaryStreamBuffer with a standard allocator.
-typedef BasicBinaryStreamBuffer<> BinaryStreamBuffer;
+/// BasicBinaryStreamBuffer that manages and owns it's own storage using a
+/// standard vector.
+class BinaryStreamBuffer : public BasicBinaryStreamBuffer {
+public:
+  BinaryStreamBuffer( std::streamsize bufferSize ) :
+    BasicBinaryStreamBuffer(),
+    mBuffer( bufferSize ) {
+    setbuf( &mBuffer[0], mBuffer.size() );
+  }
+
+  virtual ~BinaryStreamBuffer() {}
+
+private:
+  std::vector< char > mBuffer;
+};
 
 XDM_NAMESPACE_END
 

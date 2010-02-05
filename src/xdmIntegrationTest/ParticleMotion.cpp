@@ -137,8 +137,7 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
 
   // topology is polyvertex
   xdm::RefPtr< xdmGrid::Polyvertex > topology( new xdmGrid::Polyvertex() );
-  topology->setNumberOfElements( 1 );
-  topology->setNodesPerElement( kParticleCount );
+  topology->setNumberOfPoints( kParticleCount );
   grid->setTopology( topology );
 
   // geometry is interlaced with a dynamic array data item
@@ -213,15 +212,8 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
 
 
   // parallelize the tree
-  // Choose a buffer size to hold the maximum number of points for any of the
-  // processes.
-  unsigned int maxParticlesPerProcess;
-  MPI_Allreduce( &localParticles, &maxParticlesPerProcess, 
-    1, MPI_INTEGER, MPI_MAX, MPI_COMM_WORLD );
-  // Parallelize the tree with a buffer size to hold vector data and selection
-  // header information. To be safe, we give the header 1K of storage.
-  xdmComm::ParallelizeTreeVisitor parallelize(
-    (3 * maxParticlesPerProcess) * sizeof( float ) + 1024 );
+  // Choose a small buffer size to force buffering of the data.
+  xdmComm::ParallelizeTreeVisitor parallelize( sizeof( float ) );
   grid->accept( parallelize );
 
   // create the time series, opening the output stream

@@ -23,11 +23,33 @@
 
 #include <xdm/VectorStructuredArray.hpp>
 
+#include <memory>
+#include <sstream>
+#include <stdexcept>
 #include <vector>
 
 #include <xdm/NamespaceMacro.hpp>
 
 XDM_NAMESPACE_BEGIN
+
+/// Exception signalling that there is not enough memory to hold data with the
+/// given size.
+class NotEnoughMemoryError : public std::runtime_error {
+  size_t mRequested;
+public:
+  NotEnoughMemoryError( size_t requested ) :
+    std::runtime_error( "Not enough memory for this operation" ),
+    mRequested( requested ) {}
+  virtual const char* what() const throw () {
+    try {
+      std::stringstream ss;
+      ss << "Not enough memory for requested " << mRequested << " bytes";
+      return ss.str().c_str();
+    } catch ( ... ) {
+      return std::runtime_error::what();
+    }
+  }
+};
 
 /// StructuredArray that represents it's data internally as an array of bytes.
 /// The array elements are stored internally as an array of bytes, however
@@ -64,8 +86,21 @@ public:
     mType = type;
   }
 
-  /// Set the number of elements held withing the array's buffer.
+  /// Set the number of typed elements held in the array's buffer, resizing the
+  /// internal buffer if necessary. Note: this is the number of /typed/
+  /// elements. This means if the data type for this array is kInt, setSize
+  /// ensures the array can hold 4*size bytes.
+  /// @throw NotEnoughMemoryError The system cannot allocate enough memory to
+  /// hold the given number of elements.
   void setSize( size_t size ) {
+    if ( mBuffer.size() < size * typeSize( mType ) ) {
+      // allocate more space to hold the elements.
+      try {
+        mBuffer.resize( size * typeSize( mType ) );
+      } catch ( std::bad_alloc ) {
+        throw NotEnoughMemoryError( size * typeSize( mType ) );
+      }
+    }
     mSize = size;
   }
 

@@ -33,21 +33,31 @@ CoalescingStreamBuffer::CoalescingStreamBuffer(
 CoalescingStreamBuffer::~CoalescingStreamBuffer() {
 }
 
-bool CoalescingStreamBuffer::poll() const {
+bool CoalescingStreamBuffer::poll( int source ) {
   MPI_Status status;
   int flag;
 
   MPI_Iprobe( 
-    MPI_ANY_SOURCE, 
+    source,
     MpiMessageTag::kWriteData, 
     mCommunicator,
     &flag,
     &status );
 
-  return flag;
+  if ( flag != 0 ) {
+    // a message was found.
+    mCurrentSource = status.MPI_SOURCE;
+    return true;
+  } else {
+    return false;
+  }
 }
 
-void CoalescingStreamBuffer::sync() {
+int CoalescingStreamBuffer::currentSource() const {
+  return mCurrentSource;
+}
+
+int CoalescingStreamBuffer::sync() {
   // get the process rank to decide what to do
   int localRank;
   MPI_Comm_rank( mCommunicator, &localRank );
@@ -55,8 +65,8 @@ void CoalescingStreamBuffer::sync() {
   if ( localRank != 0 ) {
     // non-zero ranks send to rank 0
     MPI_Ssend( 
-      pointer(), 
-      size(), 
+      bufferStart(),
+      bufferSize(),
       MPI_BYTE, 
       0, 
       MpiMessageTag::kWriteData, 
@@ -64,17 +74,51 @@ void CoalescingStreamBuffer::sync() {
   } else {
     // rank 0 receives.
     MPI_Recv( 
-      pointer(), 
-      size(), 
+      bufferStart(),
+      bufferSize(),
       MPI_BYTE, 
-      MPI_ANY_SOURCE, 
+      mCurrentSource,
       MpiMessageTag::kWriteData, 
       mCommunicator, 
       0 );
   }
 
   // call the base class sync to prepare for reading, writing.
-  xdm::BinaryStreamBuffer::sync();
+  return xdm::BinaryStreamBuffer::sync();
+}
+
+int CoalescingStreamBuffer::overflow( int c ) {
+  std::streamsize bufferContentSize = pptr() - pbase();
+
+  // If there is content in the buffer, synchronize and return EOF on fail.
+  if ( bufferContentSize && sync() ) {
+    // sync returns nonzero on fail
+    return eof();
+  }
+
+  // Buffer has been successfully synchronized. Begin writing again as usual at
+  // the beginning of the buffer.
+  if ( c != eof() ) {
+    return sputc( c );
+  }
+
+  return eof();
+}
+
+int CoalescingStreamBuffer::uflow() {
+  std::streamsize bufferSize = egptr() - eback();
+
+  if ( eback() && bufferSize ) {
+    // spin until we have another message from the current source.
+    while( !poll( mCurrentSource ) );
+    // there is a message from the current source, receive it and continue to
+    // read data.
+    if ( sync() == 0 ) {
+      return sbumpc();
+    }
+  }
+
+  return eof();
 }
 
 XDM_COMM_NAMESPACE_END

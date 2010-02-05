@@ -140,7 +140,7 @@ BOOST_AUTO_TEST_CASE( coalesce ) {
   // communication
   xdm::RefPtr< TestDataset > testDataset( new TestDataset );
   xdm::RefPtr< xdm::Dataset > dataset( new xdmComm::MpiDatasetProxy( 
-    MPI_COMM_WORLD, testDataset, 1024 ) );
+    MPI_COMM_WORLD, testDataset, 3 ) );
 
   // set up the data selection for the local process.  We select the hyperslab
   // consisting of one element which starts at the global array location
