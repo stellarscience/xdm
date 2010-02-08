@@ -8,6 +8,7 @@ set( ${PROJECT_NAME}_HEADERS
     Geometry.hpp
     Grid.hpp
     InterlacedGeometry.hpp
+    MultiArrayGeometry.hpp
     NamespaceMacro.hpp
     NodeRef.hpp
     Polyvertex.hpp
@@ -29,6 +30,7 @@ set( ${PROJECT_NAME}_SOURCES
     Geometry.cpp
     Grid.cpp
     InterlacedGeometry.cpp
+    MultiArrayGeometry.cpp
     NodeRef.cpp
     Polyvertex.cpp
     RectilinearMesh.cpp
