@@ -26,6 +26,8 @@
 
 #include <vector>
 
+#include <cassert>
+
 #include <xdm/NamespaceMacro.hpp>
 
 XDM_NAMESPACE_BEGIN
@@ -93,7 +95,7 @@ class SingleArrayOfVectorsImpl : public VectorRefImpl< ValueType >
 public:
   SingleArrayOfVectorsImpl( ValueType* xyzArray, std::size_t elementsPerVector );
 
-  /// assumes the array is laid out contiguously in dimension order.
+  /// Assumes the array is laid out contiguously in dimension order.
   virtual ValueType& at( std::size_t baseIndex, std::size_t i );
 
   virtual std::size_t size() const;

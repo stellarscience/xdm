@@ -43,19 +43,6 @@ void InterlacedGeometry::setCoordinateValues( xdm::RefPtr< xdm::UniformDataItem 
       " already been set by a previous call to setCoordinateValues." ) );
   }
   appendChild( data );
-  mSharedVectorImp = new xdm::SingleArrayOfVectorsImpl< double >(
-    data->typedArray< double >()->begin(),
-    dimension() );
-}
-
-NodeRef InterlacedGeometry::node( std::size_t nodeIndex )
-{
-  return NodeRef( xdm::VectorRef< double >( mSharedVectorImp, nodeIndex ) );
-}
-
-const NodeRef InterlacedGeometry::node( std::size_t nodeIndex ) const
-{
-  return NodeRef( xdm::VectorRef< double >( mSharedVectorImp, nodeIndex ) );
 }
 
 void InterlacedGeometry::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
@@ -76,6 +63,14 @@ void InterlacedGeometry::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
     XDM_THROW( std::domain_error( "Unsupported number of dimensions" ) );
     break;
   }
+}
+
+xdm::RefPtr< xdm::VectorRefImpl< double > > InterlacedGeometry::createVectorImp()
+{
+  return xdm::RefPtr< xdm::VectorRefImpl< double > >(
+    new xdm::SingleArrayOfVectorsImpl< double >(
+      child( 0 )->typedArray< double >()->begin(),
+      dimension() ) );
 }
 
 XDM_GRID_NAMESPACE_END

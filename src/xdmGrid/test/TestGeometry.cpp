@@ -35,18 +35,9 @@ public:
     xdmGrid::Geometry( dimension )
   {}
 
-  virtual xdmGrid::NodeRef node( std::size_t nodeIndex )
+  virtual xdm::RefPtr< xdm::VectorRefImpl< double > > createVectorImp()
   {
-    xdm::RefPtr< xdm::VectorRefImpl< double > > emptyPtr;
-    xdm::VectorRef< double > emptyVec( emptyPtr, 0 );
-    return xdmGrid::NodeRef( emptyVec );
-  }
-
-  virtual const xdmGrid::NodeRef node( std::size_t nodeIndex ) const
-  {
-    xdm::RefPtr< xdm::VectorRefImpl< double > > emptyPtr;
-    xdm::VectorRef< double > emptyVec( emptyPtr, 0 );
-    return xdmGrid::NodeRef( emptyVec );
+    return xdm::RefPtr< xdm::VectorRefImpl< double > >();
   }
 };
 

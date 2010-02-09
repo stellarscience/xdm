@@ -53,14 +53,11 @@ public:
   /// @throws std::logic_error if called after coordinate values have already been set.
   void setCoordinateValues( xdm::RefPtr< xdm::UniformDataItem > data );
 
-  /// Grab a node by index.
-  virtual NodeRef node( std::size_t nodeIndex );
-  virtual const NodeRef node( std::size_t nodeIndex ) const;
-
   virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
 
-private:
-  xdm::RefPtr< xdm::VectorRefImpl< double > > mSharedVectorImp;
+protected:
+  virtual xdm::RefPtr< xdm::VectorRefImpl< double > > createVectorImp();
+
 };
 
 XDM_GRID_NAMESPACE_END

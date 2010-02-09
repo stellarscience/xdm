@@ -47,21 +47,16 @@ public:
   XDM_META_ITEM( TensorProductGeometry );
 
   /// Set the StructuredArray representing the coordinate values in a given
-  /// dimension. This is a convenience function that will validate the input
-  /// data to ensure that each coordinate axis has the same number of values.
-  ///
+  /// dimension.
   /// @param dim The axis of the coordinate represented by the data.
   /// @param data The data representing the coordinate values on the axis.
-  void setCoordinateValues( unsigned int dim, xdm::RefPtr< xdm::DataItem > data );
-
-  /// Grab a node by index.
-  virtual NodeRef node( std::size_t nodeIndex );
-  virtual const NodeRef node( std::size_t nodeIndex ) const;
+  void setCoordinateValues( unsigned int dim, xdm::RefPtr< xdm::UniformDataItem > data );
 
   virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
 
-private:
-  xdm::RefPtr< xdm::VectorRefImpl< double > > mSharedVectorImp;
+protected:
+  virtual xdm::RefPtr< xdm::VectorRefImpl< double > > createVectorImp();
+
 };
 
 XDM_GRID_NAMESPACE_END

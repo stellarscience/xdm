@@ -66,19 +66,7 @@ void MultiArrayGeometry::setCoordinateValues(
       XDM_THROW( std::runtime_error( "The arrays in the UniformDataItems supplied are"
         " not all of the same size." ) );
     }
-
-    mSharedVectorImp = new xdm::MultipleArraysOfVectorElementsImpl< double >( xyzArrays );
   }
-}
-
-NodeRef MultiArrayGeometry::node( std::size_t nodeIndex )
-{
-  return NodeRef( xdm::VectorRef< double >( mSharedVectorImp, nodeIndex ) );
-}
-
-const NodeRef MultiArrayGeometry::node( std::size_t nodeIndex ) const
-{
-  return NodeRef( xdm::VectorRef< double >( mSharedVectorImp, nodeIndex ) );
 }
 
 void MultiArrayGeometry::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
@@ -99,6 +87,16 @@ void MultiArrayGeometry::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
     XDM_THROW( std::domain_error( "Unsupported number of dimensions" ) );
     break;
   }
+}
+
+xdm::RefPtr< xdm::VectorRefImpl< double > > MultiArrayGeometry::createVectorImp()
+{
+  std::vector< double* > arrays( dimension() );
+  for ( int dim = 0; dim < dimension(); dim++ ) {
+    arrays[dim] = child( dim )->typedArray< double >()->begin();
+  }
+  return xdm::RefPtr< xdm::VectorRefImpl< double > >(
+    new xdm::MultipleArraysOfVectorElementsImpl< double >( arrays ) );
 }
 
 XDM_GRID_NAMESPACE_END

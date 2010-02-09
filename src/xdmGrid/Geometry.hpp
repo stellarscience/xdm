@@ -21,9 +21,10 @@
 #ifndef xdmGrid_Geometry_hpp
 #define xdmGrid_Geometry_hpp
 
-#include <xdm/DataItem.hpp>
+#include <xdm/UniformDataItem.hpp>
 #include <xdm/Item.hpp>
 #include <xdm/ObjectCompositionMixin.hpp>
+#include <xdm/VectorRef.hpp>
 
 #include <xdmGrid/NamespaceMacro.hpp>
 
@@ -36,7 +37,7 @@ class NodeRef;
 /// description of grid attributes will inherit from.
 class Geometry :
   public xdm::Item,
-  public xdm::ObjectCompositionMixin< xdm::DataItem > {
+  public xdm::ObjectCompositionMixin< xdm::UniformDataItem > {
 public:
   /// Constructor takes the dimension of the space.  That is, the size of a
   /// maximal set of linearly independent vectors in the space, and thus the
@@ -56,18 +57,27 @@ public:
   /// Get the number of nodes.
   std::size_t numberOfNodes() const;
 
-  /// Grab a node by index.
-  virtual NodeRef node( std::size_t nodeIndex ) = 0;
-  virtual const NodeRef node( std::size_t nodeIndex ) const = 0;
+  /// Get a shared node by index.
+  NodeRef node( std::size_t nodeIndex );
+  /// Get a constant shared node by index.
+  const NodeRef node( std::size_t nodeIndex ) const;
 
   virtual void traverse( xdm::ItemVisitor& iv );
 
   /// Write geometry metadata.
   virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
 
+protected:
+
+  /// Construct the vector implementation used by this geometry. Subclasses
+  /// should override this method to return an appropriate VectorRefImpl for
+  /// their internal geometry representation.
+  virtual xdm::RefPtr< xdm::VectorRefImpl< double > > createVectorImp() = 0;
+
 private:
   std::size_t mNumberOfNodes;
   unsigned int mDimension;
+  xdm::RefPtr< xdm::VectorRefImpl< double > > mSharedVectorImp;
 };
 
 XDM_GRID_NAMESPACE_END

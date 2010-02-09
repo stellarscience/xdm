@@ -21,6 +21,8 @@
 #include <xdmGrid/NodeRef.hpp>
 #include <xdmGrid/TensorProductGeometry.hpp>
 
+#include <xdm/VectorRef.hpp>
+
 #include <stdexcept>
 #include <cassert>
 
@@ -38,20 +40,9 @@ TensorProductGeometry::~TensorProductGeometry() {
 
 void TensorProductGeometry::setCoordinateValues(
   unsigned int dim,
-  xdm::RefPtr< xdm::DataItem > data ) {
+  xdm::RefPtr< xdm::UniformDataItem > data ) {
   assert( dim < dimension() );
   setChild( dim, data );
-  // TODO: Give it a mSharedVectorImp.
-}
-
-NodeRef TensorProductGeometry::node( std::size_t nodeIndex )
-{
-  return NodeRef( xdm::VectorRef< double >( mSharedVectorImp, nodeIndex ) );
-}
-
-const NodeRef TensorProductGeometry::node( std::size_t nodeIndex ) const
-{
-  return NodeRef( xdm::VectorRef< double >( mSharedVectorImp, nodeIndex ) );
 }
 
 void TensorProductGeometry::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
@@ -72,6 +63,19 @@ void TensorProductGeometry::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
     XDM_THROW( std::domain_error( "Unsupported number of dimensions" ) );
     break;
   }
+}
+
+xdm::RefPtr< xdm::VectorRefImpl< double > > TensorProductGeometry::createVectorImp()
+{
+  std::vector< double* > coordinateArrays( dimension() );
+  std::vector< size_t > coordinateArraySizes( dimension() );
+  for ( size_t i = 0; i < dimension(); i++ ) {
+    coordinateArrays[i] = child( i )->typedArray< double >()->begin();
+    coordinateArraySizes[i] = child( i )->typedArray< double >()->size();
+  }
+  return xdm::RefPtr< xdm::VectorRefImpl< double > >(
+    new xdm::TensorProductArraysImpl< double >(
+      coordinateArrays, coordinateArraySizes ) );
 }
 
 XDM_GRID_NAMESPACE_END
