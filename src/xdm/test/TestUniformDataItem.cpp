@@ -21,7 +21,7 @@
 #define BOOST_TEST_MODULE UniformDataItem 
 #include <boost/test/unit_test.hpp>
 
-#include <xdm/TemplateStructuredArray.hpp>
+#include <xdm/TypedStructuredArray.hpp>
 #include <xdm/UniformDataItem.hpp>
 #include <xdm/ArrayAdapter.hpp>
 

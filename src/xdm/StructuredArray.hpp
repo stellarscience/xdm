@@ -38,14 +38,14 @@ class DataIndexingVisitor;
 /// Array class for holding multiple types of data. This class represents a
 /// contiguous array of data in memory.  It does not own the data it holds, it
 /// merely presents an interface for querying information about an array that is
-/// useful when reading or writing data.  The TemplateStructuredArray subclass
+/// useful when reading or writing data.  The TypedStructuredArray subclass
 /// implements a type safe interface for providing this information.
 ///
 /// This class does not own the data it references, it is up to subclasses to
 /// to manage (or not manage) memory. This is to allow applications to wrap
 /// a StructuredArray around existing memory structures.
 ///
-/// @see TemplateStructuredArray
+/// @see TypedStructuredArray
 /// @see VectorStructuredArray
 class StructuredArray : public ReferencedObject {
 public:

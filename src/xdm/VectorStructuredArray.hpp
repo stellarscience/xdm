@@ -21,7 +21,7 @@
 #ifndef xdm_VectorStructuredArray_hpp
 #define xdm_VectorStructuredArray_hpp
 
-#include <xdm/TemplateStructuredArray.hpp>
+#include <xdm/TypedStructuredArray.hpp>
 
 #include <vector>
 

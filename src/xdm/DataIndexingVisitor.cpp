@@ -19,7 +19,7 @@
 //
 //------------------------------------------------------------------------------
 #include <xdm/DataIndexingVisitor.hpp>
-#include <xdm/TemplateStructuredArray.hpp>
+#include <xdm/TypedStructuredArray.hpp>
 #include <xdm/UniformDataItem.hpp>
 #include <xdm/ArrayAdapter.hpp>
 
@@ -44,48 +44,48 @@ void DataIndexingVisitor::apply( StructuredArray& array ) {
     " class StructuredArray." ) );
 }
 
-void DataIndexingVisitor::apply( TemplateStructuredArray< char >& array ) {
+void DataIndexingVisitor::apply( TypedStructuredArray< char >& array ) {
   XDM_THROW( DataTypeMismatchException( "char" ) );
 }
 
-void DataIndexingVisitor::apply( TemplateStructuredArray< short >& array ) {
+void DataIndexingVisitor::apply( TypedStructuredArray< short >& array ) {
   XDM_THROW( DataTypeMismatchException( "short" ) );
 }
 
-void DataIndexingVisitor::apply( TemplateStructuredArray< int >& array ) {
+void DataIndexingVisitor::apply( TypedStructuredArray< int >& array ) {
   XDM_THROW( DataTypeMismatchException( "int" ) );
 }
 
-void DataIndexingVisitor::apply( TemplateStructuredArray< long int >& array ) {
+void DataIndexingVisitor::apply( TypedStructuredArray< long int >& array ) {
   XDM_THROW( DataTypeMismatchException( "long int" ) );
 }
 
-void DataIndexingVisitor::apply( TemplateStructuredArray< unsigned char >& array ) {
+void DataIndexingVisitor::apply( TypedStructuredArray< unsigned char >& array ) {
   XDM_THROW( DataTypeMismatchException( "unsigned char" ) );
 }
 
-void DataIndexingVisitor::apply( TemplateStructuredArray< unsigned short >& array ) {
+void DataIndexingVisitor::apply( TypedStructuredArray< unsigned short >& array ) {
   XDM_THROW( DataTypeMismatchException( "unsigned short" ) );
 }
 
-void DataIndexingVisitor::apply( TemplateStructuredArray< unsigned int >& array ) {
+void DataIndexingVisitor::apply( TypedStructuredArray< unsigned int >& array ) {
   XDM_THROW( DataTypeMismatchException( "unsigned int" ) );
 }
 
-void DataIndexingVisitor::apply( TemplateStructuredArray< unsigned long int >& array ) {
+void DataIndexingVisitor::apply( TypedStructuredArray< unsigned long int >& array ) {
   XDM_THROW( DataTypeMismatchException( "unsigned long int" ) );
 }
 
-void DataIndexingVisitor::apply( TemplateStructuredArray< float >& array ) {
+void DataIndexingVisitor::apply( TypedStructuredArray< float >& array ) {
   XDM_THROW( DataTypeMismatchException( "float" ) );
 }
 
-void DataIndexingVisitor::apply( TemplateStructuredArray< double >& array ) {
+void DataIndexingVisitor::apply( TypedStructuredArray< double >& array ) {
   XDM_THROW( DataTypeMismatchException( "double" ) );
 }
 
 DataTypeMismatchException::DataTypeMismatchException( const std::string& dataType ) :
-  std::runtime_error( "DataIndexingVisitor::apply( TemplateStructuredArray<" + dataType +
+  std::runtime_error( "DataIndexingVisitor::apply( TypedStructuredArray<" + dataType +
     ">& array ) was called. Typically, this means that the correct virtual call does not"
     " exist, which indicates that the desired data type does not match the data type of"
     " the array argument." ),

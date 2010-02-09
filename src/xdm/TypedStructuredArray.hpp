@@ -18,8 +18,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //------------------------------------------------------------------------------
-#ifndef xdm_TemplateStructuredArray_hpp
-#define xdm_TemplateStructuredArray_hpp
+#ifndef xdm_TypedStructuredArray_hpp
+#define xdm_TypedStructuredArray_hpp
 
 #include <xdm/DataIndexingVisitor.hpp>
 #include <xdm/PrimitiveType.hpp>
@@ -41,7 +41,7 @@ XDM_NAMESPACE_BEGIN
 /// also provides STL compliant random access iterators for accessing the data
 /// as well as indexing operators for array access.
 template< typename T >
-class TemplateStructuredArray : public StructuredArray {
+class TypedStructuredArray : public StructuredArray {
 public:
 
   //-- STL Container Interface Types --//
@@ -53,20 +53,20 @@ public:
 
   /// Construct the array without initializing the data or size. The data
   /// pointer will be NULL and the size will be 0.
-  TemplateStructuredArray() :
+  TypedStructuredArray() :
     StructuredArray(),
     mData( 0 ),
     mSize( 0 ) {
   }
 
   /// Construct the array with a pointer to its data and size.
-  TemplateStructuredArray( T* data, size_t size ) :
+  TypedStructuredArray( T* data, size_t size ) :
     StructuredArray(),
     mData( data ),
     mSize( size ) {
   }
 
-  virtual ~TemplateStructuredArray() {}
+  virtual ~TypedStructuredArray() {}
 
   //-- StructuredArray Query Interface --//
 
@@ -142,13 +142,13 @@ private:
 
 /// Convenience template to construct a StructuredArray with the right type
 /// arguments. This function uses template deduction to determine the right type
-/// of TemplateStructuredArray to instantiate.
+/// of TypedStructuredArray to instantiate.
 template< typename T >
 RefPtr< StructuredArray >
 createStructuredArray( T* data, size_t size ) {
-  return makeRefPtr( new TemplateStructuredArray< T >( data, size ) );
+  return makeRefPtr( new TypedStructuredArray< T >( data, size ) );
 }
 
 XDM_NAMESPACE_END
 
-#endif // xdm_TemplateStructuredArray_hpp
+#endif // xdm_TypedStructuredArray_hpp

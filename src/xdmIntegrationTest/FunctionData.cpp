@@ -26,7 +26,7 @@
 #include <xdm/HyperSlabBlockIterator.hpp>
 #include <xdm/HyperslabDataSelection.hpp>
 #include <xdm/UniformDataItem.hpp>
-#include <xdm/TemplateStructuredArray.hpp>
+#include <xdm/TypedStructuredArray.hpp>
 #include <xdm/ThrowMacro.hpp>
 #include <xdm/VectorStructuredArray.hpp>
 #include <xdm/ArrayAdapter.hpp>
@@ -128,7 +128,7 @@ FunctionData::FunctionData(
       mBlockSize.end(),
       1,
       MultiplySize() ) );
-  mStructuredArray = new xdm::TemplateStructuredArray< double >(
+  mStructuredArray = new xdm::TypedStructuredArray< double >(
     &mStorage[0], mStorage.size() );
 }
 

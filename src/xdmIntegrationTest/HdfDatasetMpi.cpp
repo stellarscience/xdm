@@ -27,7 +27,7 @@
 #include <xdm/HyperslabDataSelection.hpp>
 #include <xdm/DataShape.hpp>
 #include <xdm/RefPtr.hpp>
-#include <xdm/TemplateStructuredArray.hpp>
+#include <xdm/TypedStructuredArray.hpp>
 
 #include <xdmComm/MpiDatasetProxy.hpp>
 

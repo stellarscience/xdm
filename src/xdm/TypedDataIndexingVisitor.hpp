@@ -22,7 +22,7 @@
 #define xdm_TypedDataIndexingVisitor_hpp
 
 #include <xdm/DataIndexingVisitor.hpp>
-#include <xdm/TemplateStructuredArray.hpp>
+#include <xdm/TypedStructuredArray.hpp>
 
 #include <xdm/NamespaceMacro.hpp>
 
@@ -34,7 +34,7 @@ public:
   TypedDataIndexingVisitor( T*& arrayOrigin ) :
     mArrayOrigin( arrayOrigin ) {}
 
-  virtual void apply( TemplateStructuredArray< T >& array ) {
+  virtual void apply( TypedStructuredArray< T >& array ) {
     mArrayOrigin = array.begin();
   }
 

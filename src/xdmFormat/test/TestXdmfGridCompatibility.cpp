@@ -27,7 +27,7 @@
 #include <xdm/CollectMetadataOperation.hpp>
 #include <xdm/SerializeDataOperation.hpp>
 #include <xdm/StructuredArray.hpp>
-#include <xdm/TemplateStructuredArray.hpp>
+#include <xdm/TypedStructuredArray.hpp>
 #include <xdm/UniformDataItem.hpp>
 #include <xdm/ArrayAdapter.hpp>
 #include <xdm/XmlObject.hpp>

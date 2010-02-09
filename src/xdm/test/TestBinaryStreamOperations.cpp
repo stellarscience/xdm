@@ -21,7 +21,7 @@
 #define BOOST_TEST_MODULE BinaryStreamOperations
 #include <boost/test/unit_test.hpp>
 
-#include <xdm/TemplateStructuredArray.hpp>
+#include <xdm/TypedStructuredArray.hpp>
 
 #include <xdm/BinaryIOStream.hpp>
 #include <xdm/BinaryStreamOperations.hpp>
@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE( StructuredArrayRoundtrip ) {
 
   std::vector< int > inData( 10 );
   std::generate( inData.begin(), inData.end(), rand );
-  xdm::TemplateStructuredArray< int > answer( &inData[0], 10 );
+  xdm::TypedStructuredArray< int > answer( &inData[0], 10 );
 
   test.stream << answer << xdm::flush;
 

@@ -18,11 +18,11 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.       
 //                                                                             
 //------------------------------------------------------------------------------
-#define BOOST_TEST_MODULE TemplateStructuredArray
+#define BOOST_TEST_MODULE TypedStructuredArray
 #include <boost/test/unit_test.hpp>
 
 #include <xdm/DataShape.hpp>
-#include <xdm/TemplateStructuredArray.hpp>
+#include <xdm/TypedStructuredArray.hpp>
 #include <xdm/RefPtr.hpp>
 
 namespace {
@@ -30,8 +30,8 @@ namespace {
 template< typename T > 
 void test() {
   T value = T();
-  xdm::RefPtr< xdm::TemplateStructuredArray< T > > array( 
-    new xdm::TemplateStructuredArray< T >( &value, 1 ) );
+  xdm::RefPtr< xdm::TypedStructuredArray< T > > array( 
+    new xdm::TypedStructuredArray< T >( &value, 1 ) );
   T* result = array->begin();
   BOOST_CHECK_EQUAL( result, &value );
 }

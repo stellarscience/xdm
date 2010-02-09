@@ -38,8 +38,8 @@ set( ${PROJECT_NAME}_HEADERS
     SerializeDataOperation.hpp
     StaticAssert.hpp
     StructuredArray.hpp
-    TemplateStructuredArray.hpp
     TypedDataIndexingVisitor.hpp
+    TypedStructuredArray.hpp
     UniformDataItem.hpp
     UpdateVisitor.hpp
     VectorRef.hpp

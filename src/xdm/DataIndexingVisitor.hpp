@@ -30,7 +30,7 @@ XDM_NAMESPACE_BEGIN
 class StructuredArray;
 
 template< typename T >
-class TemplateStructuredArray;
+class TypedStructuredArray;
 
 class UniformDataItem;
 
@@ -47,16 +47,16 @@ public:
   virtual void apply( StructuredArray& array );
 
   // Apply methods for primitive types.
-  virtual void apply( TemplateStructuredArray< char >& array );
-  virtual void apply( TemplateStructuredArray< short >& array );
-  virtual void apply( TemplateStructuredArray< int >& array );
-  virtual void apply( TemplateStructuredArray< long int >& array );
-  virtual void apply( TemplateStructuredArray< unsigned char >& array );
-  virtual void apply( TemplateStructuredArray< unsigned short >& array );
-  virtual void apply( TemplateStructuredArray< unsigned int >& array );
-  virtual void apply( TemplateStructuredArray< unsigned long int >& array );
-  virtual void apply( TemplateStructuredArray< float >& array );
-  virtual void apply( TemplateStructuredArray< double >& array );
+  virtual void apply( TypedStructuredArray< char >& array );
+  virtual void apply( TypedStructuredArray< short >& array );
+  virtual void apply( TypedStructuredArray< int >& array );
+  virtual void apply( TypedStructuredArray< long int >& array );
+  virtual void apply( TypedStructuredArray< unsigned char >& array );
+  virtual void apply( TypedStructuredArray< unsigned short >& array );
+  virtual void apply( TypedStructuredArray< unsigned int >& array );
+  virtual void apply( TypedStructuredArray< unsigned long int >& array );
+  virtual void apply( TypedStructuredArray< float >& array );
+  virtual void apply( TypedStructuredArray< double >& array );
 };
 
 class DataTypeMismatchException : public std::runtime_error {

@@ -24,7 +24,7 @@
 #include <xdm/DataShape.hpp>
 #include <xdm/HyperSlab.hpp>
 #include <xdm/RefPtr.hpp>
-#include <xdm/TemplateStructuredArray.hpp>
+#include <xdm/TypedStructuredArray.hpp>
 #include <xdm/MemoryAdapter.hpp>
 
 #include <algorithm>
@@ -123,7 +123,7 @@ private:
   GridBounds mGrid;
   xdm::HyperSlab<> mRegionOfInterest;
   std::vector< double > mStorage;
-  xdm::RefPtr< xdm::TemplateStructuredArray< double > > mStructuredArray;
+  xdm::RefPtr< xdm::TypedStructuredArray< double > > mStructuredArray;
   xdm::RefPtr< Function > mFunction;
   xdm::DataShape<> mBlockSize;
 
