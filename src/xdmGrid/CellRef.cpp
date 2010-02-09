@@ -25,18 +25,15 @@
 
 XDM_GRID_NAMESPACE_BEGIN
 
-CellRef::CellRef( xdm::RefPtr< CellSharedImp > imp, std::size_t CellIndex ) :
-  mImp( imp ), mIndex( CellIndex )
-{
+CellRef::CellRef( xdm::RefPtr< CellSharedImp > imp, std::size_t cellIndex ) :
+  mImp( imp ), mIndex( cellIndex ) {
 }
 
 CellRef::CellRef( const CellRef& copyMe ) :
-  mImp( copyMe.mImp ), mIndex( copyMe.mIndex )
-{
+  mImp( copyMe.mImp ), mIndex( copyMe.mIndex ) {
 }
 
-CellRef& CellRef::operator=( const CellRef& rhs )
-{
+CellRef& CellRef::operator=( const CellRef& rhs ) {
   if ( &rhs != this ) {
     mImp = rhs.mImp;
     mIndex = rhs.mIndex;
@@ -44,19 +41,16 @@ CellRef& CellRef::operator=( const CellRef& rhs )
   return *this;
 }
 
-const NodeRef CellRef::node( std::size_t nodeIndex ) const
-{
+const NodeRef CellRef::node( std::size_t nodeIndex ) const {
   return mImp->node( nodeIndex, mIndex );
 }
 
-NodeRef CellRef::node( std::size_t nodeIndex )
-{
+NodeRef CellRef::node( std::size_t nodeIndex ) {
   return static_cast< const CellRef& >(*this).mImp->node( nodeIndex, mIndex );
 }
 
-std::size_t CellRef::numberOfNodes() const
-{
-  return mImp->numberOfNodes();
+CellType::Type CellRef::cellType() const {
+  return mImp->cellType( mIndex );
 }
 
 XDM_GRID_NAMESPACE_END

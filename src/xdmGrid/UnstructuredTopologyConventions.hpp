@@ -23,6 +23,8 @@
 
 #include <xdmGrid/NamespaceMacro.hpp>
 
+#include <string>
+
 XDM_GRID_NAMESPACE_BEGIN
 
 namespace NodeOrderingConvention {

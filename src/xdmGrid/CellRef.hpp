@@ -21,6 +21,8 @@
 #ifndef xdm_CellRef_hpp
 #define xdm_CellRef_hpp
 
+#include <xdmGrid/UnstructuredTopologyConventions.hpp>
+
 #include <xdm/ReferencedObject.hpp>
 #include <xdm/RefPtr.hpp>
 
@@ -30,21 +32,12 @@
 
 XDM_GRID_NAMESPACE_BEGIN
 
+class CellSharedImp;
 class NodeRef;
 
-/// Shared implementation class for referencing Cell data that is not stored in a self-contained
-/// Cell structure. All Cells that use a given shared implementation should be of the same
-/// type, have the same number of nodes, etc.
-class CellSharedImp : public xdm::ReferencedObject
-{
-public:
-  /// Get a single node (the NodeRef class is a reference class).
-  virtual const NodeRef node( std::size_t nodeIndex, std::size_t CellIndex ) const;
-
-  /// The number of nodes for all Cells that this shared implementation refers to.
-  virtual std::size_t numberOfNodes() const;
-};
-
+/// A cell class that references data in a presumably large dataset. The Cell acts as
+/// self-contained cell, but it actually just refers most requests to an implementation
+/// class. Thus, the cell is lightweight and copying is cheap.
 class CellRef
 {
 public:
@@ -58,12 +51,25 @@ public:
   /// Get a single node (the NodeRef class is a reference class).
   NodeRef node( std::size_t nodeIndex );
 
-  /// The number of total nodes for this Cell.
-  std::size_t numberOfNodes() const;
+  /// The type of cell.
+  CellType::Type cellType() const;
 
 private:
   xdm::RefPtr< CellSharedImp > mImp;
   std::size_t mIndex;
+};
+
+/// Shared implementation class for referencing Cell data that is not stored in a self-contained
+/// Cell structure. All Cells that use a given shared implementation should be of the same
+/// type, have the same number of nodes, etc. However, that is not required.
+class CellSharedImp : public xdm::ReferencedObject
+{
+public:
+  /// Get a single node (the NodeRef class is a reference class).
+  virtual const NodeRef node( std::size_t nodeIndex, std::size_t cellIndex ) const = 0;
+
+  /// The cell type for all cells that this shared implementation refers to.
+  virtual CellType::Type cellType( std::size_t cellIndex ) const = 0;
 };
 
 XDM_GRID_NAMESPACE_END

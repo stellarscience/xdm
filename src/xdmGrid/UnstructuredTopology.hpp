@@ -33,6 +33,7 @@ XDM_GRID_NAMESPACE_BEGIN
 
 class CellRef;
 class CellSharedImp;
+class Geometry;
 
 /// Base class for all unstructured topologies. If the connectivity is different
 /// from the standard, an order may be specified.
@@ -42,6 +43,9 @@ public:
   virtual ~UnstructuredTopology();
 
   XDM_META_ITEM( UnstructuredTopology );
+
+  /// Set the Geometry that this topology refers to.
+  void setGeometry( xdm::RefPtr< Geometry > geometry );
 
   /// Set the number of cells in the topology.
   void setNumberOfCells( std::size_t numberOfCells );
@@ -76,6 +80,7 @@ public:
 
 private:
   xdm::RefPtr< xdm::UniformDataItem > mConnectivity;
+  xdm::RefPtr< Geometry > mGeometry;
   xdm::RefPtr< CellSharedImp > mCellSharedImp;
   CellType::Type mCellType;
   std::size_t mNumberOfCells;

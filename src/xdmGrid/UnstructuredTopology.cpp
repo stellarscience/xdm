@@ -19,9 +19,38 @@
 //
 //------------------------------------------------------------------------------
 #include <xdmGrid/CellRef.hpp>
+#include <xdmGrid/Geometry.hpp>
+#include <xdmGrid/NodeRef.hpp>
 #include <xdmGrid/UnstructuredTopology.hpp>
 
 #include <sstream>
+
+namespace {
+
+class TrivialCellRefImpl : public xdmGrid::CellSharedImp {
+public:
+  TrivialCellRefImpl(
+    const xdmGrid::CellType::Type& type,
+    xdm::RefPtr< xdmGrid::Geometry > geometry,
+    std::size_t* nodeIndexArray ) :
+    mType( type ), mGeometry( geometry ), mNodeIds( nodeIndexArray ) {}
+
+  virtual const xdmGrid::NodeRef node( std::size_t nodeIndex, std::size_t cellIndex ) const {
+    std::size_t nodeID = mNodeIds[ cellIndex * mType.nodesPerCell() + nodeIndex ];
+    return mGeometry->node( nodeID );
+  }
+
+  virtual xdmGrid::CellType::Type cellType( std::size_t cellIndex ) const {
+    return mType;
+  }
+
+private:
+  xdmGrid::CellType::Type mType;
+  xdm::RefPtr< xdmGrid::Geometry > mGeometry;
+  std::size_t* mNodeIds;
+};
+
+} // anon namespace
 
 XDM_GRID_NAMESPACE_BEGIN
 
@@ -35,6 +64,17 @@ UnstructuredTopology::UnstructuredTopology() :
 }
 
 UnstructuredTopology::~UnstructuredTopology() {
+}
+
+void UnstructuredTopology::setGeometry( xdm::RefPtr< Geometry > geometry ) {
+  mGeometry = geometry;
+  if ( mConnectivity ) {
+    mCellSharedImp =
+      new TrivialCellRefImpl(
+        mCellType,
+        mGeometry,
+        mConnectivity->typedArray< std::size_t >()->begin() );
+  }
 }
 
 void UnstructuredTopology::setNumberOfCells( std::size_t numberOfCells ) {
@@ -75,7 +115,13 @@ const CellRef UnstructuredTopology::cell( std::size_t cellIndex ) const
 
 void UnstructuredTopology::setConnectivity( xdm::RefPtr< xdm::UniformDataItem > connectivity ) {
   mConnectivity = connectivity;
-//  mCellSharedImp = new xdm::SingleArrayOfVectorsImpl< double >(
+  if ( mGeometry ) {
+    mCellSharedImp =
+      new TrivialCellRefImpl(
+        mCellType,
+        mGeometry,
+        connectivity->typedArray< std::size_t >()->begin() );
+  }
 }
 
 void UnstructuredTopology::traverse( xdm::ItemVisitor& iv ) {
