@@ -21,8 +21,6 @@
 #include <xdmGrid/CellRef.hpp>
 #include <xdmGrid/UnstructuredTopology.hpp>
 
-#include <xdm/TypedDataIndexingVisitor.hpp>
-
 #include <sstream>
 
 XDM_GRID_NAMESPACE_BEGIN
@@ -77,8 +75,6 @@ const CellRef UnstructuredTopology::cell( std::size_t cellIndex ) const
 
 void UnstructuredTopology::setConnectivity( xdm::RefPtr< xdm::UniformDataItem > connectivity ) {
   mConnectivity = connectivity;
-  std::size_t* connectivityArray;
-  xdm::TypedDataIndexingVisitor< std::size_t > visitor( connectivityArray );
 //  mCellSharedImp = new xdm::SingleArrayOfVectorsImpl< double >(
 }
 

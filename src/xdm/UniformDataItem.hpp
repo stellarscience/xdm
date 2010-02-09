@@ -24,8 +24,9 @@
 #include <xdm/Dataset.hpp>
 #include <xdm/DataShape.hpp>
 #include <xdm/DataItem.hpp>
-#include <xdm/PrimitiveType.hpp>
 #include <xdm/MemoryAdapter.hpp>
+#include <xdm/PrimitiveType.hpp>
+#include <xdm/TypedStructuredArray.hpp>
 
 #include <list>
 
@@ -33,10 +34,8 @@
 
 XDM_NAMESPACE_BEGIN
 
-class DataIndexingVisitor;
-
 /// Representation of a dataset on disk with corresponding shape and type
-/// information.  A UniformDataItem contains one or more data objects that
+/// information.  A UniformDataItem contains a data object that
 /// should fill the dataspace contained by the UniformDataItem.
 class UniformDataItem : public DataItem {
 public:
@@ -66,6 +65,25 @@ public:
   void setData( RefPtr< MemoryAdapter > data );
   /// Get the data object that provides memory access to the Item.
   RefPtr< MemoryAdapter > data();
+  /// Get the data object that provides const memory access to the Item.
+  RefPtr< const MemoryAdapter > data() const;
+
+  /// Get a typed structured array, if that is how the data is stored
+  /// here.
+  /// @throws std::runtime_error if the data type is incorrect.
+  // TODO: Since the user can already check the data type, maybe this should
+  // only throw if the data type cannot be converted to the requested type.
+  // In that case, the implementation should try to construct a
+  // TypedStructuredArray by copying and converting the data to the
+  // requested type.
+  template< typename T >
+  RefPtr< TypedStructuredArray< T > > typedArray();
+
+  /// Get a typed structured array, if that is how the data is stored
+  /// here. Const version.
+  /// @throws std::runtime_error if the data type is incorrect.
+  template< typename T >
+  RefPtr< const TypedStructuredArray< T > > typedArray() const;
 
   /// Clear all of my writable data.
   void clearData();
@@ -87,15 +105,50 @@ public:
   /// true if any of the item's MemoryAdapter's is in need of an update.
   bool serializationRequired() const;
 
-  /// Grab a value by index.
-  virtual void accept( DataIndexingVisitor& visitor );
-
 private:
   primitiveType::Value mDataType;
   DataShape<> mDataspace;
   RefPtr< Dataset > mDataset;
   RefPtr< MemoryAdapter > mData;
 };
+
+
+// Implementations for the template functions.
+#include <xdm/ThrowMacro.hpp>
+
+#include <stdexcept>
+#include <string>
+#include <typeinfo>
+
+template< typename T >
+RefPtr< TypedStructuredArray< T > > UniformDataItem::typedArray() {
+  RefPtr< StructuredArray > untyped = data()->array();
+  if ( ! untyped ) {
+    XDM_THROW( std::logic_error( "typedArray was called on a NULL MemoryAdapter or array." ) );
+  }
+  RefPtr< TypedStructuredArray< T > > typed =
+    dynamic_pointer_cast< TypedStructuredArray< T > >( data()->array() );
+  if ( ! typed ) {
+    XDM_THROW( std::runtime_error( "In typedArray, the MemoryAdapter does not hold an array"
+      " with the requested type: " + std::string( typeid( T ).name() ) ) );
+  }
+  return typed;
+}
+
+template< typename T >
+RefPtr< const TypedStructuredArray< T > > UniformDataItem::typedArray() const {
+  RefPtr< const StructuredArray > untyped = data()->array();
+  if ( ! untyped ) {
+    XDM_THROW( std::logic_error( "typedArray was called on a NULL MemoryAdapter or array." ) );
+  }
+  RefPtr< const TypedStructuredArray< T > > typed =
+    dynamic_pointer_cast< TypedStructuredArray< T > >( data()->array() );
+  if ( ! typed ) {
+    XDM_THROW( std::runtime_error( "In typedArray, the MemoryAdapter does not hold an array"
+      " with the requested type: " + std::string( typeid( T ).name() ) ) );
+  }
+  return typed;
+}
 
 XDM_NAMESPACE_END
 

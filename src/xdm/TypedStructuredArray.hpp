@@ -21,7 +21,6 @@
 #ifndef xdm_TypedStructuredArray_hpp
 #define xdm_TypedStructuredArray_hpp
 
-#include <xdm/DataIndexingVisitor.hpp>
 #include <xdm/PrimitiveType.hpp>
 #include <xdm/RefPtr.hpp>
 #include <xdm/StructuredArray.hpp>
@@ -128,11 +127,6 @@ public:
   const value_type& operator[] ( size_t i ) const {
     assert( i < mSize );
     return mData + i;
-  }
-
-  /// Access individual elements of the array in a typesafe manner.
-  virtual void accept( DataIndexingVisitor& visitor ) {
-    visitor.apply( *this );
   }
 
 private:

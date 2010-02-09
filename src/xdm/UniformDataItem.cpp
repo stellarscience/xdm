@@ -18,7 +18,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //------------------------------------------------------------------------------
-#include <xdm/DataIndexingVisitor.hpp>
 #include <xdm/DataSelection.hpp>
 #include <xdm/UniformDataItem.hpp>
 
@@ -79,6 +78,10 @@ void UniformDataItem::setData( RefPtr< MemoryAdapter > data ) {
 }
 
 RefPtr< MemoryAdapter > UniformDataItem::data() {
+  return mData;
+}
+
+RefPtr< const MemoryAdapter > UniformDataItem::data() const {
   return mData;
 }
 
@@ -149,10 +152,6 @@ void UniformDataItem::finalizeDataset() {
 
 bool UniformDataItem::serializationRequired() const {
   return mData->requiresWrite();
-}
-
-void UniformDataItem::accept( DataIndexingVisitor& visitor ) {
-  visitor.apply( *this );
 }
 
 XDM_NAMESPACE_END

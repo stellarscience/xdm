@@ -41,6 +41,7 @@ void TensorProductGeometry::setCoordinateValues(
   xdm::RefPtr< xdm::DataItem > data ) {
   assert( dim < dimension() );
   setChild( dim, data );
+  // TODO: Give it a mSharedVectorImp.
 }
 
 NodeRef TensorProductGeometry::node( std::size_t nodeIndex )

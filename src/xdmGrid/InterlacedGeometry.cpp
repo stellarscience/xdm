@@ -21,7 +21,6 @@
 #include <xdmGrid/InterlacedGeometry.hpp>
 #include <xdmGrid/NodeRef.hpp>
 
-#include <xdm/TypedDataIndexingVisitor.hpp>
 #include <xdm/VectorRef.hpp>
 
 #include <stdexcept>
@@ -39,11 +38,14 @@ InterlacedGeometry::~InterlacedGeometry() {
 }
 
 void InterlacedGeometry::setCoordinateValues( xdm::RefPtr< xdm::UniformDataItem > data ) {
+  if ( numberOfChildren() > 0 ) {
+    XDM_THROW( std::logic_error( "setCoordinateValues was called after the values had"
+      " already been set by a previous call to setCoordinateValues." ) );
+  }
   appendChild( data );
-  double* nodeLocations;
-  xdm::TypedDataIndexingVisitor< double > visitor( nodeLocations );
-  data->accept( visitor );
-  mSharedVectorImp = new xdm::SingleArrayOfVectorsImpl< double >( nodeLocations, dimension() );
+  mSharedVectorImp = new xdm::SingleArrayOfVectorsImpl< double >(
+    data->typedArray< double >()->begin(),
+    dimension() );
 }
 
 NodeRef InterlacedGeometry::node( std::size_t nodeIndex )

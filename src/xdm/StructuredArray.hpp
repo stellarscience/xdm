@@ -33,8 +33,6 @@
 
 XDM_NAMESPACE_BEGIN
 
-class DataIndexingVisitor;
-
 /// Array class for holding multiple types of data. This class represents a
 /// contiguous array of data in memory.  It does not own the data it holds, it
 /// merely presents an interface for querying information about an array that is
@@ -79,8 +77,6 @@ public:
 
   /// Get the size of the array in memory in bytes.
   size_t memorySize() const;
-
-  virtual void accept( DataIndexingVisitor& visitor );
 
 };
 

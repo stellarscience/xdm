@@ -14,7 +14,6 @@ set( ${PROJECT_NAME}_HEADERS
     CollectMetadataOperation.hpp
     CompositeDataItem.hpp
     CoordinateDataSelection.hpp
-    DataIndexingVisitor.hpp
     DataItem.hpp
     DataSelection.hpp
     DataSelectionMap.hpp
@@ -38,7 +37,6 @@ set( ${PROJECT_NAME}_HEADERS
     SerializeDataOperation.hpp
     StaticAssert.hpp
     StructuredArray.hpp
-    TypedDataIndexingVisitor.hpp
     TypedStructuredArray.hpp
     UniformDataItem.hpp
     UpdateVisitor.hpp
@@ -61,7 +59,6 @@ set( ${PROJECT_NAME}_SOURCES
     CollectMetadataOperation.cpp
     CompositeDataItem.cpp
     CoordinateDataSelection.cpp
-    DataIndexingVisitor.cpp
     DataItem.cpp
     DataSelection.cpp
     DataSelectionMap.cpp

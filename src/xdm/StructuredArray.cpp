@@ -18,7 +18,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //------------------------------------------------------------------------------
-#include <xdm/DataIndexingVisitor.hpp>
 #include <xdm/StructuredArray.hpp>
 
 #include <numeric>
@@ -34,10 +33,6 @@ StructuredArray::~StructuredArray() {
 
 size_t StructuredArray::memorySize() const {
   return elementSize() * size();
-}
-
-void StructuredArray::accept( DataIndexingVisitor& visitor ) {
-  visitor.apply( *this );
 }
 
 XDM_NAMESPACE_END

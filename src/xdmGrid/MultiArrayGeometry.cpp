@@ -21,8 +21,6 @@
 #include <xdmGrid/NodeRef.hpp>
 #include <xdmGrid/MultiArrayGeometry.hpp>
 
-#include <xdm/TypedDataIndexingVisitor.hpp>
-
 #include <algorithm>
 #include <cassert>
 #include <functional>
@@ -54,16 +52,19 @@ void MultiArrayGeometry::setCoordinateValues(
   int dimensionCount =
     std::count_if( begin(), end(), std::mem_fun_ref( &xdm::RefPtr< xdm::Item >::valid ) );
   if ( dimensionCount == dimension() ) {
-
     std::vector< double* > xyzArrays;
-    std::vector< std::size_t > axisSizes;
+    std::vector< std::size_t > sizes;
     for ( int dim = 0; dim < dimension(); ++dim ) {
-      double* nodeLocationsForOneDim;
-      xdm::TypedDataIndexingVisitor< double > visitor( nodeLocationsForOneDim );
       xdm::RefPtr< xdm::UniformDataItem > uniformItem =
         xdm::dynamic_pointer_cast< xdm::UniformDataItem >( child( dim ) );
-      uniformItem->accept( visitor );
-      xyzArrays.push_back( nodeLocationsForOneDim );
+      xyzArrays.push_back( uniformItem->typedArray< double >()->begin() );
+      sizes.push_back( uniformItem->typedArray< double >()->size() );
+    }
+
+    if ( std::count_if( ++sizes.begin(), sizes.end(),
+      bind2nd( std::equal_to< std::size_t >(), sizes.front() ) ) != dimension() ) {
+      XDM_THROW( std::runtime_error( "The arrays in the UniformDataItems supplied are"
+        " not all of the same size." ) );
     }
 
     mSharedVectorImp = new xdm::MultipleArraysOfVectorElementsImpl< double >( xyzArrays );

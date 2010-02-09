@@ -48,7 +48,9 @@ public:
 
   XDM_META_ITEM( InterlacedGeometry );
 
-  /// Set the DataItem representing the node values.
+  /// Set the DataItem representing the node values. For this type of geometry
+  /// it is only possible to have one DataItem.
+  /// @throws std::logic_error if called after coordinate values have already been set.
   void setCoordinateValues( xdm::RefPtr< xdm::UniformDataItem > data );
 
   /// Grab a node by index.

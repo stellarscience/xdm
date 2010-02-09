@@ -55,6 +55,7 @@ public:
   ///
   /// @param dim The axis of the coordinate represented by the data.
   /// @param data The data representing the coordinate values on the axis.
+  /// @throws std::runtime_error if the arrays are not all the same size.
   void setCoordinateValues( unsigned int dim, xdm::RefPtr< xdm::UniformDataItem > data );
 
   /// Grab a node by index.
