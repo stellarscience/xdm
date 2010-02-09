@@ -21,7 +21,7 @@
 #include <xdm/DataIndexingVisitor.hpp>
 #include <xdm/TemplateStructuredArray.hpp>
 #include <xdm/UniformDataItem.hpp>
-#include <xdm/WritableArray.hpp>
+#include <xdm/ArrayAdapter.hpp>
 
 #include <xdm/ThrowMacro.hpp>
 

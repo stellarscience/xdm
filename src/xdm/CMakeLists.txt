@@ -3,6 +3,7 @@ project( xdm )
 set( ${PROJECT_NAME}_HEADERS
     Algorithm.hpp
     AllDataSelection.hpp
+    ArrayAdapter.hpp
     BinaryIosBase.hpp
     BinaryIStream.hpp
     BinaryIOStream.hpp
@@ -26,6 +27,7 @@ set( ${PROJECT_NAME}_HEADERS
     HyperslabDataSelection.hpp
     Item.hpp
     ItemVisitor.hpp
+    MemoryAdapter.hpp
 	  NamespaceMacro.hpp
 	  ObjectCompositionMixin.hpp
     PrimitiveType.hpp
@@ -42,8 +44,6 @@ set( ${PROJECT_NAME}_HEADERS
     UpdateVisitor.hpp
     VectorRef.hpp
     VectorStructuredArray.hpp
-    WritableArray.hpp
-    WritableData.hpp
     XmlExcept.hpp
     XmlMetadataWrapper.hpp
     XmlObject.hpp
@@ -52,6 +52,7 @@ set( ${PROJECT_NAME}_HEADERS
 )
 
 set( ${PROJECT_NAME}_SOURCES
+    ArrayAdapter.cpp
     BinaryIStream.cpp
     BinaryIOStream.cpp
     BinaryOStream.cpp
@@ -69,6 +70,7 @@ set( ${PROJECT_NAME}_SOURCES
     DataShape.cpp
     Item.cpp
     ItemVisitor.cpp
+    MemoryAdapter.cpp
     PrimitiveType.cpp
     ProxyDataset.cpp
     ReferencedObject.cpp
@@ -78,8 +80,6 @@ set( ${PROJECT_NAME}_SOURCES
     UniformDataItem.cpp
     UpdateVisitor.cpp
     VectorRef.cpp
-    WritableArray.cpp
-    WritableData.cpp
     XmlObject.cpp
     XmlOutputStream.cpp
 )

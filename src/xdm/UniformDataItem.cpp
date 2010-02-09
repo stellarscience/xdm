@@ -74,11 +74,11 @@ void UniformDataItem::setDataspace( const DataShape<>& dataspace ) {
   }
 }
 
-void UniformDataItem::setData( RefPtr< WritableData > data ) {
+void UniformDataItem::setData( RefPtr< MemoryAdapter > data ) {
   mData = data;
 }
 
-RefPtr< WritableData > UniformDataItem::data() {
+RefPtr< MemoryAdapter > UniformDataItem::data() {
   return mData;
 }
 

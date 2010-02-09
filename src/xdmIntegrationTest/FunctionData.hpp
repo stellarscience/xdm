@@ -25,7 +25,7 @@
 #include <xdm/HyperSlab.hpp>
 #include <xdm/RefPtr.hpp>
 #include <xdm/TemplateStructuredArray.hpp>
-#include <xdm/WritableData.hpp>
+#include <xdm/MemoryAdapter.hpp>
 
 #include <algorithm>
 #include <string>
@@ -118,7 +118,7 @@ public:
 
 // class that computes the function values given the overall grid bounds and a
 // region of interest.
-class FunctionData : public xdm::WritableData {
+class FunctionData : public xdm::MemoryAdapter {
 private:
   GridBounds mGrid;
   xdm::HyperSlab<> mRegionOfInterest;

@@ -29,7 +29,7 @@
 #include <xdm/StructuredArray.hpp>
 #include <xdm/TemplateStructuredArray.hpp>
 #include <xdm/UniformDataItem.hpp>
-#include <xdm/WritableArray.hpp>
+#include <xdm/ArrayAdapter.hpp>
 #include <xdm/XmlObject.hpp>
 #include <xdm/XmlOutputStream.hpp>
 
@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_CASE( staticGrid ) {
   // dataitem.
   xdm::RefPtr< xdm::UniformDataItem > sharedData( 
     new xdm::UniformDataItem( xdm::primitiveType::kDouble, xdm::makeShape( 10 ) ) );
-  sharedData->setData( xdm::makeRefPtr( new xdm::WritableArray( array ) ) );
+  sharedData->setData( xdm::makeRefPtr( new xdm::ArrayAdapter( array ) ) );
   for ( int i = 0; i < 3; ++i ) {
     geometry->setCoordinateValues( i, sharedData );
   }
@@ -132,7 +132,7 @@ BOOST_AUTO_TEST_CASE( staticGrid ) {
   xdm::RefPtr< xdm::StructuredArray > attrvalues 
     = xdm::createStructuredArray( &data[0], 1000 );
   attributeDataItem->setData( xdm::makeRefPtr(
-    new xdm::WritableArray( attrvalues ) ) );
+    new xdm::ArrayAdapter( attrvalues ) ) );
   attribute->setDataItem( attributeDataItem );
 
   // attach an HDF dataset to all UniformDataItems
@@ -178,7 +178,7 @@ BOOST_AUTO_TEST_CASE( timeSeries ) {
   geometryDataset->setDataset( "gridValues" );
   xdm::RefPtr< xdm::UniformDataItem > geodata( 
     new xdm::UniformDataItem( xdm::primitiveType::kFloat, xdm::makeShape( 10 ) ) );
-  geodata->setData( xdm::makeRefPtr( new xdm::WritableArray( geometryArray ) ) );
+  geodata->setData( xdm::makeRefPtr( new xdm::ArrayAdapter( geometryArray ) ) );
   geodata->setDataset( geometryDataset );
   for ( int i = 0; i < 3; ++i ) {
     sharedGeometry->setCoordinateValues( i, geodata );
@@ -225,7 +225,7 @@ BOOST_AUTO_TEST_CASE( timeSeries ) {
     xdm::RefPtr< xdm::UniformDataItem > attrData( new xdm::UniformDataItem( 
       xdm::primitiveType::kFloat, 
       xdm::makeShape( 9, 9, 9 ) ) );
-    attrData->setData( xdm::makeRefPtr( new xdm::WritableArray( attrArray ) ) );
+    attrData->setData( xdm::makeRefPtr( new xdm::ArrayAdapter( attrArray ) ) );
     attrData->setDataset( attrDataset );
     attribute->setDataItem( attrData );
     

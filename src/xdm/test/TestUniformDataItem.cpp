@@ -23,7 +23,7 @@
 
 #include <xdm/TemplateStructuredArray.hpp>
 #include <xdm/UniformDataItem.hpp>
-#include <xdm/WritableArray.hpp>
+#include <xdm/ArrayAdapter.hpp>
 
 #include <algorithm>
 
@@ -68,7 +68,7 @@ public:
       xdm::primitiveType::kFloat, 
       datasetShape );
 
-    testItem->setData( xdm::makeRefPtr( new xdm::WritableArray( array ) ) );
+    testItem->setData( xdm::makeRefPtr( new xdm::ArrayAdapter( array ) ) );
     testItem->setDataset( dataset );
   }
 };

@@ -26,7 +26,7 @@
 #include <xdm/RefPtr.hpp>
 #include <xdm/UniformDataItem.hpp>
 #include <xdm/VectorStructuredArray.hpp>
-#include <xdm/WritableArray.hpp>
+#include <xdm/ArrayAdapter.hpp>
 
 #include <xdmComm/ParallelizeTreeVisitor.hpp>
 
@@ -154,8 +154,8 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
     xdm::primitiveType::kFloat, outputShape ) );
   geometry->setCoordinateValues( geometryData );
 
-  // WritableData for the geometry coordinate values
-  xdm::RefPtr< xdm::WritableArray > geometryMemory( new xdm::WritableArray(
+  // MemoryAdapter for the geometry coordinate values
+  xdm::RefPtr< xdm::ArrayAdapter > geometryMemory( new xdm::ArrayAdapter(
     mPositions ) );
   geometryMemory->setIsDynamic( true ); // changes throughout the simulation
   geometryData->setData( geometryMemory );
@@ -179,7 +179,7 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
     xdm::primitiveType::kFloat, outputShape ) );
   velocityAttribute->setDataItem( velocityData );
   // create dynamic data for the velocity values.
-  xdm::RefPtr< xdm::WritableArray > velocityMemory( new xdm::WritableArray(
+  xdm::RefPtr< xdm::ArrayAdapter > velocityMemory( new xdm::ArrayAdapter(
     mVelocities ) );
   velocityMemory->setIsDynamic( true );
   velocityData->setData( velocityMemory );

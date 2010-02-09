@@ -25,7 +25,7 @@
 #include <xdm/DataShape.hpp>
 #include <xdm/DataItem.hpp>
 #include <xdm/PrimitiveType.hpp>
-#include <xdm/WritableData.hpp>
+#include <xdm/MemoryAdapter.hpp>
 
 #include <list>
 
@@ -63,9 +63,9 @@ public:
   void setDataspace( const DataShape<>& dataspace );
 
   /// Set the data object that provides memory access to the Item.
-  void setData( RefPtr< WritableData > data );
+  void setData( RefPtr< MemoryAdapter > data );
   /// Get the data object that provides memory access to the Item.
-  RefPtr< WritableData > data();
+  RefPtr< MemoryAdapter > data();
 
   /// Clear all of my writable data.
   void clearData();
@@ -76,7 +76,7 @@ public:
   /// @param mode Access mode for the Dataset.
   void initializeDataset( const Dataset::InitializeMode& mode );
 
-  /// Serialize this item's WritableData to it's dataset.
+  /// Serialize this item's MemoryAdapter to it's dataset.
   /// @pre The item's Dataset has been initialized.
   void serializeData();
 
@@ -84,7 +84,7 @@ public:
   void finalizeDataset();
 
   /// Determine if this item currently requires serialization . This will return
-  /// true if any of the item's WritableData's is in need of an update.
+  /// true if any of the item's MemoryAdapter's is in need of an update.
   bool serializationRequired() const;
 
   /// Grab a value by index.
@@ -94,7 +94,7 @@ private:
   primitiveType::Value mDataType;
   DataShape<> mDataspace;
   RefPtr< Dataset > mDataset;
-  RefPtr< WritableData > mData;
+  RefPtr< MemoryAdapter > mData;
 };
 
 XDM_NAMESPACE_END

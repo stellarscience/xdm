@@ -18,41 +18,48 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.       
 //                                                                             
 //------------------------------------------------------------------------------
-#ifndef xdm_WritableArray_hpp
-#define xdm_WritableArray_hpp
+#include <xdm/ArrayAdapter.hpp>
 
-#include <xdm/DataSelectionMap.hpp>
-#include <xdm/RefPtr.hpp>
-#include <xdm/WritableData.hpp>
-
-#include <xdm/NamespaceMacro.hpp>
+#include <xdm/DataSelection.hpp>
+#include <xdm/Dataset.hpp>
+#include <xdm/StructuredArray.hpp>
 
 XDM_NAMESPACE_BEGIN
 
-class Dataset;
-class StructuredArray;
+ArrayAdapter::ArrayAdapter( RefPtr< StructuredArray > array, bool isDynamic ) :
+  MemoryAdapter( isDynamic ),
+  mArray( array ),
+  mSelectionMap()
+{
+}
 
-/// Writes an Array with a given selection to a selection within a dataset.
-class WritableArray : public WritableData {
-public:
-  WritableArray( RefPtr< StructuredArray > array, bool isDynamic = false );
-  virtual ~WritableArray();
+ArrayAdapter::~ArrayAdapter()
+{
+}
 
-  RefPtr< StructuredArray > array();
-  RefPtr< const StructuredArray > array() const;
-  void setArray( RefPtr< StructuredArray > array );
+RefPtr< StructuredArray > ArrayAdapter::array() {
+  return mArray;
+}
 
-  const DataSelectionMap& selectionMap() const;
-  void setSelectionMap( const DataSelectionMap& selectionMap );
+RefPtr< const StructuredArray > ArrayAdapter::array() const {
+  return mArray;
+}
 
-  virtual void writeImplementation( Dataset* dataset );
+void ArrayAdapter::setArray( RefPtr< StructuredArray > array ) {
+  mArray = array;
+}
 
-private:
-  RefPtr< StructuredArray > mArray;
-  DataSelectionMap mSelectionMap;
-};
+const DataSelectionMap& ArrayAdapter::selectionMap() const {
+  return mSelectionMap;
+}
+
+void ArrayAdapter::setSelectionMap( const DataSelectionMap& selectionMap ) {
+  mSelectionMap = selectionMap;
+}
+
+void ArrayAdapter::writeImplementation( Dataset* dataset ) {
+  dataset->serialize( mArray.get(), mSelectionMap );
+}
 
 XDM_NAMESPACE_END
-
-#endif // xdm_WritableArray_hpp
 

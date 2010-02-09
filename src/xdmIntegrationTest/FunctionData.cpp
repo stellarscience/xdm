@@ -29,7 +29,7 @@
 #include <xdm/TemplateStructuredArray.hpp>
 #include <xdm/ThrowMacro.hpp>
 #include <xdm/VectorStructuredArray.hpp>
-#include <xdm/WritableArray.hpp>
+#include <xdm/ArrayAdapter.hpp>
 
 #include <xdmGrid/UniformGrid.hpp>
 #include <xdmGrid/RectilinearMesh.hpp>
@@ -82,7 +82,7 @@ constructFunctionGrid( const GridBounds& bounds, const std::string& hdfFile ) {
     }
     // fill the final point
     (*values)[ bounds.size(i) ] = bounds.bounds(i).second;
-    dataItem->setData( xdm::makeRefPtr( new xdm::WritableArray( values ) ) );
+    dataItem->setData( xdm::makeRefPtr( new xdm::ArrayAdapter( values ) ) );
     geometry->setCoordinateValues( i, dataItem );
     xdm::RefPtr< xdmHdf::HdfDataset > dataset( new xdmHdf::HdfDataset );
     dataset->setFile( hdfFile.c_str() );

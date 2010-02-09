@@ -18,47 +18,53 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.       
 //                                                                             
 //------------------------------------------------------------------------------
-#include <xdm/WritableArray.hpp>
+#include <xdm/MemoryAdapter.hpp>
 
-#include <xdm/DataSelection.hpp>
 #include <xdm/Dataset.hpp>
-#include <xdm/StructuredArray.hpp>
 
 XDM_NAMESPACE_BEGIN
 
-WritableArray::WritableArray( RefPtr< StructuredArray > array, bool isDynamic ) :
-  WritableData( isDynamic ),
-  mArray( array ),
-  mSelectionMap()
+MemoryAdapter::MemoryAdapter( bool isDynamic ) : 
+  ReferencedObject(),
+  mIsDynamic( isDynamic ),
+  mNeedsUpdate( true )
 {
 }
 
-WritableArray::~WritableArray()
+MemoryAdapter::~MemoryAdapter()
 {
 }
 
-RefPtr< StructuredArray > WritableArray::array() {
-  return mArray;
+bool MemoryAdapter::isDynamic() const 
+{
+  return mIsDynamic;
 }
 
-RefPtr< const StructuredArray > WritableArray::array() const {
-  return mArray;
+void MemoryAdapter::setIsDynamic( bool isDynamic )
+{
+  mIsDynamic = isDynamic;
 }
 
-void WritableArray::setArray( RefPtr< StructuredArray > array ) {
-  mArray = array;
+bool MemoryAdapter::needsUpdate() const
+{
+  return mNeedsUpdate;
 }
 
-const DataSelectionMap& WritableArray::selectionMap() const {
-  return mSelectionMap;
+void MemoryAdapter::setNeedsUpdate( bool needsUpdate )
+{
+  mNeedsUpdate = needsUpdate;
 }
 
-void WritableArray::setSelectionMap( const DataSelectionMap& selectionMap ) {
-  mSelectionMap = selectionMap;
+bool MemoryAdapter::requiresWrite() const {
+  return ( mIsDynamic || mNeedsUpdate );
 }
 
-void WritableArray::writeImplementation( Dataset* dataset ) {
-  dataset->serialize( mArray.get(), mSelectionMap );
+void MemoryAdapter::write( Dataset* dataset )
+{
+  if ( requiresWrite() ) {
+    writeImplementation( dataset );
+    mNeedsUpdate = false;
+  }
 }
 
 XDM_NAMESPACE_END

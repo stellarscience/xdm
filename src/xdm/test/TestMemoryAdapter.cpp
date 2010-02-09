@@ -18,12 +18,12 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.       
 //                                                                             
 //------------------------------------------------------------------------------
-#define BOOST_TEST_MODULE WritableData 
+#define BOOST_TEST_MODULE MemoryAdapter 
 #include <boost/test/unit_test.hpp>
 
 #include <xdm/Dataset.hpp>
 #include <xdm/RefPtr.hpp>
-#include <xdm/WritableData.hpp>
+#include <xdm/MemoryAdapter.hpp>
 
 namespace {
 
@@ -52,7 +52,7 @@ public:
   void writeTextContent(xdm::XmlTextContent&) {}
 };
 
-class WritableDataTestImplementation : public xdm::WritableData {
+class MemoryAdapterTestImplementation : public xdm::MemoryAdapter {
 public:
   virtual xdm::RefPtr< xdm::StructuredArray > array() {
     // not implemented, return invalid data.
@@ -69,10 +69,10 @@ public:
 class Fixture {
 public:
   xdm::RefPtr< DatasetTestImplementation > testDataset;
-  xdm::RefPtr< WritableDataTestImplementation > testWritable;
+  xdm::RefPtr< MemoryAdapterTestImplementation > testWritable;
   Fixture() :
     testDataset( new DatasetTestImplementation ),
-    testWritable( new WritableDataTestImplementation ) {}
+    testWritable( new MemoryAdapterTestImplementation ) {}
   ~Fixture() {}
 };
 
