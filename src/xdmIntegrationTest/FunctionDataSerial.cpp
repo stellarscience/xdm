@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
 
   // add the data for the slab of interest to the grid attribute
   xdm::RefPtr< xdmGrid::Attribute > attribute = problem.second;
-  attribute->dataItem()->appendData( xdm::makeRefPtr( new FunctionData(
+  attribute->dataItem()->setData( xdm::makeRefPtr( new FunctionData(
     problemBounds, 
     slab, 
     xdm::makeRefPtr( new TestCaseFunction ) ) ) );

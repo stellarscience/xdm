@@ -27,6 +27,7 @@
 #include <xdm/HyperslabDataSelection.hpp>
 #include <xdm/UniformDataItem.hpp>
 #include <xdm/TemplateStructuredArray.hpp>
+#include <xdm/ThrowMacro.hpp>
 #include <xdm/VectorStructuredArray.hpp>
 #include <xdm/WritableArray.hpp>
 
@@ -38,6 +39,7 @@
 #include <xdmHdf/HdfDataset.hpp>
 
 #include <numeric>
+#include <stdexcept>
 
 #include <cmath>
 
@@ -80,7 +82,7 @@ constructFunctionGrid( const GridBounds& bounds, const std::string& hdfFile ) {
     }
     // fill the final point
     (*values)[ bounds.size(i) ] = bounds.bounds(i).second;
-    dataItem->appendData( xdm::makeRefPtr( new xdm::WritableArray( values ) ) );
+    dataItem->setData( xdm::makeRefPtr( new xdm::WritableArray( values ) ) );
     geometry->setCoordinateValues( i, dataItem );
     xdm::RefPtr< xdmHdf::HdfDataset > dataset( new xdmHdf::HdfDataset );
     dataset->setFile( hdfFile.c_str() );
@@ -131,6 +133,10 @@ FunctionData::FunctionData(
 }
 
 FunctionData::~FunctionData() {
+}
+
+xdm::RefPtr< xdm::StructuredArray > FunctionData::array() {
+  XDM_THROW( std::runtime_error( "Random access not implemented" ) );
 }
 
 void FunctionData::writeImplementation( xdm::Dataset* dataset ) {

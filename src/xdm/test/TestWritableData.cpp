@@ -54,6 +54,11 @@ public:
 
 class WritableDataTestImplementation : public xdm::WritableData {
 public:
+  virtual xdm::RefPtr< xdm::StructuredArray > array() {
+    // not implemented, return invalid data.
+    return xdm::RefPtr< xdm::StructuredArray >();
+  }
+
   virtual void writeImplementation( xdm::Dataset* dataset ) {
     DatasetTestImplementation* ds = 
       dynamic_cast< DatasetTestImplementation* >( dataset );

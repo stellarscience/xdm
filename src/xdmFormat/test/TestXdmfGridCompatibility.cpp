@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_CASE( staticGrid ) {
   // dataitem.
   xdm::RefPtr< xdm::UniformDataItem > sharedData( 
     new xdm::UniformDataItem( xdm::primitiveType::kDouble, xdm::makeShape( 10 ) ) );
-  sharedData->appendData( xdm::makeRefPtr( new xdm::WritableArray( array ) ) );
+  sharedData->setData( xdm::makeRefPtr( new xdm::WritableArray( array ) ) );
   for ( int i = 0; i < 3; ++i ) {
     geometry->setCoordinateValues( i, sharedData );
   }
@@ -131,7 +131,7 @@ BOOST_AUTO_TEST_CASE( staticGrid ) {
     new xdm::UniformDataItem( xdm::primitiveType::kFloat, xdm::makeShape( "10 10 10" ) ) );
   xdm::RefPtr< xdm::StructuredArray > attrvalues 
     = xdm::createStructuredArray( &data[0], 1000 );
-  attributeDataItem->appendData( xdm::makeRefPtr(
+  attributeDataItem->setData( xdm::makeRefPtr(
     new xdm::WritableArray( attrvalues ) ) );
   attribute->setDataItem( attributeDataItem );
 
@@ -178,7 +178,7 @@ BOOST_AUTO_TEST_CASE( timeSeries ) {
   geometryDataset->setDataset( "gridValues" );
   xdm::RefPtr< xdm::UniformDataItem > geodata( 
     new xdm::UniformDataItem( xdm::primitiveType::kFloat, xdm::makeShape( 10 ) ) );
-  geodata->appendData( xdm::makeRefPtr( new xdm::WritableArray( geometryArray ) ) );
+  geodata->setData( xdm::makeRefPtr( new xdm::WritableArray( geometryArray ) ) );
   geodata->setDataset( geometryDataset );
   for ( int i = 0; i < 3; ++i ) {
     sharedGeometry->setCoordinateValues( i, geodata );
@@ -225,7 +225,7 @@ BOOST_AUTO_TEST_CASE( timeSeries ) {
     xdm::RefPtr< xdm::UniformDataItem > attrData( new xdm::UniformDataItem( 
       xdm::primitiveType::kFloat, 
       xdm::makeShape( 9, 9, 9 ) ) );
-    attrData->appendData( xdm::makeRefPtr( new xdm::WritableArray( attrArray ) ) );
+    attrData->setData( xdm::makeRefPtr( new xdm::WritableArray( attrArray ) ) );
     attrData->setDataset( attrDataset );
     attribute->setDataItem( attrData );
     

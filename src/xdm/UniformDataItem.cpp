@@ -30,25 +30,13 @@
 
 XDM_NAMESPACE_BEGIN
 
-namespace {
-
-  struct WriteData {
-    Dataset* mDataset;
-    WriteData( Dataset* dataset ) : mDataset(dataset) {}
-    void operator()( RefPtr< WritableData > writable ) {
-      writable->write( mDataset );
-    }
-  };
-
-} // namespace anon
-
 UniformDataItem::UniformDataItem(
   primitiveType::Value dataType,
   const DataShape<>& dataspace ) :
   mDataType( dataType ),
   mDataspace( dataspace ),
   mDataset(),
-  mWritables() {
+  mData() {
 }
 
 UniformDataItem::~UniformDataItem() {
@@ -86,20 +74,16 @@ void UniformDataItem::setDataspace( const DataShape<>& dataspace ) {
   }
 }
 
-void UniformDataItem::appendData( RefPtr< WritableData > data ) {
-  mWritables.push_back( data );
+void UniformDataItem::setData( RefPtr< WritableData > data ) {
+  mData = data;
 }
 
-UniformDataItem::DataList& UniformDataItem::writables() {
-  return mWritables;
-}
-
-const UniformDataItem::DataList& UniformDataItem::writables() const {
-  return mWritables;
+RefPtr< WritableData > UniformDataItem::data() {
+  return mData;
 }
 
 void UniformDataItem::clearData() {
-  mWritables.clear();
+  mData.reset();
 }
 
 void UniformDataItem::writeMetadata( XmlMetadataWrapper& xml ) {
@@ -156,8 +140,7 @@ void UniformDataItem::initializeDataset( const Dataset::InitializeMode& mode ) {
 }
 
 void UniformDataItem::serializeData() {
-  std::for_each( mWritables.begin(), mWritables.end(),
-    WriteData( mDataset.get() ) );
+  mData->write( mDataset.get() );
 }
 
 void UniformDataItem::finalizeDataset() {
@@ -165,13 +148,7 @@ void UniformDataItem::finalizeDataset() {
 }
 
 bool UniformDataItem::serializationRequired() const {
-  for ( DataList::const_iterator data = mWritables.begin();
-    data != mWritables.end(); ++data ) {
-    if ( (*data)->requiresWrite() ) {
-      return true;
-    }
-  }
-  return false;
+  return mData->requiresWrite();
 }
 
 void UniformDataItem::accept( DataIndexingVisitor& visitor ) {

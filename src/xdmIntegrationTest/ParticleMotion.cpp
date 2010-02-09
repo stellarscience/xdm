@@ -158,7 +158,7 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
   xdm::RefPtr< xdm::WritableArray > geometryMemory( new xdm::WritableArray(
     mPositions ) );
   geometryMemory->setIsDynamic( true ); // changes throughout the simulation
-  geometryData->appendData( geometryMemory );
+  geometryData->setData( geometryMemory );
 
   // put the geometry memory in an HDF dataset
   xdm::RefPtr< xdmHdf::HdfDataset > geometryDataset( new xdmHdf::HdfDataset );
@@ -182,7 +182,7 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
   xdm::RefPtr< xdm::WritableArray > velocityMemory( new xdm::WritableArray(
     mVelocities ) );
   velocityMemory->setIsDynamic( true );
-  velocityData->appendData( velocityMemory );
+  velocityData->setData( velocityMemory );
   // put the velocities in an HDF dataset.
   xdm::RefPtr< xdmHdf::HdfDataset > velocityDataset( new xdmHdf::HdfDataset );
   xdmHdf::GroupPath velGroup( 1, "velocities" );

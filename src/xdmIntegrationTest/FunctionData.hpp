@@ -135,6 +135,8 @@ public:
     const xdm::DataShape<>& blockSize = xdm::makeShape( 14, 14, 14 ) );
   virtual ~FunctionData();
 
+  virtual xdm::RefPtr< xdm::StructuredArray > array();
+
   virtual void writeImplementation( xdm::Dataset* dataset );
 };
 

@@ -22,6 +22,7 @@
 #define xdm_WritableData_hpp
 
 #include <xdm/ReferencedObject.hpp>
+#include <xdm/StructuredArray.hpp>
 
 #include <xdm/NamespaceMacro.hpp>
 
@@ -55,7 +56,12 @@ public:
   bool requiresWrite() const;
 
   /// Write the data to the specified dataset.
-  void write( Dataset* dataset ); 
+  void write( Dataset* dataset );
+
+  /// Get an array representation of the underlying data. Inheritors
+  /// should implement this method to provide a StructuredArray subclass that
+  /// provides random access to their data.
+  virtual RefPtr< StructuredArray > array() = 0;
 
 private:
   /// Method to be implemented by inheritors to define the data to be written to

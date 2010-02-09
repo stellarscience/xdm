@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
   localRegion.setCount( 2, problemBounds.size(2) );
 
   // add the data for the region of interest to the grid attribute
-  attribute->dataItem()->appendData( xdm::makeRefPtr(
+  attribute->dataItem()->setData( xdm::makeRefPtr(
     new FunctionData(
       problemBounds,
       localRegion,

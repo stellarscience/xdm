@@ -68,7 +68,7 @@ public:
       xdm::primitiveType::kFloat, 
       datasetShape );
 
-    testItem->appendData( xdm::makeRefPtr( new xdm::WritableArray( array ) ) );
+    testItem->setData( xdm::makeRefPtr( new xdm::WritableArray( array ) ) );
     testItem->setDataset( dataset );
   }
 };

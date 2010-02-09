@@ -40,7 +40,6 @@ class DataIndexingVisitor;
 /// should fill the dataspace contained by the UniformDataItem.
 class UniformDataItem : public DataItem {
 public:
-  typedef std::list< RefPtr< WritableData > > DataList;
 
   explicit UniformDataItem(
     primitiveType::Value dataType,
@@ -63,13 +62,10 @@ public:
   /// Set the dataspace for this data item.
   void setDataspace( const DataShape<>& dataspace );
 
-  /// Append a data object to the list of data objects that will make up my
-  /// space.
-  void appendData( RefPtr< WritableData > data );
-  /// Access the WritableArrays.
-  DataList& writables();
-  /// Access const WritableArrays.
-  const DataList& writables() const;
+  /// Set the data object that provides memory access to the Item.
+  void setData( RefPtr< WritableData > data );
+  /// Get the data object that provides memory access to the Item.
+  RefPtr< WritableData > data();
 
   /// Clear all of my writable data.
   void clearData();
@@ -98,7 +94,7 @@ private:
   primitiveType::Value mDataType;
   DataShape<> mDataspace;
   RefPtr< Dataset > mDataset;
-  DataList mWritables;
+  RefPtr< WritableData > mData;
 };
 
 XDM_NAMESPACE_END

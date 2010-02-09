@@ -34,21 +34,9 @@ DataIndexingVisitor::~DataIndexingVisitor() {
 }
 
 void DataIndexingVisitor::apply( UniformDataItem& item ) {
-  // This logic only applies to UniformDataItems that have a single array underneath so that
-  // the data is stored contiguously and can be indexed as a simple C array.
-  if ( item.writables().size() != 1 ) {
-    XDM_THROW( std::runtime_error( "DataIndexingVisitor cannot determine which WritableArray"
-      " to use because there are more than one in the UniformDataItem." ) );
+  if ( item.data() ) {
+    item.data()->array()->accept( *this );
   }
-
-  RefPtr< WritableArray > array =
-    dynamic_pointer_cast< WritableArray >( item.writables().front() );
-  if ( ! array ) {
-    XDM_THROW( std::runtime_error( "DataIndexingVisitor failed to find a WritableArray in"
-      " the UniformDataItem." ) );
-  }
-
-  array->array()->accept( *this );
 }
 
 void DataIndexingVisitor::apply( StructuredArray& array ) {
