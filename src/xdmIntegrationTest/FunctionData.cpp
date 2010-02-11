@@ -101,6 +101,9 @@ constructFunctionGrid( const GridBounds& bounds, const std::string& hdfFile ) {
   xdm::RefPtr< xdmHdf::HdfDataset > attributeDataset( new xdmHdf::HdfDataset );
   attributeDataset->setFile( hdfFile.c_str() );
   attributeDataset->setDataset( "FunctionValues" );
+  // use chunked IO and compression because we can.
+  attributeDataset->setUseChunkedIo( true );
+  attributeDataset->setUseCompression( true );
   attribute->dataItem()->setDataset( attributeDataset );
   
   return std::make_pair( grid.get(), attribute.get() );

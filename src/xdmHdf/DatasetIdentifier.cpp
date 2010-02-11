@@ -32,6 +32,7 @@ XDM_HDF_NAMESPACE_BEGIN
 
 namespace {
 
+  // RAII object to manage HDF5 type identifiers.
   struct TypeReleaseFunctor {
     htri_t operator()( hid_t typeId ) {
       H5Tclose( typeId );
@@ -39,68 +40,113 @@ namespace {
   };
   typedef ResourceIdentifier< TypeReleaseFunctor > TypeIdentifier;
 
-} // namespace
+  // RAII object to manage HDF5 property list identifiers.
+  struct PListReleaseFunctor {
+    htri_t operator()( hid_t propertyId ) {
+      if ( propertyId != H5P_DEFAULT ) {
+        H5Pclose( propertyId );
+      }
+    }
+  };
+  typedef ResourceIdentifier< PListReleaseFunctor > PListIdentifier;
 
-xdm::RefPtr< DatasetIdentifier > createDatasetIdentifier(
-  hid_t parent,
-  const std::string& name,
-  int type,
-  hid_t dataspace,
-  const xdm::Dataset::InitializeMode& mode ) {
-  
-  // check if the dataset already exists within the given parent
-  htri_t exists = H5Lexists( parent, name.c_str(), H5P_DEFAULT );
-  
-  if ( exists ) {
+  // Open an existing dataset for read or modify access.
+  xdm::RefPtr< DatasetIdentifier > openExistingDataset(
+    const DatasetParameters& parameters )
+  {
+    xdm::RefPtr< DatasetIdentifier > datasetId(
+        new DatasetIdentifier( H5Dopen(
+            parameters.parent, parameters.name.c_str(), H5P_DEFAULT ) ) );
 
-    if ( mode == xdm::Dataset::kCreate ) {
-
-      // the dataset exists and a create was requested, delete the existing one
-      H5Ldelete( parent, name.c_str(), H5P_DEFAULT );
-
-    } else {
-
-      // mode is read or modify, make sure the dataset parameters match
-      xdm::RefPtr< DatasetIdentifier > datasetId(
-        new DatasetIdentifier( H5Dopen( parent, name.c_str(), H5P_DEFAULT ) ) );
-
-      // make sure the space on disk and the requested space match
-      xdm::RefPtr< DataspaceIdentifier > datasetSpace(
+    // make sure the space on disk and the requested space match
+    xdm::RefPtr< DataspaceIdentifier > datasetSpace(
         new DataspaceIdentifier( H5Dget_space( datasetId->get() ) ) );
-      if ( !H5Sextent_equal( datasetSpace->get(), dataspace ) ) {
-        XDM_THROW( xdm::DataspaceMismatch( name ) );
-      }
-
-      // make sure the type on disk and the requested type match
-      xdm::RefPtr< TypeIdentifier > datasetType(
-        new TypeIdentifier( H5Dget_type( datasetId->get() ) ) );
-      htri_t equalTypes = H5Tequal( type, datasetType->get() );
-      if ( equalTypes <= 0 ) {
-        XDM_THROW( xdm::DatatypeMismatch( name ) );
-      }
-
-      // return the existing dataset
-      return datasetId;
-
+    if ( !H5Sextent_equal( datasetSpace->get(), parameters.dataspace ) ) {
+      XDM_THROW( xdm::DataspaceMismatch( parameters.name ) );
     }
 
-  } // if ( exists )
+    // make sure the type on disk and the requested type match
+    xdm::RefPtr< TypeIdentifier > datasetType(
+        new TypeIdentifier( H5Dget_type( datasetId->get() ) ) );
+    htri_t equalTypes = H5Tequal( parameters.type, datasetType->get() );
+    if ( equalTypes <= 0 ) {
+      XDM_THROW( xdm::DatatypeMismatch( parameters.name ) );
+    }
+
+    // return the existing dataset
+    return datasetId;
+  }
+
+  // Set up a PList identifier for chunking with the given size and space.
+  void setupChunks( hid_t plist, const xdm::DataShape<>& size, hid_t space ) {
+   // Make sure the rank of the chunks equals the rank of the space
+    if ( H5Sget_simple_extent_ndims( space ) != size.rank() ) {
+      XDM_THROW( xdm::DataspaceMismatch( "Chunked Dataset" ) );
+    }
+    xdm::DataShape< hsize_t > chunkSize( size );
+    H5Pset_chunk(
+      plist,
+      chunkSize.rank(),
+      &(chunkSize[0]) );
+  }
+
+  // Set up a PList identifier for compression with the given level.
+  void setupCompression( hid_t plist, size_t level ) {
+    // make sure compression is available.
+    if ( H5Zfilter_avail( H5Z_FILTER_DEFLATE ) ) {
+      H5Pset_deflate( plist, level );
+    }
+  }
+
+} // namespace
+
+//------------------------------------------------------------------------------
+xdm::RefPtr< DatasetIdentifier > createDatasetIdentifier(
+  const DatasetParameters& parameters ) {
+  
+  // check if the dataset already exists within the given parent
+  htri_t exists = H5Lexists(
+    parameters.parent,
+    parameters.name.c_str(),
+    H5P_DEFAULT );
+  
+  if ( exists ) {
+    if ( parameters.mode == xdm::Dataset::kCreate ) {
+      // the dataset exists and a create was requested, delete the existing one
+      H5Ldelete( parameters.parent, parameters.name.c_str(), H5P_DEFAULT );
+    } else {
+      // read or modify access, open and return the existing dataset
+      return openExistingDataset( parameters );
+    }
+  }
 
   // the dataset doesn't exist. Read only access is an error.
-  if ( mode == xdm::Dataset::kRead ) {
-    XDM_THROW( xdm::DatasetNotFound( name ) );
+  if ( parameters.mode == xdm::Dataset::kRead ) {
+    XDM_THROW( xdm::DatasetNotFound( parameters.name ) );
+  }
+
+  // Determine the dataset access properties based off chunking and compression
+  // parameters.
+  xdm::RefPtr< PListIdentifier > createPList( new PListIdentifier( H5P_DEFAULT ) );
+  if ( parameters.chunked ) {
+    createPList->reset( H5Pcreate( H5P_DATASET_CREATE ) );
+    setupChunks( createPList->get(), parameters.chunkSize, parameters.dataspace );
+    // Chunking is enabled, so check for compression and enable it if possible.
+    if ( parameters.compress ) {
+      setupCompression( createPList->get(), parameters.compressionLevel );
+    }
   }
 
   // the mode is create or modify. In both cases we want to create it if it
   // doesn't yet exist. It is safe to create the dataset here because we deleted
   // the dataset earlier if it existed.
   hid_t datasetId = H5Dcreate(
-    parent,
-    name.c_str(),
-    type,
-    dataspace,
+    parameters.parent,
+    parameters.name.c_str(),
+    parameters.type,
+    parameters.dataspace,
     H5P_DEFAULT,
-    H5P_DEFAULT,
+    createPList->get(),
     H5P_DEFAULT );
 
   return xdm::RefPtr< DatasetIdentifier >( new DatasetIdentifier( datasetId ) );

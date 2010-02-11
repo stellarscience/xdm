@@ -83,6 +83,32 @@ public:
   /// Get the dataset name.
   const std::string& dataset() const;
 
+  /// Choose to use chunked IO or not. Used with setChunkSize, chunked IO can
+  /// be used to minimize file IO operations. If Chunked IO is used, but the
+  /// Chunk size is not set, then at Dataset initialization, the dimensions
+  /// of the entire dataset will be used for the chunk size.
+  /// @param value Whether or not to use chunked IO.
+  void setUseChunkedIo( bool value );
+  /// Set the chunk size for the dataset. Intelligently chosen chunk sizes can
+  /// minimize file IO.
+  /// @param dimensions Chunk dimensions for the dataset.
+  /// @post Initialize must be called with a space of the same rank as the
+  /// chunk size.
+  void setChunkSize( const xdm::DataShape<>& dimensions );
+
+  /// Turn compression on or off for the dataset. Enabling compression implies
+  /// that chunked IO must be used. If the HDF5 library was built without the
+  /// compression filter, this method has no effect.
+  /// @param value Whether or not to compress the data.
+  /// @post Compression and Chunked IO are enabled.
+  void setUseCompression( bool value );
+  /// Set the compression level for the dataset. Valid values are 0-9. Lower
+  /// numbers mean less compression but faster writes, higher numbers yield
+  /// more compression but slower write time. Following GZip, the default
+  /// compression level is 6.
+  /// @param level Integer between 0 and 9 to determine compression level.
+  void setCompressionLevel( size_t level );
+
   //-- Dataset Implementations --//
   virtual const char* format() { return "HDF"; }
 

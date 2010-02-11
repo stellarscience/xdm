@@ -24,7 +24,7 @@
 #include <xdm/HyperSlab.hpp>
 #include <xdm/UniformDataItem.hpp>
 
-#include <xdmFormat/TemporalCollection.hpp>
+#include <xdmFormat/VirtualDataset.hpp>
 
 #include <xdmGrid/Attribute.hpp>
 #include <xdmGrid/Grid.hpp>
@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
     xdm::makeRefPtr( new TestCaseFunction ) ) ) );
   
   xdm::RefPtr< xdmFormat::TimeSeries > timeSeries( 
-    new xdmFormat::TemporalCollection( "FunctionData.serial.xmf" ) );
+    new xdmFormat::VirtualDataset( "FunctionData.serial.xmf" ) );
   
   timeSeries->open();
   xdmFormat::writeTimestepGrid( timeSeries, problem.first );

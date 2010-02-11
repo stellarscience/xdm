@@ -43,12 +43,23 @@ public:
 
 typedef ResourceIdentifier< DatasetReleaseFunctor > DatasetIdentifier;
 
+/// Convenience structure for passing dataset creation properties into
+/// createDatasetIdentifier.
+struct DatasetParameters {
+  hid_t parent; ///< Parent identifier.
+  std::string name; ///< String name for the dataset.
+  int type; ///< Datatype for the dataset.
+  hid_t dataspace; ///< HDF5 dataspace identifier.
+  xdm::Dataset::InitializeMode mode; ///< Read write or create mode.
+  bool chunked; ///< Use chunked IO.
+  xdm::DataShape<> chunkSize; ///< the chunk size for chunked IO.
+  bool compress; /// Use compression
+  int compressionLevel; ///< If using compression, the compression level.
+};
+
+/// Create a Dataset identifier with the given parameters.
 xdm::RefPtr< DatasetIdentifier > createDatasetIdentifier(
-  hid_t parent,
-  const std::string& name,
-  int type,
-  hid_t dataspace,
-  const xdm::Dataset::InitializeMode& mode );
+  const DatasetParameters& parameters );
 
 XDM_HDF_NAMESPACE_END
 

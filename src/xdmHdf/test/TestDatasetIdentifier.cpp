@@ -29,12 +29,15 @@ public:
       H5P_DEFAULT );
     hsize_t dims[] = {2, 2};
     spaceIdentifier = H5Screate_simple( 2, dims, NULL );
-    datasetIdentifier = xdmHdf::createDatasetIdentifier(
-      fileIdentifier,
-      kDatasetName,
-      H5T_NATIVE_FLOAT,
-      spaceIdentifier,
-      xdm::Dataset::kCreate );
+    xdmHdf::DatasetParameters creationParameters;
+    creationParameters.parent = fileIdentifier;
+    creationParameters.name = kDatasetName;
+    creationParameters.type = H5T_NATIVE_FLOAT;
+    creationParameters.dataspace = spaceIdentifier;
+    creationParameters.mode = xdm::Dataset::kCreate;
+    creationParameters.compress = false;
+    creationParameters.chunked = false;
+    datasetIdentifier = xdmHdf::createDatasetIdentifier( creationParameters );
   }
 
   ~Fixture() {
@@ -55,13 +58,13 @@ BOOST_AUTO_TEST_CASE( spaceMismatchThrows ) {
 
   hsize_t badDims[] = {3, 3};
   hid_t badSpace = H5Screate_simple( 2, badDims, NULL );
-  BOOST_CHECK_THROW(
-    xdmHdf::createDatasetIdentifier(
-      test.fileIdentifier,
-      kDatasetName,
-      H5T_NATIVE_FLOAT,
-      badSpace,
-      xdm::Dataset::kRead ),
+  xdmHdf::DatasetParameters params;
+  params.parent = test.fileIdentifier;
+  params.name = kDatasetName;
+  params.type = H5T_NATIVE_FLOAT;
+  params.dataspace = badSpace;
+  params.mode = xdm::Dataset::kRead;
+  BOOST_CHECK_THROW( xdmHdf::createDatasetIdentifier( params ),
     xdm::DataspaceMismatch );
   H5Sclose( badSpace );
 }
@@ -69,13 +72,13 @@ BOOST_AUTO_TEST_CASE( spaceMismatchThrows ) {
 BOOST_AUTO_TEST_CASE( typeMismatchThrows ) {
   // check for exception when type doesn't match
   Fixture test;
-
+  xdmHdf::DatasetParameters params;
+  params.parent = test.fileIdentifier;
+  params.name = kDatasetName;
+  params.type = H5T_NATIVE_INT;
+  params.dataspace = test.spaceIdentifier;
+  params.mode = xdm::Dataset::kRead;
   BOOST_CHECK_THROW(
-    xdmHdf::createDatasetIdentifier(
-      test.fileIdentifier,
-      kDatasetName,
-      H5T_NATIVE_INT,
-      test.spaceIdentifier,
-      xdm::Dataset::kRead ),
+    xdmHdf::createDatasetIdentifier( params ),
     xdm::DatatypeMismatch );
 }

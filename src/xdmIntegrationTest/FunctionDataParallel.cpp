@@ -28,7 +28,7 @@
 
 #include <xdmComm/test/MpiTestFixture.hpp>
 
-#include <xdmFormat/TemporalCollection.hpp>
+#include <xdmFormat/VirtualDataset.hpp>
 
 #include <xdmGrid/Attribute.hpp>
 #include <xdmGrid/Grid.hpp>
@@ -89,7 +89,7 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
       xdm::makeRefPtr( new TestCaseFunction ) ) ) );
 
   xdm::RefPtr< xdmFormat::TimeSeries > timeSeries(
-    new xdmFormat::TemporalCollection( baseName.str() + ".xmf" ) );
+    new xdmFormat::VirtualDataset( baseName.str() + ".xmf" ) );
 
   // parallelize, choose a small buffer size to ensure data must be buffered
   // between processes.

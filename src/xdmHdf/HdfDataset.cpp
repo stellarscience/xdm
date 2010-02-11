@@ -104,7 +104,13 @@ struct HdfDataset::Private {
   xdm::RefPtr< FileIdentifier > mFileId;
   xdm::RefPtr< GroupIdentifier > mGroupId;
   xdm::RefPtr< DatasetIdentifier > mDatasetId;
-  xdm::RefPtr< DataspaceIdentifier > mDataspaceId; 
+  xdm::RefPtr< DataspaceIdentifier > mDataspaceId;
+
+  bool mUseChunkedIo;
+  xdm::DataShape<> mChunkSize;
+
+  bool mUseCompression;
+  size_t mCompressionLevel;
 
   Private() :
     mFile(),
@@ -113,7 +119,11 @@ struct HdfDataset::Private {
     mFileId(),
     mGroupId(),
     mDatasetId(),
-    mDataspaceId() {}
+    mDataspaceId(),
+    mUseChunkedIo( false ),
+    mChunkSize(),
+    mUseCompression( false ),
+    mCompressionLevel( 6 ) {}
   Private( 
     const std::string& file,
     const GroupPath& groupPath,
@@ -124,7 +134,11 @@ struct HdfDataset::Private {
     mFileId(),
     mGroupId(),
     mDatasetId(),
-    mDataspaceId() {}
+    mDataspaceId(),
+    mUseChunkedIo( false ),
+    mChunkSize(),
+    mUseCompression( false ),
+    mCompressionLevel( 6 ) {}
 };
 
 HdfDataset::HdfDataset() : 
@@ -163,6 +177,24 @@ void HdfDataset::setDataset( const std::string& dataset ) {
 
 const std::string& HdfDataset::dataset() const {
   return imp->mDataset;
+}
+
+void HdfDataset::setUseChunkedIo( bool value ) {
+  imp->mUseChunkedIo = value;
+}
+
+void HdfDataset::setChunkSize( const xdm::DataShape<>& dimensions ) {
+  imp->mChunkSize = dimensions;
+}
+
+void HdfDataset::setUseCompression( bool value ) {
+  // chunking is required for compression
+  imp->mUseChunkedIo = value;
+  imp->mUseCompression = value;
+}
+
+void HdfDataset::setCompressionLevel( size_t level ) {
+  imp->mCompressionLevel = level;
 }
 
 void HdfDataset::writeTextContent( xdm::XmlTextContent& text ) {
@@ -221,12 +253,18 @@ void HdfDataset::initializeImplementation(
   imp->mDataspaceId = createDataspaceIdentifier( shape );
 
   // construct the dataset in the file
-  imp->mDatasetId = createDatasetIdentifier(
-    datasetLocId,
-    imp->mDataset,
-    sHdfTypeMapping[type],
-    imp->mDataspaceId->get(),
-    mode );
+  DatasetParameters creationParameters;
+  creationParameters.parent = datasetLocId;
+  creationParameters.name = imp->mDataset;
+  creationParameters.type = sHdfTypeMapping[type];
+  creationParameters.dataspace = imp->mDataspaceId->get();
+  creationParameters.mode = mode;
+  creationParameters.chunked = imp->mUseChunkedIo;
+  creationParameters.chunkSize = ( imp->mChunkSize.rank() != 0 ) ?
+    imp->mChunkSize : shape;
+  creationParameters.compress = imp->mUseCompression;
+  creationParameters.compressionLevel = imp->mCompressionLevel;
+  imp->mDatasetId = createDatasetIdentifier( creationParameters );
 }
 
 // Code Review Matter (open): RefPtr vs Raw Pointers

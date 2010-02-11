@@ -31,11 +31,23 @@
 #include <xdmHdf/HdfDataset.hpp>
 
 #include <algorithm>
+#include <fstream>
 #include <sstream>
 
 #include <cstdlib>
 
 namespace {
+
+size_t fileSize( const char* filename ) {
+  std::ifstream file( filename );
+  if ( !file.good() || file.eof() || !file.is_open() ) {
+    return 0;
+  }
+  file.seekg( 0, std::ios_base::beg );
+  std::ifstream::pos_type beginpos = file.tellg();
+  file.seekg( 0, std::ios_base::end );
+  return ( file.tellg() - beginpos );
+}
 
 BOOST_AUTO_TEST_CASE( roundtrip ) {
     
@@ -94,6 +106,44 @@ BOOST_AUTO_TEST_CASE( roundtrip ) {
   BOOST_CHECK_EQUAL_COLLECTIONS( 
     result.begin(), result.end(), 
     data.begin(), data.end() );
+}
+
+BOOST_AUTO_TEST_CASE( compression ) {
+  const size_t kLength = 1 << 20;
+  xdm::VectorStructuredArray< int > data( kLength );
+  std::fill( data.begin(), data.end(), 0 );
+
+  // write the data uncompressed with chunking.
+  {
+    xdm::RefPtr< xdmHdf::HdfDataset > dataset( new xdmHdf::HdfDataset(
+      "Uncompressed.h5", xdmHdf::GroupPath(), "Data" ) );
+    dataset->setUseChunkedIo( true );
+    dataset->initialize(
+      xdm::primitiveType::kInt,
+      xdm::makeShape( kLength ),
+      xdm::Dataset::kCreate );
+    dataset->serialize( &data, xdm::DataSelectionMap() );
+    dataset->finalize();
+  }
+
+  // write the same data compressed with chunking.
+  {
+    xdm::RefPtr< xdmHdf::HdfDataset > dataset( new xdmHdf::HdfDataset(
+      "Iscompressed.h5", xdmHdf::GroupPath(), "Data" ) );
+    dataset->setUseChunkedIo( true );
+    dataset->setUseCompression( true );
+    dataset->initialize(
+      xdm::primitiveType::kInt,
+      xdm::makeShape( kLength ),
+      xdm::Dataset::kCreate );
+    dataset->serialize( &data, xdm::DataSelectionMap() );
+    dataset->finalize();
+  }
+
+  size_t uncompressedSize = fileSize( "Uncompressed.h5" );
+  size_t compressedSize = fileSize( "Iscompressed.h5" );
+  // it's all zeroes, so compression should be at least factor of 2.
+  BOOST_CHECK_LT( compressedSize, uncompressedSize / 2 );
 }
 
 } // namespace
