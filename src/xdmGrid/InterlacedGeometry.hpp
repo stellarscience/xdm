@@ -56,7 +56,7 @@ public:
   virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
 
 protected:
-  virtual xdm::RefPtr< xdm::VectorRefImpl< double > > createVectorImp();
+  virtual xdm::RefPtr< xdm::VectorRefImp< double > > createVectorImp();
 
 };
 

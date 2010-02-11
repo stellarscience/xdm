@@ -89,14 +89,14 @@ void MultiArrayGeometry::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
   }
 }
 
-xdm::RefPtr< xdm::VectorRefImpl< double > > MultiArrayGeometry::createVectorImp()
+xdm::RefPtr< xdm::VectorRefImp< double > > MultiArrayGeometry::createVectorImp()
 {
   std::vector< double* > arrays( dimension() );
   for ( int dim = 0; dim < dimension(); dim++ ) {
     arrays[dim] = child( dim )->typedArray< double >()->begin();
   }
-  return xdm::RefPtr< xdm::VectorRefImpl< double > >(
-    new xdm::MultipleArraysOfVectorElementsImpl< double >( arrays ) );
+  return xdm::RefPtr< xdm::VectorRefImp< double > >(
+    new xdm::MultipleArraysOfVectorElementsImp< double >( arrays ) );
 }
 
 XDM_GRID_NAMESPACE_END

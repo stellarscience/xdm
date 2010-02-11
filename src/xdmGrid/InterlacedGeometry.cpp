@@ -65,10 +65,10 @@ void InterlacedGeometry::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
   }
 }
 
-xdm::RefPtr< xdm::VectorRefImpl< double > > InterlacedGeometry::createVectorImp()
+xdm::RefPtr< xdm::VectorRefImp< double > > InterlacedGeometry::createVectorImp()
 {
-  return xdm::RefPtr< xdm::VectorRefImpl< double > >(
-    new xdm::SingleArrayOfVectorsImpl< double >(
+  return xdm::RefPtr< xdm::VectorRefImp< double > >(
+    new xdm::SingleArrayOfVectorsImp< double >(
       child( 0 )->typedArray< double >()->begin(),
       dimension() ) );
 }

@@ -35,9 +35,9 @@ public:
     xdmGrid::Geometry( dimension )
   {}
 
-  virtual xdm::RefPtr< xdm::VectorRefImpl< double > > createVectorImp()
+  virtual xdm::RefPtr< xdm::VectorRefImp< double > > createVectorImp()
   {
-    return xdm::RefPtr< xdm::VectorRefImpl< double > >();
+    return xdm::RefPtr< xdm::VectorRefImp< double > >();
   }
 };
 

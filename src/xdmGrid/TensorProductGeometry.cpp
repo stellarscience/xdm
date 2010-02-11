@@ -65,7 +65,7 @@ void TensorProductGeometry::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
   }
 }
 
-xdm::RefPtr< xdm::VectorRefImpl< double > > TensorProductGeometry::createVectorImp()
+xdm::RefPtr< xdm::VectorRefImp< double > > TensorProductGeometry::createVectorImp()
 {
   std::vector< double* > coordinateArrays( dimension() );
   std::vector< size_t > coordinateArraySizes( dimension() );
@@ -73,8 +73,8 @@ xdm::RefPtr< xdm::VectorRefImpl< double > > TensorProductGeometry::createVectorI
     coordinateArrays[i] = child( i )->typedArray< double >()->begin();
     coordinateArraySizes[i] = child( i )->typedArray< double >()->size();
   }
-  return xdm::RefPtr< xdm::VectorRefImpl< double > >(
-    new xdm::TensorProductArraysImpl< double >(
+  return xdm::RefPtr< xdm::VectorRefImp< double > >(
+    new xdm::TensorProductArraysImp< double >(
       coordinateArrays, coordinateArraySizes ) );
 }
 

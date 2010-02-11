@@ -72,12 +72,12 @@ protected:
   /// Construct the vector implementation used by this geometry. Subclasses
   /// should override this method to return an appropriate VectorRefImpl for
   /// their internal geometry representation.
-  virtual xdm::RefPtr< xdm::VectorRefImpl< double > > createVectorImp() = 0;
+  virtual xdm::RefPtr< xdm::VectorRefImp< double > > createVectorImp() = 0;
 
 private:
   std::size_t mNumberOfNodes;
   unsigned int mDimension;
-  xdm::RefPtr< xdm::VectorRefImpl< double > > mSharedVectorImp;
+  xdm::RefPtr< xdm::VectorRefImp< double > > mSharedVectorImp;
 };
 
 XDM_GRID_NAMESPACE_END
