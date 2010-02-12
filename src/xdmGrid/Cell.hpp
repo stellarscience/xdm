@@ -73,9 +73,6 @@ public:
   using CellBase::node;
 
 private:
-  xdm::RefPtr< CellSharedImp > mImp;
-  std::size_t mIndex;
-
   // Referencing a const cell with a non-const cell is not safe.
   Cell( const ConstCell& copyMe );
 };
@@ -94,9 +91,6 @@ public:
   using CellBase::node;
 
 private:
-  xdm::RefPtr< CellSharedImp > mImp;
-  std::size_t mIndex;
-
   // No non-const node access.
 };
 
