@@ -21,7 +21,11 @@
 #define BOOST_TEST_MODULE MultiArrayGeometry
 #include <boost/test/unit_test.hpp>
 
+#include <xdmGrid/test/Cube.hpp>
+
 #include <xdmGrid/MultiArrayGeometry.hpp>
+
+#include <xdm/test/TestHelpers.hpp>
 
 namespace {
 
@@ -33,6 +37,31 @@ BOOST_AUTO_TEST_CASE( writeMetadata ) {
 
   BOOST_CHECK_EQUAL( "Geometry", xml.tag() );
   BOOST_CHECK_EQUAL( "X_Y_Z", xml.attribute( "GeometryType" ) );
+}
+
+BOOST_AUTO_TEST_CASE( nodeAccess ) {
+  xdmGrid::MultiArrayGeometry g(3);
+
+  CubeOfTets cube;
+  xdm::RefPtr< xdm::UniformDataItem > nodeListX = test::createUniformDataItem(
+    cube.nodeX(), cube.numberOfNodes(), xdm::primitiveType::kDouble );
+  xdm::RefPtr< xdm::UniformDataItem > nodeListY = test::createUniformDataItem(
+    cube.nodeY(), cube.numberOfNodes(), xdm::primitiveType::kDouble );
+  xdm::RefPtr< xdm::UniformDataItem > nodeListZ = test::createUniformDataItem(
+    cube.nodeZ(), cube.numberOfNodes(), xdm::primitiveType::kDouble );
+  g.setCoordinateValues( 0, nodeListX );
+  g.setCoordinateValues( 1, nodeListY );
+  g.setCoordinateValues( 2, nodeListZ );
+
+  // Check node2. xyz is 1,1,0
+  BOOST_CHECK_EQUAL( 1., g.node( 2 )[0] );
+  BOOST_CHECK_EQUAL( 1., g.node( 2 )[1] );
+  BOOST_CHECK_EQUAL( 0., g.node( 2 )[2] );
+
+  // Check node7. xyz is 0,1,1
+  BOOST_CHECK_EQUAL( 0., g.node( 7 )[0] );
+  BOOST_CHECK_EQUAL( 1., g.node( 7 )[1] );
+  BOOST_CHECK_EQUAL( 1., g.node( 7 )[2] );
 }
 
 } // namespace

@@ -26,6 +26,10 @@ class CubeOfTets {
 public:
   double* nodeArray() { return mNodes; }
 
+  double* nodeX() { return mNodeX; }
+  double* nodeY() { return mNodeY; }
+  double* nodeZ() { return mNodeZ; }
+
   std::size_t* connectivityArray() { return mConnectivity; }
 
   std::size_t numberOfNodes() { return 8; }
@@ -33,31 +37,39 @@ public:
   std::size_t numberOfCells() { return 5; }
 
   CubeOfTets() {
+    mNodeX[0] = 0.;
+    mNodeX[1] = 1.;
+    mNodeX[2] = 1.;
+    mNodeX[3] = 0.;
+    mNodeX[4] = 0.;
+    mNodeX[5] = 1.;
+    mNodeX[6] = 1.;
+    mNodeX[7] = 0.;
+
+    mNodeY[0] = 0.;
+    mNodeY[1] = 0.;
+    mNodeY[2] = 1.;
+    mNodeY[3] = 1.;
+    mNodeY[4] = 0.;
+    mNodeY[5] = 0.;
+    mNodeY[6] = 1.;
+    mNodeY[7] = 1.;
+
+    mNodeZ[0] = 0.;
+    mNodeZ[1] = 0.;
+    mNodeZ[2] = 0.;
+    mNodeZ[3] = 0.;
+    mNodeZ[4] = 1.;
+    mNodeZ[5] = 1.;
+    mNodeZ[6] = 1.;
+    mNodeZ[7] = 1.;
+
     // Nodes go xyzxyzxyz...
-    mNodes[0] = 0.; // node 0
-    mNodes[1] = 0.;
-    mNodes[2] = 0.;
-    mNodes[3] = 1.; // node 1
-    mNodes[4] = 0.;
-    mNodes[5] = 0.;
-    mNodes[6] = 1.; // node 2
-    mNodes[7] = 1.;
-    mNodes[8] = 0.;
-    mNodes[9] = 0.; // node 3
-    mNodes[10] = 1.;
-    mNodes[11] = 0.;
-    mNodes[12] = 0.; // node 4
-    mNodes[13] = 0.;
-    mNodes[14] = 1.;
-    mNodes[15] = 1.; // node 5
-    mNodes[16] = 0.;
-    mNodes[17] = 1.;
-    mNodes[18] = 1.; // node 6
-    mNodes[19] = 1.;
-    mNodes[20] = 1.;
-    mNodes[21] = 0.; // node 7
-    mNodes[22] = 1.;
-    mNodes[23] = 1.;
+    for ( int i = 0; i < 8; ++i ) {
+      mNodes[i*3+0] = mNodeX[i];
+      mNodes[i*3+1] = mNodeY[i];
+      mNodes[i*3+2] = mNodeZ[i];
+    }
 
     // Tetrahedra have 4 nodes each. The array goes cell0node0, cell0node1, ...cell5node3. Ordering
     // is ExodusII style (right hand rule on one face points thumb toward 4th node).
@@ -85,5 +97,8 @@ public:
 
 private:
   double mNodes[8*3];
+  double mNodeX[8];
+  double mNodeY[8];
+  double mNodeZ[8];
   std::size_t mConnectivity[5*4];
 };

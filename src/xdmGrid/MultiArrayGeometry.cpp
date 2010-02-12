@@ -61,7 +61,7 @@ void MultiArrayGeometry::setCoordinateValues(
     }
 
     if ( std::count_if( ++sizes.begin(), sizes.end(),
-      bind2nd( std::equal_to< std::size_t >(), sizes.front() ) ) != dimension() ) {
+      bind2nd( std::equal_to< std::size_t >(), sizes.front() ) ) + 1 != dimension() ) {
       XDM_THROW( std::runtime_error( "The arrays in the UniformDataItems supplied are"
         " not all of the same size." ) );
     }
