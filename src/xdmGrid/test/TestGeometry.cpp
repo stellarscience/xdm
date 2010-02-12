@@ -22,7 +22,6 @@
 #include <boost/test/unit_test.hpp>
 
 #include <xdmGrid/Geometry.hpp>
-#include <xdmGrid/NodeRef.hpp>
 
 #include <xdm/VectorRef.hpp>
 #include <xdm/RefPtr.hpp>

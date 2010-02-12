@@ -20,8 +20,6 @@
 //------------------------------------------------------------------------------
 #include <xdmGrid/Geometry.hpp>
 
-#include <xdmGrid/NodeRef.hpp>
-
 #include <algorithm>
 
 XDM_GRID_NAMESPACE_BEGIN
@@ -53,18 +51,21 @@ std::size_t Geometry::numberOfNodes() const
   return mNumberOfNodes;
 }
 
-const NodeRef Geometry::node( std::size_t nodeIndex ) const
+ConstNode Geometry::node( std::size_t nodeIndex ) const
 {
   if ( !mSharedVectorImp ) {
     Geometry& mutableThis = const_cast< Geometry& >( *this );
     mutableThis.mSharedVectorImp = mutableThis.createVectorImp();
   }
-  return NodeRef( xdm::VectorRef< double >( mSharedVectorImp, nodeIndex ) );
+  return ConstNode( mSharedVectorImp, nodeIndex );
 }
 
-NodeRef Geometry::node( std::size_t nodeIndex )
+Node Geometry::node( std::size_t nodeIndex )
 {
-  return static_cast< const Geometry& >( *this ).node( nodeIndex );
+  if ( !mSharedVectorImp ) {
+    mSharedVectorImp = this->createVectorImp();
+  }
+  return Node( mSharedVectorImp, nodeIndex );
 }
 
 void Geometry::traverse( xdm::ItemVisitor& iv ) {

@@ -18,7 +18,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //------------------------------------------------------------------------------
-#include <xdmGrid/NodeRef.hpp>
 #include <xdmGrid/MultiArrayGeometry.hpp>
 
 #include <algorithm>

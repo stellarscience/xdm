@@ -18,9 +18,10 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //------------------------------------------------------------------------------
-#ifndef xdm_CellRef_hpp
-#define xdm_CellRef_hpp
+#ifndef xdm_Cell_hpp
+#define xdm_Cell_hpp
 
+#include <xdmGrid/Geometry.hpp>
 #include <xdmGrid/UnstructuredTopologyConventions.hpp>
 
 #include <xdm/ReferencedObject.hpp>
@@ -32,31 +33,67 @@
 
 XDM_GRID_NAMESPACE_BEGIN
 
+class Cell;
+class ConstCell;
 class CellSharedImp;
-class NodeRef;
 
-/// A cell class that references data in a presumably large dataset. The Cell acts as
-/// self-contained cell, but it actually just refers most requests to an implementation
-/// class. Thus, the cell is lightweight and copying is cheap.
-class CellRef
+class CellBase
 {
 public:
-  CellRef( xdm::RefPtr< CellSharedImp > imp, std::size_t CellIndex );
-  CellRef( const CellRef& copyMe );
+  CellBase( xdm::RefPtr< CellSharedImp > imp, std::size_t cellIndex );
 
-  CellRef& operator=( const CellRef& rhs );
-
-  /// Get a single const node (the NodeRef class is a reference class).
-  const NodeRef node( std::size_t nodeIndex ) const;
-  /// Get a single node (the NodeRef class is a reference class).
-  NodeRef node( std::size_t nodeIndex );
+  /// Get a single const node.
+  ConstNode node( std::size_t nodeIndex ) const;
 
   /// The type of cell.
   CellType::Type cellType() const;
 
+protected:
+  CellBase( const CellBase& copyMe );
+
+  static void copyReference( const CellBase& source, CellBase& dest );
+
 private:
   xdm::RefPtr< CellSharedImp > mImp;
   std::size_t mIndex;
+};
+
+/// A cell class that references data in a presumably large dataset. The Cell acts as
+/// self-contained cell, but it actually just refers most requests to an implementation
+/// class. Thus, the cell is lightweight and copying is cheap.
+class Cell : public CellBase
+{
+public:
+  Cell( xdm::RefPtr< CellSharedImp > imp, std::size_t cellIndex );
+  Cell( const Cell& copyMe );
+
+  /// Get a single node.
+  Node node( std::size_t nodeIndex );
+
+private:
+  xdm::RefPtr< CellSharedImp > mImp;
+  std::size_t mIndex;
+
+  // Referencing a const cell with a non-const cell is not safe.
+  Cell( const ConstCell& copyMe );
+};
+
+/// Const version of a Cell.
+class ConstCell : public CellBase
+{
+public:
+  ConstCell( xdm::RefPtr< CellSharedImp > imp, std::size_t cellIndex );
+  ConstCell( const Cell& copyMe );
+  ConstCell( const ConstCell& copyMe );
+
+  /// This is intended to be a const_cast for Cells.
+  Cell removeConstness() const;
+private:
+  xdm::RefPtr< CellSharedImp > mImp;
+  std::size_t mIndex;
+
+  // No non-const node access.
+  Node node( std::size_t nodeIndex );
 };
 
 /// Shared implementation class for referencing Cell data that is not stored in a self-contained
@@ -65,8 +102,8 @@ private:
 class CellSharedImp : public xdm::ReferencedObject
 {
 public:
-  /// Get a single node (the NodeRef class is a reference class).
-  virtual const NodeRef node( std::size_t nodeIndex, std::size_t cellIndex ) const = 0;
+  /// Get a single node.
+  virtual ConstNode node( std::size_t cellIndex, std::size_t nodeIndex ) const = 0;
 
   /// The cell type for all cells that this shared implementation refers to.
   virtual CellType::Type cellType( std::size_t cellIndex ) const = 0;
@@ -74,4 +111,4 @@ public:
 
 XDM_GRID_NAMESPACE_END
 
-#endif // xdm_CellRef_hpp
+#endif // xdm_Cell_hpp

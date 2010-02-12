@@ -2,7 +2,7 @@ project( xdmGrid )
 
 set( ${PROJECT_NAME}_HEADERS 
     Attribute.hpp
-    CellRef.hpp
+    Cell.hpp
     CollectionGrid.hpp
     Domain.hpp
     Geometry.hpp
@@ -10,7 +10,6 @@ set( ${PROJECT_NAME}_HEADERS
     InterlacedGeometry.hpp
     MultiArrayGeometry.hpp
     NamespaceMacro.hpp
-    NodeRef.hpp
     Polyvertex.hpp
     RectilinearMesh.hpp
     StructuredTopology.hpp
@@ -24,14 +23,13 @@ set( ${PROJECT_NAME}_HEADERS
 
 set( ${PROJECT_NAME}_SOURCES
     Attribute.cpp
-    CellRef.cpp
+    Cell.cpp
     CollectionGrid.cpp
     Domain.cpp
     Geometry.cpp
     Grid.cpp
     InterlacedGeometry.cpp
     MultiArrayGeometry.cpp
-    NodeRef.cpp
     Polyvertex.cpp
     RectilinearMesh.cpp
     StructuredTopology.cpp

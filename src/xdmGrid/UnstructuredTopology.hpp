@@ -31,7 +31,7 @@
 
 XDM_GRID_NAMESPACE_BEGIN
 
-class CellRef;
+class Cell;
 class CellSharedImp;
 class Geometry;
 
@@ -65,9 +65,9 @@ public:
   NodeOrderingConvention::Type nodeOrdering() const;
 
   /// Get a cell by index.
-  CellRef cell( std::size_t cellIndex );
+  Cell cell( std::size_t cellIndex );
   /// Get a const cell by index.
-  const CellRef cell( std::size_t cellIndex ) const;
+  const Cell cell( std::size_t cellIndex ) const;
 
   /// Set the connectivity values to the input DataItem. If the connectivity
   /// is not specified, then there is a default connectivity determined by the

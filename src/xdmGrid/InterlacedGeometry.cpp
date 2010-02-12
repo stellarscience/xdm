@@ -19,7 +19,6 @@
 //
 //------------------------------------------------------------------------------
 #include <xdmGrid/InterlacedGeometry.hpp>
-#include <xdmGrid/NodeRef.hpp>
 
 #include <xdm/VectorRef.hpp>
 

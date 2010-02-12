@@ -18,9 +18,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //------------------------------------------------------------------------------
-#include <xdmGrid/CellRef.hpp>
+#include <xdmGrid/Cell.hpp>
 #include <xdmGrid/Geometry.hpp>
-#include <xdmGrid/NodeRef.hpp>
 #include <xdmGrid/UnstructuredTopology.hpp>
 
 #include <sstream>
@@ -35,7 +34,7 @@ public:
     std::size_t* nodeIndexArray ) :
     mType( type ), mGeometry( geometry ), mNodeIds( nodeIndexArray ) {}
 
-  virtual const xdmGrid::NodeRef node( std::size_t nodeIndex, std::size_t cellIndex ) const {
+  virtual xdmGrid::ConstNode node( std::size_t cellIndex, std::size_t nodeIndex ) const {
     std::size_t nodeID = mNodeIds[ cellIndex * mType.nodesPerCell() + nodeIndex ];
     return mGeometry->node( nodeID );
   }
@@ -103,14 +102,14 @@ NodeOrderingConvention::Type UnstructuredTopology::nodeOrdering() const
   return mOrdering;
 }
 
-CellRef UnstructuredTopology::cell( std::size_t cellIndex )
+Cell UnstructuredTopology::cell( std::size_t cellIndex )
 {
-  return CellRef( mCellSharedImp, cellIndex );
+  return Cell( mCellSharedImp, cellIndex );
 }
 
-const CellRef UnstructuredTopology::cell( std::size_t cellIndex ) const
+const Cell UnstructuredTopology::cell( std::size_t cellIndex ) const
 {
-  return CellRef( mCellSharedImp, cellIndex );
+  return Cell( mCellSharedImp, cellIndex );
 }
 
 void UnstructuredTopology::setConnectivity( xdm::RefPtr< xdm::UniformDataItem > connectivity ) {
