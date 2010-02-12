@@ -70,6 +70,8 @@ public:
   /// Get a single node.
   Node node( std::size_t nodeIndex );
 
+  using CellBase::node;
+
 private:
   xdm::RefPtr< CellSharedImp > mImp;
   std::size_t mIndex;
@@ -88,12 +90,14 @@ public:
 
   /// This is intended to be a const_cast for Cells.
   Cell removeConstness() const;
+
+  using CellBase::node;
+
 private:
   xdm::RefPtr< CellSharedImp > mImp;
   std::size_t mIndex;
 
   // No non-const node access.
-  Node node( std::size_t nodeIndex );
 };
 
 /// Shared implementation class for referencing Cell data that is not stored in a self-contained
