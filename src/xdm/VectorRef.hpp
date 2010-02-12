@@ -79,9 +79,7 @@ public:
       static_cast< const VectorBase< T >& >( *this )[i] );
   }
 
-  const T& operator[]( std::size_t i ) const {
-    return VectorBase< T >::operator[](i);
-  }
+  using VectorBase< T >::operator[];
 
 private:
   // Copy construction from a ConstVectorRef is not possible because it would
