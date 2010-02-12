@@ -233,6 +233,29 @@ BOOST_AUTO_TEST_CASE( assignment )
   }
 }
 
+BOOST_AUTO_TEST_CASE( removeConst )
+{
+  double data[20]; // to be indexed as [10][2], i.e. 10 2D vectors.
+  xdm::RefPtr< xdm::SingleArrayOfVectorsImp< double > > imp(
+    new xdm::SingleArrayOfVectorsImp< double >( data, 2 ) );
+
+  xdm::VectorRef< double > origVec( imp, 5 );
+  origVec[0] = 0.25;
+  origVec[1] = 0.75;
+
+  xdm::ConstVectorRef< double > constVec( origVec );
+  BOOST_CHECK_EQUAL( 0.25, constVec[0] );
+  BOOST_CHECK_EQUAL( 0.75, constVec[1] );
+
+  // Now make a third vector that casts away constness of constVec but retains
+  // the reference to the same array.
+  xdm::VectorRef< double > mutableVec( constVec.removeConstness() );
+  mutableVec[0] = 3.0;
+  mutableVec[1] = 7.0;
+  BOOST_CHECK_EQUAL( 3.0, constVec[0] );
+  BOOST_CHECK_EQUAL( 7.0, constVec[1] );
+}
+
 BOOST_AUTO_TEST_CASE( dotProduct )
 {
   // First, a vector from a single array.
