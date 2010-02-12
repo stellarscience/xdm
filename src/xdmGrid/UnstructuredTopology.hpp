@@ -32,6 +32,7 @@
 XDM_GRID_NAMESPACE_BEGIN
 
 class Cell;
+class ConstCell;
 class CellSharedImp;
 class Geometry;
 
@@ -67,7 +68,7 @@ public:
   /// Get a cell by index.
   Cell cell( std::size_t cellIndex );
   /// Get a const cell by index.
-  const Cell cell( std::size_t cellIndex ) const;
+  ConstCell cell( std::size_t cellIndex ) const;
 
   /// Set the connectivity values to the input DataItem. If the connectivity
   /// is not specified, then there is a default connectivity determined by the

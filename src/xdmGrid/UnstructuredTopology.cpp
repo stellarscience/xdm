@@ -107,9 +107,9 @@ Cell UnstructuredTopology::cell( std::size_t cellIndex )
   return Cell( mCellSharedImp, cellIndex );
 }
 
-const Cell UnstructuredTopology::cell( std::size_t cellIndex ) const
+ConstCell UnstructuredTopology::cell( std::size_t cellIndex ) const
 {
-  return Cell( mCellSharedImp, cellIndex );
+  return ConstCell( mCellSharedImp, cellIndex );
 }
 
 void UnstructuredTopology::setConnectivity( xdm::RefPtr< xdm::UniformDataItem > connectivity ) {

@@ -48,7 +48,7 @@ public:
   XDM_META_ITEM( UniformDataItem );
 
   RefPtr< Dataset > dataset();
-   RefPtr< const Dataset > dataset() const;
+  RefPtr< const Dataset > dataset() const;
   void setDataset( RefPtr< Dataset > ds );
 
   /// Set the type for this data.
