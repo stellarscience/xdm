@@ -33,9 +33,6 @@ namespace {
 
 BOOST_AUTO_TEST_CASE( writeMetadata ) {
   test::Fixture test;
-  xdm::DataShape<> datasetShape(2);
-  datasetShape[0] = datasetShape[1] = 2;
-  test.testItem->setDataspace( datasetShape );
 
   xdm::RefPtr< xdm::XmlObject > obj( new xdm::XmlObject );
   xdm::XmlMetadataWrapper xml( obj );

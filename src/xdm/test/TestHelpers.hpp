@@ -75,6 +75,9 @@ public:
     testItem() {
     std::fill( data, data + 4, 0.0 );
     testItem = createUniformDataItem( data, 4, xdm::primitiveType::kFloat );
+    xdm::DataShape<> datasetShape(2);
+    datasetShape[0] = datasetShape[1] = 2;
+    testItem->setDataspace( datasetShape );
   }
 };
 
