@@ -32,7 +32,8 @@ public:
     const xdmGrid::CellType::Type& type,
     xdm::RefPtr< xdmGrid::Geometry > geometry,
     std::size_t* nodeIndexArray ) :
-    mType( type ), mGeometry( geometry ), mNodeIds( nodeIndexArray ) {}
+    mType( type ), mGeometry( geometry ), mNodeIds( nodeIndexArray ) {
+  }
 
   virtual xdmGrid::ConstNode node( std::size_t cellIndex, std::size_t nodeIndex ) const {
     std::size_t nodeID = mNodeIds[ cellIndex * mType.nodesPerCell() + nodeIndex ];
@@ -58,6 +59,7 @@ UnstructuredTopology::UnstructuredTopology() :
   mCellSharedImp(),
   mConnectivity(),
   mCellType( CellType::Default ),
+  mGeometry(),
   mNumberOfCells(),
   mOrdering() {
 }

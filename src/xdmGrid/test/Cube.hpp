@@ -73,26 +73,26 @@ public:
 
     // Tetrahedra have 4 nodes each. The array goes cell0node0, cell0node1, ...cell5node3. Ordering
     // is ExodusII style (right hand rule on one face points thumb toward 4th node).
-    mConnectivity[0] = 0; // tet 0
-    mConnectivity[0] = 2;
-    mConnectivity[0] = 5;
-    mConnectivity[0] = 7;
-    mConnectivity[0] = 2; // tet 1
-    mConnectivity[0] = 5;
-    mConnectivity[0] = 6;
-    mConnectivity[0] = 7;
-    mConnectivity[0] = 0; // tet 2
-    mConnectivity[0] = 1;
-    mConnectivity[0] = 2;
-    mConnectivity[0] = 5;
-    mConnectivity[0] = 0; // tet 3
-    mConnectivity[0] = 5;
-    mConnectivity[0] = 7;
-    mConnectivity[0] = 4;
-    mConnectivity[0] = 0; // tet 4
-    mConnectivity[0] = 2;
-    mConnectivity[0] = 3;
-    mConnectivity[0] = 7;
+    mConnectivity[ 0] = 0; // tet 0
+    mConnectivity[ 1] = 2;
+    mConnectivity[ 2] = 5;
+    mConnectivity[ 3] = 7;
+    mConnectivity[ 4] = 2; // tet 1
+    mConnectivity[ 5] = 5;
+    mConnectivity[ 6] = 6;
+    mConnectivity[ 7] = 7;
+    mConnectivity[ 8] = 0; // tet 2
+    mConnectivity[ 9] = 1;
+    mConnectivity[10] = 2;
+    mConnectivity[11] = 5;
+    mConnectivity[12] = 0; // tet 3
+    mConnectivity[13] = 5;
+    mConnectivity[14] = 7;
+    mConnectivity[15] = 4;
+    mConnectivity[16] = 0; // tet 4
+    mConnectivity[17] = 2;
+    mConnectivity[18] = 3;
+    mConnectivity[19] = 7;
   }
 
 private:
