@@ -123,7 +123,7 @@ public:
 
   virtual void writeTextContent( xdm::XmlTextContent& text );
   
-  virtual void initializeImplementation(
+  virtual xdm::DataShape<> initializeImplementation(
     xdm::primitiveType::Value type,
     const xdm::DataShape<>& shape,
     const xdm::Dataset::InitializeMode& mode );

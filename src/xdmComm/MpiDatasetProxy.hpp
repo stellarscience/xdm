@@ -84,7 +84,7 @@ public:
 protected:
   /// Initialization calls underlying dataset initialization only if this
   /// process is rank 0 within the communicator.
-  virtual void initializeImplementation( 
+  virtual xdm::DataShape<> initializeImplementation( 
     xdm::primitiveType::Value type,
     const xdm::DataShape<>& shape,
     const xdm::Dataset::InitializeMode& mode );

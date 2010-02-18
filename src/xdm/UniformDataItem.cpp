@@ -139,7 +139,7 @@ void UniformDataItem::writeMetadata( XmlMetadataWrapper& xml ) {
 }
 
 void UniformDataItem::initializeDataset( const Dataset::InitializeMode& mode ) {
-  mDataset->initialize( mDataType, mDataspace, mode );
+  mDataspace = mDataset->initialize( mDataType, mDataspace, mode );
 }
 
 void UniformDataItem::serializeData() {

@@ -26,6 +26,8 @@
 
 #include <hdf5.h>
 
+#include <algorithm>
+#include <functional>
 #include <stdexcept>
 
 XDM_HDF_NAMESPACE_BEGIN
@@ -50,6 +52,13 @@ namespace {
   };
   typedef ResourceIdentifier< PListReleaseFunctor > PListIdentifier;
 
+  xdm::DataShape<> h5sToShape( hid_t space ) {
+    int rank = H5Sget_simple_extent_ndims( space );
+    xdm::DataShape< hsize_t > retvalue( rank );
+    H5Sget_simple_extent_dims( space, &retvalue[0], NULL );
+    return retvalue;
+  }
+
   // Open an existing dataset for read or modify access.
   xdm::RefPtr< DatasetIdentifier > openExistingDataset(
     const DatasetParameters& parameters )
@@ -62,7 +71,10 @@ namespace {
     xdm::RefPtr< DataspaceIdentifier > datasetSpace(
         new DataspaceIdentifier( H5Dget_space( datasetId->get() ) ) );
     if ( !H5Sextent_equal( datasetSpace->get(), parameters.dataspace ) ) {
-      XDM_THROW( xdm::DataspaceMismatch( parameters.name ) );
+      XDM_THROW( xdm::DataspaceMismatch( 
+        parameters.name, 
+        h5sToShape( datasetSpace->get() ), 
+        h5sToShape( parameters.dataspace ) ) );
     }
 
     // make sure the type on disk and the requested type match
@@ -78,16 +90,36 @@ namespace {
   }
 
   // Set up a PList identifier for chunking with the given size and space.
-  void setupChunks( hid_t plist, const xdm::DataShape<>& size, hid_t space ) {
-   // Make sure the rank of the chunks equals the rank of the space
-    if ( H5Sget_simple_extent_ndims( space ) != size.rank() ) {
-      XDM_THROW( xdm::DataspaceMismatch( "Chunked Dataset" ) );
+  void setupChunks( hid_t plist, const xdm::DataShape<>& chunkShape, hid_t spaceId ) {
+    xdm::DataShape<> spaceShape( h5sToShape( spaceId ) );
+    
+    // Make sure the rank of the chunks equals the rank of the space
+    if ( spaceShape.rank() != chunkShape.rank() ) {
+      XDM_THROW( xdm::DataspaceMismatch( 
+        "Chunked Dataset",
+        chunkShape,
+        spaceShape ) );
     }
-    xdm::DataShape< hsize_t > chunkSize( size );
+    
+    xdm::DataShape< hsize_t > resultShape( chunkShape.rank() );
+    
+    // Ensure that the chunk size in any dimension does not exceed the
+    // corresponding dimension in the dataset.
+    xdm::DataShape< hsize_t >::DimensionIterator result = resultShape.begin();
+    for ( xdm::DataShape<>::ConstDimensionIterator
+      chunk = chunkShape.begin(), space = spaceShape.begin();
+      chunk != chunkShape.end();
+      ++chunk, ++space )
+    {
+      *result++ = std::min( *chunk, *space );
+    }
+
+    // Now we are guaranteed that each dimension of the chunk size does not
+    // exceed the corresponding dataset dimension.
     H5Pset_chunk(
       plist,
-      chunkSize.rank(),
-      &(chunkSize[0]) );
+      resultShape.rank(),
+      &(resultShape[0]) );
   }
 
   // Set up a PList identifier for compression with the given level.

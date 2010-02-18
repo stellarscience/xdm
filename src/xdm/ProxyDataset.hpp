@@ -54,7 +54,7 @@ public:
 
 protected:
   /// Pass through implementation to initialize the inner Dataset.
-  virtual void initializeImplementation(
+  virtual DataShape<> initializeImplementation(
     xdm::primitiveType::Value type,
     const xdm::DataShape<>& shape,
     const xdm::Dataset::InitializeMode& mode );

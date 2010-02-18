@@ -49,11 +49,11 @@ void ProxyDataset::writeTextContent( XmlTextContent& text ) {
   mDataset->writeTextContent( text );
 }
 
-void ProxyDataset::initializeImplementation(
+DataShape<> ProxyDataset::initializeImplementation(
   primitiveType::Value type,
   const DataShape<>& shape,
   const InitializeMode& mode ) {
-  mDataset->initialize( type, shape, mode );
+  return mDataset->initialize( type, shape, mode );
 }
 
 void ProxyDataset::serializeImplementation(

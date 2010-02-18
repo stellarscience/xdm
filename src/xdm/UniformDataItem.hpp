@@ -58,7 +58,8 @@ public:
 
   /// Get the shape of this data.
   const DataShape<>& dataspace() const;
-  /// Set the dataspace for this data item.
+  /// Set the dataspace for this data item. If any dimension has rank 0, the
+  /// internal dataspace ignores that dimension.
   void setDataspace( const DataShape<>& dataspace );
 
   /// Set the data object that provides memory access to the Item.

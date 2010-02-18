@@ -58,8 +58,35 @@ public:
 /// disk.
 class DataspaceMismatch : public DatasetError {
 public:
-  DataspaceMismatch( const std::string& name ) :
-    DatasetError( name, "Requested space does not match space on disk" ) {}
+  DataspaceMismatch( 
+    const std::string& name, 
+    xdm::DataShape<> shape1,
+    xdm::DataShape<> shape2 ) :
+    DatasetError( name, "Requested space does not match space on disk" ),
+    mShape1( shape1 ),
+    mShape2( shape2 ),
+    mWhat() {}
+  
+  virtual ~DataspaceMismatch() throw() {}
+
+  virtual const char* what() const throw() {
+    try {
+      if ( mWhat.empty() ) {
+        std::stringstream ss;
+        ss << DatasetError::what() << ": ";
+        ss << mShape1 << " does not match " << mShape2;
+        mWhat = ss.str();
+      }
+      return mWhat.c_str();
+    } catch ( ... ) {
+      // do nothing
+    }
+    return "Dataspace mismatch";
+  }
+private:
+  xdm::DataShape<> mShape1;
+  xdm::DataShape<> mShape2;
+  mutable std::string mWhat;
 };
 
 /// Exception to be thrown when the type of a dataset opened for reading or

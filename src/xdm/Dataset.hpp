@@ -217,7 +217,9 @@ public:
   /// @throw DatasetNotFound A dataset opened for reading could not be found.
   /// @throw DataspaceMismatch The requested space and the space on disk differ.
   /// @throw DatatypeMismatch The requested type and the type on disk differ.
-  void initialize( 
+  ///
+  /// @return The shape of the dataset on disk.
+  DataShape<> initialize( 
     primitiveType::Value type, 
     const DataShape<>& shape, 
     const InitializeMode& mode );
@@ -269,7 +271,7 @@ protected:
   /// Implementation method to define how a dataset is to be initialized.
   /// Inheritors should implement this function to provide the necessary calls
   /// required to initialize a dataset with the given type and shape.
-  virtual void initializeImplementation( 
+  virtual DataShape<> initializeImplementation( 
     primitiveType::Value type, 
     const DataShape<>& shape,
     const InitializeMode& mode ) = 0;

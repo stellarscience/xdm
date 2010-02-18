@@ -76,7 +76,7 @@ MpiDatasetProxy::MpiDatasetProxy(
 MpiDatasetProxy::~MpiDatasetProxy() {
 }
 
-void MpiDatasetProxy::initializeImplementation(
+xdm::DataShape<> MpiDatasetProxy::initializeImplementation(
   xdm::primitiveType::Value type,
   const xdm::DataShape<>& shape,
   const xdm::Dataset::InitializeMode& mode ) {
@@ -86,7 +86,9 @@ void MpiDatasetProxy::initializeImplementation(
   int rank;
   MPI_Comm_rank( mCommunicator, &rank );
   if ( rank == 0 ) {
-    xdm::ProxyDataset::initializeImplementation( type, shape, mode );
+    return xdm::ProxyDataset::initializeImplementation( type, shape, mode );
+  } else {
+    return xdm::DataShape<>(); // size of dataset is 0.
   }
 }
 

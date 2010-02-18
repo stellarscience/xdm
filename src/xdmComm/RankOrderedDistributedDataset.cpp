@@ -107,7 +107,7 @@ RankOrderedDistributedDataset::RankOrderedDistributedDataset(
 RankOrderedDistributedDataset::~RankOrderedDistributedDataset() {
 }
 
-void RankOrderedDistributedDataset::initializeImplementation(
+xdm::DataShape<> RankOrderedDistributedDataset::initializeImplementation(
   xdm::primitiveType::Value type,
   const xdm::DataShape<> &shape,
   const xdm::Dataset::InitializeMode &mode )
@@ -175,7 +175,7 @@ void RankOrderedDistributedDataset::initializeImplementation(
   // initialize with modified dimensions.
   xdm::DataShape<> expandedBounds( shape );
   expandedBounds[0] = sum;
-  xdm::ProxyDataset::initializeImplementation( type, expandedBounds, mode );
+  return xdm::ProxyDataset::initializeImplementation( type, expandedBounds, mode );
 }
 
 void RankOrderedDistributedDataset::serializeImplementation(

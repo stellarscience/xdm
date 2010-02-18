@@ -48,11 +48,11 @@ void Dataset::update() {
   }
 }
 
-void Dataset::initialize(
+DataShape<> Dataset::initialize(
   primitiveType::Value type,
   const DataShape<>& shape,
   const InitializeMode& mode ) {
-  initializeImplementation( type, shape, mode );
+  return initializeImplementation( type, shape, mode );
 }
 
 void Dataset::serialize(

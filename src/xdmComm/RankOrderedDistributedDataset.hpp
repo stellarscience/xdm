@@ -55,7 +55,7 @@ protected:
   /// All processes must be requesting the same type of access, and the
   /// data shape for all processes must match in every dimension except the
   /// first.
-  virtual void initializeImplementation(
+  virtual xdm::DataShape<> initializeImplementation(
     xdm::primitiveType::Value type,
     const xdm::DataShape<>& shape,
     const xdm::Dataset::InitializeMode& mode );

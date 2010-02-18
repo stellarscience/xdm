@@ -212,7 +212,7 @@ void HdfDataset::writeTextContent( xdm::XmlTextContent& text ) {
   text.appendContentLine( out.str() );
 }
 
-void HdfDataset::initializeImplementation(
+xdm::DataShape<> HdfDataset::initializeImplementation(
   xdm::primitiveType::Value type,
   const xdm::DataShape<>& shape,
   const xdm::Dataset::InitializeMode& mode ) {
@@ -265,6 +265,7 @@ void HdfDataset::initializeImplementation(
   creationParameters.compress = imp->mUseCompression;
   creationParameters.compressionLevel = imp->mCompressionLevel;
   imp->mDatasetId = createDatasetIdentifier( creationParameters );
+  return shape;
 }
 
 // Code Review Matter (open): RefPtr vs Raw Pointers
