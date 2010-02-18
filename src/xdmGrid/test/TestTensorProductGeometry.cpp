@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE( writeMetadata ) {
   BOOST_CHECK_EQUAL( "VxVyVz", xml.attribute( "GeometryType" ) );
 }
 
-BOOST_AUTO_TEST_CASE( nodeAccess ) {
+BOOST_AUTO_TEST_CASE( nodeAccess3D ) {
   xdmGrid::TensorProductGeometry g(3);
 
   StructuredCube cube;
@@ -56,15 +56,20 @@ BOOST_AUTO_TEST_CASE( nodeAccess ) {
 
   BOOST_CHECK_EQUAL( cube.numberOfNodes(), g.numberOfNodes() );
 
-//  // Check node2. xyz is 1,1,0
-//  BOOST_CHECK_EQUAL( 1., g.node( 2 )[0] );
-//  BOOST_CHECK_EQUAL( 1., g.node( 2 )[1] );
-//  BOOST_CHECK_EQUAL( 0., g.node( 2 )[2] );
-//
-//  // Check node7. xyz is 0,1,1
-//  BOOST_CHECK_EQUAL( 0., g.node( 7 )[0] );
-//  BOOST_CHECK_EQUAL( 1., g.node( 7 )[1] );
-//  BOOST_CHECK_EQUAL( 1., g.node( 7 )[2] );
+  // Check node2. xyz is 0.75, 0, 0
+  BOOST_CHECK_CLOSE( 0.75, g.node( 2 )[0], 1.e-8 );
+  BOOST_CHECK_CLOSE( 0.00, g.node( 2 )[1], 1.e-8 );
+  BOOST_CHECK_CLOSE( 0.00, g.node( 2 )[2], 1.e-8 );
+
+  // Check node7. xyz is 1.0, 0.4, 0
+  BOOST_CHECK_CLOSE( 1.0, g.node( 7 )[0], 1.e-8 );
+  BOOST_CHECK_CLOSE( 0.4, g.node( 7 )[1], 1.e-8 );
+  BOOST_CHECK_CLOSE( 0.0, g.node( 7 )[2], 1.e-8 );
+
+  // Check node17. xyz is 0.25, 0.4, 0.3
+  BOOST_CHECK_CLOSE( 0.25, g.node( 17 )[0], 1.e-8 );
+  BOOST_CHECK_CLOSE( 0.40, g.node( 17 )[1], 1.e-8 );
+  BOOST_CHECK_CLOSE( 0.30, g.node( 17 )[2], 1.e-8 );
 }
 
 } // namespace

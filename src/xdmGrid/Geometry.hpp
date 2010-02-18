@@ -58,10 +58,8 @@ public:
   /// Get the number of nodes.
   std::size_t numberOfNodes() const;
 
-  /// Get a shared node by index. It's virtual so that a derived class can override or
-  /// block the non-const access, for example, TensorProductGeometry, where it does not
-  /// make sense to relocate a node.
-  virtual Node node( std::size_t nodeIndex );
+  /// Get a shared node by index.
+  Node node( std::size_t nodeIndex );
   /// Get a constant shared node by index.
   ConstNode node( std::size_t nodeIndex ) const;
 

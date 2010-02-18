@@ -266,11 +266,10 @@ const T& TensorProductArraysImp< T >::at( std::size_t baseIndex, std::size_t i )
   // choose a convention for indexing multi-dimension structured data and
   // stick with it. Following XDMF, let's say z is always considered to be
   // the slowest varying dimension, y next, x fastest.
-  std::size_t blockSize = mAxisSizes[0];
+  std::size_t blockSize = 1;
   std::size_t location[ mSize ];
-  location[0] = baseIndex % blockSize;
-  for ( int dimension = 1; dimension < mSize; ++dimension ) {
-    location[ dimension ] = baseIndex / blockSize;
+  for ( int dimension = 0; dimension < mSize; ++dimension ) {
+    location[ dimension ] = baseIndex / blockSize % mAxisSizes[ dimension ];
     blockSize *= mAxisSizes[ dimension ];
   }
   return mCoordinateAxisValues[i][location[i]];

@@ -57,9 +57,8 @@ public:
   /// Get the number of cells in the topology.
   virtual std::size_t numberOfCells() const;
 
-  /// Get the const connectivity of a single cell. This implementation uses the
-  /// mSharedVectorImp, but classes can override this behavior.
-  virtual ConstCellConnectivity cellConnections( std::size_t cellIndex ) const;
+  /// Get the const connectivity of a single cell.
+  ConstCellConnectivity cellConnections( std::size_t cellIndex ) const;
 
   /// Get the type of a particular cell.
   virtual const CellType::Type& cellType( std::size_t cellIndex ) const = 0;

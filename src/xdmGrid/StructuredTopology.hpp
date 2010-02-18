@@ -26,6 +26,8 @@
 
 #include <xdm/DataShape.hpp>
 
+#include <vector>
+
 #include <xdmGrid/NamespaceMacro.hpp>
 
 XDM_GRID_NAMESPACE_BEGIN
@@ -50,9 +52,6 @@ public:
   /// Get the shape defined by the cells in the topology.
   const xdm::DataShape<>& shape() const;
 
-  /// This override constructs a self-contained const vector on-the-fly.
-  virtual ConstCellConnectivity cellConnections( std::size_t cellIndex ) const;
-
   /// Get the type of a particular cell. For structured meshes this always returns
   /// a quad or hex.
   virtual const CellType::Type& cellType( std::size_t cellIndex ) const;
@@ -63,6 +62,7 @@ protected:
   virtual xdm::RefPtr< xdm::VectorRefImp< std::size_t > > createVectorImp();
 
 private:
+  std::vector< std::size_t > mNodes;
   xdm::DataShape<> mShape;
   CellType::Type mCellType;
 };

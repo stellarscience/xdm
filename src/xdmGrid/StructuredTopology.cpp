@@ -29,21 +29,6 @@
 
 XDM_GRID_NAMESPACE_BEGIN
 
-template< typename T >
-class SelfContainedVec : public xdm::VectorRefImp< T > {
-public:
-  SelfContainedVec( const std::vector< T >& data ) :
-    mData( data ) {}
-
-  virtual const T& at( std::size_t /* baseIndex */, std::size_t i ) const {
-    return mData[i];
-  }
-
-  virtual std::size_t size() const { return mData.size(); }
-private:
-  std::vector< T > mData;
-};
-
 StructuredTopology::StructuredTopology() :
   Topology(),
   mShape(),
@@ -79,51 +64,6 @@ const xdm::DataShape<>& StructuredTopology::shape() const {
   return mShape;
 }
 
-ConstCellConnectivity StructuredTopology::cellConnections( std::size_t cellIndex ) const {
-  std::size_t dimension = mShape.rank();
-  std::vector< std::size_t > nodeIndices;
-  switch ( dimension ) {
-    case 2: {
-      nodeIndices.resize( 4 );
-      std::size_t xCell = cellIndex % mShape[0];
-      std::size_t yCell = cellIndex / mShape[0];
-      std::size_t xNodes = mShape[0] + 1;
-      nodeIndices[0] = ( xCell + 0 ) + ( yCell + 0 ) * xNodes;
-      nodeIndices[1] = ( xCell + 1 ) + ( yCell + 0 ) * xNodes;
-      nodeIndices[2] = ( xCell + 1 ) + ( yCell + 1 ) * xNodes;
-      nodeIndices[3] = ( xCell + 0 ) + ( yCell + 1 ) * xNodes;
-      break;
-    }
-    case 3: {
-      nodeIndices.resize( 8 );
-      std::size_t xCell = cellIndex % mShape[0];
-      std::size_t yCell = cellIndex / mShape[0];
-      std::size_t zCell = cellIndex / mShape[0] / mShape[1];
-      std::size_t xNodes = mShape[0] + 1;
-      std::size_t yNodes = mShape[1] + 1;
-      nodeIndices[0] = ( xCell + 0 ) + ( yCell + 0 ) * xNodes + ( zCell + 0 ) * xNodes * yNodes;
-      nodeIndices[1] = ( xCell + 1 ) + ( yCell + 0 ) * xNodes + ( zCell + 0 ) * xNodes * yNodes;
-      nodeIndices[2] = ( xCell + 1 ) + ( yCell + 1 ) * xNodes + ( zCell + 0 ) * xNodes * yNodes;
-      nodeIndices[3] = ( xCell + 0 ) + ( yCell + 1 ) * xNodes + ( zCell + 0 ) * xNodes * yNodes;
-      nodeIndices[4] = ( xCell + 0 ) + ( yCell + 0 ) * xNodes + ( zCell + 1 ) * xNodes * yNodes;
-      nodeIndices[5] = ( xCell + 1 ) + ( yCell + 0 ) * xNodes + ( zCell + 1 ) * xNodes * yNodes;
-      nodeIndices[6] = ( xCell + 1 ) + ( yCell + 1 ) * xNodes + ( zCell + 1 ) * xNodes * yNodes;
-      nodeIndices[7] = ( xCell + 0 ) + ( yCell + 1 ) * xNodes + ( zCell + 1 ) * xNodes * yNodes;
-      break;
-    }
-    default: {
-      std::stringstream ss;
-      ss << "The rank of the DataShape represents an unknown structured mesh topology (something"
-        " other than 2D or 3D). The rank was " << dimension;
-      XDM_THROW( std::runtime_error( ss.str() ) );
-    }
-  }
-
-  xdm::RefPtr< xdm::VectorRefImp< std::size_t > > vecImp(
-    new SelfContainedVec< std::size_t >( nodeIndices ) );
-  return ConstCellConnectivity( vecImp, 0 );
-}
-
 const CellType::Type& StructuredTopology::cellType( std::size_t /* cellIndex */ ) const {
   return mCellType;
 }
@@ -138,8 +78,47 @@ void StructuredTopology::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
 }
 
 xdm::RefPtr< xdm::VectorRefImp< std::size_t > > StructuredTopology::createVectorImp() {
-  // This is not needed since cellConnections() is overridden by this class.
-  return xdm::RefPtr< xdm::VectorRefImp< std::size_t > >( NULL ); }
+  mNodes.clear();
+  switch( mShape.rank() ) {
+    case 2:
+      for ( std::size_t x = 0; x < mShape[0]; ++x ) {
+        for ( std::size_t y = 0; y < mShape[1]; ++y ) {
+          std::size_t xNodes = mShape[0] + 1;
+          mNodes.push_back( ( x + 0 ) + ( y + 0 ) * xNodes );
+          mNodes.push_back( ( x + 1 ) + ( y + 0 ) * xNodes );
+          mNodes.push_back( ( x + 1 ) + ( y + 1 ) * xNodes );
+          mNodes.push_back( ( x + 0 ) + ( y + 1 ) * xNodes );
+        }
+      }
+      break;
+    case 3:
+      for ( std::size_t x = 0; x < mShape[0]; ++x ) {
+        for ( std::size_t y = 0; y < mShape[1]; ++y ) {
+          for ( std::size_t z = 0; z < mShape[2]; ++z ) {
+            std::size_t xNodes = mShape[0] + 1;
+            std::size_t yNodes = mShape[1] + 1;
+            mNodes.push_back( ( x + 0 ) + ( y + 0 ) * xNodes + ( z + 0 ) * xNodes * yNodes );
+            mNodes.push_back( ( x + 1 ) + ( y + 0 ) * xNodes + ( z + 0 ) * xNodes * yNodes );
+            mNodes.push_back( ( x + 1 ) + ( y + 1 ) * xNodes + ( z + 0 ) * xNodes * yNodes );
+            mNodes.push_back( ( x + 0 ) + ( y + 1 ) * xNodes + ( z + 0 ) * xNodes * yNodes );
+            mNodes.push_back( ( x + 0 ) + ( y + 0 ) * xNodes + ( z + 1 ) * xNodes * yNodes );
+            mNodes.push_back( ( x + 1 ) + ( y + 0 ) * xNodes + ( z + 1 ) * xNodes * yNodes );
+            mNodes.push_back( ( x + 1 ) + ( y + 1 ) * xNodes + ( z + 1 ) * xNodes * yNodes );
+            mNodes.push_back( ( x + 0 ) + ( y + 1 ) * xNodes + ( z + 1 ) * xNodes * yNodes );
+          }
+        }
+      }
+      break;
+    default:
+      std::stringstream ss;
+      ss << "The rank of the DataShape represents an unknown structured mesh topology (something"
+        " other than 2D or 3D). The rank was " << mShape.rank();
+      XDM_THROW( std::runtime_error( ss.str() ) );
+  }
+
+  return xdm::RefPtr< xdm::VectorRefImp< std::size_t > >(
+    new xdm::SingleArrayOfVectorsImp< std::size_t >( &mNodes[0], mCellType.nodesPerCell() ) );
+}
 
 XDM_GRID_NAMESPACE_END
 

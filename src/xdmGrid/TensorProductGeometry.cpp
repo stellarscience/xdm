@@ -58,11 +58,6 @@ void TensorProductGeometry::setCoordinateValues(
   }
 }
 
-Node TensorProductGeometry::node( std::size_t nodeIndex ) {
-  XDM_THROW( std::logic_error( "Non-const access of nodes in a TensorProductGeometry does not"
-    " make sense and is unallowed." ) );
-}
-
 void TensorProductGeometry::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
   Geometry::writeMetadata( xml );
 
