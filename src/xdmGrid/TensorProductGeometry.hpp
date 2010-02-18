@@ -52,6 +52,11 @@ public:
   /// @param data The data representing the coordinate values on the axis.
   void setCoordinateValues( unsigned int dim, xdm::RefPtr< xdm::UniformDataItem > data );
 
+  /// Since it does not make sense to modify the locations of nodes for this class, this
+  /// function always throws a logic error.
+  /// @throws std::logic_error always.
+  virtual Node node( std::size_t nodeIndex );
+
   virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
 
 protected:

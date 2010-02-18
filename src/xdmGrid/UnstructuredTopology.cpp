@@ -18,79 +18,55 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //------------------------------------------------------------------------------
-#include <xdmGrid/Cell.hpp>
-#include <xdmGrid/Geometry.hpp>
 #include <xdmGrid/UnstructuredTopology.hpp>
 
 #include <sstream>
 
-namespace {
-
-class TrivialCellRefImpl : public xdmGrid::CellSharedImp {
-public:
-  TrivialCellRefImpl(
-    const xdmGrid::CellType::Type& type,
-    xdm::RefPtr< xdmGrid::Geometry > geometry,
-    std::size_t* nodeIndexArray ) :
-    mType( type ), mGeometry( geometry ), mNodeIds( nodeIndexArray ) {
-  }
-
-  virtual xdmGrid::ConstNode node( std::size_t cellIndex, std::size_t nodeIndex ) const {
-    std::size_t nodeID = mNodeIds[ cellIndex * mType.nodesPerCell() + nodeIndex ];
-    return mGeometry->node( nodeID );
-  }
-
-  virtual xdmGrid::CellType::Type cellType( std::size_t cellIndex ) const {
-    return mType;
-  }
-
-private:
-  xdmGrid::CellType::Type mType;
-  xdm::RefPtr< xdmGrid::Geometry > mGeometry;
-  std::size_t* mNodeIds;
-};
-
-} // anon namespace
+//namespace {
+//
+//class TrivialCellRefImpl : public xdmGrid::CellSharedImp {
+//public:
+//  TrivialCellRefImpl(
+//    const xdmGrid::CellType::Type& type,
+//    xdm::RefPtr< xdmGrid::Geometry > geometry,
+//    std::size_t* nodeIndexArray ) :
+//    mType( type ), mGeometry( geometry ), mNodeIds( nodeIndexArray ) {
+//  }
+//
+//  virtual xdmGrid::ConstNode node( std::size_t cellIndex, std::size_t nodeIndex ) const {
+//    std::size_t nodeID = mNodeIds[ cellIndex * mType.nodesPerCell() + nodeIndex ];
+//    return mGeometry->node( nodeID );
+//  }
+//
+//  virtual xdmGrid::CellType::Type cellType( std::size_t cellIndex ) const {
+//    return mType;
+//  }
+//
+//private:
+//  xdmGrid::CellType::Type mType;
+//  xdm::RefPtr< xdmGrid::Geometry > mGeometry;
+//  std::size_t* mNodeIds;
+//};
+//
+//} // anon namespace
 
 XDM_GRID_NAMESPACE_BEGIN
 
 UnstructuredTopology::UnstructuredTopology() :
   Topology(),
-  mCellSharedImp(),
   mConnectivity(),
   mCellType( CellType::Default ),
-  mGeometry(),
-  mNumberOfCells(),
   mOrdering() {
 }
 
 UnstructuredTopology::~UnstructuredTopology() {
 }
 
-void UnstructuredTopology::setGeometry( xdm::RefPtr< Geometry > geometry ) {
-  mGeometry = geometry;
-  if ( mConnectivity ) {
-    mCellSharedImp =
-      new TrivialCellRefImpl(
-        mCellType,
-        mGeometry,
-        mConnectivity->typedArray< std::size_t >()->begin() );
-  }
-}
-
-void UnstructuredTopology::setNumberOfCells( std::size_t numberOfCells ) {
-  mNumberOfCells = numberOfCells;
-}
-
-std::size_t UnstructuredTopology::numberOfCells() const {
-  return mNumberOfCells;
-}
-
 void UnstructuredTopology::setCellType( const CellType::Type& type ) {
   mCellType = type;
 }
 
-const CellType::Type& UnstructuredTopology::cellType() const {
+const CellType::Type& UnstructuredTopology::cellType( std::size_t ) const {
   return mCellType;
 }
 
@@ -104,25 +80,8 @@ NodeOrderingConvention::Type UnstructuredTopology::nodeOrdering() const
   return mOrdering;
 }
 
-Cell UnstructuredTopology::cell( std::size_t cellIndex )
-{
-  return Cell( mCellSharedImp, cellIndex );
-}
-
-ConstCell UnstructuredTopology::cell( std::size_t cellIndex ) const
-{
-  return ConstCell( mCellSharedImp, cellIndex );
-}
-
 void UnstructuredTopology::setConnectivity( xdm::RefPtr< xdm::UniformDataItem > connectivity ) {
   mConnectivity = connectivity;
-  if ( mGeometry ) {
-    mCellSharedImp =
-      new TrivialCellRefImpl(
-        mCellType,
-        mGeometry,
-        connectivity->typedArray< std::size_t >()->begin() );
-  }
 }
 
 void UnstructuredTopology::traverse( xdm::ItemVisitor& iv ) {
@@ -135,13 +94,19 @@ void UnstructuredTopology::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
   Topology::writeMetadata( xml );
 
   // Write the number of cells
-  xml.setAttribute( "NumberOfElements", mNumberOfCells );
+  xml.setAttribute( "NumberOfElements", numberOfCells() );
 
   // Write the cell type
   xml.setAttribute( "ElementType", mCellType.shapeName() );
 
   // Write the nodes per cell
   xml.setAttribute( "NodesPerElement", mCellType.nodesPerCell() );
+}
+
+xdm::RefPtr< xdm::VectorRefImp< std::size_t > > UnstructuredTopology::createVectorImp() {
+  return xdm::RefPtr< xdm::VectorRefImp< std::size_t > >(
+    new xdm::SingleArrayOfVectorsImp< std::size_t >(
+        mConnectivity->typedArray< std::size_t >()->begin(), mCellType.nodesPerCell() ) );
 }
 
 XDM_GRID_NAMESPACE_END

@@ -31,11 +31,6 @@
 
 XDM_GRID_NAMESPACE_BEGIN
 
-class Cell;
-class ConstCell;
-class CellSharedImp;
-class Geometry;
-
 /// Base class for all unstructured topologies. If the connectivity is different
 /// from the standard, an order may be specified.
 class UnstructuredTopology : public Topology {
@@ -45,18 +40,12 @@ public:
 
   XDM_META_ITEM( UnstructuredTopology );
 
-  /// Set the Geometry that this topology refers to.
-  void setGeometry( xdm::RefPtr< Geometry > geometry );
-
-  /// Set the number of cells in the topology.
-  void setNumberOfCells( std::size_t numberOfCells );
-  /// Get the number of cells in the topology.
-  std::size_t numberOfCells() const;
-
   /// Set the type of the cells.
   void setCellType( const CellType::Type& type );
-  /// Get the type of the cells.
-  const CellType::Type& cellType() const;
+
+  /// Get the type of the cells. For now, this ignores the cellIndex and assumes all
+  /// cells are of the same type.
+  virtual const CellType::Type& cellType( std::size_t cellIndex ) const;
 
   /// Set the node ordering convention for the shape of the Cells. For example,
   /// Exodus II orders the nodes of a linear tetrahedron differently than some
@@ -64,11 +53,6 @@ public:
   void setNodeOrdering( const NodeOrderingConvention::Type& order );
   /// Get the node odering for the shape of these Cells.
   NodeOrderingConvention::Type nodeOrdering() const;
-
-  /// Get a cell by index.
-  Cell cell( std::size_t cellIndex );
-  /// Get a const cell by index.
-  ConstCell cell( std::size_t cellIndex ) const;
 
   /// Set the connectivity values to the input DataItem. If the connectivity
   /// is not specified, then there is a default connectivity determined by the
@@ -79,12 +63,12 @@ public:
 
   virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
 
+protected:
+  virtual xdm::RefPtr< xdm::VectorRefImp< std::size_t > > createVectorImp();
+
 private:
   xdm::RefPtr< xdm::UniformDataItem > mConnectivity;
-  xdm::RefPtr< Geometry > mGeometry;
-  xdm::RefPtr< CellSharedImp > mCellSharedImp;
   CellType::Type mCellType;
-  std::size_t mNumberOfCells;
   NodeOrderingConvention::Type mOrdering;
 };
 
