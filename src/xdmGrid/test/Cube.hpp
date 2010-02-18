@@ -18,6 +18,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //------------------------------------------------------------------------------
+#include <functional>
+#include <numeric>
 #include <vector>
 
 /// Test helper class that represents a cube. The vertices are the 8 corners of
@@ -101,4 +103,43 @@ private:
   double mNodeY[8];
   double mNodeZ[8];
   std::size_t mConnectivity[5*4];
+};
+
+class StructuredCube {
+  typedef std::vector< std::vector< double > > Axes;
+public:
+  double* axis( std::size_t i ) { return &mAxes[i][0]; }
+
+  std::size_t axisSize( std::size_t i ) const { return mAxes[i].size(); }
+
+  std::size_t numberOfNodes() const {
+    std::size_t product = 1;
+    for ( Axes::const_iterator i = mAxes.begin(); i != mAxes.end(); ++i ) {
+      product *= i->size();
+    }
+    return product;
+  }
+
+  StructuredCube() :
+    mAxes( 3 ) {
+    mAxes[0].resize( 4 );
+    mAxes[0][0] = 0.0;
+    mAxes[0][1] = 0.25;
+    mAxes[0][2] = 0.75;
+    mAxes[0][3] = 1.0;
+
+    mAxes[1].resize( 3 );
+    mAxes[1][0] = 0.0;
+    mAxes[1][1] = 0.4;
+    mAxes[1][2] = 1.0;
+
+    mAxes[2].resize( 4 );
+    mAxes[2][0] = 0.0;
+    mAxes[2][1] = 0.3;
+    mAxes[2][2] = 0.7;
+    mAxes[2][3] = 1.0;
+  }
+
+private:
+  Axes mAxes;
 };

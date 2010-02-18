@@ -42,6 +42,20 @@ void TensorProductGeometry::setCoordinateValues(
   xdm::RefPtr< xdm::UniformDataItem > data ) {
   assert( dim < dimension() );
   setChild( dim, data );
+
+  // We can automatically set the number of nodes after coordinate values have been specified
+  // for all axes.
+  int dimensionCount =
+    std::count_if( begin(), end(), std::mem_fun_ref( &xdm::RefPtr< xdm::Item >::valid ) );
+  if ( dimensionCount == dimension() ) {
+    std::size_t nodeProduct = 1;
+    for ( ConstIterator childIt = begin(); childIt != end(); ++childIt ) {
+      xdm::RefPtr< xdm::UniformDataItem > uniformItem =
+        xdm::dynamic_pointer_cast< xdm::UniformDataItem >( *childIt );
+      nodeProduct *= uniformItem->typedArray< double >()->size();
+    }
+    setNumberOfNodes( nodeProduct );
+  }
 }
 
 Node TensorProductGeometry::node( std::size_t nodeIndex ) {
