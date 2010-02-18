@@ -1,27 +1,28 @@
 //==============================================================================
-// This software developed by Stellar Science Ltd Co and the U.S. Government.  
-// Copyright (C) 2009 Stellar Science. Government-purpose rights granted.      
-//                                                                             
-// This file is part of XDM                                                    
-//                                                                             
-// This program is free software: you can redistribute it and/or modify it     
-// under the terms of the GNU Lesser General Public License as published by    
-// the Free Software Foundation, either version 3 of the License, or (at your  
-// option) any later version.                                                  
-//                                                                             
-// This program is distributed in the hope that it will be useful, but WITHOUT 
-// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or       
-// FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public        
-// License for more details.                                                   
-//                                                                             
-// You should have received a copy of the GNU Lesser General Public License    
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.       
-//                                                                             
+// This software developed by Stellar Science Ltd Co and the U.S. Government.
+// Copyright (C) 2009 Stellar Science. Government-purpose rights granted.
+//
+// This file is part of XDM
+//
+// This program is free software: you can redistribute it and/or modify it
+// under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or (at your
+// option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+// FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+// License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
 //------------------------------------------------------------------------------
-#define BOOST_TEST_MODULE MemoryAdapter 
+#define BOOST_TEST_MODULE MemoryAdapter
 #include <boost/test/unit_test.hpp>
 
 #include <xdm/Dataset.hpp>
+#include <xdm/DataShape.hpp>
 #include <xdm/RefPtr.hpp>
 #include <xdm/MemoryAdapter.hpp>
 
@@ -31,18 +32,19 @@ class DatasetTestImplementation : public xdm::Dataset {
 public:
   bool dataWritten;
   DatasetTestImplementation() : xdm::Dataset(), dataWritten(false) {}
-  
-  void initializeImplementation( 
-    xdm::primitiveType::Value, 
-    const xdm::DataShape<>&, 
-    const Dataset::InitializeMode& )
-  {}
 
-  void serializeImplementation( 
+  xdm::DataShape<> initializeImplementation(
+    xdm::primitiveType::Value,
+    const xdm::DataShape<>&,
+    const Dataset::InitializeMode& ) {
+    return xdm::DataShape<>();
+  }
+
+  void serializeImplementation(
     const xdm::StructuredArray*, const xdm::DataSelectionMap& )
   {}
-  
-  void deserializeImplementation( 
+
+  void deserializeImplementation(
     xdm::StructuredArray*, const xdm::DataSelectionMap& )
   {}
 
@@ -60,7 +62,7 @@ public:
   }
 
   virtual void writeImplementation( xdm::Dataset* dataset ) {
-    DatasetTestImplementation* ds = 
+    DatasetTestImplementation* ds =
       dynamic_cast< DatasetTestImplementation* >( dataset );
     ds->dataWritten=true;
   }
@@ -80,7 +82,7 @@ BOOST_AUTO_TEST_CASE( dynamicWrite ) {
   Fixture test;
 
   test.testWritable->setIsDynamic(true);
-  
+
   BOOST_CHECK( !test.testDataset->dataWritten );
 
   test.testWritable->write( test.testDataset.get() );

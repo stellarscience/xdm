@@ -18,6 +18,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //------------------------------------------------------------------------------
+#include <xdm/DataShape.hpp>
 #include <xdm/TypedStructuredArray.hpp>
 #include <xdm/UniformDataItem.hpp>
 #include <xdm/ArrayAdapter.hpp>
@@ -32,10 +33,10 @@ class DummyDataset : public xdm::Dataset {
   void writeTextContent( xdm::XmlTextContent& text ) {
     text.appendContentLine( "DummyDatasetInitializationContent" );
   }
-  void initializeImplementation(
+  xdm::DataShape<> initializeImplementation(
     xdm::primitiveType::Value,
     const xdm::DataShape<>&,
-    const Dataset::InitializeMode& ) {}
+    const Dataset::InitializeMode& ) { return xdm::DataShape<>(); }
   void serializeImplementation(
     const xdm::StructuredArray*,
     const xdm::DataSelectionMap& ) {}

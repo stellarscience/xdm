@@ -25,6 +25,7 @@
 
 #include <xdmComm/test/MpiTestFixture.hpp>
 
+#include <xdm/DataShape.hpp>
 #include <xdm/HyperslabDataSelection.hpp>
 
 #include <mpi.h>
@@ -46,12 +47,13 @@ public:
   virtual void writeTextContent( xdm::XmlTextContent& ) {}
 
 protected:
-  virtual void initializeImplementation(
+  virtual xdm::DataShape<> initializeImplementation(
     xdm::primitiveType::Value type,
     const xdm::DataShape<> &shape,
     const xdm::Dataset::InitializeMode &mode ) {
     data.resize( shape[0] );
     std::fill( data.begin(), data.end(), 'x' );
+    return xdm::DataShape<>();
   }
 
   virtual void serializeImplementation(
