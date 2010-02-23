@@ -33,6 +33,7 @@
 
 #include <xdmComm/test/MpiTestFixture.hpp>
 
+#include <xdmFormat/LinearTopologyData.hpp>
 #include <xdmFormat/TemporalCollection.hpp>
 #include <xdmFormat/VirtualDataset.hpp>
 
@@ -148,6 +149,14 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
   // topology is polyvertex
   xdm::RefPtr< xdmGrid::Polyvertex > topology( new xdmGrid::Polyvertex() );
   topology->setNumberOfPoints( kParticleCount );
+  xdm::RefPtr< xdm::UniformDataItem > topologyConn =
+    xdmFormat::createLinearTopologyUniformDataItem( topology );
+  topology->setConnectivity( topologyConn );
+  xdm::RefPtr< xdmHdf::HdfDataset > topologyDataset( new xdmHdf::HdfDataset );
+  topologyDataset->setFile( baseName.str() + ".h5" );
+  topologyDataset->setGroupPath( xdmHdf::GroupPath( 1, "connectivity" ) );
+  topologyDataset->setUpdateCallback( xdm::makeRefPtr( new NameDataset ) );
+  topologyConn->setDataset( topologyDataset );
   grid->setTopology( topology );
 
   // geometry is interlaced with a dynamic array data item

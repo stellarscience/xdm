@@ -1,6 +1,7 @@
 project( xdmFormat )
 
 set( ${PROJECT_NAME}_HEADERS 
+    LinearTopologyData.hpp
     NamespaceMacro.hpp
     Reader.hpp
     TemporalCollection.hpp
@@ -10,6 +11,7 @@ set( ${PROJECT_NAME}_HEADERS
 )
 
 set( ${PROJECT_NAME}_SOURCES
+    LinearTopologyData.cpp
     Reader.cpp
     TemporalCollection.cpp
     VirtualDataset.cpp

@@ -118,6 +118,10 @@ void UniformDataItem::writeMetadata( XmlMetadataWrapper& xml ) {
     xml.setAttribute( "NumberType", "UInt" );
     xml.setAttribute( "Precision", sizeof( unsigned int ) );
     break;
+  case primitiveType::kLongUnsignedInt:
+    xml.setAttribute( "NumberType", "UInt" );
+    xml.setAttribute( "Precision", sizeof( long unsigned int ) );
+    break;
   case primitiveType::kFloat:
     xml.setAttribute( "NumberType", "Float" );
     xml.setAttribute( "Precision", sizeof( float ) );
