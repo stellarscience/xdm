@@ -237,7 +237,7 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
 
   // create the time series, opening the output stream
   xdm::RefPtr< xdmFormat::TimeSeries > series(
-    new xdmFormat::TemporalCollection( xmfFile, xdm::Dataset::kCreate ) );
+    new xdmFormat::VirtualDataset( baseName.str() + ".xmf" ) );
 
   // begin a time series
   series->open();
