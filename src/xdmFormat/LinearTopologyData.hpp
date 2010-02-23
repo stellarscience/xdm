@@ -41,6 +41,10 @@ XDM_FORMAT_NAMESPACE_BEGIN
 /// the referenced Polyvertex Topology. This is useful if the XDMF output will
 /// be used in VisIt, as it requires explicit specification of the connectivity
 /// of Polyvertex topology.
+///
+/// This class uses 32-bit signed integers to hold the data in order to deal
+/// with a ParaView bug that causes the system to crash if the data is held as
+/// an unsigned integer.
 class LinearTopologyData : public xdm::MemoryAdapter {
 public:
   /// Construct with a topology to use as a reference for the list of numbers
@@ -55,7 +59,8 @@ protected:
 
 private:
   xdm::RefPtr< xdmGrid::Polyvertex > mTopology;
-  xdm::RefPtr< xdm::VectorStructuredArray< unsigned int > > mArrayValues;
+  // See the class doxygen documentation for why this is 32-bit signed.
+  xdm::RefPtr< xdm::VectorStructuredArray< int > > mArrayValues;
 };
 
 /// Convenience function to construct a UniformDataItem that will track the size

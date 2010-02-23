@@ -43,14 +43,14 @@ LinearTopologyData::~LinearTopologyData()
 xdm::RefPtr< xdm::StructuredArray > LinearTopologyData::array()
 {
   if ( !mArrayValues ) {
-    mArrayValues = new xdm::VectorStructuredArray< unsigned int >;
+    mArrayValues = new xdm::VectorStructuredArray< int >;
   }  
   if ( mTopology ) {
     if ( mArrayValues->size() != mTopology->numberOfPoints() ) {
-      unsigned int oldSize = mArrayValues->size();
-      unsigned int newSize = mTopology->numberOfPoints();
+      size_t oldSize = mArrayValues->size();
+      size_t newSize = mTopology->numberOfPoints();
       mArrayValues->resize( newSize );
-      for ( unsigned int i = oldSize; i < newSize; i++ ) {
+      for ( int i = oldSize; i < newSize; i++ ) {
         (*mArrayValues)[i] = i;
       }
     }
@@ -67,7 +67,7 @@ xdm::RefPtr< xdm::UniformDataItem > createLinearTopologyUniformDataItem(
   xdm::RefPtr<xdmGrid::Polyvertex>topology )
 {
   xdm::RefPtr< xdm::UniformDataItem > result( new xdm::UniformDataItem(
-    xdm::PrimitiveTypeInfo< unsigned int >::kValue,
+    xdm::PrimitiveTypeInfo< int >::kValue,
     xdm::makeShape( topology->numberOfPoints() ) ) );
   result->setData( xdm::makeRefPtr( new LinearTopologyData( topology ) ) );
   return result;
