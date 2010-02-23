@@ -1,0 +1,31 @@
+# - Find NetCDF
+# Find the native NetCDF includes and library
+#
+#  NETCDF_INCLUDE_DIR - where to find netcdf.h, etc.
+#  NETCDF_LIBRARY     - the NetCDF library.
+#  NETCDF_NCDUMP      - location of ncdump executable.
+#  NETCDF_FOUND       - True if NetCDF found.
+
+IF( NETCDF_INCLUDE_DIR )
+  # Already in cache, be silent
+  SET( NetCDF_FIND_QUIETLY TRUE )
+ENDIF( NETCDF_INCLUDE_DIR )
+
+FIND_PATH( NETCDF_INCLUDE_DIR netcdf.h )
+FIND_PROGRAM( NETCDF_NCDUMP ncdump )
+
+SET( NETCDF_NAMES netcdf netcdfdll )
+FIND_LIBRARY( NETCDF_LIBRARY NAMES ${NETCDF_NAMES} )
+
+# handle the QUIETLY and REQUIRED arguments and set NetCDF_FOUND to TRUE if 
+# all listed variables are TRUE
+INCLUDE( FindPackageHandleStandardArgs )
+FIND_PACKAGE_HANDLE_STANDARD_ARGS( NetCDF DEFAULT_MSG NETCDF_LIBRARY NETCDF_INCLUDE_DIR NETCDF_NCDUMP )
+
+IF( NETCDF_FOUND )
+  SET( NETCDF_LIBRARY ${NETCDF_LIBRARY} )
+ELSE( NETCDF_FOUND )
+  SET( NETCDF_LIBRARY )
+ENDIF( NETCDF_FOUND )
+
+MARK_AS_ADVANCED( NETCDF_LIBRARY NETCDF_INCLUDE_DIR NETCDF_NCDUMP )
