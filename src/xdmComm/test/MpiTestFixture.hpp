@@ -68,7 +68,7 @@ public:
 
   int processes() const { return mProcesses; }
   int localRank() const { return mLocalRank; }
-
+  void waitAll() { MPI_Barrier( MPI_COMM_WORLD ); }
 };
 
 } // namespace test

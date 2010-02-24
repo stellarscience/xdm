@@ -38,7 +38,9 @@ public:
   /// Construct a virtual dataset given a base name for all output files.  The
   /// output for a given time step will then take the form 
   /// metadataBaseName.<time_step>.xmf.
-  VirtualDataset( const std::string& metadataBaseName );
+  VirtualDataset( 
+    const std::string& metadataBaseName,
+    xdm::Dataset::InitializeMode mode );
   virtual ~VirtualDataset();
 
   virtual void open();

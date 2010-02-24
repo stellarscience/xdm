@@ -34,7 +34,10 @@
 
 XDM_FORMAT_NAMESPACE_BEGIN
 
-TemporalCollection::TemporalCollection( const std::string& metadataFile ) :
+TemporalCollection::TemporalCollection( 
+  const std::string& metadataFile,
+  xdm::Dataset::InitializeMode mode ) :
+  TimeSeries( mode ),
   mFilename( metadataFile ),
   mFileStream(),
   mXmlStream( mFileStream )
@@ -78,7 +81,7 @@ void TemporalCollection::writeGridMetadata( xdm::RefPtr< xdmGrid::Grid > grid ) 
 
 void TemporalCollection::writeGridData( xdm::RefPtr< xdmGrid::Grid > grid ) {
   // serialize the heavy data
-  xdm::SerializeDataOperation serializer;
+  xdm::SerializeDataOperation serializer( mode() );
   grid->accept( serializer );
 }
 

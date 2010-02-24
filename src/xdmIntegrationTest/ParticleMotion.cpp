@@ -22,6 +22,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include <xdm/AllDataSelection.hpp>
+#include <xdm/FileSystem.hpp>
 #include <xdm/HyperslabDataSelection.hpp>
 #include <xdm/RefPtr.hpp>
 #include <xdm/UniformDataItem.hpp>
@@ -99,6 +100,15 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
   std::stringstream baseName;
   baseName << "ParticleMotion.parallel."<< globalFixture.processes();
 
+  const std::string xmfFile = baseName.str() + ".xmf";
+  const std::string hdfFile = baseName.str() + ".h5";
+
+  if ( globalFixture.localRank() == 0 ) {
+    xdm::remove( xdm::FileSystemPath( xmfFile ) );
+    xdm::remove( xdm::FileSystemPath( hdfFile ) );
+  }
+  globalFixture.waitAll();
+
   // split the particles roughly equally among the total number of processes
   int particlesPerProcess = kParticleCount / globalFixture.processes();
   int remainingParticles = kParticleCount % globalFixture.processes();
@@ -163,7 +173,7 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
   // put the geometry memory in an HDF dataset
   xdm::RefPtr< xdmHdf::HdfDataset > geometryDataset( new xdmHdf::HdfDataset );
   xdmHdf::GroupPath datasetPath( 1, "points" );
-  geometryDataset->setFile( baseName.str() + ".h5" );
+  geometryDataset->setFile( hdfFile );
   geometryDataset->setGroupPath( datasetPath );
   // install the callback to set a new dataset name every timestep
   geometryDataset->setUpdateCallback( xdm::makeRefPtr( new NameDataset ) );
@@ -186,7 +196,7 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
   // put the velocities in an HDF dataset.
   xdm::RefPtr< xdmHdf::HdfDataset > velocityDataset( new xdmHdf::HdfDataset );
   xdmHdf::GroupPath velGroup( 1, "velocities" );
-  velocityDataset->setFile( baseName.str() + ".h5" );
+  velocityDataset->setFile( hdfFile );
   velocityDataset->setGroupPath( velGroup );
   velocityDataset->setUpdateCallback( xdm::makeRefPtr( new NameDataset ) );
   velocityData->setDataset( velocityDataset );
@@ -218,7 +228,7 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
 
   // create the time series, opening the output stream
   xdm::RefPtr< xdmFormat::TimeSeries > series(
-    new xdmFormat::TemporalCollection( baseName.str() + ".xmf" ) );
+    new xdmFormat::TemporalCollection( xmfFile, xdm::Dataset::kCreate ) );
 
   // begin a time series
   series->open();

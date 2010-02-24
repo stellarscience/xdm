@@ -25,6 +25,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include <xdm/CollectMetadataOperation.hpp>
+#include <xdm/FileSystem.hpp>
 #include <xdm/SerializeDataOperation.hpp>
 #include <xdm/StructuredArray.hpp>
 #include <xdm/TypedStructuredArray.hpp>
@@ -85,6 +86,10 @@ std::vector< float > createAttributeData(
 }
 
 BOOST_AUTO_TEST_CASE( staticGrid ) {
+  const char * hdfFile = "XdmfCompatibility.staticGrid.h5";
+
+  xdm::remove( xdm::FileSystemPath( hdfFile ) );
+
   xdm::RefPtr< xdmGrid::Domain > domain( new xdmGrid::Domain );
 
   // build the grid for the domain
@@ -137,7 +142,7 @@ BOOST_AUTO_TEST_CASE( staticGrid ) {
 
   // attach an HDF dataset to all UniformDataItems
   xdmHdf::AttachHdfDatasetOperation attachHdfDataset( 
-    "XdmfCompatibility.staticGrid.h5", "data" );
+    hdfFile, "data" );
   domain->accept( attachHdfDataset );
 
   // write the tree's data to disk
@@ -156,14 +161,20 @@ BOOST_AUTO_TEST_CASE( staticGrid ) {
 }
 
 BOOST_AUTO_TEST_CASE( timeSeries ) {
+  const char * hdfFile = "XdmfGridCompatibility.timeSeries.h5";
+  
+  xdm::remove( xdm::FileSystemPath( hdfFile ) );
+
   // write this as both a temporal collection and as a virtual dataset
   xdm::RefPtr< xdmFormat::TimeSeries > temporalCollection (
     new xdmFormat::TemporalCollection(
-      "XdmfGridCompatibility.temporalCollection.xmf" ) );
+      "XdmfGridCompatibility.temporalCollection.xmf",
+      xdm::Dataset::kCreate ) );
   temporalCollection->open();
 
   xdm::RefPtr< xdmFormat::TimeSeries > virtualDataset(
-    new xdmFormat::VirtualDataset( "XdmfGridCompatibility.virtualDataset" ) );
+    new xdmFormat::VirtualDataset( "XdmfGridCompatibility.virtualDataset",
+      xdm::Dataset::kCreate ) );
   virtualDataset->open();
 
   // since the geometry and topology of the grid will remain constant throughout
@@ -217,7 +228,7 @@ BOOST_AUTO_TEST_CASE( timeSeries ) {
         &attrvalues[0], 
         9*9*9 );
     xdm::RefPtr< xdmHdf::HdfDataset > attrDataset( new xdmHdf::HdfDataset );
-    attrDataset->setFile( "XdmfGridCompatibility.timeSeries.h5" );
+    attrDataset->setFile( hdfFile );
     attrDataset->setGroupPath( xdmHdf::GroupPath( 1, "FunctionValues" ) );
     std::stringstream stepStr;
     stepStr << std::setfill('0') << std::setw(5) << step;

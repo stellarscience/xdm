@@ -37,7 +37,9 @@ XDM_FORMAT_NAMESPACE_BEGIN
 class TemporalCollection : public TimeSeries {
 public:
   /// Construct a temporal collection with  
-  TemporalCollection( const std::string& metadataFile );
+  TemporalCollection( 
+    const std::string& metadataFile,
+    xdm::Dataset::InitializeMode mode );
   virtual ~TemporalCollection();
 
   virtual void open();

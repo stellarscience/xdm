@@ -21,6 +21,7 @@ set( ${PROJECT_NAME}_HEADERS
     Dataset.hpp
     DatasetExcept.hpp
     DataShape.hpp
+    FileSystem.hpp
     HyperSlab.hpp
     HyperSlabBlockIterator.hpp
     HyperslabDataSelection.hpp
@@ -65,6 +66,7 @@ set( ${PROJECT_NAME}_SOURCES
     DataSelectionVisitor.cpp
     Dataset.cpp
     DataShape.cpp
+    FileSystem.cpp
     Item.cpp
     ItemVisitor.cpp
     MemoryAdapter.cpp

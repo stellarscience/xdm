@@ -21,6 +21,7 @@
 #define BOOST_TEST_MODULE FunctionDataParallel 
 #include <boost/test/unit_test.hpp>
 
+#include <xdm/FileSystem.hpp>
 #include <xdm/HyperSlab.hpp>
 #include <xdm/UniformDataItem.hpp>
 
@@ -28,7 +29,7 @@
 
 #include <xdmComm/test/MpiTestFixture.hpp>
 
-#include <xdmFormat/VirtualDataset.hpp>
+#include <xdmFormat/TemporalCollection.hpp>
 
 #include <xdmGrid/Attribute.hpp>
 #include <xdmGrid/Grid.hpp>
@@ -47,13 +48,22 @@ xdmComm::test::MpiTestFixture globalFixture;
 BOOST_AUTO_TEST_CASE( writeResult ) {
   std::stringstream baseName;
   baseName << "FunctionData.parallel." << globalFixture.processes();
+
+  const std::string xmfFile = baseName.str() + ".xmf";
+  const std::string hdfFile = baseName.str() + ".h5";
+
+  if ( globalFixture.localRank() == 0 ) {
+    xdm::remove( xdm::FileSystemPath( xmfFile ) );
+    xdm::remove( xdm::FileSystemPath( hdfFile ) );
+  }
+  globalFixture.waitAll();
   
   // get the information for the global problem grid
   GridBounds problemBounds = testCaseBounds();
 
   // construct the problem grid
   ProblemInfo problem = constructFunctionGrid(
-    problemBounds, baseName.str() + ".h5" );
+    problemBounds, hdfFile );
   xdm::RefPtr< xdmGrid::Grid > grid = problem.first;
   xdm::RefPtr< xdmGrid::Attribute > attribute = problem.second;
 
@@ -89,7 +99,7 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
       xdm::makeRefPtr( new TestCaseFunction ) ) ) );
 
   xdm::RefPtr< xdmFormat::TimeSeries > timeSeries(
-    new xdmFormat::VirtualDataset( baseName.str() + ".xmf" ) );
+    new xdmFormat::TemporalCollection( xmfFile, xdm::Dataset::kCreate ) );
 
   // parallelize, choose a small buffer size to ensure data must be buffered
   // between processes.

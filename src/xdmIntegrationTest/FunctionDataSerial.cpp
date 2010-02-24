@@ -21,6 +21,7 @@
 #define BOOST_TEST_MODULE FunctionDataSerial 
 #include <boost/test/unit_test.hpp>
 
+#include <xdm/FileSystem.hpp>
 #include <xdm/HyperSlab.hpp>
 #include <xdm/UniformDataItem.hpp>
 
@@ -36,13 +37,19 @@
 namespace {
 
 BOOST_AUTO_TEST_CASE( writeResult ) {
+  const char * xmfFile = "FunctionData.serial.xmf";
+  const char * hdfFile = "FunctionData.serial.h5";
+
+  xdm::remove( xdm::FileSystemPath( xmfFile ) );
+  xdm::remove( xdm::FileSystemPath( hdfFile ) );
+
   // get the information for the problem grid
   GridBounds problemBounds = testCaseBounds();
 
   // construct the problem grid
   ProblemInfo problem = constructFunctionGrid( 
     testCaseBounds(),
-    "FunctionData.serial.h5" );
+    hdfFile );
 
   // in serial, the hyperslab of interest is the whole problem
   xdm::HyperSlab<> slab( problemBounds.shape() );
@@ -61,7 +68,7 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
     xdm::makeRefPtr( new TestCaseFunction ) ) ) );
   
   xdm::RefPtr< xdmFormat::TimeSeries > timeSeries( 
-    new xdmFormat::VirtualDataset( "FunctionData.serial.xmf" ) );
+    new xdmFormat::VirtualDataset( xmfFile, xdm::Dataset::kCreate ) );
   
   timeSeries->open();
   xdmFormat::writeTimestepGrid( timeSeries, problem.first );

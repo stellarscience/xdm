@@ -23,6 +23,7 @@
 
 #include <xdm/AllDataSelection.hpp>
 #include <xdm/DataSelectionMap.hpp>
+#include <xdm/FileSystem.hpp>
 #include <xdm/HyperSlab.hpp>
 #include <xdm/HyperslabDataSelection.hpp>
 #include <xdm/DataShape.hpp>
@@ -49,9 +50,17 @@ xdmComm::test::MpiTestFixture globalFixture;
 BOOST_AUTO_TEST_CASE( writeDataset1D ) {
   std::stringstream testCaseFile;
   testCaseFile << "HdfDataMpi-" << globalFixture.processes() << ".h5";
-  
+
+  const std::string testFileName = testCaseFile.str();
+
+  if ( globalFixture.localRank() == 0 ) {
+    xdm::remove( xdm::FileSystemPath( testFileName ) );
+  }
+  // wait for rank 0 to clean up for the run.
+  globalFixture.waitAll();
+
   xdm::RefPtr< xdmHdf::HdfDataset > hdfDataset( new xdmHdf::HdfDataset );
-  hdfDataset->setFile( testCaseFile.str() );
+  hdfDataset->setFile( testFileName );
   hdfDataset->setDataset( "Values" );
 
   xdm::DataShape<> shape = xdm::makeShape( kSize );

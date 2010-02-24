@@ -21,6 +21,7 @@
 #ifndef xdmFormat_TimeSeries_hpp
 #define xdmFormat_TimeSeries_hpp
 
+#include <xdm/Dataset.hpp>
 #include <xdm/ReferencedObject.hpp>
 #include <xdm/RefPtr.hpp>
 
@@ -34,7 +35,7 @@ XDM_FORMAT_NAMESPACE_BEGIN
 /// series grid information.
 class TimeSeries : public xdm::ReferencedObject {
 public:
-  TimeSeries() {}
+  TimeSeries( xdm::Dataset::InitializeMode mode ) : mMode( mode ) {}
   virtual ~TimeSeries() {}
 
   /// Open a new time series.  Opens a new time series and prepares it for
@@ -52,6 +53,12 @@ public:
 
   /// Close the time series.
   virtual void close() = 0;
+
+  xdm::Dataset::InitializeMode mode() const { return mMode; }
+  void setMode( xdm::Dataset::InitializeMode mode ) { mMode = mode; }
+
+private:
+  xdm::Dataset::InitializeMode mMode;
 };
 
 /// Convenience function to perform all steps of writing a TimeSeries grid.

@@ -20,6 +20,7 @@
 //------------------------------------------------------------------------------
 #include <xdmComm/MpiDatasetProxy.hpp>
 
+#include <xdmComm/BarrierOnExit.hpp>
 #include <xdmComm/CoalescingStreamBuffer.hpp>
 #include <xdmComm/MpiMessageTag.hpp>
 

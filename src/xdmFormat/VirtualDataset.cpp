@@ -40,7 +40,10 @@
 
 XDM_FORMAT_NAMESPACE_BEGIN
 
-VirtualDataset::VirtualDataset( const std::string& metadataBaseName ) :
+VirtualDataset::VirtualDataset( 
+  const std::string& metadataBaseName,
+  xdm::Dataset::InitializeMode mode ) :
+  TimeSeries( mode ),
   mBaseName( metadataBaseName ),
   mTimeStep( 0 )
 {
@@ -90,7 +93,7 @@ void VirtualDataset::writeGridMetadata( xdm::RefPtr< xdmGrid::Grid > grid ) {
 void VirtualDataset::writeGridData( xdm::RefPtr< xdmGrid::Grid > grid )
 {
   // serialize the heavy data
-  xdm::SerializeDataOperation serializer;
+  xdm::SerializeDataOperation serializer( mode() );
   grid->accept( serializer ); 
   mTimeStep++;
 }

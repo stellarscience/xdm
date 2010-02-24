@@ -21,11 +21,11 @@
 #define BOOST_TEST_MODULE TestHdfDataset
 #include <boost/test/unit_test.hpp>
 
+#include <xdm/DataSelection.hpp>
+#include <xdm/FileSystem.hpp>
 #include <xdm/StructuredArray.hpp>
 #include <xdm/VectorStructuredArray.hpp>
 #include <xdm/RefPtr.hpp>
-
-#include <xdm/DataSelection.hpp>
 
 #include <xdmHdf/FileIdentifierRegistry.hpp>
 #include <xdmHdf/HdfDataset.hpp>
@@ -38,19 +38,11 @@
 
 namespace {
 
-size_t fileSize( const char* filename ) {
-  std::ifstream file( filename );
-  if ( !file.good() || file.eof() || !file.is_open() ) {
-    return 0;
-  }
-  file.seekg( 0, std::ios_base::beg );
-  std::ifstream::pos_type beginpos = file.tellg();
-  file.seekg( 0, std::ios_base::end );
-  return ( file.tellg() - beginpos );
-}
-
 BOOST_AUTO_TEST_CASE( roundtrip ) {
-    
+  const char * kDatasetFile = "HdfDataset.h5";
+
+  xdm::remove( xdm::FileSystemPath( kDatasetFile ) );
+  
   // set up the input data
   xdm::VectorStructuredArray< int > data(16);
   srand( 42 );
@@ -67,7 +59,7 @@ BOOST_AUTO_TEST_CASE( roundtrip ) {
 
     // create the dataset
     xdm::RefPtr< xdmHdf::HdfDataset > dataset( new xdmHdf::HdfDataset() );
-    dataset->setFile( "HdfDataset.h5" );
+    dataset->setFile( kDatasetFile );
     dataset->setDataset( "testdata" );
 
     // write the data to disk
@@ -91,7 +83,7 @@ BOOST_AUTO_TEST_CASE( roundtrip ) {
 
     // open the dataset
     xdm::RefPtr< xdmHdf::HdfDataset > dataset( new xdmHdf::HdfDataset() );
-    dataset->setFile( "HdfDataset.h5" );
+    dataset->setFile( kDatasetFile );
     dataset->setDataset( "testdata" );
 
     // read the data from disk into the array
@@ -109,6 +101,12 @@ BOOST_AUTO_TEST_CASE( roundtrip ) {
 }
 
 BOOST_AUTO_TEST_CASE( compression ) {
+  const char * kUncompressedFile = "Uncompressed.h5";
+  const char * kCompressedFile = "Iscompressed.h5";
+
+  xdm::remove( xdm::FileSystemPath( kUncompressedFile ) );
+  xdm::remove( xdm::FileSystemPath( kCompressedFile ) );
+
   const size_t kLength = 1 << 20;
   xdm::VectorStructuredArray< int > data( kLength );
   std::fill( data.begin(), data.end(), 0 );
@@ -116,7 +114,7 @@ BOOST_AUTO_TEST_CASE( compression ) {
   // write the data uncompressed with chunking.
   {
     xdm::RefPtr< xdmHdf::HdfDataset > dataset( new xdmHdf::HdfDataset(
-      "Uncompressed.h5", xdmHdf::GroupPath(), "Data" ) );
+      kUncompressedFile, xdmHdf::GroupPath(), "Data" ) );
     dataset->setUseChunkedIo( true );
     dataset->initialize(
       xdm::primitiveType::kInt,
@@ -129,7 +127,7 @@ BOOST_AUTO_TEST_CASE( compression ) {
   // write the same data compressed with chunking.
   {
     xdm::RefPtr< xdmHdf::HdfDataset > dataset( new xdmHdf::HdfDataset(
-      "Iscompressed.h5", xdmHdf::GroupPath(), "Data" ) );
+      kCompressedFile, xdmHdf::GroupPath(), "Data" ) );
     dataset->setUseChunkedIo( true );
     dataset->setUseCompression( true );
     dataset->initialize(
@@ -140,8 +138,8 @@ BOOST_AUTO_TEST_CASE( compression ) {
     dataset->finalize();
   }
 
-  size_t uncompressedSize = fileSize( "Uncompressed.h5" );
-  size_t compressedSize = fileSize( "Iscompressed.h5" );
+  size_t uncompressedSize = xdm::size( xdm::FileSystemPath( kUncompressedFile ) );
+  size_t compressedSize = xdm::size( xdm::FileSystemPath( kCompressedFile ) );
   // it's all zeroes, so compression should be at least factor of 2.
   BOOST_CHECK_LT( compressedSize, uncompressedSize / 2 );
 }
