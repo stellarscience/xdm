@@ -236,8 +236,8 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
   grid->accept( parallelize );
 
   // create the time series, opening the output stream
-  xdm::RefPtr< xdmFormat::TimeSeries > series(
-    new xdmFormat::VirtualDataset( baseName.str() + ".xmf" ) );
+  xdm::RefPtr< xdmFormat::TimeSeries > series(		      
+    new xdmFormat::VirtualDataset( xmfFile, xdm::Dataset::kCreate ) );
 
   // begin a time series
   series->open();
