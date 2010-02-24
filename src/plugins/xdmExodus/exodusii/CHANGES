@@ -1,0 +1,20 @@
+This is a lightweight version of ExodusII 4.90. It does not include 
+Fortran bindings or any of the CVS snapshot info.
+
+Deletions:
+
+1. All Fortran bindings.
+
+2. All CVS directories.
+
+3. All Unix makefiles.
+
+Changes:
+
+1. Added CMakeModules/FindNetCDF.
+
+2. Moved ENABLE_TESTING up to root level CMakeLists.txt.
+
+3. Moved project declaration into cbind/CMakeLists.txt.
+
+4. Made modifications necessary to use FindNetCDF module.

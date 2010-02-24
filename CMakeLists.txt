@@ -18,6 +18,12 @@ option( BUILD_TESTING
   OFF 
 )
 
+# option to build plugins
+option( BUILD_PLUGINS
+  "Enable the build of the plugins directory."
+  OFF
+)
+
 if( BUILD_TESTING )
   message( STATUS "Unit tests are enabled" )
   include( CTest )

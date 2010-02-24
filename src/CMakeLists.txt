@@ -12,6 +12,10 @@ if ( XDM_COMMUNICATION )
     add_subdirectory( xdmComm )
 endif()
 
+if( BUILD_PLUGINS )
+  add_subdirectory( plugins )
+endif()
+
 if( BUILD_TESTING AND XDM_COMMUNICATION )
     add_subdirectory( xdmIntegrationTest )
 endif()
