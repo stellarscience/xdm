@@ -35,8 +35,8 @@ void Polyvertex::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
 
   xml.setAttribute( "TopologyType", "Polyvertex" );
 
-  xml.setAttribute( "NumberOfElements", 1 );
-  xml.setAttribute( "NodesPerElement", mNumberOfPoints );
+  xml.setAttribute( "NumberOfElements", mNumberOfPoints );
+  xml.setAttribute( "NodesPerElement", 1 );
 }
 
 void Polyvertex::setNumberOfPoints( size_t n ) {
