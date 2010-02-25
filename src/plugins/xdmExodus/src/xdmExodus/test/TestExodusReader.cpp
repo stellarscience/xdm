@@ -18,22 +18,16 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //------------------------------------------------------------------------------
-#ifndef xdmExodus_ExodusIO_hpp
-#define xdmExodus_ExodusIO_hpp
+#define BOOST_TEST_MODULE Geometry
+#include <boost/test/unit_test.hpp>
 
-#include <xdmGrid/Grid.hpp>
+#include <xdmExodus/ExodusReader.hpp>
 
-#include <xdmExodus/NamespaceMacro.hpp>
+namespace {
 
-XDM_EXODUS_NAMESPACE_BEGIN
+BOOST_AUTO_TEST_CASE( doNothing ) {
+  BOOST_CHECK_EQUAL( "foo", "foo" );
+}
 
-class ExodusIO {
-public:
-  ExodusIO( unsigned int dimension );
-  virtual ~ExodusIO();
-};
-
-XDM_EXODUS_NAMESPACE_END
-
-#endif // xdmExodus_ExodusIO_hpp
+} // namespace
 

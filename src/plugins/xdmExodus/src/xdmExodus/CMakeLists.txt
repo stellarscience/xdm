@@ -4,12 +4,12 @@
 project( xdmExodus )
 
 set( ${PROJECT_NAME}_HEADERS
-    ExodusIO.hpp
+    ExodusReader.hpp
     NamespaceMacro.hpp
 )
 
 set( ${PROJECT_NAME}_SOURCES
-    ExodusIO.cpp
+    ExodusReader.cpp
 )
 
 add_library( ${PROJECT_NAME} 
@@ -18,7 +18,10 @@ add_library( ${PROJECT_NAME}
 )
 
 target_link_libraries( ${PROJECT_NAME}
-  exoIIv2c )
+  exoIIv2c
+  xdm
+  xdmFormat
+  xdmGrid )
 
 if( BUILD_TESTING )
     add_subdirectory( test )

@@ -7,5 +7,5 @@ macro( xdmExodus_test_serial test_name )
     add_test( xdmExodus.${test_name} xdmExodus.${test_name}.test )
 endmacro()
 
-xdmExodus_test_serial( ExodusIO TestExodusIO.cpp )
+xdmExodus_test_serial( ExodusReader TestExodusReader.cpp )
 

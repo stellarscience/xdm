@@ -36,9 +36,13 @@ namespace NodeOrderingConvention {
 namespace CellShape {
   enum Type {
     Default = 0,
+    Circle,
+    Beam,
     Hex,
     Polyvertex,
+    Pyramid,
     Quad,
+    Sphere,
     Tetra,
     Triangle,
     Wedge
@@ -50,7 +54,9 @@ class CellClass {
   std::size_t mNodesPerCell;
   std::string mShapeName;
 public:
-  CellClass( CellShape::Type sh, std::size_t nodes, const std::string& shapeName ) :
+  CellClass() : mShape( CellShape::Default ), mNodesPerCell(), mShapeName( "Default" ) {}
+
+    CellClass( CellShape::Type sh, std::size_t nodes, const std::string& shapeName ) :
     mShape( sh ), mNodesPerCell( nodes ), mShapeName( shapeName ) {}
 
   inline CellShape::Type shape() const { return mShape; }
@@ -60,13 +66,30 @@ public:
 
 namespace CellType {
   typedef CellClass Type;
-  const CellClass Default( CellShape::Default, 0, "Default" );
-  const CellClass Hex( CellShape::Hex, 8, "Hexahedron" );
+  const CellClass Default;
+
+  /// Degenerate types
+  const CellClass Circle( CellShape::Circle, 1, "Circle" );
   const CellClass Polyvertex( CellShape::Polyvertex, 1, "Polyvertex" );
+  const CellClass Sphere( CellShape::Sphere, 1, "Sphere" );
+
+  /// Linear cells
+  const CellClass Beam( CellShape::Beam, 2, "Beam" );
+  const CellClass Hex( CellShape::Hex, 8, "Hexahedron" );
+  const CellClass Pyramid( CellShape::Pyramid, 5, "Pyramid" );
   const CellClass Quad( CellShape::Quad, 4, "Quadrilateral" );
   const CellClass Tetra( CellShape::Tetra, 4, "Tetrahedron" );
   const CellClass Triangle( CellShape::Triangle, 3, "Triangle" );
   const CellClass Wedge( CellShape::Wedge, 6, "Wedge" );
+
+  /// Quadratic cells
+  const CellClass QuadraticBeam( CellShape::Beam, 3, "QuadraticBeam" );
+  const CellClass QuadraticHex( CellShape::Hex, 21, "QuadraticHexahedron" );
+  const CellClass QuadraticPyramid( CellShape::Pyramid, 13, "QuadraticPyramid" );
+  const CellClass QuadraticQuad( CellShape::Quad, 9, "QuadraticQuadrilateral" );
+  const CellClass QuadraticTetra( CellShape::Tetra, 11, "QuadraticTetrahedron" );
+  const CellClass QuadraticTriangle( CellShape::Triangle, 7, "QuadraticTriangle" );
+  const CellClass QuadraticWedge( CellShape::Wedge, 16, "QuadraticWedge" );
 }
 
 XDM_GRID_NAMESPACE_END

@@ -18,18 +18,28 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //------------------------------------------------------------------------------
+#ifndef xdmExodus_ExodusReader_hpp
+#define xdmExodus_ExodusReader_hpp
 
-#include <xdmExodus/ExodusIO.hpp>
+#include <xdmFormat/Reader.hpp>
 
-#include <exodusII.h>
+#include <xdmExodus/NamespaceMacro.hpp>
 
 XDM_EXODUS_NAMESPACE_BEGIN
 
-ExodusIO::ExodusIO( unsigned int dimension ) {
-}
+/// Class for reading an ExodusII file. Uses the ExodusII library functions to read
+/// an unstructured grid from an ExodusII file complete with nodes and element blocks
+/// for now.
+class ExodusReader : public xdmFormat::Reader {
+public:
+  ExodusReader();
+  virtual ~ExodusReader();
 
-ExodusIO::~ExodusIO() {
-}
+  /// Read an Item from a give file with the given name.
+  virtual xdm::RefPtr< xdm::Item > readItem( const std::string& filename );
+};
 
 XDM_EXODUS_NAMESPACE_END
+
+#endif // xdmExodus_ExodusReader_hpp
 
