@@ -37,6 +37,7 @@ namespace CellShape {
   enum Type {
     Default = 0,
     Hex,
+    Polyvertex,
     Quad,
     Tetra,
     Triangle,
@@ -61,6 +62,7 @@ namespace CellType {
   typedef CellClass Type;
   const CellClass Default( CellShape::Default, 0, "Default" );
   const CellClass Hex( CellShape::Hex, 8, "Hexahedron" );
+  const CellClass Polyvertex( CellShape::Polyvertex, 1, "Polyvertex" );
   const CellClass Quad( CellShape::Quad, 4, "Quadrilateral" );
   const CellClass Tetra( CellShape::Tetra, 4, "Tetrahedron" );
   const CellClass Triangle( CellShape::Triangle, 3, "Triangle" );

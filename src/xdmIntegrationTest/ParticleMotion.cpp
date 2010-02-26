@@ -1,22 +1,22 @@
 //==============================================================================
-// This software developed by Stellar Science Ltd Co and the U.S. Government.  
-// Copyright (C) 2009 Stellar Science. Government-purpose rights granted.      
-//                                                                             
-// This file is part of XDM                                                    
-//                                                                             
-// This program is free software: you can redistribute it and/or modify it     
-// under the terms of the GNU Lesser General Public License as published by    
-// the Free Software Foundation, either version 3 of the License, or (at your  
-// option) any later version.                                                  
-//                                                                             
-// This program is distributed in the hope that it will be useful, but WITHOUT 
-// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or       
-// FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public        
-// License for more details.                                                   
-//                                                                             
-// You should have received a copy of the GNU Lesser General Public License    
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.       
-//                                                                             
+// This software developed by Stellar Science Ltd Co and the U.S. Government.
+// Copyright (C) 2009 Stellar Science. Government-purpose rights granted.
+//
+// This file is part of XDM
+//
+// This program is free software: you can redistribute it and/or modify it
+// under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or (at your
+// option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+// FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+// License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
 //------------------------------------------------------------------------------
 #define BOOST_TEST_MODULE ParticleMotion
 #include <boost/test/unit_test.hpp>
@@ -148,7 +148,7 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
 
   // topology is polyvertex
   xdm::RefPtr< xdmGrid::Polyvertex > topology( new xdmGrid::Polyvertex() );
-  topology->setNumberOfPoints( kParticleCount );
+  topology->setNumberOfCells( kParticleCount );
   xdm::RefPtr< xdm::UniformDataItem > topologyConn =
     xdmFormat::createLinearTopologyUniformDataItem( topology );
   topology->setConnectivity( topologyConn );
@@ -189,7 +189,7 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
   geometryData->setDataset( geometryDataset );
 
   // create a vector attribute for the velocity.
-  xdm::RefPtr< xdmGrid::Attribute > velocityAttribute( 
+  xdm::RefPtr< xdmGrid::Attribute > velocityAttribute(
     new xdmGrid::Attribute( xdmGrid::Attribute::kVector ) );
   velocityAttribute->setName( "velocity" );
   grid->addAttribute( velocityAttribute );
@@ -210,7 +210,7 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
   velocityDataset->setUpdateCallback( xdm::makeRefPtr( new NameDataset ) );
   velocityData->setDataset( velocityDataset );
 
-  
+
   // Set up the memory's data selection to map from the entire array to the
   // subset of the output dataset beginning at my local start index.
   xdm::HyperSlab<> datasetSlab( outputShape );
@@ -236,7 +236,7 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
   grid->accept( parallelize );
 
   // create the time series, opening the output stream
-  xdm::RefPtr< xdmFormat::TimeSeries > series(		      
+  xdm::RefPtr< xdmFormat::TimeSeries > series(
     new xdmFormat::VirtualDataset( xmfFile, xdm::Dataset::kCreate ) );
 
   // begin a time series
@@ -252,7 +252,7 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
   for ( unsigned int i = 0; i < kSteps; i++ ) {
     t += dt;
     grid->time()->setValue( t );
-    
+
     // particle update loop
     for ( unsigned int i = 0; i < localParticles; i++ ) {
       evolve( &(*mPositions)[3*i], &(*mVelocities)[3*i], dt );

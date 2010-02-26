@@ -44,11 +44,11 @@ xdm::RefPtr< xdm::StructuredArray > LinearTopologyData::array()
 {
   if ( !mArrayValues ) {
     mArrayValues = new xdm::VectorStructuredArray< int >;
-  }  
+  }
   if ( mTopology ) {
-    if ( mArrayValues->size() != mTopology->numberOfPoints() ) {
+    if ( mArrayValues->size() != mTopology->numberOfCells() ) {
       size_t oldSize = mArrayValues->size();
-      size_t newSize = mTopology->numberOfPoints();
+      size_t newSize = mTopology->numberOfCells();
       mArrayValues->resize( newSize );
       for ( int i = oldSize; i < newSize; i++ ) {
         (*mArrayValues)[i] = i;
@@ -68,7 +68,7 @@ xdm::RefPtr< xdm::UniformDataItem > createLinearTopologyUniformDataItem(
 {
   xdm::RefPtr< xdm::UniformDataItem > result( new xdm::UniformDataItem(
     xdm::PrimitiveTypeInfo< int >::kValue,
-    xdm::makeShape( topology->numberOfPoints() ) ) );
+    xdm::makeShape( topology->numberOfCells() ) ) );
   result->setData( xdm::makeRefPtr( new LinearTopologyData( topology ) ) );
   return result;
 }
