@@ -25,7 +25,7 @@ XDM_GRID_NAMESPACE_BEGIN
 Polyvertex::Polyvertex() :
   UnstructuredTopology(),
   mNumberOfPoints() {
-  setCellType( CellType::Polyvertex );
+  UnstructuredTopology::setCellType( CellType::Polyvertex );
 }
 
 Polyvertex::~Polyvertex() {

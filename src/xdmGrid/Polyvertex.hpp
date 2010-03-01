@@ -37,6 +37,9 @@ public:
   virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
 private:
   size_t mNumberOfPoints;
+
+  // Cannot change the type from Polyvertex.
+  void setCellType( const CellType::Type& type );
 };
 
 XDM_GRID_NAMESPACE_END

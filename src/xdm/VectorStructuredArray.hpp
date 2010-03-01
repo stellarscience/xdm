@@ -90,7 +90,7 @@ public:
   virtual const void* data() const {
     return &mVector[0];
   }
-
+  using StructuredArray::data;
 };
 
 XDM_NAMESPACE_END

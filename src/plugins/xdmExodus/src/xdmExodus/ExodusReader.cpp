@@ -20,8 +20,10 @@
 //------------------------------------------------------------------------------
 #include <xdmExodus/ExodusReader.hpp>
 
-#include <xdmGrid/CollectionGrid.hpp>
+#include <xdmGrid/Attribute.hpp>
+#include <xdmGrid/Domain.hpp>
 #include <xdmGrid/MultiArrayGeometry.hpp>
+#include <xdmGrid/Polyvertex.hpp>
 #include <xdmGrid/UniformGrid.hpp>
 #include <xdmGrid/UnstructuredTopology.hpp>
 #include <xdmGrid/UnstructuredTopologyConventions.hpp>
@@ -40,9 +42,38 @@
 #include <string>
 #include <vector>
 
+#define EXODUS_CHECK( functionCall, errorString ) \
+  if ( #functionCall < 0 ) { \
+    throw std::runtime_error( #errorString ); \
+  }
+
 XDM_EXODUS_NAMESPACE_BEGIN
 
 namespace {
+
+// Helpers that create a UniformDataItem from a StructuredArray. This is done frequently.
+// First version takes one dimension.
+xdm::RefPtr< xdm::UniformDataItem > makeDataItem(
+  xdm::RefPtr< xdm::StructuredArray > vector,
+  xdm::primitiveType::Value primType,
+  std::size_t firstExtent ) {
+
+  xdm::RefPtr< xdm::UniformDataItem > dataItem(
+    new xdm::UniformDataItem( primType, xdm::makeShape( firstExtent ) ) );
+  dataItem->setData( xdm::makeRefPtr( new xdm::ArrayAdapter( vector ) ) );
+}
+
+// Second version takes two dimensions.
+xdm::RefPtr< xdm::UniformDataItem > makeDataItem(
+  xdm::RefPtr< xdm::StructuredArray > vector,
+  xdm::primitiveType::Value primType,
+  std::size_t firstExtent,
+  std::size_t secondExtent ) {
+
+  xdm::RefPtr< xdm::UniformDataItem > dataItem(
+    new xdm::UniformDataItem( primType, xdm::makeShape( firstExtent, secondExtent ) ) );
+  dataItem->setData( xdm::makeRefPtr( new xdm::ArrayAdapter( vector ) ) );
+}
 
 xdmGrid::CellType::Type lookupCellType( std::size_t nodesPerCell, const std::string& cellName ) {
   // Make a map that takes the number of nodes and the Exodus name and gives a CellType.
@@ -110,37 +141,40 @@ xdm::RefPtr< xdm::Item > ExodusReader::readItem( const std::string& filename ) {
     &doubleWordSize,
     &storedDataWordSize,
     &version );
+  if ( fileId < 0 ) {
+    throw std::runtime_error( "Could not open ExodusII filename: " + filename );
+  }
 
   ex_init_params gridParameters;
-  int error = ex_get_init_ext( fileId, &gridParameters );
+  EXODUS_CHECK(  ex_get_init_ext( fileId, &gridParameters ), "ex_get_init_ext returned an error." );
 
+  //---------------NODES-------------------
   // Read the nodes. For Exodus, there is only ever one set of nodes that all element blocks
   // refer to.
-  std::vector< xdm::RefPtr< xdm::StructuredArray > > xyzCoords( 3 );
+  std::vector< xdm::RefPtr< xdm::VectorStructuredArray< double > > > xyzCoords( 3 );
   xdm::RefPtr< xdmGrid::MultiArrayGeometry > geom(
     new xdmGrid::MultiArrayGeometry( gridParameters.num_dim ) );
   for( std::size_t dim = 0; dim < gridParameters.num_dim; ++dim ) {
     xyzCoords[ dim ] = new xdm::VectorStructuredArray< double >( gridParameters.num_nodes );
-    xdm::DataShape<> datasetShape(1);
-    datasetShape[0] = xyzCoords[ dim ]->size();
-    xdm::RefPtr< xdm::UniformDataItem > dataItem(
-      xdm::makeRefPtr( new xdm::UniformDataItem( xdm::primitiveType::kDouble, datasetShape ) ) );
-    dataItem->setData( xdm::makeRefPtr( new xdm::ArrayAdapter( xyzCoords[ dim ] ) ) );
+    xdm::RefPtr< xdm::UniformDataItem > dataItem = makeDataItem(
+      xyzCoords[ dim ], xdm::primitiveType::kDouble, gridParameters.num_nodes );
     geom->setCoordinateValues( dim, dataItem );
   }
-  error = ex_get_coord( fileId, xyzCoords[0]->data(), xyzCoords[1]->data(), xyzCoords[2]->data() );
+  EXODUS_CHECK(
+    ex_get_coord( fileId, xyzCoords[0]->data(), xyzCoords[1]->data(), xyzCoords[2]->data() ),
+    "ex_get_coord returned an error." );
 
-  // Read the each element block into a separate topology and add it to the main collection.
-  xdm::RefPtr< xdmGrid::CollectionGrid > collection(
-    new xdmGrid::CollectionGrid( xdmGrid::CollectionGrid::kSpatial ) );
+  //-----------ELEMENT BLOCKS--------------
+  // Read the each element block into a separate topology and add it to the domain.
+  xdm::RefPtr< xdmGrid::Domain > domain( new xdmGrid::Domain );
   std::vector< int > blockIds( gridParameters.num_elem_blk );
-  error = ex_get_ids( fileId, EX_ELEM_BLOCK, &blockIds[0] );
+  EXODUS_CHECK( ex_get_ids( fileId, EX_ELEM_BLOCK, &blockIds[0] ), "ex_get_ids returned an error." );
   for( std::vector< int >::const_iterator blockId = blockIds.begin(); blockId != blockIds.end();
     ++blockId ) {
-    char elementType[ MAX_STR_LENGTH + 1 ];
+    char elementType[ MAX_STR_LENGTH + 1 ], blockName[ MAX_STR_LENGTH + 1 ];
     int numberOfElements, numberOfNodesPerElement, numberOfAttributesPerElement;
     int numberOfEdgesPerElement, numberOfFacesPerElement; // unused here
-    error = ex_get_block(
+    EXODUS_CHECK( ex_get_block(
       fileId,
       EX_ELEM_BLOCK,
       *blockId,
@@ -149,11 +183,14 @@ xdm::RefPtr< xdm::Item > ExodusReader::readItem( const std::string& filename ) {
       &numberOfNodesPerElement,
       &numberOfEdgesPerElement,
       &numberOfFacesPerElement,
-      &numberOfAttributesPerElement );
+      &numberOfAttributesPerElement ), "ex_get_block returned an error." );
+    EXODUS_CHECK( ex_get_name( fileId, EX_ELEM_BLOCK, *blockId, blockName ),
+      "ex_get_name returned an error." );
     std::vector< int > intConnectivity( numberOfElements * numberOfNodesPerElement );
-    error = ex_get_conn( fileId, EX_ELEM_BLOCK, *blockId, &intConnectivity[0], 0, 0 );
+    EXODUS_CHECK( ex_get_conn( fileId, EX_ELEM_BLOCK, *blockId, &intConnectivity[0], 0, 0 ),
+      "ex_get_conn returned an error." );
 
-    // Exodus numbering starts at 1, so change that to 0. Also, the connections have
+    // Exodus node numbering starts at 1, so change that to 0. Also, the connections have
     // to be std::size_t for xdm.
     xdm::RefPtr< xdm::VectorStructuredArray< std::size_t > > connectivity(
       new xdm::VectorStructuredArray< std::size_t >( intConnectivity.size() ) );
@@ -162,29 +199,106 @@ xdm::RefPtr< xdm::Item > ExodusReader::readItem( const std::string& filename ) {
 
     // Turn the connectivity into a data item and give it to a topology along with the
     // geometry.
-    xdm::DataShape<> datasetShape(1);
-    datasetShape[0] = connectivity->size();
-    xdm::RefPtr< xdm::UniformDataItem > dataItem( xdm::makeRefPtr(
-      new xdm::UniformDataItem( xdm::primitiveType::kLongUnsignedInt, datasetShape ) ) );
-    dataItem->setData( xdm::makeRefPtr( new xdm::ArrayAdapter( connectivity ) ) );
+    xdm::RefPtr< xdm::UniformDataItem > dataItem = makeDataItem(
+      connectivity, xdm::primitiveType::kLongUnsignedInt, numberOfElements, numberOfNodesPerElement );
     xdm::RefPtr< xdmGrid::UnstructuredTopology > elementBlock(
       new xdmGrid::UnstructuredTopology() );
     elementBlock->setConnectivity( dataItem );
     elementBlock->setNumberOfCells( numberOfElements );
     elementBlock->setCellType( lookupCellType( numberOfNodesPerElement, elementType ) );
     elementBlock->setNodeOrdering( xdmGrid::NodeOrderingConvention::ExodusII );
+    elementBlock->setName( blockName );
 
     // There is a UniformGrid for each topology... however, they all refer to the same
     // Geometry.
     xdm::RefPtr< xdmGrid::UniformGrid > grid( new xdmGrid::UniformGrid() );
     grid->setGeometry( geom );
     grid->setTopology( elementBlock );
-    collection->appendChild( grid );
+
+    // Read the attributes. For element blocks, these are cell-centered values, but there
+    // is no way to know here whether they should be interpreted to be scalars,
+    // vectors, matrices, etc.
+    char attrNames[ numberOfAttributesPerElement ][ MAX_STR_LENGTH + 1 ];
+    char* attrNamesPtr[ numberOfAttributesPerElement ];
+    if ( numberOfAttributesPerElement > 0 ) {
+      for ( std::size_t attrIndex = 0; attrIndex < numberOfAttributesPerElement; ++attrIndex ) {
+        attrNamesPtr[ attrIndex ] = &attrNames[ attrIndex ][0];
+      }
+      EXODUS_CHECK( ex_get_attr_names( fileId, EX_ELEM_BLOCK, *blockId, attrNamesPtr ),
+        "ex_get_attr_names returned an error." );
+    }
+
+    for ( std::size_t attrIndex = 0; attrIndex < numberOfAttributesPerElement; ++attrIndex ) {
+      xdm::RefPtr< xdm::VectorStructuredArray< double > > attribute(
+        new xdm::VectorStructuredArray< double >( numberOfElements ) );
+      EXODUS_CHECK( ex_get_one_attr( fileId, EX_ELEM_BLOCK, *blockId, attrIndex + 1, &attribute ),
+        "ex_get_one_attr returned an error." );
+      xdm::RefPtr< xdm::UniformDataItem > dataItem = makeDataItem(
+        attribute, xdm::primitiveType::kDouble, numberOfElements );
+      xdm::RefPtr< xdmGrid::Attribute > attr(
+        new xdmGrid::Attribute( xdmGrid::Attribute::kScalar, xdmGrid::Attribute::kCell ) );
+      attr->setName( attrNames[ attrIndex ] );
+      grid->addAttribute( attr );
+    }
+
+    domain->addGrid( grid );
   }
+
+  //-------------NODE SETS-----------------
+  // Read node sets into polyvertex topologies
+  std::vector< int > nodeSetIds( gridParameters.num_node_sets );
+  EXODUS_CHECK( ex_get_ids( fileId, EX_NODE_SET, &nodeSetIds[0] ), "ex_get_ids returned an error." );
+  for( std::vector< int >::const_iterator nodeSetId = nodeSetIds.begin();
+    nodeSetId != nodeSetIds.end(); ++nodeSetId ) {
+    int numberOfNodes, numberOfDistributionFactors;
+    EXODUS_CHECK( ex_get_set_param(
+      fileId,
+      EX_NODE_SET,
+      *nodeSetId,
+      &numberOfNodes,
+      &numberOfDistributionFactors ), "ex_get_set_param returned an error." );
+    std::vector< int > intNodeList( numberOfNodes );
+    EXODUS_CHECK( ex_get_set( fileId, EX_NODE_SET, *nodeSetId, &intNodeList[0], NULL ),
+      "ex_get_set returned an error." );
+
+    // Exodus node numbering starts at 1, so change that to 0. Also, the node indices have
+    // to be std::size_t for xdm.
+    xdm::RefPtr< xdm::VectorStructuredArray< std::size_t > > nodeList(
+      new xdm::VectorStructuredArray< std::size_t >( intNodeList.size() ) );
+    std::transform( intNodeList.begin(), intNodeList.end(), nodeList->begin(),
+      std::bind2nd( std::minus< std::size_t >(), 1 ) );
+
+    // Turn the node list into a data item and give it to a polyvertex topology along with the
+    // geometry that everything else uses.
+    xdm::RefPtr< xdm::UniformDataItem > dataItem = makeDataItem(
+      nodeList, xdm::primitiveType::kLongUnsignedInt, numberOfNodes );
+    xdm::RefPtr< xdmGrid::Polyvertex > polyvertex( new xdmGrid::Polyvertex() );
+    polyvertex->setConnectivity( dataItem );
+    polyvertex->setNumberOfCells( numberOfNodes );
+
+    xdm::RefPtr< xdmGrid::UniformGrid > grid( new xdmGrid::UniformGrid() );
+    grid->setGeometry( geom );
+    grid->setTopology( polyvertex );
+    domain->addGrid( grid );
+  }
+
+
+
+  // TODO: do something with side sets
+
+  // TODO: do something with node number map... maybe read it into polyvertex
+
+  // TODO: do something with element number map
+
+  // TODO: do something with optimized element order map
+
+  // TODO: take care of results
+
+  // TODO: maybe read distribution factors into an attribute
 
   ex_close( fileId );
 
-  return collection;
+  return domain;
 }
 
 XDM_EXODUS_NAMESPACE_END
