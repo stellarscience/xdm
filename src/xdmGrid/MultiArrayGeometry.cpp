@@ -60,7 +60,9 @@ void MultiArrayGeometry::setCoordinateValues(
       sizes.push_back( uniformItem->typedArray< double >()->size() );
     }
 
-    if ( std::count_if( ++sizes.begin(), sizes.end(),
+    // Need to pass this iterator by value to satisfy PGI's compiler.
+    std::vector< std::size_t >::iterator firstSize = sizes.begin();
+    if ( std::count_if( ++firstSize, sizes.end(),
       bind2nd( std::equal_to< std::size_t >(), sizes.front() ) ) + 1 != dimension() ) {
       XDM_THROW( std::runtime_error( "The arrays in the UniformDataItems supplied are"
         " not all of the same size." ) );
