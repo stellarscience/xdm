@@ -43,13 +43,20 @@
 #include <vector>
 
 #define EXODUS_CHECK( functionCall, errorString ) \
-  if ( #functionCall < 0 ) { \
-    throw std::runtime_error( #errorString ); \
+  if ( (#functionCall) < 0 ) { \
+    throw std::runtime_error( (#errorString) ); \
   }
 
 XDM_EXODUS_NAMESPACE_BEGIN
 
 namespace {
+
+// String type for Exodus
+struct ExodusString {
+  char raw[ MAX_STR_LENGTH + 1 ];
+  char* ptr() { return raw; }
+  std::string string() { return std::string( raw ); }
+};
 
 // Helpers that create a UniformDataItem from a StructuredArray. This is done frequently.
 // First version takes one dimension.
@@ -171,20 +178,20 @@ xdm::RefPtr< xdm::Item > ExodusReader::readItem( const std::string& filename ) {
   EXODUS_CHECK( ex_get_ids( fileId, EX_ELEM_BLOCK, &blockIds[0] ), "ex_get_ids returned an error." );
   for( std::vector< int >::const_iterator blockId = blockIds.begin(); blockId != blockIds.end();
     ++blockId ) {
-    char elementType[ MAX_STR_LENGTH + 1 ], blockName[ MAX_STR_LENGTH + 1 ];
+    ExodusString elementType, blockName;
     int numberOfElements, numberOfNodesPerElement, numberOfAttributesPerElement;
     int numberOfEdgesPerElement, numberOfFacesPerElement; // unused here
     EXODUS_CHECK( ex_get_block(
       fileId,
       EX_ELEM_BLOCK,
       *blockId,
-      elementType,
+      elementType.ptr(),
       &numberOfElements,
       &numberOfNodesPerElement,
       &numberOfEdgesPerElement,
       &numberOfFacesPerElement,
       &numberOfAttributesPerElement ), "ex_get_block returned an error." );
-    EXODUS_CHECK( ex_get_name( fileId, EX_ELEM_BLOCK, *blockId, blockName ),
+    EXODUS_CHECK( ex_get_name( fileId, EX_ELEM_BLOCK, *blockId, blockName.ptr() ),
       "ex_get_name returned an error." );
     std::vector< int > intConnectivity( numberOfElements * numberOfNodesPerElement );
     EXODUS_CHECK( ex_get_conn( fileId, EX_ELEM_BLOCK, *blockId, &intConnectivity[0], 0, 0 ),
@@ -205,9 +212,9 @@ xdm::RefPtr< xdm::Item > ExodusReader::readItem( const std::string& filename ) {
       new xdmGrid::UnstructuredTopology() );
     elementBlock->setConnectivity( dataItem );
     elementBlock->setNumberOfCells( numberOfElements );
-    elementBlock->setCellType( lookupCellType( numberOfNodesPerElement, elementType ) );
+    elementBlock->setCellType( lookupCellType( numberOfNodesPerElement, elementType.string() ) );
     elementBlock->setNodeOrdering( xdmGrid::NodeOrderingConvention::ExodusII );
-    elementBlock->setName( blockName );
+    elementBlock->setName( blockName.string() );
 
     // There is a UniformGrid for each topology... however, they all refer to the same
     // Geometry.
@@ -218,26 +225,23 @@ xdm::RefPtr< xdm::Item > ExodusReader::readItem( const std::string& filename ) {
     // Read the attributes. For element blocks, these are cell-centered values, but there
     // is no way to know here whether they should be interpreted to be scalars,
     // vectors, matrices, etc.
-    char attrNames[ numberOfAttributesPerElement ][ MAX_STR_LENGTH + 1 ];
+    ExodusString attrNames[ numberOfAttributesPerElement ];
     char* attrNamesPtr[ numberOfAttributesPerElement ];
-    if ( numberOfAttributesPerElement > 0 ) {
-      for ( std::size_t attrIndex = 0; attrIndex < numberOfAttributesPerElement; ++attrIndex ) {
-        attrNamesPtr[ attrIndex ] = &attrNames[ attrIndex ][0];
-      }
-      EXODUS_CHECK( ex_get_attr_names( fileId, EX_ELEM_BLOCK, *blockId, attrNamesPtr ),
-        "ex_get_attr_names returned an error." );
-    }
+    std::transform( attrNames, attrNames + numberOfAttributesPerElement, attrNamesPtr,
+      std::mem_fun_ref( &ExodusString::ptr ) );
+    EXODUS_CHECK( ex_get_attr_names( fileId, EX_ELEM_BLOCK, *blockId, attrNamesPtr ),
+      "ex_get_attr_names returned an error." );
 
     for ( std::size_t attrIndex = 0; attrIndex < numberOfAttributesPerElement; ++attrIndex ) {
       xdm::RefPtr< xdm::VectorStructuredArray< double > > attribute(
         new xdm::VectorStructuredArray< double >( numberOfElements ) );
-      EXODUS_CHECK( ex_get_one_attr( fileId, EX_ELEM_BLOCK, *blockId, attrIndex + 1, &attribute ),
-        "ex_get_one_attr returned an error." );
+      EXODUS_CHECK( ex_get_one_attr( fileId, EX_ELEM_BLOCK, *blockId, attrIndex + 1,
+        attribute->data() ), "ex_get_one_attr returned an error." );
       xdm::RefPtr< xdm::UniformDataItem > dataItem = makeDataItem(
         attribute, xdm::primitiveType::kDouble, numberOfElements );
       xdm::RefPtr< xdmGrid::Attribute > attr(
         new xdmGrid::Attribute( xdmGrid::Attribute::kScalar, xdmGrid::Attribute::kCell ) );
-      attr->setName( attrNames[ attrIndex ] );
+      attr->setName( attrNames[ attrIndex ].string() );
       grid->addAttribute( attr );
     }
 
