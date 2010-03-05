@@ -30,10 +30,14 @@ core data model defined in the xdm library. While specializing interfaces in the
 core library, each component is expected to be generic enough not to be attached
 to a particular application domain.
 
-In addition to the component libraries, there is a project, xdmIntegrationTest,
-that serves as a simple example of writing the output of a simple sine function
-over a grid and acts as a test suite to integrate multiple XDM components into
-working code.
+In addition to the core libraries, there are plugins that implement the core
+interfaces for reading formats. Currently documented plugins are:
+
+- xdmf: Plugin for reading and writing data in the XDMF file format.
+
+The xdmIntegrationTest project serves as a simple example of writing the output
+of a simple sine function over a grid and acts as a test suite to integrate
+multiple XDM components into working code.
 
 */
 

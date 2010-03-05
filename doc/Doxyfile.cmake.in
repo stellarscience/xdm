@@ -360,7 +360,8 @@ INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/mainpage.hpp \
                          @CMAKE_CURRENT_SOURCE_DIR@/../src/xdmComm \
                          @CMAKE_CURRENT_SOURCE_DIR@/../src/xdmFormat \
                          @CMAKE_CURRENT_SOURCE_DIR@/../src/xdmGrid \
-                         @CMAKE_CURRENT_SOURCE_DIR@/../src/xdmHdf
+                         @CMAKE_CURRENT_SOURCE_DIR@/../src/xdmHdf \
+                         @CMAKE_CURRENT_SOURCE_DIR@/../src/plugins/xdmf
                          
 
 # If the value of the INPUT tag contains directories, you can use the 
@@ -663,7 +664,9 @@ PREDEFINED             = "XDM_NAMESPACE_BEGIN=namespace xdm {" \
                          "XDM_GRID_NAMESPACE_BEGIN=namespace xdmGrid {" \
                          "XDM_GRID_NAMESPACE_END=}" \
                          "XDM_HDF_NAMESPACE_BEGIN=namespace xdmHdf {" \
-                         "XDM_HDF_NAMESPACE_END=}" 
+                         "XDM_HDF_NAMESPACE_END=}" \
+                         "XDMF_NAMESPACE_BEGIN=namespace xdmf {" \
+                         "XDMF_NAMESPACE_END=}"
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then 
 # this tag can be used to specify a list of macro names that should be expanded. 
