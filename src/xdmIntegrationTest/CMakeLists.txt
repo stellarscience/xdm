@@ -1,7 +1,10 @@
 find_package( HDF5 )
 find_package( MPI )
 
-include_directories( ${Boost_INCLUDE_DIRS} )
+include_directories( 
+  ${Boost_INCLUDE_DIRS}
+  ${CMAKE_CURRENT_SOURCE_DIR}/../plugins # FIXME Temporary until we get the full plugin infrastructure in place
+)
 
 set( XDM_COMPONENTS
     xdm
@@ -9,6 +12,7 @@ set( XDM_COMPONENTS
     xdmFormat
     xdmGrid
     xdmHdf
+    xdmXdmfPlugin # FIXME Temporary until we get the full plugin infrastructure in place
 )
 
 add_library( xdmIntegrationTest STATIC 

@@ -18,17 +18,43 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.       
 //                                                                             
 //------------------------------------------------------------------------------
-#include <xdmFormat/XdmfHelpers.hpp>
+#ifndef xdmf_TemporalCollection_hpp
+#define xdmf_TemporalCollection_hpp
 
-#include <xdm/XmlObject.hpp>
+#include <xdmf/TimeSeries.hpp>
 
-XDM_FORMAT_NAMESPACE_BEGIN
+#include <xdm/XmlOutputStream.hpp>
 
-xdm::RefPtr< xdm::XmlObject > createXdmfRoot( const std::string& version ) {
-  xdm::RefPtr< xdm::XmlObject > xdmf( new xdm::XmlObject( "Xdmf" ) );
-  xdmf->appendAttribute( "Version", version );
-  return xdmf;
-}
+#include <fstream>
+#include <string>
 
-XDM_FORMAT_NAMESPACE_END
+#include <xdmf/NamespaceMacro.hpp>
+
+XDMF_NAMESPACE_BEGIN
+
+/// Time series output that writes all grids as a temporal collection within a
+/// single XDMF file.
+class TemporalCollection : public TimeSeries {
+public:
+  /// Construct a temporal collection with  
+  TemporalCollection( 
+    const std::string& metadataFile,
+    xdm::Dataset::InitializeMode mode );
+  virtual ~TemporalCollection();
+
+  virtual void open();
+  virtual void updateGrid( xdm::RefPtr< xdmGrid::Grid > grid );
+  virtual void writeGridMetadata( xdm::RefPtr< xdmGrid::Grid > grid );
+  virtual void writeGridData( xdm::RefPtr< xdmGrid::Grid > grid );
+  virtual void close();
+
+private:
+  std::string mFilename;
+  std::fstream mFileStream;
+  xdm::XmlOutputStream mXmlStream;
+};
+
+XDMF_NAMESPACE_END
+
+#endif // xdmf_TemporalCollectionTimeSeries_hpp
 

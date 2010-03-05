@@ -18,9 +18,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.       
 //                                                                             
 //------------------------------------------------------------------------------
-#include <xdmFormat/VirtualDataset.hpp>
+#include <xdmf/TemporalCollection.hpp>
 
-#include <xdmFormat/XdmfHelpers.hpp>
+#include <xdmf/XdmfHelpers.hpp>
 
 #include <xdm/CollectMetadataOperation.hpp>
 #include <xdm/SerializeDataOperation.hpp>
@@ -28,79 +28,67 @@
 #include <xdm/RefPtr.hpp>
 #include <xdm/UpdateVisitor.hpp>
 #include <xdm/XmlObject.hpp>
-#include <xdm/XmlOutputStream.hpp>
 
 #include <xdmGrid/Domain.hpp>
 #include <xdmGrid/CollectionGrid.hpp>
 
-#include <iomanip>
-#include <iostream>
-#include <fstream>
-#include <sstream>
+XDMF_NAMESPACE_BEGIN
 
-XDM_FORMAT_NAMESPACE_BEGIN
-
-VirtualDataset::VirtualDataset( 
-  const std::string& metadataBaseName,
+TemporalCollection::TemporalCollection( 
+  const std::string& metadataFile,
   xdm::Dataset::InitializeMode mode ) :
   TimeSeries( mode ),
-  mBaseName( metadataBaseName ),
-  mTimeStep( 0 )
+  mFilename( metadataFile ),
+  mFileStream(),
+  mXmlStream( mFileStream )
 {
 }
 
-VirtualDataset::~VirtualDataset()
+TemporalCollection::~TemporalCollection()
 {
 }
 
-void VirtualDataset::open() 
+void TemporalCollection::open() 
 {
-  mTimeStep = 0;
+  mFileStream.open( mFilename.c_str(), std::ios::out );
+
+  xdm::RefPtr< xdmGrid::Domain > domain( new xdmGrid::Domain );
+  xdm::RefPtr< xdmGrid::CollectionGrid > temporalCollection(
+    new xdmGrid::CollectionGrid( xdmGrid::CollectionGrid::kTemporal ) );
+  domain->addGrid( temporalCollection );
+
+  // open a context within the xml stream to begin the temporal collection
+  xdm::CollectMetadataOperation collect;
+  domain->accept( collect );
+  xdm::RefPtr< xdm::XmlObject > xdmf = xdmf::createXdmfRoot();
+  xdmf->appendChild( collect.result() );
+  mXmlStream.openContext( xdmf );
 }
 
-void VirtualDataset::updateGrid( xdm::RefPtr< xdmGrid::Grid > grid ) {
-  // update the grid for the new timestep.
+void TemporalCollection::updateGrid( xdm::RefPtr< xdmGrid::Grid > grid ) {
+  // update the data tree for a new timestep.
   xdm::UpdateVisitor update;
   grid->accept( update );
 }
 
-void VirtualDataset::writeGridMetadata( xdm::RefPtr< xdmGrid::Grid > grid ) {
-  // add the grid to a new domain for a valid layout
-  xdm::RefPtr< xdmGrid::Domain > domain( new xdmGrid::Domain );
-  domain->addGrid( grid );
-  
-  // open a new xml stream to write this timestep to
-  std::stringstream outputName;
-  outputName << mBaseName << ".";
-  outputName << std::setfill('0') << std::setw( 7 ) << mTimeStep;
-  outputName << ".xmf";
-  std::fstream ostr( outputName.str().c_str(), std::ios::out );
-  xdm::XmlOutputStream xml( ostr );
-
-  // write the timestep to the xml stream
+void TemporalCollection::writeGridMetadata( xdm::RefPtr< xdmGrid::Grid > grid ) {
+  // write the metadata to the stream
   xdm::CollectMetadataOperation collect;
-  domain->accept( collect );
-  
-  xdm::RefPtr< xdm::XmlObject > xdmf = xdmFormat::createXdmfRoot();
-  xdmf->appendChild( collect.result() );
-  
-  xml.writeObject( xdmf );
-
-  xml.closeStream();
-
+  grid->accept( collect );
+  xdm::RefPtr< xdm::XmlObject > xml( collect.result() );
+  mXmlStream.writeObject( xml );
 }
 
-void VirtualDataset::writeGridData( xdm::RefPtr< xdmGrid::Grid > grid )
-{
+void TemporalCollection::writeGridData( xdm::RefPtr< xdmGrid::Grid > grid ) {
   // serialize the heavy data
   xdm::SerializeDataOperation serializer( mode() );
-  grid->accept( serializer ); 
-  mTimeStep++;
+  grid->accept( serializer );
 }
 
-void VirtualDataset::close()
+void TemporalCollection::close()
 {
+  mXmlStream.closeStream();
 }
 
-XDM_FORMAT_NAMESPACE_END
+XDMF_NAMESPACE_END
 

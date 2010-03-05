@@ -1,21 +1,12 @@
 project( xdmFormat )
 
 set( ${PROJECT_NAME}_HEADERS 
-    LinearTopologyData.hpp
     NamespaceMacro.hpp
     Reader.hpp
-    TemporalCollection.hpp
-    TimeSeries.hpp
-    VirtualDataset.hpp
-    XdmfHelpers.hpp
 )
 
 set( ${PROJECT_NAME}_SOURCES
-    LinearTopologyData.cpp
     Reader.cpp
-    TemporalCollection.cpp
-    VirtualDataset.cpp
-    XdmfHelpers.cpp
 )
 
 add_library( ${PROJECT_NAME} STATIC
@@ -25,11 +16,5 @@ add_library( ${PROJECT_NAME} STATIC
 
 target_link_libraries( ${PROJECT_NAME}
     xdm
-    xdmGrid
-    xdmHdf
 )
-
-if( BUILD_TESTING )
-    add_subdirectory( test )
-endif()
 

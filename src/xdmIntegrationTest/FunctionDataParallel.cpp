@@ -29,7 +29,7 @@
 
 #include <xdmComm/test/MpiTestFixture.hpp>
 
-#include <xdmFormat/TemporalCollection.hpp>
+#include <plugins/xdmf/TemporalCollection.hpp>
 
 #include <xdmGrid/Attribute.hpp>
 #include <xdmGrid/Grid.hpp>
@@ -98,8 +98,8 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
       localRegion,
       xdm::makeRefPtr( new TestCaseFunction ) ) ) );
 
-  xdm::RefPtr< xdmFormat::TimeSeries > timeSeries(
-    new xdmFormat::TemporalCollection( xmfFile, xdm::Dataset::kCreate ) );
+  xdm::RefPtr< xdmf::TimeSeries > timeSeries(
+    new xdmf::TemporalCollection( xmfFile, xdm::Dataset::kCreate ) );
 
   // parallelize, choose a small buffer size to ensure data must be buffered
   // between processes.
@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
   grid->accept( parallelize );
 
   timeSeries->open();
-  xdmFormat::writeTimestepGrid( timeSeries, grid );
+  xdmf::writeTimestepGrid( timeSeries, grid );
   timeSeries->close();
 }
 

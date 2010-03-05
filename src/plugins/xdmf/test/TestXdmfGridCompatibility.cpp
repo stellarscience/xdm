@@ -34,10 +34,10 @@
 #include <xdm/XmlObject.hpp>
 #include <xdm/XmlOutputStream.hpp>
 
-#include <xdmFormat/TemporalCollection.hpp>
-#include <xdmFormat/TimeSeries.hpp>
-#include <xdmFormat/VirtualDataset.hpp>
-#include <xdmFormat/XdmfHelpers.hpp>
+#include <xdmf/TemporalCollection.hpp>
+#include <xdmf/TimeSeries.hpp>
+#include <xdmf/VirtualDataset.hpp>
+#include <xdmf/XdmfHelpers.hpp>
 
 #include <xdmGrid/CollectionGrid.hpp>
 #include <xdmGrid/Domain.hpp>
@@ -152,7 +152,7 @@ BOOST_AUTO_TEST_CASE( staticGrid ) {
   // collect the tree's metadata
   xdm::CollectMetadataOperation collector;
   domain->accept( collector );
-  xdm::RefPtr< xdm::XmlObject > xdmf = xdmFormat::createXdmfRoot();
+  xdm::RefPtr< xdm::XmlObject > xdmf = xdmf::createXdmfRoot();
   xdmf->appendChild( collector.result() );
 
   std::ofstream xdmfFile("XdmfGridCompatibility.staticGrid.xmf");
@@ -166,14 +166,14 @@ BOOST_AUTO_TEST_CASE( timeSeries ) {
   xdm::remove( xdm::FileSystemPath( hdfFile ) );
 
   // write this as both a temporal collection and as a virtual dataset
-  xdm::RefPtr< xdmFormat::TimeSeries > temporalCollection (
-    new xdmFormat::TemporalCollection(
+  xdm::RefPtr< xdmf::TimeSeries > temporalCollection (
+    new xdmf::TemporalCollection(
       "XdmfGridCompatibility.temporalCollection.xmf",
       xdm::Dataset::kCreate ) );
   temporalCollection->open();
 
-  xdm::RefPtr< xdmFormat::TimeSeries > virtualDataset(
-    new xdmFormat::VirtualDataset( "XdmfGridCompatibility.virtualDataset",
+  xdm::RefPtr< xdmf::TimeSeries > virtualDataset(
+    new xdmf::VirtualDataset( "XdmfGridCompatibility.virtualDataset",
       xdm::Dataset::kCreate ) );
   virtualDataset->open();
 
@@ -241,8 +241,8 @@ BOOST_AUTO_TEST_CASE( timeSeries ) {
     attribute->setDataItem( attrData );
     
     // write the grid for this step to the TimeSeries files
-    xdmFormat::writeTimestepGrid( temporalCollection, grid );
-    xdmFormat::writeTimestepGrid( virtualDataset, grid );
+    xdmf::writeTimestepGrid( temporalCollection, grid );
+    xdmf::writeTimestepGrid( virtualDataset, grid );
   }
   temporalCollection->close();
   virtualDataset->close();

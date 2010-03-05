@@ -18,7 +18,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //------------------------------------------------------------------------------
-#include <xdmFormat/LinearTopologyData.hpp>
+#include <xdmf/LinearTopologyData.hpp>
 
 #include <xdmGrid/Polyvertex.hpp>
 
@@ -27,7 +27,7 @@
 #include <xdm/UniformDataItem.hpp>
 #include <xdm/VectorStructuredArray.hpp>
 
-XDM_FORMAT_NAMESPACE_BEGIN
+XDMF_NAMESPACE_BEGIN
 
 LinearTopologyData::LinearTopologyData( xdm::RefPtr< xdmGrid::Polyvertex > topology ):
   MemoryAdapter( true ),
@@ -73,4 +73,4 @@ xdm::RefPtr< xdm::UniformDataItem > createLinearTopologyUniformDataItem(
   return result;
 }
 
-XDM_FORMAT_NAMESPACE_END
+XDMF_NAMESPACE_END

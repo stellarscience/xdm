@@ -18,27 +18,62 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.       
 //                                                                             
 //------------------------------------------------------------------------------
-#ifndef xdmFormat_XdmfHelpers_hpp
-#define xdmFormat_XdmfHelpers_hpp
+#ifndef xdmf_TimeSeries_hpp
+#define xdmf_TimeSeries_hpp
 
+#include <xdm/Dataset.hpp>
+#include <xdm/ReferencedObject.hpp>
 #include <xdm/RefPtr.hpp>
 
-#include <string>
+#include <xdmGrid/Grid.hpp>
 
-#include <xdmFormat/NamespaceMacro.hpp>
-#include <xdm/NamespaceMacro.hpp>
+#include <xdmf/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
-  class XmlObject;
-XDM_NAMESPACE_END
+XDMF_NAMESPACE_BEGIN
 
-XDM_FORMAT_NAMESPACE_BEGIN
+/// Interface that inheritors should reimplement in order to write time
+/// series grid information.
+class TimeSeries : public xdm::ReferencedObject {
+public:
+  TimeSeries( xdm::Dataset::InitializeMode mode ) : mMode( mode ) {}
+  virtual ~TimeSeries() {}
 
-/// Create the root XDMF xml object that must be the root of any XDMF tree.
-xdm::RefPtr< xdm::XmlObject > createXdmfRoot( 
-  const std::string& version = "2.1" );
+  /// Open a new time series.  Opens a new time series and prepares it for
+  /// accepting timestep grids.
+  virtual void open() = 0;
 
-XDM_FORMAT_NAMESPACE_END
+  /// Update the grid for a new timestep.
+  virtual void updateGrid( xdm::RefPtr< xdmGrid::Grid > grid ) = 0;
 
-#endif // xdmFormat_XdmfHelpers_hpp
+  /// Write the metadata for a grid.
+  virtual void writeGridMetadata( xdm::RefPtr< xdmGrid::Grid > grid ) = 0;
+
+  /// Write the large datasets for the grid.
+  virtual void writeGridData( xdm::RefPtr< xdmGrid::Grid > grid ) = 0;
+
+  /// Close the time series.
+  virtual void close() = 0;
+
+  xdm::Dataset::InitializeMode mode() const { return mMode; }
+  void setMode( xdm::Dataset::InitializeMode mode ) { mMode = mode; }
+
+private:
+  xdm::Dataset::InitializeMode mMode;
+};
+
+/// Convenience function to perform all steps of writing a TimeSeries grid.
+inline void writeTimestepGrid( 
+  xdm::RefPtr< TimeSeries > timeSeries, 
+  xdm::RefPtr< xdmGrid::Grid > grid ) {
+
+  timeSeries->updateGrid( grid );
+  timeSeries->writeGridMetadata( grid );
+  timeSeries->writeGridData( grid );
+
+}
+  
+
+XDMF_NAMESPACE_END
+
+#endif // xdmf_TimeSeries_hpp
 

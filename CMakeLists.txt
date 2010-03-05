@@ -21,7 +21,7 @@ option( BUILD_TESTING
 # option to build plugins
 option( BUILD_PLUGINS
   "Enable the build of the plugins directory."
-  OFF
+  ON
 )
 
 if( BUILD_TESTING )

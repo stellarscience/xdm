@@ -33,9 +33,9 @@
 
 #include <xdmComm/test/MpiTestFixture.hpp>
 
-#include <xdmFormat/LinearTopologyData.hpp>
-#include <xdmFormat/TemporalCollection.hpp>
-#include <xdmFormat/VirtualDataset.hpp>
+#include <xdmf/LinearTopologyData.hpp>
+#include <xdmf/TemporalCollection.hpp>
+#include <xdmf/VirtualDataset.hpp>
 
 #include <xdmGrid/Attribute.hpp>
 #include <xdmGrid/InterlacedGeometry.hpp>
@@ -150,7 +150,7 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
   xdm::RefPtr< xdmGrid::Polyvertex > topology( new xdmGrid::Polyvertex() );
   topology->setNumberOfCells( kParticleCount );
   xdm::RefPtr< xdm::UniformDataItem > topologyConn =
-    xdmFormat::createLinearTopologyUniformDataItem( topology );
+    xdmf::createLinearTopologyUniformDataItem( topology );
   topology->setConnectivity( topologyConn );
   xdm::RefPtr< xdmHdf::HdfDataset > topologyDataset( new xdmHdf::HdfDataset );
   topologyDataset->setFile( baseName.str() + ".h5" );
@@ -236,8 +236,8 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
   grid->accept( parallelize );
 
   // create the time series, opening the output stream
-  xdm::RefPtr< xdmFormat::TimeSeries > series(
-    new xdmFormat::VirtualDataset( xmfFile, xdm::Dataset::kCreate ) );
+  xdm::RefPtr< xdmf::TimeSeries > series(
+    new xdmf::VirtualDataset( xmfFile, xdm::Dataset::kCreate ) );
 
   // begin a time series
   series->open();

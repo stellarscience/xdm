@@ -18,13 +18,13 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //------------------------------------------------------------------------------
-#ifndef xdmFormat_LinearTopologyData_hpp
-#define xdmFormat_LinearTopologyData_hpp
+#ifndef xdmf_LinearTopologyData_hpp
+#define xdmf_LinearTopologyData_hpp
 
 #include <xdm/MemoryAdapter.hpp>
 #include <xdm/RefPtr.hpp>
 
-#include <xdmFormat/NamespaceMacro.hpp>
+#include <xdmf/NamespaceMacro.hpp>
 
 namespace xdm {
   class UniformDataItem;
@@ -35,7 +35,7 @@ namespace xdmGrid {
   class Polyvertex;
 }
 
-XDM_FORMAT_NAMESPACE_BEGIN
+XDMF_NAMESPACE_BEGIN
 
 /// MemoryAdapter that generates a list of unsigned integers up to the size of
 /// the referenced Polyvertex Topology. This is useful if the XDMF output will
@@ -69,6 +69,6 @@ xdm::RefPtr< xdm::UniformDataItem >
 createLinearTopologyUniformDataItem(
   xdm::RefPtr< xdmGrid::Polyvertex > topology );
 
-XDM_FORMAT_NAMESPACE_END
+XDMF_NAMESPACE_END
 
-#endif // xdmFormat_LinearTopologyData_hpp
+#endif // xdmf_LinearTopologyData_hpp
