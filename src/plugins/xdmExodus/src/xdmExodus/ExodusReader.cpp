@@ -150,6 +150,8 @@ xdm::RefPtr< xdm::Item > ExodusReader::readItem( const std::string& filename ) {
     EXODUS_CALL( ex_get_all_times( fileId, &timeSteps[0] ), "Could not read time steps." );
   }
 
+  xdm::RefPtr< xdmGrid::Domain > domain( new xdmGrid::Domain );
+
   //---------------NODES-------------------
   // Read the nodes. For Exodus, there is only ever one set of nodes that all element blocks
   // refer to.
@@ -187,7 +189,7 @@ xdm::RefPtr< xdm::Item > ExodusReader::readItem( const std::string& filename ) {
     // Get the names of the instances, if they are named.
     std::vector< ExodusString > objectNames( numberOfObjectInstances );
     char* objectNamesCharArray[ numberOfObjectInstances ];
-    vectorToCharStarArray( objectNames, objectNamesCharStar );
+    vectorToCharStarArray( objectNames, objectNamesCharArray );
     EXODUS_CALL( ex_get_names( fileId, kObjectTypes[ objectTypeIndex ], objectNamesCharArray ),
       "Could not read object names." );
 
@@ -231,6 +233,7 @@ xdm::RefPtr< xdm::Item > ExodusReader::readItem( const std::string& filename ) {
     // of sets, or the ordering info for edges/faces/elements in the case of maps.
     for ( std::size_t objectInstance = 0; objectInstance < numberOfObjectInstances; ++objectInstance ) {
       int numberOfEntries = 0;
+      xdm::RefPtr< xdmGrid::UniformGrid > grid( new xdmGrid::UniformGrid() );
 
       if ( objectIsBlock( objectTypeIndex ) ) {
 
@@ -265,11 +268,32 @@ xdm::RefPtr< xdm::Item > ExodusReader::readItem( const std::string& filename ) {
             &faceConnections[0] ),
           "Could not read connectivity." );
 
+        xdm::RefPtr< xdm::VectorStructuredArray< std::size_t > > nodeConnectivity(
+          new xdm::VectorStructuredArray< std::size_t >( nodeConnections.size() ) );
+        convertToZeroBase( nodeConnections, nodeConnectivity->begin() );
+        xdm::RefPtr< xdm::UniformDataItem > dataItem = makeDataItem(
+          nodeConnectivity, xdm::primitiveType::kLongUnsignedInt, numberOfEntries, nodesPerEntry );
+        xdm::RefPtr< xdmGrid::UnstructuredTopology > block(
+          new xdmGrid::UnstructuredTopology() );
+        block->setConnectivity( dataItem );
+        block->setNumberOfCells( numberOfEntries );
+        block->setCellType( lookupCellType( nodesPerEntry, entryType.string() ) );
+        block->setNodeOrdering( xdmGrid::NodeOrderingConvention::ExodusII );
+        block->setName( objectNames[ objectInstance ].string() );
+
+        // TODO: do something with edge/face lists for element blocks.
+
+        // TODO: somehow assign the ID for this block, maybe with an attribute?
+
+        // There is a UniformGrid for each topology... however, they all refer to the same
+        // Geometry.
+        grid->setGeometry( geom );
+        grid->setTopology( block );
+
         // Read the attributes. For element blocks, these are cell-centered values, but there
         // is no way to know here whether they should be interpreted to be scalars,
         // vectors, matrices, etc, except by maybe checking their names. For Exodus, all
-        // attributes (and variables) are floating point, so this routine just reads them
-        // all into a single data item.
+        // attributes (and variables) are floating point.
         if ( attributesPerEntry > 0 ) {
           std::vector< ExodusString > attributeNames( attributesPerEntry );
           char* attributeNamesCharArray[ attributesPerEntry ];
@@ -282,14 +306,25 @@ xdm::RefPtr< xdm::Item > ExodusReader::readItem( const std::string& filename ) {
               attributeNamesCharArray ),
             "Could not read attribute names." );
 
-          std::vector< double > attributeValues( attributesPerEntry * numberOfEntries );
-          EXODUS_CALL(
-            ex_get_attr(
-              fileId,
-              kObjectTypes[ objectTypeIndex ],
-              objectIds[ objectInstance ],
-              &attributeValues[0] ),
-            "Could not read attribute values." );
+          for ( std::size_t attributeIndex = 0; attributeIndex < attributesPerEntry; ++attributeIndex ) {
+            xdm::RefPtr< xdm::VectorStructuredArray< double > > attribute(
+              new xdm::VectorStructuredArray< double >( numberOfEntries ) );
+            EXODUS_CALL(
+              ex_get_one_attr(
+                fileId,
+                kObjectTypes[ objectTypeIndex ],
+                objectIds[ objectInstance ],
+                attributeIndex + 1,
+                attribute->data() ),
+              "Could not read attribute values." );
+
+            xdm::RefPtr< xdm::UniformDataItem > dataItem = makeDataItem(
+              attribute, xdm::primitiveType::kDouble, numberOfEntries );
+            xdm::RefPtr< xdmGrid::Attribute > attr(
+              new xdmGrid::Attribute( xdmGrid::Attribute::kScalar, xdmGrid::Attribute::kCell ) );
+            attr->setName( attributeNames[ attributeIndex ].string() );
+            grid->addAttribute( attr );
+          }
         }
 
       } else if ( objectIsSet( objectTypeIndex ) ) {
@@ -327,6 +362,9 @@ xdm::RefPtr< xdm::Item > ExodusReader::readItem( const std::string& filename ) {
             extraPtr ),
           "Could not read set." );
 
+        // TODO: We need an XDM grid that holds a set, probably an XDMF SubSet Grid, which
+        // we don't have yet.
+
         if ( numberOfDistributionFactors > 0 ) {
           std::vector< double > distributionFactors( numberOfDistributionFactors );
           EXODUS_CALL(
@@ -363,9 +401,15 @@ xdm::RefPtr< xdm::Item > ExodusReader::readItem( const std::string& filename ) {
               &map[0] ),
             "Could not read map." );
         }
+
+        // TODO: We need an XDM grid that holds a map, probably an XDMF SubSet Grid, which
+        // we don't have yet. This is even worse than sets, because these maps use Exodus
+        // internal node numbering, and we do not have a way to store that info. Maybe create
+        // a special Topology that holds a ref impl class that can point to elements/faces/edges
+        // that exist in any of the other topologies.
       }
 
-      // Read the results variables.
+      // Read the results variables. For XDM, these will just be additional attributes.
       if ( numberOfVariables > 0 &&
         ( objectIsBlock( objectTypeIndex ) || objectIsSet( objectTypeIndex ) ) ) {
 
@@ -375,7 +419,7 @@ xdm::RefPtr< xdm::Item > ExodusReader::readItem( const std::string& filename ) {
             continue;
           }
 
-          for ( std::size_t timeStep = 1; timeStep <= numberOfTimesteps; ++timeStep ) {
+          for ( std::size_t timeStep = 1; timeStep <= numberOfTimeSteps; ++timeStep ) {
             EXODUS_CALL(
               ex_get_var(
                 fileId,
@@ -386,209 +430,18 @@ xdm::RefPtr< xdm::Item > ExodusReader::readItem( const std::string& filename ) {
                 numberOfEntries,
                 &variable[0] ),
               "Could not read variable values." );
+
+            // TODO: Not sure how to handle time series.
           }
         }
       }
+
+      domain->addGrid( grid );
 
     } // object Index
   } // objectTypeIndex
 
   EXODUS_CALL( ex_close( fileId ), "Unable to close Exodus file." );
-
-  return 0;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  // Open the file and get some info.
-  float version;
-  int doubleWordSize = sizeof( double );
-  int storedDataWordSize = 0;
-  int fileId = ex_open(
-    filename.c_str(),
-    EX_READ,
-    &doubleWordSize,
-    &storedDataWordSize,
-    &version );
-  if ( fileId < 0 ) {
-    throw std::runtime_error( "Could not open ExodusII filename: " + filename );
-  }
-
-  ex_init_params gridParameters;
-  EXODUS_CALL(  ex_get_init_ext( fileId, &gridParameters ), "ex_get_init_ext returned an error." );
-
-  //---------------NODES-------------------
-  // Read the nodes. For Exodus, there is only ever one set of nodes that all element blocks
-  // refer to.
-  std::vector< xdm::RefPtr< xdm::VectorStructuredArray< double > > > xyzCoords( 3 );
-  xdm::RefPtr< xdmGrid::MultiArrayGeometry > geom(
-    new xdmGrid::MultiArrayGeometry( gridParameters.num_dim ) );
-  for( std::size_t dim = 0; dim < gridParameters.num_dim; ++dim ) {
-    xyzCoords[ dim ] = new xdm::VectorStructuredArray< double >( gridParameters.num_nodes );
-    xdm::RefPtr< xdm::UniformDataItem > dataItem = makeDataItem(
-      xyzCoords[ dim ], xdm::primitiveType::kDouble, gridParameters.num_nodes );
-    geom->setCoordinateValues( dim, dataItem );
-  }
-  EXODUS_CALL(
-    ex_get_coord( fileId, xyzCoords[0]->data(), xyzCoords[1]->data(), xyzCoords[2]->data() ),
-    "ex_get_coord returned an error." );
-
-  //-----------ELEMENT BLOCKS--------------
-  // Read the each element block into a separate topology and add it to the domain.
-  xdm::RefPtr< xdmGrid::Domain > domain( new xdmGrid::Domain );
-  std::vector< int > blockIds( gridParameters.num_elem_blk );
-  EXODUS_CALL( ex_get_ids( fileId, EX_ELEM_BLOCK, &blockIds[0] ), "ex_get_ids returned an error." );
-  for( std::vector< int >::const_iterator blockId = blockIds.begin(); blockId != blockIds.end();
-    ++blockId ) {
-    ExodusString elementType, blockName;
-    int numberOfElements, numberOfNodesPerElement, numberOfAttributesPerElement;
-    int numberOfEdgesPerElement, numberOfFacesPerElement; // unused here
-    EXODUS_CALL( ex_get_block(
-      fileId,
-      EX_ELEM_BLOCK,
-      *blockId,
-      elementType.ptr(),
-      &numberOfElements,
-      &numberOfNodesPerElement,
-      &numberOfEdgesPerElement,
-      &numberOfFacesPerElement,
-      &numberOfAttributesPerElement ), "ex_get_block returned an error." );
-    EXODUS_CALL( ex_get_name( fileId, EX_ELEM_BLOCK, *blockId, blockName.ptr() ),
-      "ex_get_name returned an error." );
-    std::vector< int > intConnectivity( numberOfElements * numberOfNodesPerElement );
-    EXODUS_CALL( ex_get_conn( fileId, EX_ELEM_BLOCK, *blockId, &intConnectivity[0], 0, 0 ),
-      "ex_get_conn returned an error." );
-
-    // Exodus node numbering starts at 1, so change that to 0. Also, the connections have
-    // to be std::size_t for xdm.
-    xdm::RefPtr< xdm::VectorStructuredArray< std::size_t > > connectivity(
-      new xdm::VectorStructuredArray< std::size_t >( intConnectivity.size() ) );
-    std::transform( intConnectivity.begin(), intConnectivity.end(), connectivity->begin(),
-      std::bind2nd( std::minus< std::size_t >(), 1 ) );
-
-    // Turn the connectivity into a data item and give it to a topology along with the
-    // geometry.
-    xdm::RefPtr< xdm::UniformDataItem > dataItem = makeDataItem(
-      connectivity, xdm::primitiveType::kLongUnsignedInt, numberOfElements, numberOfNodesPerElement );
-    xdm::RefPtr< xdmGrid::UnstructuredTopology > elementBlock(
-      new xdmGrid::UnstructuredTopology() );
-    elementBlock->setConnectivity( dataItem );
-    elementBlock->setNumberOfCells( numberOfElements );
-    elementBlock->setCellType( lookupCellType( numberOfNodesPerElement, elementType.string() ) );
-    elementBlock->setNodeOrdering( xdmGrid::NodeOrderingConvention::ExodusII );
-    elementBlock->setName( blockName.string() );
-
-    // There is a UniformGrid for each topology... however, they all refer to the same
-    // Geometry.
-    xdm::RefPtr< xdmGrid::UniformGrid > grid( new xdmGrid::UniformGrid() );
-    grid->setGeometry( geom );
-    grid->setTopology( elementBlock );
-
-    // Read the attributes. For element blocks, these are cell-centered values, but there
-    // is no way to know here whether they should be interpreted to be scalars,
-    // vectors, matrices, etc.
-    ExodusString attrNames[ numberOfAttributesPerElement ];
-    char* attrNamesPtr[ numberOfAttributesPerElement ];
-    std::transform( attrNames, attrNames + numberOfAttributesPerElement, attrNamesPtr,
-      std::mem_fun_ref( &ExodusString::ptr ) );
-    EXODUS_CALL( ex_get_attr_names( fileId, EX_ELEM_BLOCK, *blockId, attrNamesPtr ),
-      "ex_get_attr_names returned an error." );
-
-    for ( std::size_t attrIndex = 0; attrIndex < numberOfAttributesPerElement; ++attrIndex ) {
-      xdm::RefPtr< xdm::VectorStructuredArray< double > > attribute(
-        new xdm::VectorStructuredArray< double >( numberOfElements ) );
-      EXODUS_CALL( ex_get_one_attr( fileId, EX_ELEM_BLOCK, *blockId, attrIndex + 1,
-        attribute->data() ), "ex_get_one_attr returned an error." );
-      xdm::RefPtr< xdm::UniformDataItem > dataItem = makeDataItem(
-        attribute, xdm::primitiveType::kDouble, numberOfElements );
-      xdm::RefPtr< xdmGrid::Attribute > attr(
-        new xdmGrid::Attribute( xdmGrid::Attribute::kScalar, xdmGrid::Attribute::kCell ) );
-      attr->setName( attrNames[ attrIndex ].string() );
-      grid->addAttribute( attr );
-    }
-
-    domain->addGrid( grid );
-  }
-
-  //-------------NODE SETS-----------------
-  // Read node sets into polyvertex topologies
-  std::vector< int > nodeSetIds( gridParameters.num_node_sets );
-  EXODUS_CALL( ex_get_ids( fileId, EX_NODE_SET, &nodeSetIds[0] ), "ex_get_ids returned an error." );
-  for( std::vector< int >::const_iterator nodeSetId = nodeSetIds.begin();
-    nodeSetId != nodeSetIds.end(); ++nodeSetId ) {
-    int numberOfNodes, numberOfDistributionFactors;
-    EXODUS_CALL( ex_get_set_param(
-      fileId,
-      EX_NODE_SET,
-      *nodeSetId,
-      &numberOfNodes,
-      &numberOfDistributionFactors ), "ex_get_set_param returned an error." );
-    std::vector< int > intNodeList( numberOfNodes );
-    EXODUS_CALL( ex_get_set( fileId, EX_NODE_SET, *nodeSetId, &intNodeList[0], NULL ),
-      "ex_get_set returned an error." );
-
-    // Exodus node numbering starts at 1, so change that to 0. Also, the node indices have
-    // to be std::size_t for xdm.
-    xdm::RefPtr< xdm::VectorStructuredArray< std::size_t > > nodeList(
-      new xdm::VectorStructuredArray< std::size_t >( intNodeList.size() ) );
-    std::transform( intNodeList.begin(), intNodeList.end(), nodeList->begin(),
-      std::bind2nd( std::minus< std::size_t >(), 1 ) );
-
-    // Turn the node list into a data item and give it to a polyvertex topology along with the
-    // geometry that everything else uses.
-    xdm::RefPtr< xdm::UniformDataItem > dataItem = makeDataItem(
-      nodeList, xdm::primitiveType::kLongUnsignedInt, numberOfNodes );
-    xdm::RefPtr< xdmGrid::Polyvertex > polyvertex( new xdmGrid::Polyvertex() );
-    polyvertex->setConnectivity( dataItem );
-    polyvertex->setNumberOfCells( numberOfNodes );
-
-    xdm::RefPtr< xdmGrid::UniformGrid > grid( new xdmGrid::UniformGrid() );
-    grid->setGeometry( geom );
-    grid->setTopology( polyvertex );
-    domain->addGrid( grid );
-  }
-
-
-
-  // TODO: do something with side sets
-
-  // TODO: do something with node number map... maybe read it into polyvertex
-
-  // TODO: do something with element number map
-
-  // TODO: do something with optimized element order map
-
-  // TODO: take care of results
-
-  // TODO: maybe read distribution factors into an attribute
-
-  ex_close( fileId );
 
   return domain;
 }

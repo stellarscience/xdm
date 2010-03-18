@@ -51,11 +51,10 @@ void vectorToCharStarArray( std::vector< ExodusString >& input, char* output[] )
 
 /// Do two conversions: int -> size_t and also move the base to zero. Exodus numbering starts at
 /// 1, so this subtracts 1 from all values to give zero-based indexing.
-std::vector< std::size_t > convertToZeroBase( const std::vector< int >& vecWithExodusOrdering ) {
-  std::vector< std::size_t > result;
-  std::transform( vecWithExodusOrdering.begin(), vecWithExodusOrdering.end(), result.begin(),
+template< typename OutputIterator >
+void convertToZeroBase( const std::vector< int >& vecWithExodusOrdering, OutputIterator oBegin ) {
+  std::transform( vecWithExodusOrdering.begin(), vecWithExodusOrdering.end(), oBegin,
     std::bind2nd( std::minus< std::size_t >(), 1 ) );
-  return result;
 }
 
 const std::size_t kNumberOfObjectTypes = 12;
