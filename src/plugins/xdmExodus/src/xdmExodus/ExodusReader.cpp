@@ -19,6 +19,7 @@
 //
 //------------------------------------------------------------------------------
 #include <xdmExodus/ExodusReader.hpp>
+#include <xdmExodus/ExodusConstants.hpp>
 
 #include <xdmGrid/Attribute.hpp>
 #include <xdmGrid/Domain.hpp>
@@ -32,8 +33,6 @@
 #include <xdm/UniformDataItem.hpp>
 #include <xdm/VectorStructuredArray.hpp>
 
-#include <exodusII.h>
-
 #include <algorithm>
 #include <functional>
 #include <map>
@@ -42,21 +41,9 @@
 #include <string>
 #include <vector>
 
-#define EXODUS_CHECK( functionCall, errorString ) \
-  if ( (#functionCall) < 0 ) { \
-    throw std::runtime_error( (#errorString) ); \
-  }
-
 XDM_EXODUS_NAMESPACE_BEGIN
 
 namespace {
-
-// String type for Exodus
-struct ExodusString {
-  char raw[ MAX_STR_LENGTH + 1 ];
-  char* ptr() { return raw; }
-  std::string string() { return std::string( raw ); }
-};
 
 // Helpers that create a UniformDataItem from a StructuredArray. This is done frequently.
 // First version takes one dimension.
@@ -149,11 +136,19 @@ xdm::RefPtr< xdm::Item > ExodusReader::readItem( const std::string& filename ) {
     &storedDataWordSize,
     &version );
   if ( fileId < 0 ) {
-    throw std::runtime_error( "Could not open ExodusII filename: " + filename );
+    throw std::runtime_error( "Could not open ExodusII file at " + filename );
   }
 
+  // Get the mesh parameters and time steps.
   ex_init_params gridParameters;
-  EXODUS_CHECK(  ex_get_init_ext( fileId, &gridParameters ), "ex_get_init_ext returned an error." );
+  EXODUS_CALL( ex_get_init_ext( fileId, &gridParameters ), "Unable to read Exodus file parameters." );
+  int numberOfTimeSteps;
+  EXODUS_CALL( ex_inquire( fileId, EX_INQ_TIME, &numberOfTimeSteps, 0, 0 ), "Unable to read"
+    " number of time steps." );
+  std::vector< double > timeSteps( numberOfTimeSteps );
+  if ( numberOfTimeSteps > 0 ) {
+    EXODUS_CALL( ex_get_all_times( fileId, &timeSteps[0] ), "Could not read time steps." );
+  }
 
   //---------------NODES-------------------
   // Read the nodes. For Exodus, there is only ever one set of nodes that all element blocks
@@ -167,7 +162,300 @@ xdm::RefPtr< xdm::Item > ExodusReader::readItem( const std::string& filename ) {
       xyzCoords[ dim ], xdm::primitiveType::kDouble, gridParameters.num_nodes );
     geom->setCoordinateValues( dim, dataItem );
   }
-  EXODUS_CHECK(
+  EXODUS_CALL(
+    ex_get_coord( fileId, xyzCoords[0]->data(), xyzCoords[1]->data(), xyzCoords[2]->data() ),
+    "Could not read node coordinates from Exouds file." );
+
+  for ( std::size_t objectTypeIndex = 0; objectTypeIndex < kNumberOfObjectTypes; ++objectTypeIndex ) {
+
+    // Get the number of instances of this type of object.
+    int numberOfObjectInstances;
+    EXODUS_CALL(
+      ex_inquire( fileId, kInquireObjectSizes[ objectTypeIndex ], &numberOfObjectInstances, 0, 0 ),
+      "The number of objects could not be determined." );
+
+    if ( ! numberOfObjectInstances ) {
+      // Skip this object type if there are no instances.
+      continue;
+    }
+
+    // Get the "ID" of all of the instances.
+    std::vector< int > objectIds( numberOfObjectInstances );
+    EXODUS_CALL( ex_get_ids( fileId, kObjectTypes[ objectTypeIndex ], &objectIds[0] ),
+      "Could not read object IDs." );
+
+    // Get the names of the instances, if they are named.
+    std::vector< ExodusString > objectNames( numberOfObjectInstances );
+    char* objectNamesCharArray[ numberOfObjectInstances ];
+    vectorToCharStarArray( objectNames, objectNamesCharStar );
+    EXODUS_CALL( ex_get_names( fileId, kObjectTypes[ objectTypeIndex ], objectNamesCharArray ),
+      "Could not read object names." );
+
+    // For blocks and sets, get the variable information if there are time series.
+    int numberOfVariables = 0;
+    std::vector< int > variableTruthTable;
+    std::vector< ExodusString > variableNames;
+    if ( numberOfTimeSteps > 0 &&
+      ( objectIsBlock( objectTypeIndex ) || objectIsSet( objectTypeIndex ) ) ) {
+
+      // Get the number of variables for this type of block or set.
+      EXODUS_CALL(
+        ex_get_var_param( fileId, kObjectTypeChar[ objectTypeIndex ], &numberOfVariables ),
+        "Could not read number of variables." );
+
+      // The truth table gives a 1 or 0 denoting whether or not a particular variable is used
+      // for each instance of this object type. For example, if there are 3 element blocks and
+      // two variables for element blocks, then the truth table tells which variables are active
+      // for each of the 3 blocks.
+      if ( numberOfVariables > 0 ) {
+        variableTruthTable.resize( numberOfVariables * numberOfObjectInstances );
+        EXODUS_CALL(
+          ex_get_var_tab( fileId, kObjectTypeChar[ objectTypeIndex ], numberOfObjectInstances,
+            numberOfVariables, &variableTruthTable[0] ),
+          "Could not read the variable truth table." );
+
+        // Get the names of the variables.
+        variableNames.resize( numberOfVariables );
+        char* variableNamesCharArray[ numberOfVariables ];
+        vectorToCharStarArray( variableNames, variableNamesCharArray );
+        EXODUS_CALL(
+          ex_get_var_names( fileId, kObjectTypeChar[ objectTypeIndex ],
+            numberOfVariables, variableNames ),
+          "Could not read variable names." );
+      }
+    }
+
+    // This is where we read the actual objects. These are blocks (edges, faces, elements), sets
+    // (nodes, edges, faces, elements), or maps. They all contain integer arrays. These arrays
+    // represent the connectivity info in the case of blocks, the collection info in the case
+    // of sets, or the ordering info for edges/faces/elements in the case of maps.
+    for ( std::size_t objectInstance = 0; objectInstance < numberOfObjectInstances; ++objectInstance ) {
+      int numberOfEntries = 0;
+
+      if ( objectIsBlock( objectTypeIndex ) ) {
+
+        int nodesPerEntry;
+        int edgesPerEntry;
+        int facesPerEntry;
+        int attributesPerEntry;
+        ExodusString entryType; // e.g. TET4, HEX8
+        EXODUS_CALL(
+          ex_get_block(
+            fileId,
+            kObjectTypes[ objectTypeIndex ],
+            objectIds[ objectInstance ],
+            entryType.ptr(),
+            &numberOfEntries,
+            &nodesPerEntry,
+            &edgesPerEntry,
+            &facesPerEntry,
+            &attributesPerEntry ),
+          "Could not read block params." );
+
+        std::vector< int > nodeConnections( numberOfEntries * nodesPerEntry );
+        std::vector< int > edgeConnections( numberOfEntries * edgesPerEntry );
+        std::vector< int > faceConnections( numberOfEntries * facesPerEntry );
+        EXODUS_CALL(
+          ex_get_conn(
+            fileId,
+            kObjectTypes[ objectTypeIndex ],
+            objectIds[ objectInstance ],
+            &nodeConnections[0],
+            &edgeConnections[0],
+            &faceConnections[0] ),
+          "Could not read connectivity." );
+
+        // Read the attributes. For element blocks, these are cell-centered values, but there
+        // is no way to know here whether they should be interpreted to be scalars,
+        // vectors, matrices, etc, except by maybe checking their names. For Exodus, all
+        // attributes (and variables) are floating point, so this routine just reads them
+        // all into a single data item.
+        if ( attributesPerEntry > 0 ) {
+          std::vector< ExodusString > attributeNames( attributesPerEntry );
+          char* attributeNamesCharArray[ attributesPerEntry ];
+          vectorToCharStarArray( attributeNames, attributeNamesCharArray );
+          EXODUS_CALL(
+            ex_get_attr_names(
+              fileId,
+              kObjectTypes[ objectTypeInstance ],
+              objectIds[ objectInstance ],
+              attributeNamesCharArray ),
+            "Could not read attribute names." );
+
+          std::vector< double > attributeValues( attributesPerEntry * numberOfEntries );
+          EXODUS_CALL(
+            ex_get_attr(
+              fileId,
+              kObjectTypes[ objectTypeIndex ],
+              objectIds[ objectInstance ],
+              &attributeValues[0] ),
+            "Could not read attribute values." );
+        }
+
+      } else if ( objectIsSet( objectTypeIndex ) ) {
+
+        // Since there can only be one distribution factor per entry, this number can be either
+        // zero or numberOfEntries.
+        int numberOfDistributionFactors;
+        EXODUS_CALL(
+          ex_get_set_param(
+            fileId,
+            kObjectTypes[ objectTypeIndex ],
+            objectIds[ objectInstance ],
+            &numberOfEntries,
+            &numberOfDistributionFactors ),
+          "Could not read set parameters." );
+
+        std::vector< int > setEntries( numberOfEntries );
+        // setExtra contains an int for each entry. The use of this int is only specified for
+        // side sets, where the entry refers to the particular element and the extra int refers
+        // to a specific side in that element. However, edge and face sets can also use this
+        // extra int to specify things like direction (-1/+1).
+        std::vector< int > setExtra;
+        int* extraPtr = 0;
+        if ( kObjectTypes[ objectTypeIndex ] != EX_NODE_SET &&
+             kObjectTypes[ objectTypeIndex ] != EX_ELEM_SET ) {
+          setExtra.resize( numberOfEntries );
+          extraPtr = &setExtra[0];
+        }
+        EXODUS_CALL(
+          ex_get_set(
+            fileId,
+            kObjectTypes[ objectTypeIndex ],
+            objectIds[ objectInstance ],
+            &setEntries[0],
+            extraPtr ),
+          "Could not read set." );
+
+        if ( numberOfDistributionFactors > 0 ) {
+          std::vector< double > distributionFactors( numberOfDistributionFactors );
+          EXODUS_CALL(
+            ex_get_set_dist_fact(
+              fileId,
+              kObjectTypes[ objectTypeIndex ],
+              objectIds[ objectInstance ] ),
+            "Could not read set distribution factors." );
+        }
+
+      } else if ( objectIsMap( objectTypeIndex ) ) {
+
+        switch ( kObjectTypes[ objectTypeIndex ] ) {
+          case EX_NODE_MAP:
+            numberOfEntries = gridParameters.num_nodes;
+            break;
+          case EX_EDGE_MAP:
+            numberOfEntries = gridParameters.num_edge;
+            break;
+          case EX_FACE_MAP:
+            numberOfEntries = gridParameters.num_face;
+            break;
+          case EX_ELEM_MAP:
+            numberOfEntries = gridParameters.num_elem;
+            break;
+        }
+        if ( numberOfEntries > 0 ) {
+          std::vector< int > map( numberOfEntries );
+          EXODUS_CALL(
+            ex_get_num_map(
+              fileId,
+              kObjectTypes[ objectTypeIndex ],
+              objectIds[ objectInstance ],
+              &map[0] ),
+            "Could not read map." );
+        }
+      }
+
+      // Read the results variables.
+      if ( numberOfVariables > 0 &&
+        ( objectIsBlock( objectTypeIndex ) || objectIsSet( objectTypeIndex ) ) ) {
+
+        std::vector< double > variable( numberOfEntries );
+        for ( std::size_t variableIndex = 0; variableIndex < numberOfVariables; ++variableIndex ) {
+          if ( variableTruthTable[ numberOfVariables * objectInstance + variableIndex ] == 0 ) {
+            continue;
+          }
+
+          for ( std::size_t timeStep = 1; timeStep <= numberOfTimesteps; ++timeStep ) {
+            EXODUS_CALL(
+              ex_get_var(
+                fileId,
+                timeStep,
+                kObjectTypes[ objectTypeIndex ],
+                variableIndex + 1,
+                objectIds[ objectInstance ],
+                numberOfEntries,
+                &variable[0] ),
+              "Could not read variable values." );
+          }
+        }
+      }
+
+    } // object Index
+  } // objectTypeIndex
+
+  EXODUS_CALL( ex_close( fileId ), "Unable to close Exodus file." );
+
+  return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // Open the file and get some info.
+  float version;
+  int doubleWordSize = sizeof( double );
+  int storedDataWordSize = 0;
+  int fileId = ex_open(
+    filename.c_str(),
+    EX_READ,
+    &doubleWordSize,
+    &storedDataWordSize,
+    &version );
+  if ( fileId < 0 ) {
+    throw std::runtime_error( "Could not open ExodusII filename: " + filename );
+  }
+
+  ex_init_params gridParameters;
+  EXODUS_CALL(  ex_get_init_ext( fileId, &gridParameters ), "ex_get_init_ext returned an error." );
+
+  //---------------NODES-------------------
+  // Read the nodes. For Exodus, there is only ever one set of nodes that all element blocks
+  // refer to.
+  std::vector< xdm::RefPtr< xdm::VectorStructuredArray< double > > > xyzCoords( 3 );
+  xdm::RefPtr< xdmGrid::MultiArrayGeometry > geom(
+    new xdmGrid::MultiArrayGeometry( gridParameters.num_dim ) );
+  for( std::size_t dim = 0; dim < gridParameters.num_dim; ++dim ) {
+    xyzCoords[ dim ] = new xdm::VectorStructuredArray< double >( gridParameters.num_nodes );
+    xdm::RefPtr< xdm::UniformDataItem > dataItem = makeDataItem(
+      xyzCoords[ dim ], xdm::primitiveType::kDouble, gridParameters.num_nodes );
+    geom->setCoordinateValues( dim, dataItem );
+  }
+  EXODUS_CALL(
     ex_get_coord( fileId, xyzCoords[0]->data(), xyzCoords[1]->data(), xyzCoords[2]->data() ),
     "ex_get_coord returned an error." );
 
@@ -175,13 +463,13 @@ xdm::RefPtr< xdm::Item > ExodusReader::readItem( const std::string& filename ) {
   // Read the each element block into a separate topology and add it to the domain.
   xdm::RefPtr< xdmGrid::Domain > domain( new xdmGrid::Domain );
   std::vector< int > blockIds( gridParameters.num_elem_blk );
-  EXODUS_CHECK( ex_get_ids( fileId, EX_ELEM_BLOCK, &blockIds[0] ), "ex_get_ids returned an error." );
+  EXODUS_CALL( ex_get_ids( fileId, EX_ELEM_BLOCK, &blockIds[0] ), "ex_get_ids returned an error." );
   for( std::vector< int >::const_iterator blockId = blockIds.begin(); blockId != blockIds.end();
     ++blockId ) {
     ExodusString elementType, blockName;
     int numberOfElements, numberOfNodesPerElement, numberOfAttributesPerElement;
     int numberOfEdgesPerElement, numberOfFacesPerElement; // unused here
-    EXODUS_CHECK( ex_get_block(
+    EXODUS_CALL( ex_get_block(
       fileId,
       EX_ELEM_BLOCK,
       *blockId,
@@ -191,10 +479,10 @@ xdm::RefPtr< xdm::Item > ExodusReader::readItem( const std::string& filename ) {
       &numberOfEdgesPerElement,
       &numberOfFacesPerElement,
       &numberOfAttributesPerElement ), "ex_get_block returned an error." );
-    EXODUS_CHECK( ex_get_name( fileId, EX_ELEM_BLOCK, *blockId, blockName.ptr() ),
+    EXODUS_CALL( ex_get_name( fileId, EX_ELEM_BLOCK, *blockId, blockName.ptr() ),
       "ex_get_name returned an error." );
     std::vector< int > intConnectivity( numberOfElements * numberOfNodesPerElement );
-    EXODUS_CHECK( ex_get_conn( fileId, EX_ELEM_BLOCK, *blockId, &intConnectivity[0], 0, 0 ),
+    EXODUS_CALL( ex_get_conn( fileId, EX_ELEM_BLOCK, *blockId, &intConnectivity[0], 0, 0 ),
       "ex_get_conn returned an error." );
 
     // Exodus node numbering starts at 1, so change that to 0. Also, the connections have
@@ -229,13 +517,13 @@ xdm::RefPtr< xdm::Item > ExodusReader::readItem( const std::string& filename ) {
     char* attrNamesPtr[ numberOfAttributesPerElement ];
     std::transform( attrNames, attrNames + numberOfAttributesPerElement, attrNamesPtr,
       std::mem_fun_ref( &ExodusString::ptr ) );
-    EXODUS_CHECK( ex_get_attr_names( fileId, EX_ELEM_BLOCK, *blockId, attrNamesPtr ),
+    EXODUS_CALL( ex_get_attr_names( fileId, EX_ELEM_BLOCK, *blockId, attrNamesPtr ),
       "ex_get_attr_names returned an error." );
 
     for ( std::size_t attrIndex = 0; attrIndex < numberOfAttributesPerElement; ++attrIndex ) {
       xdm::RefPtr< xdm::VectorStructuredArray< double > > attribute(
         new xdm::VectorStructuredArray< double >( numberOfElements ) );
-      EXODUS_CHECK( ex_get_one_attr( fileId, EX_ELEM_BLOCK, *blockId, attrIndex + 1,
+      EXODUS_CALL( ex_get_one_attr( fileId, EX_ELEM_BLOCK, *blockId, attrIndex + 1,
         attribute->data() ), "ex_get_one_attr returned an error." );
       xdm::RefPtr< xdm::UniformDataItem > dataItem = makeDataItem(
         attribute, xdm::primitiveType::kDouble, numberOfElements );
@@ -251,18 +539,18 @@ xdm::RefPtr< xdm::Item > ExodusReader::readItem( const std::string& filename ) {
   //-------------NODE SETS-----------------
   // Read node sets into polyvertex topologies
   std::vector< int > nodeSetIds( gridParameters.num_node_sets );
-  EXODUS_CHECK( ex_get_ids( fileId, EX_NODE_SET, &nodeSetIds[0] ), "ex_get_ids returned an error." );
+  EXODUS_CALL( ex_get_ids( fileId, EX_NODE_SET, &nodeSetIds[0] ), "ex_get_ids returned an error." );
   for( std::vector< int >::const_iterator nodeSetId = nodeSetIds.begin();
     nodeSetId != nodeSetIds.end(); ++nodeSetId ) {
     int numberOfNodes, numberOfDistributionFactors;
-    EXODUS_CHECK( ex_get_set_param(
+    EXODUS_CALL( ex_get_set_param(
       fileId,
       EX_NODE_SET,
       *nodeSetId,
       &numberOfNodes,
       &numberOfDistributionFactors ), "ex_get_set_param returned an error." );
     std::vector< int > intNodeList( numberOfNodes );
-    EXODUS_CHECK( ex_get_set( fileId, EX_NODE_SET, *nodeSetId, &intNodeList[0], NULL ),
+    EXODUS_CALL( ex_get_set( fileId, EX_NODE_SET, *nodeSetId, &intNodeList[0], NULL ),
       "ex_get_set returned an error." );
 
     // Exodus node numbering starts at 1, so change that to 0. Also, the node indices have
