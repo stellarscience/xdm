@@ -22,9 +22,11 @@
 #include <xdmExodus/ExodusConstants.hpp>
 
 #include <xdmGrid/Attribute.hpp>
+#include <xdmGrid/CollectionGrid.hpp>
 #include <xdmGrid/Domain.hpp>
 #include <xdmGrid/MultiArrayGeometry.hpp>
 #include <xdmGrid/Polyvertex.hpp>
+#include <xdmGrid/Time.hpp>
 #include <xdmGrid/UniformGrid.hpp>
 #include <xdmGrid/UnstructuredTopology.hpp>
 #include <xdmGrid/UnstructuredTopologyConventions.hpp>
@@ -34,6 +36,7 @@
 #include <xdm/VectorStructuredArray.hpp>
 
 #include <algorithm>
+#include <cassert>
 #include <functional>
 #include <map>
 #include <sstream>
@@ -116,6 +119,35 @@ xdmGrid::CellType::Type lookupCellType( std::size_t nodesPerCell, const std::str
   throw std::runtime_error( ss.str() );
 }
 
+std::string embedExodusId( int id ) {
+  std::stringstream ss;
+  ss << "ExodusID_" << id;
+  return ss.str();
+}
+
+bool extractExodusId( const std::string& s, int& id ) {
+  std::string::size_type found = s.find( "ExodusID_" );
+  if ( found != std::string::npos ) {
+    std::stringstream ss( s.substr( found ) );
+    ss >> id;
+    return true;
+  }
+  return false;
+}
+
+// This process shows up a lot and clutters the code. The routine finds the proper instance
+// of a UniformGrid for the current time step. Be careful: it chooses the last one!
+xdmGrid::UniformGrid&
+backUniformGrid( xdm::RefPtr< xdmGrid::CollectionGrid >& timeCollection, int timeStep ) {
+  xdm::RefPtr< xdmGrid::CollectionGrid > spatialCollection =
+    xdm::dynamic_pointer_cast< xdmGrid::CollectionGrid >( timeCollection->child( timeStep ) );
+  assert( spatialCollection.valid() );
+  xdm::RefPtr< xdmGrid::UniformGrid > uniformGrid =
+    xdm::dynamic_pointer_cast< xdmGrid::UniformGrid >( spatialCollection->back() );
+  assert( uniformGrid.valid() );
+  return *uniformGrid;
+}
+
 } // anon namespace
 
 ExodusReader::ExodusReader() {
@@ -142,15 +174,31 @@ xdm::RefPtr< xdm::Item > ExodusReader::readItem( const std::string& filename ) {
   // Get the mesh parameters and time steps.
   ex_init_params gridParameters;
   EXODUS_CALL( ex_get_init_ext( fileId, &gridParameters ), "Unable to read Exodus file parameters." );
-  int numberOfTimeSteps;
+  int numberOfTimeSteps = 0;
   EXODUS_CALL( ex_inquire( fileId, EX_INQ_TIME, &numberOfTimeSteps, 0, 0 ), "Unable to read"
     " number of time steps." );
   std::vector< double > timeSteps( numberOfTimeSteps );
   if ( numberOfTimeSteps > 0 ) {
     EXODUS_CALL( ex_get_all_times( fileId, &timeSteps[0] ), "Could not read time steps." );
   }
+  xdm::RefPtr< xdmGrid::Time > time( new xdmGrid::Time );
+  time->setValues( timeSteps );
+
+  // The top-most CollectionGrid lives just under Domain. It is a temporal collection,
+  // and holds another set of CollectionGrids, one per time step. Each of these
+  // lower-level CollectionGrids is a spatial collection with nearly identical structures.
+  // The only thing that varies in an Exodus file is the variable information, so all
+  // of the geometries, topologies, and static attributes are the same across all time
+  // steps.
+  xdm::RefPtr< xdmGrid::CollectionGrid > timeCollection( new xdmGrid::CollectionGrid );
+  timeCollection->setTime( time );
+  timeCollection->setNumberOfChildren( numberOfTimeSteps );
+  for ( xdmGrid::CollectionGrid::Iterator it = timeCollection->begin(); it != timeCollection->end(); ++it ) {
+    *it = xdm::makeRefPtr( new xdmGrid::CollectionGrid );
+  }
 
   xdm::RefPtr< xdmGrid::Domain > domain( new xdmGrid::Domain );
+  domain->addGrid( timeCollection );
 
   //---------------NODES-------------------
   // Read the nodes. For Exodus, there is only ever one set of nodes that all element blocks
@@ -168,6 +216,7 @@ xdm::RefPtr< xdm::Item > ExodusReader::readItem( const std::string& filename ) {
     ex_get_coord( fileId, xyzCoords[0]->data(), xyzCoords[1]->data(), xyzCoords[2]->data() ),
     "Could not read node coordinates from Exouds file." );
 
+  //----------BLOCKS/SETS/MAPS-------------
   for ( std::size_t objectTypeIndex = 0; objectTypeIndex < kNumberOfObjectTypes; ++objectTypeIndex ) {
 
     // Get the number of instances of this type of object.
@@ -233,7 +282,6 @@ xdm::RefPtr< xdm::Item > ExodusReader::readItem( const std::string& filename ) {
     // of sets, or the ordering info for edges/faces/elements in the case of maps.
     for ( std::size_t objectInstance = 0; objectInstance < numberOfObjectInstances; ++objectInstance ) {
       int numberOfEntries = 0;
-      xdm::RefPtr< xdmGrid::UniformGrid > grid( new xdmGrid::UniformGrid() );
 
       if ( objectIsBlock( objectTypeIndex ) ) {
 
@@ -283,12 +331,18 @@ xdm::RefPtr< xdm::Item > ExodusReader::readItem( const std::string& filename ) {
 
         // TODO: do something with edge/face lists for element blocks.
 
-        // TODO: somehow assign the ID for this block, maybe with an attribute?
-
         // There is a UniformGrid for each topology... however, they all refer to the same
         // Geometry.
-        grid->setGeometry( geom );
-        grid->setTopology( block );
+        for ( std::size_t timeStep = 0; timeStep < numberOfTimeSteps; ++timeStep ) {
+          xdm::RefPtr< xdmGrid::CollectionGrid > spatialCollection =
+            xdm::dynamic_pointer_cast< xdmGrid::CollectionGrid >( timeCollection->child( timeStep ) );
+          assert( spatialCollection.valid() );
+          xdm::RefPtr< xdmGrid::UniformGrid > grid( new xdmGrid::UniformGrid );
+          grid->setGeometry( geom );
+          grid->setTopology( block );
+          grid->setName( embedExodusId( objectIds[ objectInstance ] ) );
+          spatialCollection->appendChild( grid );
+        }
 
         // Read the attributes. For element blocks, these are cell-centered values, but there
         // is no way to know here whether they should be interpreted to be scalars,
@@ -322,8 +376,13 @@ xdm::RefPtr< xdm::Item > ExodusReader::readItem( const std::string& filename ) {
               attribute, xdm::primitiveType::kDouble, numberOfEntries );
             xdm::RefPtr< xdmGrid::Attribute > attr(
               new xdmGrid::Attribute( xdmGrid::Attribute::kScalar, xdmGrid::Attribute::kCell ) );
+            attr->setDataItem( dataItem );
             attr->setName( attributeNames[ attributeIndex ].string() );
-            grid->addAttribute( attr );
+
+            // Add the attribute to the back grid at every time step.
+            for ( std::size_t timeStep = 0; timeStep < numberOfTimeSteps; ++timeStep ) {
+              backUniformGrid( timeCollection, timeStep ).addAttribute( attr );
+            }
           }
         }
 
@@ -410,34 +469,40 @@ xdm::RefPtr< xdm::Item > ExodusReader::readItem( const std::string& filename ) {
       }
 
       // Read the results variables. For XDM, these will just be additional attributes.
-      if ( numberOfVariables > 0 &&
-        ( objectIsBlock( objectTypeIndex ) || objectIsSet( objectTypeIndex ) ) ) {
+      // TODO: add sets
+      if ( numberOfVariables > 0 && objectIsBlock( objectTypeIndex ) ) {
 
-        std::vector< double > variable( numberOfEntries );
         for ( std::size_t variableIndex = 0; variableIndex < numberOfVariables; ++variableIndex ) {
           if ( variableTruthTable[ numberOfVariables * objectInstance + variableIndex ] == 0 ) {
             continue;
           }
 
-          for ( std::size_t timeStep = 1; timeStep <= numberOfTimeSteps; ++timeStep ) {
+          for ( std::size_t timeStep = 0; timeStep < numberOfTimeSteps; ++timeStep ) {
+            xdm::RefPtr< xdm::VectorStructuredArray< double > > variable(
+              new xdm::VectorStructuredArray< double >( numberOfEntries ) );
             EXODUS_CALL(
               ex_get_var(
                 fileId,
-                timeStep,
+                timeStep + 1,
                 kObjectTypes[ objectTypeIndex ],
                 variableIndex + 1,
                 objectIds[ objectInstance ],
                 numberOfEntries,
-                &variable[0] ),
+                variable->data() ),
               "Could not read variable values." );
 
-            // TODO: Not sure how to handle time series.
+            xdm::RefPtr< xdm::UniformDataItem > dataItem = makeDataItem(
+              variable, xdm::primitiveType::kDouble, numberOfEntries );
+            xdm::RefPtr< xdmGrid::Attribute > attr(
+              new xdmGrid::Attribute( xdmGrid::Attribute::kScalar, xdmGrid::Attribute::kCell ) );
+            attr->setDataItem( dataItem );
+            attr->setName( variableNames[ variableIndex ].string() );
+
+            // Add the attribute to the back grid.
+            backUniformGrid( timeCollection, timeStep ).addAttribute( attr );
           }
         }
       }
-
-      domain->addGrid( grid );
-
     } // object Index
   } // objectTypeIndex
 

@@ -35,8 +35,41 @@ public:
   ExodusReader();
   virtual ~ExodusReader();
 
-  /// Read an Item from a give file with the given name.
+  /// Read a complete ExodusII file.
+  /// ExodusII files are structured around a single invariant geometry with invariant topologies.
+  /// If the geometry or topology must change, then additional ExodusII files are necessary. In
+  /// addition, there are a few nomenclature clashes with XDM. For ExodusII, all "attributes" are
+  /// static values that may be assigned to different portions of the mesh. ExodusII "variables"
+  /// are time varying values. Since XDM does not distinguish between the two, everything becomes
+  /// an xdmGrid::Attribute. An example of the conversion of a thermal problem on a fixed mesh
+  /// with results for several time steps is shown below.
+  /// Domain
+  ///   CollectionGrid (1 Grid per time step)
+  ///     Time (whole series)
+  ///     CollectionGrid (time step 1)
+  ///       Time (for just this time step)
+  ///       UniformGrid
+  ///         Name
+  ///         Geometry (points to the only one)
+  ///         Topology (one edge/face/element block)
+  ///         Attribute (thermal conductivity for this block for all time)
+  ///         Attribute (variable 1 for each element)
+  ///         Attribute (variable 2 for each element)
+  ///       UniformGrid
+  ///         Name
+  ///         Geometry (points to only one)
+  ///         Topology (one block)
+  ///         Attribute (variable 1 for each element)
+  ///     CollectionGrid (time step 2)
+  ///       Identical to one above except attributes (just the variables) have changed values. This
+  ///       grid contains pointers to the same topologies as above (the actual data values are only
+  ///       stored once).
+  ///     CollectionGrid (time step 3)
+  ///       Identical to one above except attributes (just the variables) have changed values
+  ///          ...
+  /// @return an xdmGrid::Domain
   virtual xdm::RefPtr< xdm::Item > readItem( const std::string& filename );
+
 };
 
 XDM_EXODUS_NAMESPACE_END
