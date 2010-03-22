@@ -21,7 +21,8 @@ public:
   virtual xdm::RefPtr< xdm::Item > readItem( const std::string& filename );
 
 private:
-  // This class uses a private implementation to keep LibXml2 out of the header.
+  // This class uses a private implementation to keep LibXml2 out of the
+  // header.
   class Private;
   std::auto_ptr< Private > imp;
 };

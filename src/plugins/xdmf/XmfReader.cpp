@@ -11,14 +11,14 @@ XDMF_NAMESPACE_BEGIN
 
 class XmfReader::Private {
 public:
-  xmlDocPtr document;
+  xmlDocPtr mDocument;
 
   Private() :
-    document( 0 ) {
+    mDocument( 0 ) {
   }
 
   ~Private() {
-    xmlFreeDoc( document );
+    xmlFreeDoc( mDocument );
   }
 };
 
