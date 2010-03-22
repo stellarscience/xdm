@@ -4,6 +4,7 @@
 project( xdmExodus )
 
 set( ${PROJECT_NAME}_HEADERS
+    ExodusConstants.hpp
     ExodusReader.hpp
     NamespaceMacro.hpp
 )
