@@ -18,16 +18,48 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //------------------------------------------------------------------------------
-#define BOOST_TEST_MODULE Geometry
-#include <boost/test/unit_test.hpp>
+#ifndef xdmExodus_Sets_hpp
+#define xdmExodus_Sets_hpp
 
-#include <xdmExodus/Reader.hpp>
+#include <xdmExodus/Object.hpp>
 
-namespace {
+#include <xdmExodus/NamespaceMacro.hpp>
 
-BOOST_AUTO_TEST_CASE( doNothing ) {
-  BOOST_CHECK_EQUAL( "foo", "foo" );
-}
+XDM_EXODUS_NAMESPACE_BEGIN
 
-} // namespace
+/// An Exodus set is an integer array of offsets into internal element, face, edge, or node
+/// IDs. Note that these are *internal* IDs, which can only be determined by reading the
+/// elements/faces/edges sequentially from file and numbering them beginning with 1.
+class Set :
+  public Object {
+};
+
+class NodeSet : public Set {
+protected:
+  virtual int exodusObjectTypeIndex() const { return 3; }
+};
+
+class EdgeSet : public Set {
+protected:
+  virtual int exodusObjectTypeIndex() const { return 4; }
+};
+
+class FaceSet : public Set {
+protected:
+  virtual int exodusObjectTypeIndex() const { return 5; }
+};
+
+class SideSet : public Set {
+protected:
+  virtual int exodusObjectTypeIndex() const { return 6; }
+};
+
+class ElementSet : public Set {
+protected:
+  virtual int exodusObjectTypeIndex() const { return 7; }
+};
+
+XDM_EXODUS_NAMESPACE_END
+
+#endif // xdmExodus_Sets_hpp
 

@@ -5,6 +5,7 @@ set( ${PROJECT_NAME}_HEADERS
     Cell.hpp
     CollectionGrid.hpp
     Domain.hpp
+    Forward.hpp
     Geometry.hpp
     Grid.hpp
     InterlacedGeometry.hpp
@@ -38,6 +39,7 @@ set( ${PROJECT_NAME}_SOURCES
     Topology.cpp
     UniformGrid.cpp
     UnstructuredTopology.cpp
+    UnstructuredTopologyConventions.cpp
 )
 
 add_library( ${PROJECT_NAME} STATIC 

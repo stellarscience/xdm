@@ -18,8 +18,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //------------------------------------------------------------------------------
-#ifndef xdmExodus_ExodusReader_hpp
-#define xdmExodus_ExodusReader_hpp
+#ifndef xdmExodus_Reader_hpp
+#define xdmExodus_Reader_hpp
 
 #include <xdmFormat/Reader.hpp>
 
@@ -30,7 +30,7 @@ XDM_EXODUS_NAMESPACE_BEGIN
 /// Class for reading an ExodusII file. Uses the ExodusII library functions to read
 /// an unstructured grid from an ExodusII file complete with nodes and element blocks
 /// for now.
-class ExodusReader : public xdmFormat::Reader {
+class ExodusReader {
 public:
   ExodusReader();
   virtual ~ExodusReader();
@@ -68,11 +68,21 @@ public:
   ///       Identical to one above except attributes (just the variables) have changed values
   ///          ...
   /// @return an xdmGrid::Domain
-  virtual xdm::RefPtr< xdm::Item > readItem( const std::string& filename );
+  virtual xdm::RefPtr< xdm::Item > readItem( const xdm::FileSystemPath& path );
+
+  /// Read the data for a particular time step.
+  /// @see xdmFormat::Reader
+  virtual bool update(
+    xdm::RefPtr< xdm::Item > item,
+    const xdm::FileSystemPath& path,
+    std::size_t timeStep = 0 );
+
+  /// Get the number of time steps in the ExodusII file.
+  std::size_t numberOfTimeSteps( const xdm::FileSystemPath& path ) const;
 
 };
 
 XDM_EXODUS_NAMESPACE_END
 
-#endif // xdmExodus_ExodusReader_hpp
+#endif // xdmExodus_Reader_hpp
 

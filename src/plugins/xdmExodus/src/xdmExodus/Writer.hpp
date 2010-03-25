@@ -18,16 +18,37 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //------------------------------------------------------------------------------
-#define BOOST_TEST_MODULE Geometry
-#include <boost/test/unit_test.hpp>
+#ifndef xdmExodus_Writer_hpp
+#define xdmExodus_Writer_hpp
 
-#include <xdmExodus/Reader.hpp>
+#include <xdmFormat/Writer.hpp>
 
-namespace {
+#include <xdmExodus/NamespaceMacro.hpp>
 
-BOOST_AUTO_TEST_CASE( doNothing ) {
-  BOOST_CHECK_EQUAL( "foo", "foo" );
-}
+XDM_EXODUS_NAMESPACE_BEGIN
 
-} // namespace
+/// Class for writing an ExodusII file. Uses the ExodusII library functions to write
+/// an unstructured grid to an ExodusII file complete with nodes and blocks for now.
+class ExodusWriter : public xdmFormat::Writer {
+public:
+  ExodusWriter();
+  virtual ~ExodusWriter();
+
+  /// Write an Item to the file with the given path.
+  /// @see xdmFormat::Writer::writeItem
+  virtual void writeItem( xdm::RefPtr< xdm::Item > item, const xdm::FileSystemPath& path );
+
+  /// Write an existing Item and it's subtree at a new time step. If there is no dynamic
+  /// data in the tree, then this function does nothing.
+  /// @see xdmFormat::Writer::update
+  virtual bool update(
+    xdm::RefPtr< xdm::Item > item,
+    const xdm::FileSystemPath& path,
+    std::size_t timeStep = 0 );
+
+};
+
+XDM_EXODUS_NAMESPACE_END
+
+#endif // xdmExodus_Writer_hpp
 

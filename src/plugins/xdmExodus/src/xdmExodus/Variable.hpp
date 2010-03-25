@@ -18,16 +18,40 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //------------------------------------------------------------------------------
-#define BOOST_TEST_MODULE Geometry
-#include <boost/test/unit_test.hpp>
+#ifndef xdmExodus_Variable_hpp
+#define xdmExodus_Variable_hpp
 
-#include <xdmExodus/Reader.hpp>
+#include <xdmGrid/Attribute.hpp>
 
-namespace {
+#include <xdm/NamespaceMacro.hpp>
 
-BOOST_AUTO_TEST_CASE( doNothing ) {
-  BOOST_CHECK_EQUAL( "foo", "foo" );
-}
+XDM_NAMESPACE_BEGIN
+template< typename T > class VectorStructuredArray;
+XDM_NAMESPACE_END
 
-} // namespace
+#include <xdmExodus/NamespaceMacro.hpp>
+
+XDM_EXODUS_NAMESPACE_BEGIN
+
+class Variable : public xdmGrid::Attribute {
+public:
+  Variable(
+    int exodusObjectType,
+    int variableIndex,
+    int objectId,
+    std::size_t numberOfEntries );
+
+  void readTimeStep( int exodusFileId, std::size_t timeStep );
+
+  int id() const;
+
+private:
+  int mExodusObjectType;
+  int mVariableIndex;
+  int mObjectId;
+};
+
+XDM_EXODUS_NAMESPACE_END
+
+#endif // xdmExodus_Variable_hpp
 

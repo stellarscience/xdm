@@ -36,8 +36,8 @@ namespace NodeOrderingConvention {
 namespace CellShape {
   enum Type {
     Default = 0,
-    Circle,
     Beam,
+    Circle,
     Hex,
     Polyvertex,
     Pyramid,
@@ -91,6 +91,12 @@ namespace CellType {
   const CellClass QuadraticTriangle( CellShape::Triangle, 7, "QuadraticTriangle" );
   const CellClass QuadraticWedge( CellShape::Wedge, 16, "QuadraticWedge" );
 }
+
+/// Get the CellClass that corresponds to an Exodus shape string.
+CellType::Type exodusCellType( std::size_t nodesPerCell, const std::string& cellName );
+
+/// Get the Exodus shape string the corresponds to a CellClass.
+std::string exodusShapeString( const CellType::Type& cell );
 
 XDM_GRID_NAMESPACE_END
 

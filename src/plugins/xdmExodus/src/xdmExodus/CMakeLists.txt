@@ -4,13 +4,23 @@
 project( xdmExodus )
 
 set( ${PROJECT_NAME}_HEADERS
-    ExodusConstants.hpp
-    ExodusReader.hpp
+    Blocks.hpp
+    Helpers.hpp
+    Maps.hpp
+    Object.hpp
+    Reader.hpp
+    Sets.hpp
+    Variable.hpp
+    Writer.hpp
     NamespaceMacro.hpp
 )
 
 set( ${PROJECT_NAME}_SOURCES
-    ExodusReader.cpp
+    Blocks.cpp
+    Object.cpp
+    Reader.cpp
+    Variable.cpp
+    Writer.cpp
 )
 
 add_library( ${PROJECT_NAME} 

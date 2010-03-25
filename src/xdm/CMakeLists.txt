@@ -22,6 +22,7 @@ set( ${PROJECT_NAME}_HEADERS
     DatasetExcept.hpp
     DataShape.hpp
     FileSystem.hpp
+    Forward.hpp
     HyperSlab.hpp
     HyperSlabBlockIterator.hpp
     HyperslabDataSelection.hpp

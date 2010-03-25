@@ -18,16 +18,30 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //------------------------------------------------------------------------------
-#define BOOST_TEST_MODULE Geometry
-#include <boost/test/unit_test.hpp>
+#ifndef xdmGrid_Forward_hpp
+#define xdmGrid_Forward_hpp
 
-#include <xdmExodus/Reader.hpp>
+#include <xdmGrid/NamespaceMacro.hpp>
 
-namespace {
+XDM_GRID_NAMESPACE_BEGIN
 
-BOOST_AUTO_TEST_CASE( doNothing ) {
-  BOOST_CHECK_EQUAL( "foo", "foo" );
-}
+class Attribute;
+class Cell;
+class CellSharedImp;
+class ConstCell;
+class CollectionGrid;
+class Domain;
+class Geometry;
+class Grid;
+class InterlacedGeometry;
+class MultiArrayGeometry;
+class StructuredTopology;
+class TensorProductGeometry;
+class Time;
+class UniformGrid;
+class UnstructuredTopology;
 
-} // namespace
+XDM_GRID_NAMESPACE_END
+
+#endif // xdmGrid_Forward_hpp
 

@@ -4,6 +4,9 @@
 //-----------------------------------------------------------------------------
 #include <xdmf/XmfReader.hpp>
 
+#include <xdm/Item.hpp>
+#include <xdm/RefPtr.hpp>
+
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 

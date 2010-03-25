@@ -18,16 +18,42 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //------------------------------------------------------------------------------
-#define BOOST_TEST_MODULE Geometry
-#include <boost/test/unit_test.hpp>
+#ifndef xdmExodus_Maps_hpp
+#define xdmExodus_Maps_hpp
 
-#include <xdmExodus/Reader.hpp>
+#include <xdmExodus/Object.hpp>
 
-namespace {
+#include <xdmExodus/NamespaceMacro.hpp>
 
-BOOST_AUTO_TEST_CASE( doNothing ) {
-  BOOST_CHECK_EQUAL( "foo", "foo" );
-}
+XDM_EXODUS_NAMESPACE_BEGIN
 
-} // namespace
+/// An Exodus map is not really an object, but it inherits from Object to grab some of
+/// the Exodus type lookup functionality.
+class Map :
+  public Object {
+};
+
+class NodeMap : public Map {
+protected:
+  virtual int exodusObjectTypeIndex() const { return 8; }
+};
+
+class EdgeMap : public Map {
+protected:
+  virtual int exodusObjectTypeIndex() const { return 9; }
+};
+
+class FaceMap : public Map {
+protected:
+  virtual int exodusObjectTypeIndex() const { return 10; }
+};
+
+class ElementMap : public Map {
+protected:
+  virtual int exodusObjectTypeIndex() const { return 11; }
+};
+
+XDM_EXODUS_NAMESPACE_END
+
+#endif // xdmExodus_Maps_hpp
 

@@ -180,6 +180,30 @@ void appendChild( ObjectCompositionMixin< T >& obj, RefPtr< T > child ) {
   obj.appendChild( child );
 }
 
+/// Get the first child.
+template< typename T >
+RefPtr< T > front( ObjectCompositionMixin< T >& obj ) {
+  return obj.front();
+}
+
+/// Get a const first child.
+template< typename T >
+RefPtr< const T > front( const ObjectCompositionMixin< T >& obj ) {
+  return obj.front();
+}
+
+/// Get the last child.
+template< typename T >
+RefPtr< T > back( ObjectCompositionMixin< T >& obj ) {
+  return obj.back();
+}
+
+/// Get a const last child.
+template< typename T >
+RefPtr< const T > back( const ObjectCompositionMixin< T >& obj ) {
+  return obj.back();
+}
+
 XDM_NAMESPACE_END
 
 #endif // xdm_ObjectCompositionMixin_hpp

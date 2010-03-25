@@ -18,10 +18,20 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //------------------------------------------------------------------------------
+
+#include <xdmGrid/UnstructuredTopology.hpp>
+#include <xdmGrid/UnstructuredTopologyConventions.hpp>
+
+#include <xdm/ArrayAdapter.hpp>
+#include <xdm/RefPtr.hpp>
+
 #include <exodusII.h>
 
 #include <algorithm>
+#include <cstring>
 #include <functional>
+#include <map>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -36,11 +46,21 @@ XDM_EXODUS_NAMESPACE_BEGIN
 
 /// String type for working with Exodus char*.
 struct ExodusString {
+  ExodusString() {}
+
+  ExodusString( const std::string& str ) {
+    std::strcpy( raw, str.substr( 0, MAX_STR_LENGTH + 1 ).c_str() );
+  }
+
+  ExodusString( const char* str ){
+    std::strcpy( raw, std::string( str ).substr( 0, MAX_STR_LENGTH + 1 ).c_str() );
+  }
+
   char raw[ MAX_STR_LENGTH + 1 ];
 
   char* ptr() { return raw; }
 
-  std::string string() { return std::string( raw ); }
+  std::string string() const { return std::string( raw ); }
 };
 
 /// Get a char** that points to the individual strings in a std::vector< ExodusString >.
@@ -55,6 +75,13 @@ template< typename OutputIterator >
 void convertToZeroBase( const std::vector< int >& vecWithExodusOrdering, OutputIterator oBegin ) {
   std::transform( vecWithExodusOrdering.begin(), vecWithExodusOrdering.end(), oBegin,
     std::bind2nd( std::minus< std::size_t >(), 1 ) );
+}
+
+/// This is the inverse of convertToZeroBase.
+template< typename OutputIterator >
+void convertToOneBase( const std::vector< std::size_t >& vecWithBaseZeroOrdering, OutputIterator oBegin ) {
+  std::transform( vecWithBaseZeroOrdering.begin(), vecWithBaseZeroOrdering.end(), oBegin,
+    std::bind2nd( std::plus< int >(), 1 ) );
 }
 
 const std::size_t kNumberOfObjectTypes = 12;
@@ -98,21 +125,6 @@ const int kInquireObjectSizes[ kNumberOfObjectTypes ] = {
   EX_INQ_ELEM_MAP
 };
 
-const ExodusString kObjectTypenames[ kNumberOfObjectTypes ] = {
-  { "   Edge block" },
-  { "   Face block" },
-  { "Element block" },
-  { "    Node set" },
-  { "    Edge set" },
-  { "    Face set" },
-  { "    Side set" },
-  { " Element set" },
-  { "    Node map" },
-  { "    Edge map" },
-  { "    Face map" },
-  { " Element map" }
-};
-
 const char* kObjectTypeChar[ kNumberOfObjectTypes ] = {
   "L",
   "F",
@@ -127,6 +139,30 @@ const char* kObjectTypeChar[ kNumberOfObjectTypes ] = {
   0,
   0,
 };
+
+// Helpers that create a UniformDataItem from a StructuredArray. This is done frequently.
+// First version takes one dimension.
+xdm::RefPtr< xdm::UniformDataItem > makeDataItem(
+  xdm::RefPtr< xdm::StructuredArray > vector,
+  xdm::primitiveType::Value primType,
+  std::size_t firstExtent ) {
+
+  xdm::RefPtr< xdm::UniformDataItem > dataItem(
+    new xdm::UniformDataItem( primType, xdm::makeShape( firstExtent ) ) );
+  dataItem->setData( xdm::makeRefPtr( new xdm::ArrayAdapter( vector ) ) );
+}
+
+// Second version takes two dimensions.
+xdm::RefPtr< xdm::UniformDataItem > makeDataItem(
+  xdm::RefPtr< xdm::StructuredArray > vector,
+  xdm::primitiveType::Value primType,
+  std::size_t firstExtent,
+  std::size_t secondExtent ) {
+
+  xdm::RefPtr< xdm::UniformDataItem > dataItem(
+    new xdm::UniformDataItem( primType, xdm::makeShape( firstExtent, secondExtent ) ) );
+  dataItem->setData( xdm::makeRefPtr( new xdm::ArrayAdapter( vector ) ) );
+}
 
 XDM_EXODUS_NAMESPACE_END
 

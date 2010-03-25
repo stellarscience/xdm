@@ -6,11 +6,7 @@
 #define xdmFormat_Reader_hpp
 
 #include <xdm/FileSystem.hpp>
-#include <xdm/Item.hpp>
-#include <xdm/RefPtr.hpp>
-
-#include <stdexcept>
-#include <string>
+#include <xdm/Forward.hpp>
 
 #include <xdmFormat/NamespaceMacro.hpp>
 
@@ -26,7 +22,7 @@ public:
   /// Read an Item from the file with the given path.
   /// @param path Path to the file to read.
   /// @return A new Item on success, an invalid RefPtr on failure.
-  virtual xdm::RefPtr< xdm::Item > 
+  virtual xdm::RefPtr< xdm::Item >
   readItem( const xdm::FileSystemPath& path ) = 0;
 
   /// Update an existing Item and it's subtree for a new time step, if possible.
@@ -34,7 +30,10 @@ public:
   /// @post The data in the input item is updated to reflect a new time step.
   /// @param item An existing item tree.
   /// @return True if new data is available, false otherwise.
-  virtual bool update( xdm::RefPtr< xdm::Item > item ) = 0;
+  virtual bool update(
+    xdm::RefPtr< xdm::Item > item,
+    const xdm::FileSystemPath& path,
+    std::size_t timeStep = 0 ) = 0;
 
 };
 
