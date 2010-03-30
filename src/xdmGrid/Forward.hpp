@@ -38,6 +38,7 @@ class MultiArrayGeometry;
 class StructuredTopology;
 class TensorProductGeometry;
 class Time;
+class Topology;
 class UniformGrid;
 class UnstructuredTopology;
 

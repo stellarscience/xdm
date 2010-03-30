@@ -24,6 +24,7 @@
 #include <xdmExodus/Helpers.hpp>
 #include <xdmExodus/Variable.hpp>
 
+#include <xdmGrid/CollectionGrid.hpp>
 #include <xdmGrid/Domain.hpp>
 #include <xdmGrid/MultiArrayGeometry.hpp>
 #include <xdmGrid/Time.hpp>
@@ -253,6 +254,8 @@ xdm::RefPtr< xdm::Item > ExodusReader::readItem( const xdm::FileSystemPath& path
 
   // The Item returned is an xdmGrid::Domain.
   xdm::RefPtr< xdmGrid::Domain > domain( new xdmGrid::Domain );
+  xdm::RefPtr< xdmGrid::CollectionGrid > spatialCollection( new xdmGrid::CollectionGrid );
+  domain->addGrid( spatialCollection );
 
   //---------------NODES-------------------
   xdm::RefPtr< xdmGrid::Geometry > geom = readGeometry( fileId, gridParameters );
@@ -287,7 +290,7 @@ xdm::RefPtr< xdm::Item > ExodusReader::readItem( const xdm::FileSystemPath& path
         block->setEntryGlobalOffset( globalOffset );
         globalOffset += block->numberOfEntries();
 
-        domain->addGrid( block );
+        spatialCollection->appendChild( block );
 
       } else if ( objectIsSet( objectTypeIndex ) ) {
 

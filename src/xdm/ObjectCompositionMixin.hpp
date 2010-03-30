@@ -116,6 +116,16 @@ public:
     return mChildObjects.back();
   }
 
+  /// Get a reference to a vector of the stored pointers.
+  std::vector< xdm::RefPtr< T > >& allChildren() {
+    return mChildObjects;
+  }
+
+  /// Get a const reference to a vector of the stored pointers.
+  const std::vector< xdm::RefPtr< T > >& allChildren() const {
+    return mChildObjects;
+  }
+
 protected:
 
   /// Only sublclasses can construct.  Takes an optional argument to initialize
@@ -170,8 +180,8 @@ const RefPtr< T > child( const ObjectCompositionMixin< T >& obj, unsigned int i 
 
 /// Set the i'th child of the given object.
 template< typename T >
-void setChildObject( ObjectCompositionMixin< T >& obj, unsigned int i, RefPtr< T > child ) {
-  obj.setChildObject( i, child );
+void setChild( ObjectCompositionMixin< T >& obj, unsigned int i, RefPtr< T > child ) {
+  obj.setChild( i, child );
 }
 
 /// Append a child to the given object.

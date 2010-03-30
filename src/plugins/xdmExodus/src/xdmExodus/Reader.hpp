@@ -41,36 +41,35 @@ public:
   /// addition, there are a few nomenclature clashes with XDM. For ExodusII, all "attributes" are
   /// static values that may be assigned to different portions of the mesh. ExodusII "variables"
   /// are time varying values. Since XDM does not distinguish between the two, everything becomes
-  /// an xdmGrid::Attribute. An example of the conversion of a thermal problem on a fixed mesh
-  /// with results for several time steps is shown below.
+  /// an xdmGrid::Attribute.
+  ///
+  /// This reader creates a Domain with a single spatial CollectionGrid underneath that contains
+  /// all of the Exodus blocks, sets, and maps. If there is dynamic information (variables) then
+  /// readItem will set up these variables, but a call to update() is needed to read a time step.
+  ///
+  /// The example below shows a result that might be obtained when reading a thermal mesh.
+  ///
   /// Domain
-  ///   CollectionGrid (1 Grid per time step)
-  ///     Time (whole series)
-  ///     CollectionGrid (time step 1)
-  ///       Time (for just this time step)
-  ///       UniformGrid
-  ///         Name
-  ///         Geometry (points to the only one)
-  ///         Topology (one edge/face/element block)
-  ///         Attribute (thermal conductivity for this block for all time)
-  ///         Attribute (variable 1 for each element)
-  ///         Attribute (variable 2 for each element)
-  ///       UniformGrid
-  ///         Name
-  ///         Geometry (points to only one)
-  ///         Topology (one block)
-  ///         Attribute (variable 1 for each element)
-  ///     CollectionGrid (time step 2)
-  ///       Identical to one above except attributes (just the variables) have changed values. This
-  ///       grid contains pointers to the same topologies as above (the actual data values are only
-  ///       stored once).
-  ///     CollectionGrid (time step 3)
-  ///       Identical to one above except attributes (just the variables) have changed values
+  ///   CollectionGrid (a spatial collection)
+  ///     UniformGrid
+  ///       Name
+  ///       Geometry (points to the only one)
+  ///       Topology (one edge/face/element block)
+  ///       Attribute (thermal conductivity for this block for all time)
+  ///       Attribute (variable 1 for each element)
+  ///       Attribute (variable 2 for each element)
+  ///     UniformGrid
+  ///       Name
+  ///       Geometry (points to only one)
+  ///       Topology (one block)
+  ///       Attribute (variable 1 for each element)
   ///          ...
   /// @return an xdmGrid::Domain
   virtual xdm::RefPtr< xdm::Item > readItem( const xdm::FileSystemPath& path );
 
   /// Read the data for a particular time step.
+  /// @post A Time object is attached to all Grid items and all Attributes that have dynamic
+  ///       data (Exodus variables) have updated values.
   /// @see xdmFormat::Reader
   virtual bool update(
     xdm::RefPtr< xdm::Item > item,
@@ -85,4 +84,3 @@ public:
 XDM_EXODUS_NAMESPACE_END
 
 #endif // xdmExodus_Reader_hpp
-

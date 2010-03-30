@@ -50,14 +50,21 @@ public:
 
   virtual void addVariable( xdm::RefPtr< Variable > variable ) {}
 
+  virtual std::vector< xdm::RefPtr< Variable > > variables() {}
+
   void setupVariables(
     std::vector< int >::const_iterator beginTruthTable,
     const std::size_t numberOfVariables,
     const std::vector< ExodusString >& variableNames );
 
-  void readTimeStep( int exodusFileId, std::size_t timeStep );
+  virtual void writeToFile( int exodusFileId, int* variableTruthTable ) {}
+
+  virtual void readTimeStep( int exodusFileId, std::size_t timeStep );
+
+  virtual void writeTimeStep( int exodusFileId, std::size_t timeStep );
 
 protected:
+  /// Inheriting classes must return the appropriate index into the xdmExodus::kObjectTypes array.
   virtual int exodusObjectTypeIndex() const = 0;
 
 private:

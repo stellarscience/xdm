@@ -43,6 +43,8 @@ public:
 
   void readTimeStep( int exodusFileId, std::size_t timeStep );
 
+  void writeTimeStep( int exodusFileId, std::size_t timeStep );
+
   int id() const;
 
 private:

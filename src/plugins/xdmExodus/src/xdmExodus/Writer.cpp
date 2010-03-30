@@ -114,7 +114,7 @@ public:
     }
   }
 
-  std::vector< T* >& pointers() { return mPointers; }
+  std::vector< Object* >& pointers() { return mPointers; }
   std::size_t totalNumberOfEntries() const { return mEntryCount; }
   const VariableNameMap& names() const { return mNames; }
 
@@ -128,34 +128,74 @@ public:
 
 private:
   VariableNameMap mNames;
-  std::vector< T* > mPointers;
+  std::vector< Object* > mPointers;
   std::size_t mEntryCount;
 };
 
-// This is expected to only be called on UniformGrids or other classes that contain Attributes.
-// The visitor collects attributes, distinguishing between Exodus "attributes" and Variables.
-class AttributeVariableVisitor : public xdm::ItemVisitor {
+class FindTimeVisitor : public xdm::ItemVisitor {
 public:
   virtual void apply( xdm::Item& item ) {
-    xdmGrid::Attribute* attribute = dynamic_cast< xdmGrid::Attribute* >( &item );
-    if ( attribute ) {
-      Variable* variable = dynamic_cast< Variable* >( attribute );
-      if ( variable ) {
-        mVariables.push_back( variable );
-      } else {
-        mAttributes.push_back( attribute );
+    if ( ! mTime.valid() ) {
+      xdmGrid::Grid* grid = dynamic_cast< xdmGrid::Grid* >( &item );
+      if ( grid ) {
+        if ( grid->time().valid() ) {
+          mTime = grid->time();
+        }
       }
     }
   }
 
-  std::vector< xdmGrid::Attribute* >& attributes() { return mAttributes; }
-  std::vector< Variable* >& variables() { return mVariables; }
-
+  xdm::RefPtr< xdmGrid::Time > time() { return mTime; }
 
 private:
-  std::vector< xdmGrid::Attribute* > mAttributes;
-  std::vector< Variable* > mVariables;
+  xdm::RefPtr< xdmGrid::Time > mTime;
 };
+
+void writeBlockData(
+  int exodusFileId,
+  int exodusObjectType,
+  const VariableNameMap& variableNames,
+  std::vector< Object* >& objects ) {
+
+  // Write the Exodus variable data for this block.
+  std::size_t numberOfVariables = 0;
+  if ( ! variableNames.empty() ) {
+    numberOfVariables = variableNames.rbegin()->first;
+    EXODUS_CALL(
+      ex_put_variable_param( exodusFileId, exodusObjectType, numberOfVariables ),
+      "Unable to write edge result variable parameters." );
+  }
+  for ( VariableNameMap::const_iterator nameIt = variableNames.begin();
+    nameIt != variableNames.end(); ++nameIt ) {
+
+    EXODUS_CALL(
+      ex_put_variable_name(
+        exodusFileId,
+        exodusObjectType,
+        nameIt->first,
+        nameIt->second.c_str() ),
+      "Unable to write variable name." );
+  }
+
+  // Write the blocks while simultaneously building the truth table.
+  std::vector< int > variableTruthTable( objects.size() * numberOfVariables, 0 );
+  for ( std::size_t blockIndex = 0; blockIndex < objects.size(); ++blockIndex ) {
+    objects[ blockIndex ]->writeToFile(
+      exodusFileId,
+      &variableTruthTable[ blockIndex * numberOfVariables ] );
+  }
+
+  // Writing the truth table before trying to write variables makes the writing
+  // much faster because only one allocation is performed by NetCDF.
+  EXODUS_CALL(
+   ex_put_truth_table(
+    exodusFileId,
+    exodusObjectType,
+    objects.size(),
+    numberOfVariables,
+    &variableTruthTable[0] ),
+  "Unable to write variable truth table." );
+}
 
 } // anon namespace
 
@@ -195,11 +235,11 @@ void ExodusWriter::writeItem( xdm::RefPtr< xdm::Item > item, const xdm::FileSyst
   // the first one.
   xdmGrid::Geometry* geom;
   if ( meshParams.num_edge_blk > 0 ) {
-    geom = edgeBlockGatherVisitor.pointers().front()->geometry().get();
+    geom = dynamic_cast< Block* >( edgeBlockGatherVisitor.pointers().front() )->geometry().get();
   } else if ( meshParams.num_face_blk > 0 ) {
-    geom = faceBlockGatherVisitor.pointers().front()->geometry().get();
+    geom = dynamic_cast< Block* >( faceBlockGatherVisitor.pointers().front() )->geometry().get();
   } else {
-    geom = elementBlockGatherVisitor.pointers().front()->geometry().get();
+    geom = dynamic_cast< Block* >( elementBlockGatherVisitor.pointers().front() )->geometry().get();
   }
   meshParams.num_dim = geom->dimension();
   meshParams.num_nodes = geom->numberOfNodes();
@@ -237,116 +277,45 @@ void ExodusWriter::writeItem( xdm::RefPtr< xdm::Item > item, const xdm::FileSyst
   EXODUS_CALL( ex_put_init_ext( file.id(), &meshParams ),
     "Unable to initialize database.\n" );
 
-  // Write the block data.
-  std::vector< int > variableTruthTable(
-    meshParams.num_edge_blk * edgeBlockGatherVisitor.maxVariableId(), 0 );
+  // Write the time step info, if there is any.
+  FindTimeVisitor timeVisit;
+  item->traverse( timeVisit );
+  if ( timeVisit.time() ) {
+    double timeVal = timeVisit.time()->value();
+    EXODUS_CALL( ex_put_time( file.id(), (int)( timeStep + 1 ), (void*)&timeVal ),
+      "Unable to write time value." );
+  }
+
+  // Write the blocks.
+  writeBlockData(
+    file.id(),
+    EX_EDGE_BLOCK,
+    edgeBlockGatherVisitor.names(),
+    edgeBlockGatherVisitor.pointers() );
+
+  writeBlockData(
+    file.id(),
+    EX_FACE_BLOCK,
+    faceBlockGatherVisitor.names(),
+    faceBlockGatherVisitor.pointers() );
+
+  writeBlockData(
+    file.id(),
+    EX_ELEM_BLOCK,
+    elementBlockGatherVisitor.names(),
+    elementBlockGatherVisitor.pointers() );
+
+  // Write the variable data for this time step.
   for ( std::size_t blockIndex = 0; blockIndex < meshParams.num_edge_blk; ++blockIndex ) {
-    Block& block = *edgeBlockGatherVisitor.pointers()[ blockIndex ];
-    AttributeVariableVisitor visitor;
-    block.traverse( visitor );
-    EXODUS_CALL(
-      ex_put_block(
-        file.id(),
-        EX_EDGE_BLOCK,
-        block.id(),
-        xdmGrid::exodusShapeString( block.topology()->cellType( 0 ) ).c_str(),
-        (int)block.numberOfEntries(),
-        (int)block.topology()->cellType( 0 ).nodesPerCell(),
-        0, // edges per entry
-        0, // faces per entry
-        (int)visitor.attributes().size() ),
-      "Unable to write edge block parameters." );
-
-    std::vector< int > connections;
-    for ( std::size_t entry = 0; entry < block.numberOfEntries(); ++entry ) {
-      xdmGrid::ConstCellConnectivity entryNodes = block.topology()->cellConnections( entry );
-      for ( std::size_t node = 0; node < entryNodes.size(); ++node ) {
-        connections.push_back( (int)entryNodes[ node ] + 1 );
-      }
-    }
-    EXODUS_CALL( ex_put_conn( file.id(), EX_EDGE_BLOCK, block.id(), &connections[0], 0, 0 ),
-      "Unable to write edge block connectivity." );
-    EXODUS_CALL( ex_put_name( file.id(), EX_EDGE_BLOCK, block.id(), block.name().c_str() ),
-      "Unable to write edge block name." );
-
-    // Write the Exodus attributes.
-    std::vector< ExodusString > attributeNames;
-    for ( std::size_t att = 0; att < visitor.attributes().size(); ++att ) {
-      // Skip anything that isn't a scalar for now.
-      if ( visitor.attributes()[ att ]->dataType() != xdmGrid::Attribute::kScalar ) {
-        continue;
-      }
-
-      attributeNames.push_back( visitor.attributes()[ att ]->name() );
-      EXODUS_CALL(
-        ex_put_one_attr(
-          file.id(),
-          EX_EDGE_BLOCK,
-          block.id(),
-          (int)att,
-          (void*)visitor.attributes()[ att ]->dataItem()->typedArray< double >()->begin() ),
-        "Unable to write edge block attribute values." );
-
-    }
-    if ( visitor.attributes().size() > 0 ) {
-      char* attributeNamesCharArray[ attributeNames.size() ];
-      vectorToCharStarArray( attributeNames, attributeNamesCharArray );
-      EXODUS_CALL(
-        ex_put_attr_names( file.id(), EX_EDGE_BLOCK, block.id(), attributeNamesCharArray ),
-        "Unable to write edge block attribute names." );
-    }
-
-    // Construct the truth table (this is not strictly necessary, but helps with efficiency).
-    for ( std::size_t var = 0; var < visitor.variables().size(); ++var ) {
-      variableTruthTable[ blockIndex * edgeBlockGatherVisitor.maxVariableId() +
-        ( visitor.variables()[ var ]->id() - 1 ) ] = 1;
-    }
+    edgeBlockGatherVisitor.pointers()[ blockIndex ]->writeTimeStep( file.id(), timeStep );
+  }
+  for ( std::size_t blockIndex = 0; blockIndex < meshParams.num_face_blk; ++blockIndex ) {
+    faceBlockGatherVisitor.pointers()[ blockIndex ]->writeTimeStep( file.id(), timeStep );
+  }
+  for ( std::size_t blockIndex = 0; blockIndex < meshParams.num_elem_blk; ++blockIndex ) {
+    elementBlockGatherVisitor.pointers()[ blockIndex ]->writeTimeStep( file.id(), timeStep );
   }
 
-  // Write the Exodus variables.
-  if ( edgeBlockGatherVisitor.maxVariableId() > 0 ) {
-    EXODUS_CALL(
-      ex_put_variable_param( file.id(), EX_EDGE_BLOCK, edgeBlockGatherVisitor.maxVariableId() ),
-      "Unable to write edge result variable parameters." );
-  }
-  for ( int var = 1; var <= edgeBlockGatherVisitor.maxVariableId(); ++var ) {
-    EXODUS_CALL(
-      ex_put_variable_name(
-        file.id(),
-        EX_EDGE_BLOCK,
-        var,
-        edgeBlockGatherVisitor.names()[ var ].c_str() ),
-      "Unable to write variable name." );
-  }
-  xdm::RefPtr< const xdmGrid::Time > time;
-  for ( std::size_t blockIndex = 0; blockIndex < meshParams.num_edge_blk; ++blockIndex ) {
-    Block& block = *edgeBlockGatherVisitor.pointers()[ blockIndex ];
-    AttributeVariableVisitor visitor;
-    block.traverse( visitor );
-    for ( std::size_t var = 0; var < visitor.variables().size(); ++var ) {
-      EXODUS_CALL(
-        ex_put_var(
-          file.id(),
-          (int)( timeStep + 1 ),
-          EX_EDGE_BLOCK,
-          (int)( var + 1 ),
-          block.id(),
-          block.numberOfEntries(),
-          (void*)visitor.variables()[ var ]->dataItem()->typedArray< double >()->begin() ),
-        "Unable to write edge block variable." );
-    }
-
-    // Grab a time if one is available.
-    if ( block.time().valid() ) {
-      time = block.time();
-    }
-  }
-
-  // Write the time step info.
-  if ( time.valid() ) {
-    double timeVal = time->value();
-    EXODUS_CALL( ex_put_time( file.id(), (int)(timeStep + 1 ), (void*)&timeVal ), "Unable to write time value." );
-  }
 }
 
 bool ExodusWriter::update(

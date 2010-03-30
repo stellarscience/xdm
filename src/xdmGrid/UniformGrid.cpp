@@ -28,6 +28,7 @@
 #include <xdmGrid/UnstructuredTopologyConventions.hpp>
 
 #include <xdm/ItemVisitor.hpp>
+#include <xdm/RefPtr.hpp>
 #include <xdm/UniformDataItem.hpp>
 #include <xdm/ThrowMacro.hpp>
 
@@ -100,7 +101,7 @@ void UniformGrid::addAttribute( xdm::RefPtr< Attribute > attribute ) {
 Cell UniformGrid::cell( std::size_t cellIndex )
 {
   if ( ! mCellImp ) {
-    mCellImp = new SimpleCellImp( mGeometry, mTopology );
+    setCellSharedImp( xdm::makeRefPtr( new SimpleCellImp( mGeometry, mTopology ) ) );
   }
   return Cell( mCellImp, cellIndex );
 }
@@ -109,7 +110,8 @@ ConstCell UniformGrid::cell( std::size_t cellIndex ) const
 {
   if ( ! mCellImp ) {
     UniformGrid& mutableThis = const_cast< UniformGrid& >( *this );
-    mutableThis.mCellImp = new SimpleCellImp( mutableThis.mGeometry, mutableThis.mTopology );
+    mutableThis.setCellSharedImp(
+      xdm::makeRefPtr( new SimpleCellImp( mutableThis.mGeometry, mutableThis.mTopology ) ) );
   }
   return ConstCell( mCellImp, cellIndex );
 }
@@ -130,6 +132,10 @@ void UniformGrid::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
 
   // write Uniform grid type
   xml.setAttribute( "GridType", "Uniform" );
+}
+
+void UniformGrid::setCellSharedImp( xdm::RefPtr< CellSharedImp > cellImp ) {
+  mCellImp = cellImp;
 }
 
 xdm::RefPtr< xdmGrid::Attribute >

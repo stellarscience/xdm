@@ -49,7 +49,11 @@ public:
 
   virtual void addVariable( xdm::RefPtr< Variable > variable );
 
-  virtual void readAttributes( int exodusFileId, std::size_t attributesPerEntry );
+  virtual std::vector< xdm::RefPtr< Variable > > variables();
+
+  /// Get the Exodus attributes (note that these are a subset of xdmGrid::Attributes because
+  /// Exodus uses the term "variable" to denote dynamic attributes).
+  virtual std::vector< xdm::RefPtr< xdmGrid::Attribute > > attributes();
 
   virtual void readFromFile(
     int exodusFileId,
@@ -59,6 +63,12 @@ public:
     std::vector< int >::const_iterator beginTruthTable,
     const std::size_t numberOfVariables,
     const std::vector< ExodusString >& variableNames );
+
+  virtual void writeToFile( int exodusFileId, int* variableTruthTable );
+
+protected:
+  virtual void readAttributes( int exodusFileId, std::size_t attributesPerEntry );
+  virtual void writeAttributes( int exodusFileId );
 
 private:
   std::size_t mOffset;

@@ -50,6 +50,16 @@ void Block::addVariable( xdm::RefPtr< Variable > variable ) {
   addAttribute( variable );
 }
 
+std::vector< xdm::RefPtr< Variable > > Block::variables() {
+  std::vector< xdm::RefPtr< Variable > > vars;
+  for ( Iterator varIt = begin(); varIt != end(); ++varIt ) {
+    xdm::RefPtr< Variable > variable = xdm::dynamic_pointer_cast< Variable >( *varIt );
+    if ( variable.valid() ) {
+      vars.push_back( variable );
+    }
+  }
+}
+
 void Block::readAttributes( int exodusFileId, std::size_t attributesPerEntry ) {
   std::vector< ExodusString > attributeNames( attributesPerEntry );
   char* attributeNamesCharArray[ attributesPerEntry ];
@@ -82,7 +92,45 @@ void Block::readAttributes( int exodusFileId, std::size_t attributesPerEntry ) {
     attr->setName( attributeNames[ attributeIndex ].string() );
     addAttribute( attr );
   }
+}
 
+void Block::writeAttributes( int exodusFileId ) {
+  std::vector< xdm::RefPtr< xdmGrid::Attribute > > attribs = attributes();
+  std::vector< ExodusString > attributeNames;
+  for ( std::size_t attIndex = 0; attIndex < attribs.size(); ++attIndex ) {
+    // Skip anything that isn't a scalar for now.
+    if ( attribs[ attIndex ]->dataType() != xdmGrid::Attribute::kScalar ) {
+      continue;
+    }
+
+    attributeNames.push_back( attribs[ attIndex ]->name() );
+    EXODUS_CALL(
+      ex_put_one_attr(
+        exodusFileId,
+        exodusObjectType(),
+        id(),
+        (int)attIndex,
+        (void*)attribs[ attIndex ]->dataItem()->typedArray< double >()->begin() ),
+      "Unable to write block attribute values." );
+
+  }
+  if ( attribs.size() > 0 ) {
+    char* attributeNamesCharArray[ attributeNames.size() ];
+    vectorToCharStarArray( attributeNames, attributeNamesCharArray );
+    EXODUS_CALL(
+      ex_put_attr_names( exodusFileId, exodusObjectType(), id(), attributeNamesCharArray ),
+      "Unable to write block attribute names." );
+  }
+}
+
+std::vector< xdm::RefPtr< xdmGrid::Attribute > > Block::attributes() {
+  std::vector< xdm::RefPtr< xdmGrid::Attribute > > attribs;
+  for ( Iterator attIt = begin(); attIt != end(); ++attIt ) {
+    xdm::RefPtr< Variable > variable = xdm::dynamic_pointer_cast< Variable >( *attIt );
+    if ( ! variable.valid() ) {
+      attribs.push_back( *attIt );
+    }
+  }
 }
 
 void Block::readFromFile(
@@ -157,6 +205,45 @@ void Block::readFromFile(
     // Fill the variables with the data from the first time step. If data from another step
     // is needed, the user can call update().
     readTimeStep( exodusFileId, 0 );
+  }
+}
+
+void Block::writeToFile( int exodusFileId, int* variableTruthTable ) {
+  // First get the attributes.
+  std::vector< xdm::RefPtr< xdmGrid::Attribute > > attribs = attributes();
+
+  EXODUS_CALL(
+    ex_put_block(
+      exodusFileId,
+      exodusObjectType(),
+      id(),
+      xdmGrid::exodusShapeString( topology()->cellType( 0 ) ).c_str(),
+      (int)numberOfEntries(),
+      (int)topology()->cellType( 0 ).nodesPerCell(),
+      0, // edges per entry
+      0, // faces per entry
+      (int)attribs.size() ),
+    "Unable to write block parameters." );
+
+  std::vector< int > connections;
+  for ( std::size_t entry = 0; entry < numberOfEntries(); ++entry ) {
+    xdmGrid::ConstCellConnectivity entryNodes = topology()->cellConnections( entry );
+    for ( std::size_t node = 0; node < entryNodes.size(); ++node ) {
+      connections.push_back( (int)entryNodes[ node ] + 1 );
+    }
+  }
+  EXODUS_CALL( ex_put_conn( exodusFileId, exodusObjectType(), id(), &connections[0], 0, 0 ),
+    "Unable to write block connectivity." );
+  EXODUS_CALL( ex_put_name( exodusFileId, exodusObjectType(), id(), name().c_str() ),
+    "Unable to write block name." );
+
+  // Write the Exodus attributes.
+  writeAttributes( exodusFileId );
+
+  // Construct the truth table (this is not strictly necessary, but helps with efficiency).
+  std::vector< xdm::RefPtr< Variable > > vars = variables();
+  for ( std::size_t varIndex = 0; varIndex < vars.size(); ++varIndex ) {
+    variableTruthTable[ ( vars[ varIndex ]->id() - 1 ) ] = 1;
   }
 }
 

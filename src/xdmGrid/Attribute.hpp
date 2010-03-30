@@ -21,16 +21,12 @@
 #ifndef xdmGrid_Attribute_hpp
 #define xdmGrid_Attribute_hpp
 
+#include <xdm/Forward.hpp>
 #include <xdm/Item.hpp>
 #include <xdm/ItemVisitor.hpp>
 #include <xdm/RefPtr.hpp>
 
 #include <xdmGrid/NamespaceMacro.hpp>
-#include <xdm/NamespaceMacro.hpp>
-
-XDM_NAMESPACE_BEGIN
-  class UniformDataItem;
-XDM_NAMESPACE_END
 
 XDM_GRID_NAMESPACE_BEGIN
 

@@ -69,4 +69,11 @@ void Object::readTimeStep( int exodusFileId, std::size_t timeStep ) {
   }
 }
 
+void Object::writeTimeStep( int exodusFileId, std::size_t timeStep ) {
+  typedef std::vector< xdm::RefPtr< Variable > >::iterator VariableIterator;
+  for ( VariableIterator var = mVariables.begin(); var != mVariables.end(); ++var ) {
+    (*var)->writeTimeStep( exodusFileId, timeStep );
+  }
+}
+
 XDM_EXODUS_NAMESPACE_END

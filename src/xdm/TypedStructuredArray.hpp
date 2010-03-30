@@ -120,13 +120,13 @@ public:
   /// Index the ith element of the array.
   value_type& operator[]( size_t i ) {
     assert( i < mSize );
-    return mData + i;
+    return mData[i];
   }
 
   /// Index the const ith element of the array.
   const value_type& operator[] ( size_t i ) const {
     assert( i < mSize );
-    return mData + i;
+    return mData[i];
   }
 
 private:

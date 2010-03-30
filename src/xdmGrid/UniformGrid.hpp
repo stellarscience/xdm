@@ -22,29 +22,19 @@
 #define xdmGrid_UniformGrid_hpp
 
 #include <xdmGrid/Attribute.hpp>
+#include <xdmGrid/Forward.hpp>
 #include <xdmGrid/Grid.hpp>
 
+#include <xdm/Forward.hpp>
 #include <xdm/ObjectCompositionMixin.hpp>
 #include <xdm/PrimitiveType.hpp>
-#include <xdm/RefPtr.hpp>
 
 #include <string>
 #include <vector>
 
-#include <xdm/NamespaceMacro.hpp>
 #include <xdmGrid/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
-  class ItemVisitor;
-XDM_NAMESPACE_END
-
 XDM_GRID_NAMESPACE_BEGIN
-
-class Cell;
-class ConstCell;
-class CellSharedImp;
-class Geometry;
-class Topology;
 
 /// Grid type containing the actual geometry and topology for a grid.  This is a
 /// terminal grid node that contains the geometric and topological properties of
@@ -79,6 +69,11 @@ public:
 
   /// Redefinition of metadata from Grid.
   virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
+
+protected:
+  /// If a class inherits from this class, it can set the shared imp for ease
+  /// of implementation.
+  void setCellSharedImp( xdm::RefPtr< CellSharedImp > cellImp );
 
 private:
   xdm::RefPtr< Geometry > mGeometry;

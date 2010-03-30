@@ -62,6 +62,19 @@ void Variable::readTimeStep( int exodusFileId, std::size_t timeStep ) {
     "Could not read variable values." );
 }
 
+void Variable::writeTimeStep( int exodusFileId, std::size_t timeStep ) {
+  EXODUS_CALL(
+    ex_put_var(
+      exodusFileId,
+      (int)( timeStep + 1 ),
+      mExodusObjectType,
+      mVariableIndex,
+      mObjectId,
+      (int)dataItem()->data()->array()->size(),
+      (void*)dataItem()->typedArray< double >()->begin() ),
+    "Unable to write variable." );
+}
+
 int Variable::id() const {
   return mVariableIndex;
 }

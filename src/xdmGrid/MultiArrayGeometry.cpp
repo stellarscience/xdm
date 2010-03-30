@@ -67,6 +67,9 @@ void MultiArrayGeometry::setCoordinateValues(
       XDM_THROW( std::runtime_error( "The arrays in the UniformDataItems supplied are"
         " not all of the same size." ) );
     }
+
+    setNumberOfNodes( sizes.front() );
+
   }
 }
 
