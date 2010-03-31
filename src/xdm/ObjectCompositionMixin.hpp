@@ -174,7 +174,7 @@ RefPtr< T > child( ObjectCompositionMixin< T >& obj, unsigned int i ) {
 
 /// Get the const i'th child of an object.
 template< typename T >
-const RefPtr< T > child( const ObjectCompositionMixin< T >& obj, unsigned int i ) {
+RefPtr< const T > child( const ObjectCompositionMixin< T >& obj, unsigned int i ) {
   return obj.child( i );
 }
 

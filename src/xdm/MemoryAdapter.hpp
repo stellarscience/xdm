@@ -1,22 +1,22 @@
 //==============================================================================
-// This software developed by Stellar Science Ltd Co and the U.S. Government.  
-// Copyright (C) 2009 Stellar Science. Government-purpose rights granted.      
-//                                                                             
-// This file is part of XDM                                                    
-//                                                                             
-// This program is free software: you can redistribute it and/or modify it     
-// under the terms of the GNU Lesser General Public License as published by    
-// the Free Software Foundation, either version 3 of the License, or (at your  
-// option) any later version.                                                  
-//                                                                             
-// This program is distributed in the hope that it will be useful, but WITHOUT 
-// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or       
-// FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public        
-// License for more details.                                                   
-//                                                                             
-// You should have received a copy of the GNU Lesser General Public License    
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.       
-//                                                                             
+// This software developed by Stellar Science Ltd Co and the U.S. Government.
+// Copyright (C) 2009 Stellar Science. Government-purpose rights granted.
+//
+// This file is part of XDM
+//
+// This program is free software: you can redistribute it and/or modify it
+// under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or (at your
+// option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+// FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+// License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
 //------------------------------------------------------------------------------
 #ifndef xdm_MemoryAdapter_hpp
 #define xdm_MemoryAdapter_hpp
@@ -58,10 +58,14 @@ public:
   /// Write the data to the specified dataset.
   void write( Dataset* dataset );
 
-  /// Get an array representation of the underlying data. Inheritors
+  /// Get a const array representation of the underlying data. Inheritors
   /// should implement this method to provide a StructuredArray subclass that
   /// provides random access to their data.
-  virtual RefPtr< StructuredArray > array() = 0;
+  virtual RefPtr< const StructuredArray > array() const = 0;
+
+  /// Get a const array representation of the underlying data. The default
+  /// implementation calls the const version.
+  virtual RefPtr< StructuredArray > array();
 
 private:
   /// Method to be implemented by inheritors to define the data to be written to

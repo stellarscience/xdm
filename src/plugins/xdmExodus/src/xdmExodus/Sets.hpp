@@ -23,6 +23,8 @@
 
 #include <xdmExodus/Object.hpp>
 
+#include <xdmGrid/ReferencingGrid.hpp>
+
 #include <xdmExodus/NamespaceMacro.hpp>
 
 XDM_EXODUS_NAMESPACE_BEGIN
@@ -31,7 +33,35 @@ XDM_EXODUS_NAMESPACE_BEGIN
 /// IDs. Note that these are *internal* IDs, which can only be determined by reading the
 /// elements/faces/edges sequentially from file and numbering them beginning with 1.
 class Set :
-  public Object {
+  public Object,
+  public xdmGrid::ReferencingGrid {
+
+  virtual std::size_t numberOfEntries() const;
+
+  virtual void addVariable( xdm::RefPtr< Variable > variable );
+
+  virtual void writeToFile( int exodusFileId, int* variableTruthTable );
+
+  /// Set the distribution factors for this set. There is one factor per
+  /// entry in the set or zero factors.
+  void setDistributionFactors( xdm::RefPtr< xdm::UniformDataItem > factors );
+
+  /// Get the distribution factors.
+  /// @returns The factors if they were set, or null if they were not set.
+  xdm::RefPtr< xdm::UniformDataItem > distributionFactors();
+
+  /// Exodus sets may or may not come with an additional set of integer flags
+  /// that have unspecified meaning. If the flags exist, there is one flag per
+  /// entry in the set. Otherwise, there are zero flags.
+  void setExtraFlags( xdm::RefPtr< xdm::UniformDataItem > extraFlags );
+
+  /// Get the extra flags.
+  /// @returns The data item containing the flags, or null if none are present.
+  xdm::RefPtr< xdm::UniformDataItem > extraFlags();
+
+private:
+  xdm::RefPtr< xdm::UniformDataItem > mDistributionFactors;
+  xdm::RefPtr< xdm::UniformDataItem > mExtraFlags;
 };
 
 class NodeSet : public Set {
@@ -58,6 +88,8 @@ class ElementSet : public Set {
 protected:
   virtual int exodusObjectTypeIndex() const { return 7; }
 };
+
+xdm::RefPtr< Set > setFactory( int exodusObjectType );
 
 XDM_EXODUS_NAMESPACE_END
 

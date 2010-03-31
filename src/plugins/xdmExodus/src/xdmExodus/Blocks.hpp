@@ -49,8 +49,6 @@ public:
 
   virtual void addVariable( xdm::RefPtr< Variable > variable );
 
-  virtual std::vector< xdm::RefPtr< Variable > > variables();
-
   /// Get the Exodus attributes (note that these are a subset of xdmGrid::Attributes because
   /// Exodus uses the term "variable" to denote dynamic attributes).
   virtual std::vector< xdm::RefPtr< xdmGrid::Attribute > > attributes();

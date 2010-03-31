@@ -52,7 +52,9 @@ public:
   LinearTopologyData( xdm::RefPtr< xdmGrid::Polyvertex > topology );
   virtual ~LinearTopologyData();
 
-  virtual xdm::RefPtr< xdm::StructuredArray > array();
+  virtual xdm::RefPtr< const xdm::StructuredArray > array() const;
+
+  using xdm::MemoryAdapter::array;
 
 protected:
   virtual void writeImplementation( xdm::Dataset* dataset );

@@ -19,6 +19,7 @@ set( ${PROJECT_NAME}_SOURCES
     Blocks.cpp
     Object.cpp
     Reader.cpp
+    Sets.cpp
     Variable.cpp
     Writer.cpp
 )

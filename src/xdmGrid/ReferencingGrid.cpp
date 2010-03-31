@@ -38,9 +38,8 @@ class MultiReferenceCellImp : public xdmGrid::CellSharedImp {
 public:
   MultiReferenceCellImp(
     std::vector< xdm::RefPtr< xdmGrid::UniformGrid > >& grids,
-    std::vector< xdm::RefPtr< xdm::UniformDataItem > >& arrays,
-    std::vector< std::size_t >& offsets ) :
-      mGrids( grids ), mArrays( arrays ), mOffsets( offsets ) {
+    std::vector< xdm::RefPtr< xdm::UniformDataItem > >& arrays ) :
+      mGrids( grids ), mArrays( arrays ), mCellOffsets() {
   }
 
   virtual xdmGrid::ConstNode node( std::size_t cellIndex, std::size_t nodeIndex ) const {
@@ -56,22 +55,50 @@ public:
 
 private:
   std::pair< xdmGrid::UniformGrid*, std::size_t > findGrid( std::size_t cellIndex ) const {
+    if ( mCellOffsets.size() != mGrids.size() ) {
+      computeOffsets();
+    }
     std::vector< std::size_t >::const_iterator found =
-      std::upper_bound( mOffsets.begin(), mOffsets.end(), cellIndex );
-    assert( found != mOffsets.end() );
-    std::size_t gridIndex = found - mOffsets.begin();
+      std::upper_bound( mCellOffsets.begin(), mCellOffsets.end(), cellIndex );
+    assert( found != mCellOffsets.end() );
+    std::size_t gridIndex = found - mCellOffsets.begin();
     std::size_t offsetIndex = cellIndex;
     if ( gridIndex > 0 ) {
       offsetIndex -= *(--found);
     }
-    return std::make_pair(
-      mGrids[ gridIndex ].get(),
-      (*mArrays[ gridIndex ]->typedArray< std::size_t >())[ offsetIndex ] );
+    if ( mArrays[ gridIndex ].valid() ) {
+      return std::make_pair(
+        mGrids[ gridIndex ].get(),
+        (*mArrays[ gridIndex ]->typedArray< std::size_t >())[ offsetIndex ] );
+    } else {
+      // If the array pointer is null, then we are using the complete grid.
+      return std::make_pair(
+        mGrids[ gridIndex ].get(),
+        offsetIndex );
+    }
+  }
+
+  void computeOffsets() const {
+    assert( mGrids.size() == mArrays.size() );
+
+    mCellOffsets.clear();
+    for ( std::size_t arrayIndex = 0; arrayIndex < mArrays.size(); ++arrayIndex ) {
+      if ( mArrays[ arrayIndex ].valid() ) {
+        mCellOffsets.push_back( mArrays[ arrayIndex ]->dataspace()[0] );
+      } else {
+        // Special treatment if the pointer is null: this means that the whole
+        // grid is being used.
+        mCellOffsets.push_back( mGrids[ arrayIndex ]->topology()->numberOfCells() );
+      }
+      if ( arrayIndex > 0 ) {
+        mCellOffsets[ arrayIndex ] += mCellOffsets[ arrayIndex - 1 ];
+      }
+    }
   }
 
   std::vector< xdm::RefPtr< xdmGrid::UniformGrid > >& mGrids;
   std::vector< xdm::RefPtr< xdm::UniformDataItem > >& mArrays;
-  std::vector< std::size_t >& mOffsets;
+  mutable std::vector< std::size_t > mCellOffsets;
 };
 
 } // anon namespace
@@ -82,11 +109,30 @@ ReferencingGrid::ReferencingGrid() {
   setCellSharedImp( xdm::makeRefPtr(
     new MultiReferenceCellImp(
       xdm::ObjectCompositionMixin< UniformGrid >::allChildren(),
-      xdm::ObjectCompositionMixin< xdm::UniformDataItem >::allChildren(),
-      mCellOffsets ) ) );
+      xdm::ObjectCompositionMixin< xdm::UniformDataItem >::allChildren() ) ) );
 }
 
 ReferencingGrid::~ReferencingGrid() {
+}
+
+std::size_t ReferencingGrid::numberOfCells() const {
+  std::size_t numberOfDataItems =
+    xdm::ObjectCompositionMixin< xdm::UniformDataItem >::numberOfChildren();
+  assert( numberOfDataItems ==
+    xdm::ObjectCompositionMixin< xdmGrid::UniformGrid >::numberOfChildren() );
+
+  std::size_t cellCount = 0;
+  for ( std::size_t i = 0; i < numberOfDataItems; ++i )     {
+    xdm::RefPtr< const xdm::UniformDataItem > array = xdm::child< xdm::UniformDataItem >( *this, i );
+    if ( array.valid() ) {
+      cellCount += array->typedArray< std::size_t >()->size();
+    } else {
+      // If the array does not exist, then we assume that the whole grid is being used.
+      xdm::RefPtr< const xdmGrid::UniformGrid > grid = xdm::child< xdmGrid::UniformGrid >( *this, i );
+      cellCount += grid->topology()->numberOfCells();
+    }
+  }
+  return cellCount;
 }
 
 void ReferencingGrid::setNumberOfReferencedGrids( const std::size_t n ) {
@@ -100,19 +146,17 @@ void ReferencingGrid::appendReferenceGrid(
 
   xdm::appendChild< UniformGrid >( *this, grid );
   xdm::appendChild< xdm::UniformDataItem >( *this, cellIndices );
-  computeOffsets();
 }
 
 void ReferencingGrid::setReferenceGrid(
+  const std::size_t gridIndex,
   xdm::RefPtr< UniformGrid > grid,
-  xdm::RefPtr< xdm::UniformDataItem > cellIndices,
-  const std::size_t gridIndex ) {
+  xdm::RefPtr< xdm::UniformDataItem > cellIndices ) {
 
   assert( gridIndex < xdm::ObjectCompositionMixin< UniformGrid >::numberOfChildren() );
 
   xdm::setChild< UniformGrid >( *this, gridIndex, grid );
   xdm::setChild< xdm::UniformDataItem >( *this, gridIndex, cellIndices );
-  computeOffsets();
 }
 
 void ReferencingGrid::traverse( xdm::ItemVisitor& iv ) {
@@ -131,27 +175,6 @@ void ReferencingGrid::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
 
   // write grid type
   xml.setAttribute( "GridType", "Referencing" );
-}
-
-void ReferencingGrid::computeOffsets() {
-  assert( xdm::ObjectCompositionMixin< UniformGrid >::numberOfChildren() ==
-          xdm::ObjectCompositionMixin< xdm::UniformDataItem >::numberOfChildren() );
-
-  mCellOffsets.clear();
-  std::size_t numberOfArrays =
-    xdm::ObjectCompositionMixin< xdm::UniformDataItem >::numberOfChildren();
-  for ( std::size_t childIndex = 0; childIndex < numberOfArrays; ++childIndex ) {
-    xdm::RefPtr< xdm::UniformDataItem > item =
-      xdm::child< xdm::UniformDataItem >( *this, childIndex );
-    if ( item.valid() ) {
-      mCellOffsets.push_back( item->dataspace()[0] );
-    } else {
-      mCellOffsets.push_back( 0 );
-    }
-    if ( childIndex > 0 ) {
-      mCellOffsets[ childIndex ] += mCellOffsets[ childIndex - 1 ];
-    }
-  }
 }
 
 XDM_GRID_NAMESPACE_END

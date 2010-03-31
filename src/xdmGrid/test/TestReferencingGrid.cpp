@@ -68,9 +68,9 @@ BOOST_AUTO_TEST_CASE( indirectCellAccess ) {
   t0->setConnectivity( cellList0 );
   t0->setNumberOfCells( 5 );
   t0->setCellType( xdmGrid::CellType::Tetra );
-  xdmGrid::UniformGrid grid0;
-  grid0.setGeometry( g );
-  grid0.setTopology( t0 );
+  xdm::RefPtr< xdmGrid::UniformGrid > grid0( new xdmGrid::UniformGrid );
+  grid0->setGeometry( g );
+  grid0->setTopology( t0 );
 
   // Topology 1
   xdm::RefPtr< xdmGrid::UnstructuredTopology > t1( new xdmGrid::UnstructuredTopology() );
@@ -123,23 +123,63 @@ BOOST_AUTO_TEST_CASE( indirectCellAccess ) {
   xdm::RefPtr< xdm::UniformDataItem > cells3Item = test::createUniformDataItem(
     cellOrdering, 1, xdm::primitiveType::kLongUnsignedInt );
 
-  xdmGrid::ReferencingGrid refGrid;
-  refGrid.appendReferenceGrid( grid1, cells1Item );
-  refGrid.appendReferenceGrid( grid2, cells2Item );
-  refGrid.appendReferenceGrid( grid3, cells3Item );
+  xdmGrid::ReferencingGrid refGrid1;
+  refGrid1.appendReferenceGrid( grid1, cells1Item );
+  refGrid1.appendReferenceGrid( grid2, cells2Item );
+  refGrid1.appendReferenceGrid( grid3, cells3Item );
 
   // Check to see if the node values from the referenced grid match the original
   // nodes.
   std::size_t cellMap[] = { 0, 4, 3, 2, 1 };
+  BOOST_CHECK_EQUAL( refGrid1.numberOfCells(), 5 );
   for ( std::size_t cellIndex = 0; cellIndex < 5; ++cellIndex ) {
-    xdmGrid::ConstCell cellOrig = grid0.cell( cellMap[ cellIndex ] );
-    xdmGrid::ConstCell cellRef = refGrid.cell( cellIndex );
+    xdmGrid::ConstCell cellOrig = grid0->cell( cellMap[ cellIndex ] );
+    xdmGrid::ConstCell cellRef = refGrid1.cell( cellIndex );
     for ( std::size_t nodeIndex = 0; nodeIndex < 4; ++nodeIndex ) {
       for ( std::size_t dim = 0; dim < 3; ++dim ) {
-        BOOST_CHECK_EQUAL( cellOrig.node( nodeIndex )[ dim ], cellRef.node( nodeIndex )[ dim ] );
+        double refValue = cellRef.node( nodeIndex )[ dim ];
+        double origValue = cellOrig.node( nodeIndex )[ dim ];
+        BOOST_CHECK_EQUAL( origValue, refValue );
       }
     }
   }
+
+  // Test again, this time without providing the data items. Because cellOrdering is just
+  // default ordering, this new grid should reference the original grids in exactly the
+  // same way.
+  xdmGrid::ReferencingGrid refGrid2;
+  refGrid2.appendReferenceGrid( grid1 );
+  refGrid2.appendReferenceGrid( grid2 );
+  refGrid2.appendReferenceGrid( grid3 );
+  BOOST_CHECK_EQUAL( refGrid2.numberOfCells(), 5 );
+  for ( std::size_t cellIndex = 0; cellIndex < 5; ++cellIndex ) {
+    xdmGrid::ConstCell cellOrig = grid0->cell( cellMap[ cellIndex ] );
+    xdmGrid::ConstCell cellRef = refGrid2.cell( cellIndex );
+    for ( std::size_t nodeIndex = 0; nodeIndex < 4; ++nodeIndex ) {
+      for ( std::size_t dim = 0; dim < 3; ++dim ) {
+        double refValue = cellRef.node( nodeIndex )[ dim ];
+        double origValue = cellOrig.node( nodeIndex )[ dim ];
+        BOOST_CHECK_EQUAL( origValue, refValue );
+      }
+    }
+  }
+
+  // May as well also test it with just one grid.
+  xdmGrid::ReferencingGrid refGrid3;
+  refGrid3.appendReferenceGrid( grid0 );
+  BOOST_CHECK_EQUAL( refGrid3.numberOfCells(), 5 );
+  for ( std::size_t cellIndex = 0; cellIndex < 5; ++cellIndex ) {
+    xdmGrid::ConstCell cellOrig = grid0->cell( cellIndex );
+    xdmGrid::ConstCell cellRef = refGrid3.cell( cellIndex );
+    for ( std::size_t nodeIndex = 0; nodeIndex < 4; ++nodeIndex ) {
+      for ( std::size_t dim = 0; dim < 3; ++dim ) {
+        double refValue = cellRef.node( nodeIndex )[ dim ];
+        double origValue = cellOrig.node( nodeIndex )[ dim ];
+        BOOST_CHECK_EQUAL( origValue, refValue );
+      }
+    }
+  }
+
 }
 
 } // namespace

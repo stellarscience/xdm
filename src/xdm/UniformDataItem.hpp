@@ -143,7 +143,7 @@ RefPtr< const TypedStructuredArray< T > > UniformDataItem::typedArray() const {
     XDM_THROW( std::logic_error( "typedArray was called on a NULL MemoryAdapter or array." ) );
   }
   RefPtr< const TypedStructuredArray< T > > typed =
-    dynamic_pointer_cast< TypedStructuredArray< T > >( data()->array() );
+    dynamic_pointer_cast< const TypedStructuredArray< T > >( data()->array() );
   if ( ! typed ) {
     XDM_THROW( std::runtime_error( "In typedArray, the MemoryAdapter does not hold an array"
       " with the requested type: " + std::string( typeid( T ).name() ) ) );

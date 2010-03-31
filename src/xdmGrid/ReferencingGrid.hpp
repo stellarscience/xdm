@@ -39,16 +39,23 @@ public:
 
   XDM_META_ITEM( ReferencingGrid );
 
+  /// Since the ReferencingGrid can contain subsets of many different topologies,
+  /// this function returns the total number of referenced cells. This is an
+  /// expensive call because it recomputes the total number of cells at each
+  /// function call.
+  std::size_t numberOfCells() const;
+
   /// Set the number of referenced grids.
   void setNumberOfReferencedGrids( const std::size_t n );
 
   /// Append a reference grid with the corresponding cell indices.
   /// @param grid The grid that will be referenced.
   /// @param cellIndices An integer array containing the cell indices for the cells
-  ///        that are referenced in @arg grid.
+  ///        that are referenced in @arg grid. If this array is omitted, then all
+  ///        cells in the corresponding grid will be referenced, in default order.
   void appendReferenceGrid(
     xdm::RefPtr< UniformGrid > grid,
-    xdm::RefPtr< xdm::UniformDataItem > cellIndices );
+    xdm::RefPtr< xdm::UniformDataItem > cellIndices = xdm::RefPtr< xdm::UniformDataItem >() );
 
   /// Set a reference grid with the corresponding cell indices.
   /// @param grid The grid that will be referenced.
@@ -61,9 +68,9 @@ public:
   /// @pre setNumberOfReferencedGrids() must have been called and gridIndex must be less
   ///      than the number of grids.
   void setReferenceGrid(
+    const std::size_t gridIndex,
     xdm::RefPtr< UniformGrid > grid,
-    xdm::RefPtr< xdm::UniformDataItem > cellIndices,
-    const std::size_t gridIndex );
+    xdm::RefPtr< xdm::UniformDataItem > cellIndices = xdm::RefPtr< xdm::UniformDataItem >() );
 
   /// Redefinition of visitor traversal from xdm::Item.
   virtual void traverse( xdm::ItemVisitor& iv );
@@ -79,10 +86,6 @@ private:
   void setTopology( xdm::RefPtr< Topology > topo );
   xdm::RefPtr< Topology > topology();
   xdm::RefPtr< const Topology > topology() const;
-
-  void computeOffsets();
-
-  std::vector< std::size_t > mCellOffsets;
 };
 
 XDM_GRID_NAMESPACE_END

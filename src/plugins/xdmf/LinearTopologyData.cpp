@@ -32,26 +32,24 @@ XDMF_NAMESPACE_BEGIN
 LinearTopologyData::LinearTopologyData( xdm::RefPtr< xdmGrid::Polyvertex > topology ):
   MemoryAdapter( true ),
   mTopology( topology ),
-  mArrayValues()
-{
+  mArrayValues() {
 }
 
-LinearTopologyData::~LinearTopologyData()
-{
+LinearTopologyData::~LinearTopologyData() {
 }
 
-xdm::RefPtr< xdm::StructuredArray > LinearTopologyData::array()
-{
+xdm::RefPtr< const xdm::StructuredArray > LinearTopologyData::array() const {
+  LinearTopologyData& mutableMe = const_cast< LinearTopologyData& >( *this );
   if ( !mArrayValues ) {
-    mArrayValues = new xdm::VectorStructuredArray< int >;
+    mutableMe.mArrayValues = new xdm::VectorStructuredArray< int >;
   }
   if ( mTopology ) {
     if ( mArrayValues->size() != mTopology->numberOfCells() ) {
       size_t oldSize = mArrayValues->size();
       size_t newSize = mTopology->numberOfCells();
-      mArrayValues->resize( newSize );
+      mutableMe.mArrayValues->resize( newSize );
       for ( int i = oldSize; i < newSize; i++ ) {
-        (*mArrayValues)[i] = i;
+        (*mutableMe.mArrayValues)[i] = i;
       }
     }
   }
