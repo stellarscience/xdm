@@ -64,3 +64,9 @@ $ make htmldoc
 This will generate HTML documentation for the library and place the main
 documentation file in xdm-build/doc/api_doc/index.html
 
+If you prefer LaTeX documentation, you can run
+
+$ make latexdoc 
+
+to build documentation in LaTeX.
+
