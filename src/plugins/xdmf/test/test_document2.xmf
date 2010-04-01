@@ -1,0 +1,23 @@
+<Xdmf Version='2.1'>
+  <Domain>
+    <Grid GridType='Uniform' Name='Particles'>
+      <Time Value='0'>
+      </Time>
+      <Topology NodesPerElement='1' NumberOfElements='0' TopologyType='Polyvertex'>
+        <DataItem Dimensions='1' Format='HDF' ItemType='Uniform' NumberType='Int' Precision='4'>
+          xdmf_particles1.00000.00099.h5:/Connectivity/00000
+        </DataItem>
+      </Topology>
+      <Geometry GeometryType='XYZ'>
+        <DataItem Dimensions='16 3' Format='HDF' ItemType='Uniform' NumberType='Float' Precision='8'>
+          xdmf_particles1.00000.00099.h5:/Position/00000
+        </DataItem>
+      </Geometry>
+      <Attribute AttributeType='Vector' Center='Node' Name='Velocity'>
+        <DataItem Dimensions='16 3' Format='HDF' ItemType='Uniform' NumberType='Float' Precision='8'>
+          xdmf_particles1.00000.00099.h5:/Velocity/00000
+        </DataItem>
+      </Attribute>
+    </Grid>
+  </Domain>
+</Xdmf>

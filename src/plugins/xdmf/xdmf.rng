@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<grammar 
+   xmlns="http://relaxng.org/ns/structure/1.0"
+   datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+
+  <start>
+    <ref name="XdmfRoot"/>
+  </start>
+  
+  <!-- The Root Xdmf Element -->
+  <define name="XdmfRoot">
+    <element name="Xdmf">
+      <optional>
+        <attribute name="Version"><text/></attribute>
+      </optional>
+      <zeroOrMore>
+        <choice>
+          <ref name="DataItem"/>
+          <ref name="Domain"/>
+          <ref name="Information"/>
+        </choice>
+      </zeroOrMore>
+    </element>
+  </define>
+
+  <!-- XDMF Information Specification -->
+  <define name="Information">
+    <element name="Information">
+      <ref name="NameAttribute"/>
+      <attribute name="Value"><text/></attribute>
+    </element>
+  </define>
+
+  <!-- Information can be used anywhere in the tree -->
+  <define name="OptionalInformation">
+    <zeroOrMore>
+      <ref name="Information"/>
+    </zeroOrMore>
+  </define>
+
+  <!-- Name attribute specification -->
+  <define name="NameAttribute">
+    <optional>
+      <attribute name="Name">
+        <text/>
+      </attribute>
+    </optional>
+  </define>
+
+  <!-- XDMF DataItem Specification -->
+  <define name="DataItem">
+    <element name="DataItem">
+      <optional>
+        <attribute name="Dimensions">
+          <data type="string"/>
+        </attribute> <!-- Dimensions -->
+      </optional>
+      <ref name="NameAttribute"/>
+      <optional>
+        <attribute name="ItemType">
+          <choice>
+            <value>Uniform</value>
+            <value>Tree</value>
+          </choice>
+        </attribute> <!-- ItemType -->
+      </optional>
+      <optional>
+        <attribute name="NumberType">
+          <choice>
+            <value>Float</value>
+            <value>Int</value>
+            <value>UInt</value>
+            <value>Char</value>
+            <value>UChar</value>
+          </choice>
+        </attribute> <!-- NumberType -->
+      </optional>
+      <optional>
+        <attribute name="Precision">
+          <choice>
+            <value>1</value>
+            <value>4</value>
+            <value>8</value>
+          </choice>
+        </attribute> <!-- Precision -->
+      </optional>
+      <optional>
+        <attribute name="Format">
+          <value>HDF</value>
+        </attribute> <!-- Format -->
+      </optional>
+      <text/>
+    </element>
+  </define>
+
+  <!-- XDMF Domain Specification -->
+  <define name="Domain">
+    <element name="Domain">
+      <optional>
+        <ref name="NameAttribute"/>
+      </optional>
+      <zeroOrMore>
+        <choice>
+          <ref name="Grid"/>
+          <ref name="DataItem"/>
+          <ref name="Information"/>
+        </choice>
+      </zeroOrMore>
+    </element>
+  </define>
+
+  <!-- XDMF Grid Specification -->
+  <define name="Grid">
+    <element name="Grid">
+      <ref name="NameAttribute"/>
+      <attribute name="GridType">
+        <choice>
+          <value>Uniform</value>
+          <value>Collection</value>
+          <value>Tree</value>
+          <value>Subset</value>
+        </choice>
+      </attribute>
+      <optional>
+        <attribute name="CollectionType">
+          <choice>
+            <value>Spatial</value>
+            <value>Temporal</value>
+          </choice>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="Section">
+          <choice>
+            <value>DataItem</value>
+            <value>All</value>
+          </choice>
+        </attribute>
+      </optional>
+      <!-- Element Children -->
+      <interleave>
+        <ref name="OptionalInformation"/>
+        <ref name="Geometry"/>
+        <ref name="Topology"/>
+        <ref name="Time"/>
+        <zeroOrMore>
+          <ref name="Attribute"/>
+        </zeroOrMore>
+      </interleave>
+    </element>
+  </define>
+
+  <!-- XDMF Geometry Specification -->
+  <define name="Geometry">
+    <element name="Geometry">
+      <optional>
+        <attribute name="GeometryType">
+          <choice>
+            <value>XYZ</value>
+            <value>XY</value>
+            <value>X_Y_Z</value>
+            <value>X_Y</value>
+            <value>VxVyVz</value>
+            <value>VxVy</value>
+            <value>Origin_DxDyDz</value>
+            <value>Origin_DxDy</value>
+          </choice>
+        </attribute>
+      </optional>
+      <oneOrMore>
+        <ref name="DataItem"/>
+      </oneOrMore>
+    </element>
+  </define>
+
+  <!-- XDMF Topology Specification -->
+  <define name="Topology">
+    <element name="Topology">
+      <optional>
+        <ref name="NameAttribute"/>
+      </optional>
+      <attribute name="TopologyType">
+        <choice>
+          <value>Polyvertex</value>
+          <value>Polyline</value>
+          <value>Polygon</value>
+          <value>Triangle</value>
+          <value>Quadrilateral</value>
+          <value>Tetrahedron</value>
+          <value>Pyramid</value>
+          <value>Wedge</value>
+          <value>Hexahedron</value>
+          <value>Edge_3</value>
+          <value>Triangle_6</value>
+          <value>Quadrilateral_8</value>
+          <value>Tetrahedron_10</value>
+          <value>Pyramid_13</value>
+          <value>Wedge_15</value>
+          <value>Hexahedron_20</value>
+          <value>Mixed</value>
+          <value>2DSMesh</value>
+          <value>2DRectMesh</value>
+          <value>2DCoRectMesh</value>
+          <value>3DSMesh</value>
+          <value>3DRectMesh</value>
+          <value>3DCoRectMesh</value>
+        </choice>
+      </attribute>
+      <choice>
+        <!-- Unstructured Topologies -->
+        <group>
+          <optional>
+            <attribute name="NodesPerElement">
+              <data type="integer"/>
+            </attribute>
+          </optional>
+          <attribute name="NumberOfElements">
+            <data type="integer"/>
+          </attribute>
+        </group>
+        <!-- Structured Topologies -->
+        <attribute name="Dimensions">
+          <data type="string"/>
+        </attribute>
+      </choice>
+      <zeroOrMore>
+        <ref name="DataItem"/>
+      </zeroOrMore>
+    </element>
+  </define>
+
+  <!-- XDMF Attribute Specification -->
+  <define name="Attribute">
+    <element name="Attribute">
+      <ref name="NameAttribute"/>
+      <optional>
+        <attribute name="AttributeType">
+          <choice>
+            <value>Scalar</value>
+            <value>Vector</value>
+            <value>Tensor</value>
+            <value>Tensor6</value>
+            <value>Matrix</value>
+            <value>GlobalID</value>
+          </choice>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="Center">
+          <choice>
+            <value>Node</value>
+            <value>Cell</value>
+            <value>Grid</value>
+            <value>Face</value>
+            <value>Edge</value>
+          </choice>
+        </attribute>
+      </optional>
+      <ref name="DataItem"/>
+    </element>
+  </define>
+
+  <!-- XDMF Time Specification -->
+  <define name="Time">
+    <element name="Time">
+      <optional>
+        <attribute name="TimeType">
+          <choice>
+            <value>Single</value>
+            <value>HyperSlab</value>
+            <value>List</value>
+            <value>Range</value>
+          </choice>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="Value">
+          <data type="double"/>
+        </attribute>
+      </optional>
+      <optional>
+        <ref name="DataItem"/>
+      </optional>
+    </element>
+  </define>
+
+</grammar>

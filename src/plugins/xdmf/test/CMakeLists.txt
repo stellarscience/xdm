@@ -9,4 +9,5 @@ macro( xdmfPlugin_serial_test test_name )
 endmacro()
 
 xdmfPlugin_serial_test( XdmfGridCompatibility TestXdmfGridCompatibility.cpp )
+xdmfPlugin_serial_test( XmfReader TestXmfReader.cpp )
 

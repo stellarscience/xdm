@@ -18,13 +18,19 @@ public:
   XmfReader();
   virtual ~XmfReader();
 
-  virtual xdm::RefPtr< xdm::Item > readItem( const std::string& filename );
+  virtual xdm::RefPtr< xdm::Item > readItem( 
+    const xdm::FileSystemPath& path );
+
+  virtual bool update(
+    xdm::RefPtr< xdm::Item > item,
+    const xdm::FileSystemPath& path,
+    std::size_t timeStep = 0 );
 
 private:
   // This class uses a private implementation to keep LibXml2 out of the
   // header.
   class Private;
-  std::auto_ptr< Private > imp;
+  std::auto_ptr< Private > mImp;
 };
 
 XDMF_NAMESPACE_END

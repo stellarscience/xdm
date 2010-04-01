@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Xdmf Version='2.1'>
+  <Information Name="Author" Value="Will Dicharry"/>
+  <Domain>
+    <Grid GridType='Uniform' Name='ProblemGrid'>
+      <Time Value='0'>
+      </Time>
+      <Topology Dimensions='383 129 129' TopologyType='3DRectMesh'>
+      </Topology>
+      <Geometry GeometryType='VxVyVz'>
+        <DataItem Dimensions='129' Format='HDF' ItemType='Uniform' NumberType='Float' Precision='4'>
+          xdmf_fields1.00000.00099.h5:/GridValues/X
+        </DataItem>
+        <DataItem Dimensions='129' Format='HDF' ItemType='Uniform' NumberType='Float' Precision='4'>
+          xdmf_fields1.00000.00099.h5:/GridValues/Y
+        </DataItem>
+        <DataItem Dimensions='383' Format='HDF' ItemType='Uniform' NumberType='Float' Precision='4'>
+          xdmf_fields1.00000.00099.h5:/GridValues/Z
+        </DataItem>
+      </Geometry>
+      <Attribute AttributeType='Vector' Center='Cell' Name='E'>
+        <DataItem Dimensions='382 128 128 3' Format='HDF' ItemType='Uniform' NumberType='Float' Precision='8'>
+          xdmf_fields1.00000.00099.h5:/E/00000
+        </DataItem>
+      </Attribute>
+      <Attribute AttributeType='Vector' Center='Cell' Name='B'>
+        <DataItem Dimensions='382 128 128 3' Format='HDF' ItemType='Uniform' NumberType='Float' Precision='8'>
+          xdmf_fields1.00000.00099.h5:/B/00000
+        </DataItem>
+      </Attribute>
+      <Attribute AttributeType='Scalar' Center='Cell' Name='InternalCell'>
+        <DataItem Dimensions='382 128 128' Format='HDF' ItemType='Uniform' NumberType='Float' Precision='8'>
+          xdmf_fields1.00000.00099.h5:/InternalCell
+        </DataItem>
+      </Attribute>
+    </Grid>
+  </Domain>
+</Xdmf>

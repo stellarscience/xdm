@@ -8,9 +8,45 @@
 #include <xdm/FileSystem.hpp>
 #include <xdm/Forward.hpp>
 
+#include <sstream>
+#include <stdexcept>
+
 #include <xdmFormat/NamespaceMacro.hpp>
 
 XDM_FORMAT_NAMESPACE_BEGIN
+
+/// Exception to be thrown when an error occurs while reading an input file.
+class ReadError : public std::runtime_error {
+public:
+  ReadError( const std::string& message ) : 
+    std::runtime_error( message.c_str() ) {}
+  virtual ~ReadError() throw() {}
+};
+
+/// Exception to be thrown when an error is encountered while parsing a text
+/// input file. Contains information about the line and column number of the
+/// parse error.
+class ParseError : public ReadError {
+  int mLine;
+  int mColumn;
+public:
+  ParseError( int line, int column ) : 
+    ReadError( "Parse error:" ),
+    mLine( line ),
+    mColumn( column ) {}
+  virtual ~ParseError() throw() {}
+  virtual const char* what() const throw() {
+    try {
+      std::stringstream ss;
+      ss << ReadError::what() << "Line " << mLine << ", Column" << mColumn;
+      return ss.str().c_str();
+    } catch ( ... ) {
+      return "Parse error";
+    }
+  }
+  int line() const { return mLine; }
+  int column() const { return mColumn; }
+};
 
 /// Interface for types that read items from files. Implement this interface to
 /// read a tree of items from a file.
