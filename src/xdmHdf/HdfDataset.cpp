@@ -26,6 +26,7 @@
 #include <xdmHdf/HdfDataset.hpp>
 #include <xdmHdf/SelectionVisitor.hpp>
 
+#include <xdm/Algorithm.hpp>
 #include <xdm/DatasetExcept.hpp>
 #include <xdm/PrimitiveType.hpp>
 #include <xdm/RefPtr.hpp>
@@ -348,6 +349,45 @@ void HdfDataset::deserializeImplementation(
 
 void HdfDataset::finalizeImplementation() {
   H5Fflush( imp->mFileId->get(), H5F_SCOPE_GLOBAL );
+}
+
+// -----------------------------------------------------------------------------
+bool parseDatasetInfo(
+  std::string infoString,
+  std::string& outFile,
+  xdmHdf::GroupPath& outPath,
+  std::string& outDataset )
+{
+  // A conformant string looks like 'file.h5:/path/to/dataset'
+  xdm::trim( infoString );
+  // Split on ':' to separate file from internal path.
+  size_t separator = infoString.find_first_of( ":" );
+  if ( infoString.find_first_of( ":", separator + 1 ) != std::string::npos ) {
+    return false;
+  }
+  // The file is the content before the ':' delimiter.
+  outFile = infoString.substr( 0, separator );
+  // The group path + dataset is the content after the ':' delimiter.
+  std::string internalPath = infoString.substr( separator + 1, std::string::npos );
+
+  // Parse '/path/to/dataset' into a vector of strings delimited by '/'.
+  outPath.clear(); // make sure the path is clear
+  if ( internalPath[0] != '/' ) return false;
+  size_t match = 0;
+  while ( match != std::string::npos ) {
+    size_t next = internalPath.find_first_of( "/", match + 1 );
+    outPath.push_back( internalPath.substr( match + 1, next - match - 1 ) );
+    match = next;
+  }
+  // There must be at least one item, the dataset name.
+  if ( outPath.size() == 0 ) {
+    return false;
+  }
+  // get the dataset name (the last element in the path)
+  outDataset = outPath.back();
+  // The rest is the group path.
+  outPath.pop_back();
+  return true;
 }
 
 XDM_HDF_NAMESPACE_END

@@ -23,6 +23,8 @@
 
 #include <algorithm>
 
+#include <string>
+
 #include <xdm/NamespaceMacro.hpp>
 
 XDM_NAMESPACE_BEGIN
@@ -138,6 +140,16 @@ bool unorderedCollectionsEqual(
   typedef typename std::iterator_traits< InputIterator1 >::value_type Value;
   return unorderedCollectionsEqual( first1, last1, first2, last2,
                                     std::equal_to< Value >() );
+}
+
+/// Trim leading and trailing white space from a string.
+inline void trim( std::string& io ) {
+  std::string::size_type pos = io.find_last_not_of( " \t" );
+  if ( pos != std::string::npos ) {
+    io.erase( pos + 1 );
+    pos = io.find_first_not_of( " \t" );
+    if ( pos != std::string::npos ) io.erase( 0, pos );
+  }
 }
 
 XDM_NAMESPACE_END

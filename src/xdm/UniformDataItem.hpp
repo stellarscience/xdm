@@ -40,6 +40,10 @@ XDM_NAMESPACE_BEGIN
 class UniformDataItem : public DataItem {
 public:
 
+  /// Constructor initializes with a 4 byte floating point type specification.
+  /// and an empty dataspace.
+  UniformDataItem();
+
   explicit UniformDataItem(
     primitiveType::Value dataType,
     const DataShape<>& dataspace = DataShape<>() );

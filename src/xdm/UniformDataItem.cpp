@@ -29,6 +29,13 @@
 
 XDM_NAMESPACE_BEGIN
 
+UniformDataItem::UniformDataItem() :
+  mDataType( primitiveType::kFloat ),
+  mDataspace(),
+  mDataset(),
+  mData() {
+}
+
 UniformDataItem::UniformDataItem(
   primitiveType::Value dataType,
   const DataShape<>& dataspace ) :

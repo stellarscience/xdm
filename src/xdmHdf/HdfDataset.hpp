@@ -147,6 +147,16 @@ private:
   std::auto_ptr< Private > imp;
 };
 
+/// Parse HDF dataset information from a string specifying a path to an HDF5
+/// file and the group path and dataset in the file that looks like:
+/// file.h5:/group1/group2/dataset.
+/// @return True on success, false otherwise.
+bool parseDatasetInfo(
+  std::string infoString,
+  std::string& outFile,
+  GroupPath& outPath,
+  std::string& outDataset );
+
 XDM_HDF_NAMESPACE_END
 
 #endif // xdmHdf_HdfDataset_hpp

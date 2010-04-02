@@ -10,4 +10,5 @@ endmacro()
 
 xdmfPlugin_serial_test( XdmfGridCompatibility TestXdmfGridCompatibility.cpp )
 xdmfPlugin_serial_test( XmfReader TestXmfReader.cpp )
+xdmfPlugin_serial_test( ImplTreeBuilder TestImplTreeBuilder.cpp )
 
