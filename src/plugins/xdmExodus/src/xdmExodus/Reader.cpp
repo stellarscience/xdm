@@ -22,6 +22,7 @@
 
 #include <xdmExodus/Blocks.hpp>
 #include <xdmExodus/Helpers.hpp>
+#include <xdmExodus/Sets.hpp>
 #include <xdmExodus/Variable.hpp>
 
 #include <xdmGrid/CollectionGrid.hpp>
@@ -230,6 +231,22 @@ bool readObjectGroupData(
   return true;
 }
 
+// Fill an array with increasing ints and turn it into a data item.
+xdm::RefPtr< xdm::UniformDataItem >
+iotaArrayOfSizeT( const std::size_t& size, const std::size_t beginWith = 0 ) {
+  xdm::RefPtr< xdm::VectorStructuredArray< std::size_t > > array(
+    new xdm::VectorStructuredArray< std::size_t >( size ) );
+  for ( std::size_t i = 0; i < size; ++i )   {
+    (*array)[i] = i + beginWith;
+  }
+  xdm::DataShape<> datasetShape(1);
+  datasetShape[0] = size;
+  xdm::RefPtr< xdm::UniformDataItem > returnItem(
+    xdm::makeRefPtr( new xdm::UniformDataItem( xdm::primitiveType::kLongUnsignedInt, datasetShape ) ) );
+  returnItem->setData( xdm::makeRefPtr( new xdm::ArrayAdapter( array ) ) );
+
+  return returnItem;
+}
 
 } // anon namespace
 
@@ -257,8 +274,36 @@ xdm::RefPtr< xdm::Item > ExodusReader::readItem( const xdm::FileSystemPath& path
   xdm::RefPtr< xdmGrid::CollectionGrid > spatialCollection( new xdmGrid::CollectionGrid );
   domain->addGrid( spatialCollection );
 
+  // The sets and maps refer to internal ordering of nodes, edges, faces, and elements. We
+  // need to make a superset for each of these object types. Then, the sets and maps will
+  // refer to their respective supersets.
+  xdm::RefPtr< xdmGrid::UniformGrid > globalNodeSet( new xdmGrid::UniformGrid );
+  std::vector< xdm::RefPtr< xdmGrid::ReferencingGrid > > globalSets( kNumberOfObjectTypes );
+  globalSets[ EX_EDGE_BLOCK ] = xdm::makeRefPtr( new xdmGrid::ReferencingGrid );
+  globalSets[ EX_FACE_BLOCK ] = xdm::makeRefPtr( new xdmGrid::ReferencingGrid );
+  globalSets[ EX_ELEM_BLOCK ] = xdm::makeRefPtr( new xdmGrid::ReferencingGrid );
+  globalSets[ EX_EDGE_SET ] = globalSets[ EX_EDGE_BLOCK ];
+  globalSets[ EX_FACE_SET ] = globalSets[ EX_FACE_BLOCK ];
+  globalSets[ EX_SIDE_SET ] = globalSets[ EX_ELEM_BLOCK ];
+  globalSets[ EX_ELEM_SET ] = globalSets[ EX_ELEM_BLOCK ];
+  globalSets[ EX_EDGE_MAP ] = globalSets[ EX_EDGE_BLOCK ];
+  globalSets[ EX_FACE_MAP ] = globalSets[ EX_FACE_BLOCK ];
+  globalSets[ EX_ELEM_MAP ] = globalSets[ EX_ELEM_BLOCK ];
+
+  spatialCollection->appendChild( globalNodeSet );
+  spatialCollection->appendChild( globalSets[ EX_EDGE_BLOCK ] );
+  spatialCollection->appendChild( globalSets[ EX_FACE_BLOCK ] );
+  spatialCollection->appendChild( globalSets[ EX_ELEM_BLOCK ] );
+
   //---------------NODES-------------------
   xdm::RefPtr< xdmGrid::Geometry > geom = readGeometry( fileId, gridParameters );
+  xdm::RefPtr< xdm::UniformDataItem > nodeConn = iotaArrayOfSizeT( geom->numberOfNodes() );
+  xdm::RefPtr< xdmGrid::UnstructuredTopology > nodeTopo( new xdmGrid::UnstructuredTopology );
+  nodeTopo->setConnectivity( nodeConn );
+  nodeTopo->setNumberOfCells( geom->numberOfNodes() );
+  nodeTopo->setCellType( xdmGrid::CellType::Polyvertex );
+  globalNodeSet->setGeometry( geom );
+  globalNodeSet->setTopology( nodeTopo );
 
   //----------BLOCKS/SETS/MAPS-------------
   for ( std::size_t objectTypeIndex = 0; objectTypeIndex < kNumberOfObjectTypes; ++objectTypeIndex ) {
@@ -291,6 +336,8 @@ xdm::RefPtr< xdm::Item > ExodusReader::readItem( const xdm::FileSystemPath& path
         globalOffset += block->numberOfEntries();
 
         spatialCollection->appendChild( block );
+
+        globalSets[ objectTypeIndex ]->appendReferenceGrid( block );
 
       } else if ( objectIsSet( objectTypeIndex ) ) {
 

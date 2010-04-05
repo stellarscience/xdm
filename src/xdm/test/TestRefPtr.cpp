@@ -37,6 +37,9 @@ class TestBase : public xdm::ReferencedObject {
 public:
   TestBase( int n ) : mInt( n ) {}
   int getInt() const { return mInt; }
+
+  int constCheck() const { return 0; }
+  int constCheck() { mInt = 1; return mInt; }
 private:
   int mInt;
 };
@@ -90,6 +93,15 @@ BOOST_AUTO_TEST_CASE( dynamicCast2 ) {
   // Check member access.
   BOOST_CHECK_EQUAL( 1, derivedPtr->getIntBase() );
   BOOST_CHECK_EQUAL( 2, derivedPtr->getInt() );
+}
+
+BOOST_AUTO_TEST_CASE( constCast ) {
+  xdm::RefPtr< TestBase > a( new TestBase(0) );
+  xdm::RefPtr< const TestBase > b( new TestBase(0) );
+
+  BOOST_CHECK_EQUAL( a->constCheck(), 1 );
+  BOOST_CHECK_EQUAL( b->constCheck(), 0 );
+  BOOST_CHECK_EQUAL( xdm::const_pointer_cast< TestBase >( b )->constCheck(), 1 );
 }
 
 } // namespace

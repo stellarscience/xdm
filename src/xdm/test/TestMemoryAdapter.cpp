@@ -57,9 +57,9 @@ public:
 
 class MemoryAdapterTestImplementation : public xdm::MemoryAdapter {
 public:
-  virtual xdm::RefPtr< xdm::StructuredArray > array() {
+  virtual xdm::RefPtr< const xdm::StructuredArray > array() const {
     // not implemented, return invalid data.
-    return xdm::RefPtr< xdm::StructuredArray >();
+    return xdm::RefPtr< const xdm::StructuredArray >();
   }
 
   virtual void writeImplementation( xdm::Dataset* dataset ) {

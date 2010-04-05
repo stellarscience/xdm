@@ -47,17 +47,8 @@ std::size_t Block::numberOfEntries() const {
 }
 
 void Block::addVariable( xdm::RefPtr< Variable > variable ) {
+  Object::addVariable( variable );
   addAttribute( variable );
-}
-
-std::vector< xdm::RefPtr< Variable > > Block::variables() {
-  std::vector< xdm::RefPtr< Variable > > vars;
-  for ( Iterator varIt = begin(); varIt != end(); ++varIt ) {
-    xdm::RefPtr< Variable > variable = xdm::dynamic_pointer_cast< Variable >( *varIt );
-    if ( variable.valid() ) {
-      vars.push_back( variable );
-    }
-  }
 }
 
 void Block::readAttributes( int exodusFileId, std::size_t attributesPerEntry ) {
@@ -246,7 +237,6 @@ void Block::writeToFile( int exodusFileId, int* variableTruthTable ) {
     variableTruthTable[ ( vars[ varIndex ]->id() - 1 ) ] = 1;
   }
 }
-
 
 xdm::RefPtr< Block > blockFactory( int exodusObjectType ) {
   xdm::RefPtr< Block > block;

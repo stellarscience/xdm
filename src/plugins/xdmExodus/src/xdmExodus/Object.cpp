@@ -38,6 +38,14 @@ int Object::exodusInquireFlag() const { return kInquireObjectSizes[ exodusObject
 
 const char* Object::exodusTypeChar() const { return kObjectTypeChar[ exodusObjectTypeIndex() ]; }
 
+void Object::addVariable( xdm::RefPtr< Variable > variable ) {
+  mVariables.push_back( variable );
+}
+
+std::vector< xdm::RefPtr< Variable > > Object::variables() {
+  return mVariables;
+}
+
 void Object::setupVariables(
   std::vector< int >::const_iterator beginTruthTable,
   const std::size_t numberOfVariables,
@@ -54,11 +62,7 @@ void Object::setupVariables(
       id(),
       numberOfEntries() ) );
     variable->setName( variableNames[ variableIndex ].string() );
-    addVariable( variable );
-
-    // Keep a copy of the variable as a Variable to avoid having to dynamic cast
-    // xdmGrid::Attributes to Variables later when reading time step data.
-    mVariables.push_back( variable );
+    addVariable( variable ); // virtual
   }
 }
 

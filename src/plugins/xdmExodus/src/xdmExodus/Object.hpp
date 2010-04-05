@@ -48,9 +48,13 @@ public:
 
   virtual std::size_t numberOfEntries() const = 0;
 
-  virtual void addVariable( xdm::RefPtr< Variable > variable ) {}
+  /// Add a Variable to the Object.
+  /// Inheriting classes should call this function if the variables() function is to ever
+  /// be called. This function just stashes the pointer for future use to avoid downcasting
+  /// xdmGrid::Attributes to Variables.
+  virtual void addVariable( xdm::RefPtr< Variable > variable );
 
-  virtual std::vector< xdm::RefPtr< Variable > > variables() {}
+  std::vector< xdm::RefPtr< Variable > > variables();
 
   void setupVariables(
     std::vector< int >::const_iterator beginTruthTable,
@@ -59,6 +63,9 @@ public:
 
   virtual void writeToFile( int exodusFileId, int* variableTruthTable ) {}
 
+  /// Read the data for the variables at a specific time step.
+  /// @pre A call to setupVariables to make sure the variables exist in the data structure.
+  /// @post The Variables in the Object have values corresponding to @arg timeStep.
   virtual void readTimeStep( int exodusFileId, std::size_t timeStep );
 
   virtual void writeTimeStep( int exodusFileId, std::size_t timeStep );

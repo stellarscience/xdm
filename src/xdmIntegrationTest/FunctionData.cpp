@@ -1,22 +1,22 @@
 //==============================================================================
-// This software developed by Stellar Science Ltd Co and the U.S. Government.  
-// Copyright (C) 2009 Stellar Science. Government-purpose rights granted.      
-//                                                                             
-// This file is part of XDM                                                    
-//                                                                             
-// This program is free software: you can redistribute it and/or modify it     
-// under the terms of the GNU Lesser General Public License as published by    
-// the Free Software Foundation, either version 3 of the License, or (at your  
-// option) any later version.                                                  
-//                                                                             
-// This program is distributed in the hope that it will be useful, but WITHOUT 
-// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or       
-// FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public        
-// License for more details.                                                   
-//                                                                             
-// You should have received a copy of the GNU Lesser General Public License    
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.       
-//                                                                             
+// This software developed by Stellar Science Ltd Co and the U.S. Government.
+// Copyright (C) 2009 Stellar Science. Government-purpose rights granted.
+//
+// This file is part of XDM
+//
+// This program is free software: you can redistribute it and/or modify it
+// under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or (at your
+// option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+// FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+// License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
 //------------------------------------------------------------------------------
 #include <xdmIntegrationTest/FunctionData.hpp>
 
@@ -58,24 +58,24 @@ constructFunctionGrid( const GridBounds& bounds, const std::string& hdfFile ) {
 
   // Topology
   xdm::RefPtr< xdmGrid::RectilinearMesh > topology( new xdmGrid::RectilinearMesh );
-  topology->setShape( xdm::makeShape( 
-    bounds.size(2) + 1, 
+  topology->setShape( xdm::makeShape(
+    bounds.size(2) + 1,
     bounds.size(1) + 1,
     bounds.size(0) + 1 ) );
   grid->setTopology( topology );
 
   // Geometry
-  xdm::RefPtr< xdmGrid::TensorProductGeometry > geometry( 
+  xdm::RefPtr< xdmGrid::TensorProductGeometry > geometry(
     new xdmGrid::TensorProductGeometry( 3 ) );
   grid->setGeometry( geometry );
 
   // assign geometry values
   for ( int i = 0; i < 3 ; i++ ) {
-    xdm::RefPtr< xdm::UniformDataItem > dataItem( new xdm::UniformDataItem( 
+    xdm::RefPtr< xdm::UniformDataItem > dataItem( new xdm::UniformDataItem(
       xdm::primitiveType::kDouble, xdm::makeShape( bounds.size(i) + 1 ) ) );
     // allocate enough space for bounds + 1 vertices to encompass the whole
     // range.
-    xdm::RefPtr< xdm::VectorStructuredArray< double > > values( 
+    xdm::RefPtr< xdm::VectorStructuredArray< double > > values(
       new xdm::VectorStructuredArray< double >( bounds.size(i) + 1 ) );
     for ( int j = 0; j < bounds.size(i); j++ ) {
       (*values)[j] = bounds.nodeCoordinate( i, j );
@@ -92,9 +92,9 @@ constructFunctionGrid( const GridBounds& bounds, const std::string& hdfFile ) {
 
   // construct an attribute to hold the function values
   xdm::RefPtr< xdmGrid::Attribute > attribute = xdmGrid::createAttribute (
-    grid, 
-    xdmGrid::Attribute::kCell, 
-    xdmGrid::Attribute::kScalar, 
+    grid,
+    xdmGrid::Attribute::kCell,
+    xdmGrid::Attribute::kScalar,
     "FunctionValues",
     xdm::primitiveType::kDouble );
   grid->appendChild( attribute );
@@ -105,13 +105,13 @@ constructFunctionGrid( const GridBounds& bounds, const std::string& hdfFile ) {
   attributeDataset->setUseChunkedIo( true );
   attributeDataset->setUseCompression( true );
   attribute->dataItem()->setDataset( attributeDataset );
-  
+
   return std::make_pair( grid.get(), attribute.get() );
 }
 
 //-----------------------------------------------------------------------------
-FunctionData::FunctionData( 
-  const GridBounds& grid, 
+FunctionData::FunctionData(
+  const GridBounds& grid,
   const xdm::HyperSlab<>& region,
   xdm::RefPtr< Function > function,
   const xdm::DataShape<>& blockSize ) :
@@ -121,13 +121,13 @@ FunctionData::FunctionData(
   mStructuredArray(),
   mFunction( function ),
   mBlockSize( blockSize ) {
-  
+
   using std::accumulate;
   typedef std::multiplies< std::vector< double >::size_type > MultiplySize;
 
-  mStorage.resize( 
-    accumulate( 
-      mBlockSize.begin(), 
+  mStorage.resize(
+    accumulate(
+      mBlockSize.begin(),
       mBlockSize.end(),
       1,
       MultiplySize() ) );
@@ -138,7 +138,7 @@ FunctionData::FunctionData(
 FunctionData::~FunctionData() {
 }
 
-xdm::RefPtr< xdm::StructuredArray > FunctionData::array() {
+xdm::RefPtr< const xdm::StructuredArray > FunctionData::array() const {
   XDM_THROW( std::runtime_error( "Random access not implemented" ) );
 }
 
