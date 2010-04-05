@@ -182,6 +182,10 @@ void FunctionData::writeImplementation( xdm::Dataset* dataset ) {
   }
 }
 
+void FunctionData::readImplementation( xdm::Dataset* dataset ) {
+  XDM_THROW( std::runtime_error( "Not implemented" ) );
+}
+
 //-----------------------------------------------------------------------------
 double TestCaseFunction::operator()( double x, double y, double z ) {
   using std::sin;

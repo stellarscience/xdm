@@ -56,6 +56,7 @@ public:
 
 protected:
   virtual void writeImplementation( xdm::Dataset* dataset );
+  virtual void readImplementation( xdm::Dataset* dataset );
 
 private:
   xdm::RefPtr< xdmGrid::Polyvertex > mTopology;

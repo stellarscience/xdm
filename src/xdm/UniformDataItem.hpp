@@ -103,6 +103,11 @@ public:
   /// @pre The item's Dataset has been initialized.
   void serializeData();
 
+  /// Deserialize data from the dataset to this item's MemoryAdapter.
+  /// @pre The item's Dataset has been initialized.
+  /// @post The item's MemoryAdapter contains the data from the dataset.
+  void deserializeData();
+
   /// Instruct this data item to finalize it's dataset.
   void finalizeDataset();
 

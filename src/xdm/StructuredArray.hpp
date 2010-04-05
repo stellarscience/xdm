@@ -29,9 +29,30 @@
 
 #include <xdm/NamespaceMacro.hpp>
 
+#include <sstream>
+#include <stdexcept>
 #include <vector>
 
 XDM_NAMESPACE_BEGIN
+
+/// Exception signalling that there is not enough memory to hold data with the
+/// given size.
+class NotEnoughMemoryError : public std::runtime_error {
+  size_t mRequested;
+public:
+  NotEnoughMemoryError( size_t requested ) :
+    std::runtime_error( "Not enough memory for this operation" ),
+    mRequested( requested ) {}
+  virtual const char* what() const throw () {
+    try {
+      std::stringstream ss;
+      ss << "Not enough memory for requested " << mRequested << " bytes";
+      return ss.str().c_str();
+    } catch ( ... ) {
+      return std::runtime_error::what();
+    }
+  }
+};
 
 /// Array class for holding multiple types of data. This class represents a
 /// contiguous array of data in memory.  It does not own the data it holds, it
@@ -77,6 +98,15 @@ public:
 
   /// Get the size of the array in memory in bytes.
   size_t memorySize() const;
+
+  /// Resize the array to hold the specified number of data elements. This
+  /// method should have the same semantics as std::vector. That is, a call to
+  /// resize should only ever result in increased memory use. If the requested
+  /// size is less than the current size, subsequent calls to size() should
+  /// return the requested size, but no memory should be returned to the system.
+  /// @param count The number of data elements to hold.
+  /// @throw OutOfMemoryError There is not enough memory for the operation.
+  virtual void resize( size_t count ) = 0;
 
 };
 

@@ -23,9 +23,11 @@
 
 #include <xdm/TypedStructuredArray.hpp>
 
+#include <stdexcept>
 #include <vector>
 
 #include <xdm/NamespaceMacro.hpp>
+#include <xdm/ThrowMacro.hpp>
 
 XDM_NAMESPACE_BEGIN
 
@@ -74,7 +76,11 @@ public:
   reference operator[]( size_type i ) { return mVector[i]; }
   const_reference operator[]( size_type i ) const { return mVector[i]; }
 
-  void resize( size_type n ) { mVector.resize( n ); }
+  void resize( size_type n ) {
+    mVector.resize( n );
+    TypedStructuredArray< T >::setSize( n );
+    TypedStructuredArray< T >::setData( &mVector[0] );
+  }
   void reserve( size_type n) { mVector.reserve( n ); }
 
   //-- StructuredArray Query Interface --//
@@ -92,6 +98,35 @@ public:
   }
   using StructuredArray::data;
 };
+
+/// Create a vector structured array given a primitiveType::Value parameter.
+inline RefPtr< StructuredArray >
+makeVectorStructuredArray( primitiveType::Value type ) {
+  switch ( type ) {
+  case primitiveType::kChar:
+    return makeRefPtr( new VectorStructuredArray< char > ); break;
+  case primitiveType::kShort:
+    return makeRefPtr( new VectorStructuredArray< short > ); break;
+  case primitiveType::kInt:
+    return makeRefPtr( new VectorStructuredArray< int > ); break;
+  case primitiveType::kLongInt:
+    return makeRefPtr( new VectorStructuredArray< long int > ); break;
+  case primitiveType::kUnsignedChar:
+    return makeRefPtr( new VectorStructuredArray< unsigned char > ); break;
+  case primitiveType::kUnsignedShort:
+    return makeRefPtr( new VectorStructuredArray< unsigned short > ); break;
+  case primitiveType::kUnsignedInt:
+    return makeRefPtr( new VectorStructuredArray< unsigned int > ); break;
+  case primitiveType::kLongUnsignedInt:
+    return makeRefPtr( new VectorStructuredArray< long unsigned int > ); break;
+  case primitiveType::kFloat:
+    return makeRefPtr( new VectorStructuredArray< float > ); break;
+  case primitiveType::kDouble:
+    return makeRefPtr( new VectorStructuredArray< double > ); break;
+  default:
+    XDM_THROW( std::runtime_error( "Unknown array type." ) );
+  }
+}
 
 XDM_NAMESPACE_END
 

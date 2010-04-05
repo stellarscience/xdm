@@ -67,5 +67,12 @@ void MemoryAdapter::write( Dataset* dataset )
   }
 }
 
+void MemoryAdapter::read( Dataset* dataset ) {
+  if ( requiresWrite() ) {
+    readImplementation( dataset );
+    mNeedsUpdate = false;
+  }
+}
+
 XDM_NAMESPACE_END
 

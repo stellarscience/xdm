@@ -31,7 +31,8 @@ namespace {
 class DatasetTestImplementation : public xdm::Dataset {
 public:
   bool dataWritten;
-  DatasetTestImplementation() : xdm::Dataset(), dataWritten(false) {}
+  bool dataRead;
+  DatasetTestImplementation() : xdm::Dataset(), dataWritten(false), dataRead(false) {}
 
   xdm::DataShape<> initializeImplementation(
     xdm::primitiveType::Value,
@@ -65,6 +66,12 @@ public:
     DatasetTestImplementation* ds =
       dynamic_cast< DatasetTestImplementation* >( dataset );
     ds->dataWritten=true;
+  }
+
+  virtual void readImplementation( xdm::Dataset* dataset ) {
+   DatasetTestImplementation* ds =
+      dynamic_cast< DatasetTestImplementation* >( dataset );
+    ds->dataRead=true;
   }
 };
 

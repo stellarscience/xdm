@@ -261,7 +261,8 @@ xdm::DataShape<> HdfDataset::initializeImplementation(
   creationParameters.dataspace = imp->mDataspaceId->get();
   creationParameters.mode = mode;
   creationParameters.chunked = imp->mUseChunkedIo;
-  creationParameters.chunkSize = ( imp->mChunkSize.rank() != 0 ) ?
+  creationParameters.chunkSize =
+    ( imp->mChunkSize.rank() != 0 ) ?
     imp->mChunkSize : shape;
   creationParameters.compress = imp->mUseCompression;
   creationParameters.compressionLevel = imp->mCompressionLevel;

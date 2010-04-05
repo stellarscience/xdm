@@ -23,8 +23,11 @@
 
 #include <xdmf/impl/TreeBuilder.hpp>
 
+#include <xdm/AllDataSelection.hpp>
+#include <xdm/DataSelectionMap.hpp>
 #include <xdm/Dataset.hpp>
 #include <xdm/TypedStructuredArray.hpp>
+#include <xdm/VectorStructuredArray.hpp>
 #include <xdm/UniformDataItem.hpp>
 
 #include <xdmHdf/HdfDataset.hpp>
@@ -34,17 +37,46 @@
 
 namespace {
 
+char const * const kTestDatasetFilename = "BuildTreeTest.h5";
+
+// Create a simple test HDF5 file.
+void createHdfFile() {
+  xdm::RefPtr< xdmHdf::HdfDataset > dataset( new xdmHdf::HdfDataset );
+  dataset->setFile( kTestDatasetFilename );
+  xdmHdf::GroupPath path;
+  path.push_back( "group1" );
+  path.push_back( "group2" );
+  dataset->setGroupPath( path );
+  dataset->setDataset( "dataset" );
+  xdm::RefPtr< xdm::VectorStructuredArray< double > > array(
+    new xdm::VectorStructuredArray< double >( 9 ) );
+  for ( int i = 1; i <= 9; i++ ) {
+    (*array)[i-1] = i;
+  }
+
+  // write the array
+  dataset->initialize(
+    xdm::primitiveType::kDouble,
+    xdm::makeShape( 3, 3),
+    xdm::Dataset::kCreate );
+  dataset->serialize( array.get(), xdm::DataSelectionMap() );
+  dataset->finalize();
+}
+
 BOOST_AUTO_TEST_CASE( buildUniformDataItem ) {
-  char const * const kXml = 
+  char const * const kXml =
   "<DataItem Name='test' "
   "  ItemType='Uniform'"
   "  Dimensions='3 3'"
   "  NumberType='Float'"
   "  Precision='8'"
   "  Format='HDF'>"
-  "  test.h5:/path/to/dataset"
+  "  BuildTreeTest.h5:/group1/group2/dataset"
   "</DataItem>";
-  double resultData[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+  double resultData[] = { 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0 };
+
+  createHdfFile();
+
   xmlDocPtr document = xmlParseDoc( reinterpret_cast< const xmlChar *>(kXml) );
   xmlNode * rootNode = xmlDocGetRootElement( document );
 
@@ -62,14 +94,27 @@ BOOST_AUTO_TEST_CASE( buildUniformDataItem ) {
     = xdm::dynamic_pointer_cast< xdmHdf::HdfDataset >( item->dataset() );
   BOOST_REQUIRE( dataset );
 
-  BOOST_CHECK_EQUAL( dataset->file(), "test.h5" );
+  BOOST_CHECK_EQUAL( dataset->file(), kTestDatasetFilename );
   xdmHdf::GroupPath path;
-  path.push_back( "path" );
-  path.push_back( "to" );
+  path.push_back( "group1" );
+  path.push_back( "group2" );
   BOOST_CHECK_EQUAL_COLLECTIONS(
     dataset->groupPath().begin(), dataset->groupPath().end(),
     path.begin(), path.end() );
   BOOST_CHECK_EQUAL( "dataset", dataset->dataset() );
+
+  // check the data
+  item->initializeDataset( xdm::Dataset::kRead );
+  item->deserializeData();
+  item->finalizeDataset();
+
+  xdm::RefPtr< xdm::TypedStructuredArray< double > > array
+    = item->typedArray< double >();
+  BOOST_REQUIRE( array );
+  BOOST_CHECK_EQUAL_COLLECTIONS(
+    array->begin(), array->end(),
+    resultData, resultData + 9 );
+
   xmlFreeDoc( document );
 }
 

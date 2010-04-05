@@ -23,7 +23,9 @@
 XDM_NAMESPACE_BEGIN
 
 Dataset::Dataset() :
-  mUpdateCallback() {
+  mUpdateCallback(),
+  mIsInitialized( false ),
+  mShape() {
 }
 
 Dataset::~Dataset() {
@@ -48,11 +50,21 @@ void Dataset::update() {
   }
 }
 
+bool Dataset::isInitialized() const {
+  return mIsInitialized;
+}
+
+const DataShape<>& Dataset::shape() const {
+  return mShape;
+}
+
 DataShape<> Dataset::initialize(
   primitiveType::Value type,
   const DataShape<>& shape,
   const InitializeMode& mode ) {
-  return initializeImplementation( type, shape, mode );
+  mShape = initializeImplementation( type, shape, mode );
+  mIsInitialized = true;
+  return mShape;
 }
 
 void Dataset::serialize(
@@ -71,6 +83,8 @@ void Dataset::deserialize(
 
 void Dataset::finalize() {
   finalizeImplementation();
+  mIsInitialized = false;
+  mShape = DataShape<>();
 }
 
 XDM_NAMESPACE_END

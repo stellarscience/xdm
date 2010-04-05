@@ -138,6 +138,7 @@ public:
   virtual xdm::RefPtr< xdm::StructuredArray > array();
 
   virtual void writeImplementation( xdm::Dataset* dataset );
+  virtual void readImplementation( xdm::Dataset* dataset );
 };
 
 /// Constant function returns a constant value over the grid.

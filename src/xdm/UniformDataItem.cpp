@@ -157,6 +157,10 @@ void UniformDataItem::serializeData() {
   mData->write( mDataset.get() );
 }
 
+void UniformDataItem::deserializeData() {
+  mData->read( mDataset.get() );
+}
+
 void UniformDataItem::finalizeDataset() {
   mDataset->finalize();
 }

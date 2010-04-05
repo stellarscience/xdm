@@ -25,6 +25,8 @@
 #include <xdm/RefPtr.hpp>
 #include <xdm/StructuredArray.hpp>
 
+#include <memory>
+
 #include <cassert>
 
 #include <xdm/NamespaceMacro.hpp>
@@ -85,6 +87,36 @@ public:
     return mData;
   }
 
+  virtual void resize( size_t count ) {
+    if ( count < mSize ) {
+      // don't allocate, just reset the size.
+      mSize = count;
+    } else {
+      // try to reallocate the memory
+      T* tmp;
+      try {
+        tmp = new T[ count ];
+      } catch ( std::bad_alloc ) {
+        throw NotEnoughMemoryError( count * sizeof( T ) );
+      }
+
+      // try to copy the old memory over.
+      try {
+        // copy the the existing elements into place.
+        std::uninitialized_copy( mData, mData + mSize, tmp );
+        // fill the rest with default elements.
+        std::uninitialized_fill( tmp + mSize, tmp + count, T() );
+      } catch ( ... ) {
+        delete [] tmp;
+        throw;
+      }
+      // delete the old data and update internal state.
+      delete [] mData;
+      mData = tmp;
+      mSize = count;
+    }
+  }
+
   //-- Data Access Interface --//
 
   /// Set the pointer to the array data.
@@ -109,23 +141,23 @@ public:
 
   /// Get an iterator pointing to the end of the data.
   iterator end() {
-    return mData + mSize;
+    return mData + size();
   }
 
   /// Get a const iterator pointing to the end of the data.
   const_iterator end() const {
-    return mData + mSize;
+    return mData + size();
   }
 
   /// Index the ith element of the array.
   value_type& operator[]( size_t i ) {
-    assert( i < mSize );
+    assert( i < size() );
     return mData[i];
   }
 
   /// Index the const ith element of the array.
   const value_type& operator[] ( size_t i ) const {
-    assert( i < mSize );
+    assert( i < size() );
     return mData[i];
   }
 

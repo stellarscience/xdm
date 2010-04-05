@@ -45,7 +45,9 @@ public:
   const DataSelectionMap& selectionMap() const;
   void setSelectionMap( const DataSelectionMap& selectionMap );
 
+protected:
   virtual void writeImplementation( Dataset* dataset );
+  virtual void readImplementation( Dataset* dataset );
 
 private:
   RefPtr< StructuredArray > mArray;

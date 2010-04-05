@@ -148,6 +148,11 @@ public:
   /// Invoke the update callback for the dataset.
   /// @see BasicDatasetUpdateCallback
   virtual void update();
+
+  // Determine if the dataset has been initialized.
+  bool isInitialized() const;
+  // Determine the data shape.
+  const DataShape<>& shape() const;
   
   // Code Review Matter (open): Doxygen groups
   // Did you consider using Doxygen documentation groups to aid in the
@@ -297,6 +302,8 @@ protected:
 
 private:
   RefPtr< BasicDatasetUpdateCallback > mUpdateCallback;
+  bool mIsInitialized;
+  DataShape<> mShape;
 };
 
 XDM_NAMESPACE_END

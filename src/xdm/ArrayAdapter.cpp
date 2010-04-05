@@ -24,6 +24,9 @@
 #include <xdm/Dataset.hpp>
 #include <xdm/StructuredArray.hpp>
 
+#include <algorithm>
+#include <numeric>
+
 XDM_NAMESPACE_BEGIN
 
 ArrayAdapter::ArrayAdapter( RefPtr< StructuredArray > array, bool isDynamic ) :
@@ -59,6 +62,14 @@ void ArrayAdapter::setSelectionMap( const DataSelectionMap& selectionMap ) {
 
 void ArrayAdapter::writeImplementation( Dataset* dataset ) {
   dataset->serialize( mArray.get(), mSelectionMap );
+}
+
+void ArrayAdapter::readImplementation( Dataset* dataset ) {
+  DataShape<> shape = dataset->shape();
+  size_t totalSize = std::accumulate( shape.begin(), shape.end(), 1,
+    std::multiplies< size_t >() );
+  mArray->resize( totalSize );
+  dataset->deserialize( mArray.get(), mSelectionMap );
 }
 
 XDM_NAMESPACE_END

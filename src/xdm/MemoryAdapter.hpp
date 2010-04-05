@@ -53,10 +53,14 @@ public:
   void setNeedsUpdate( bool needsUpdate );
 
   /// Determine if the data currently requires writing.
+  /// @todo Rename this to dirty(), as it applies to both input and output.
   bool requiresWrite() const;
 
   /// Write the data to the specified dataset.
   void write( Dataset* dataset );
+
+  /// Read data in from the specified dataset.
+  void read( Dataset* dataset );
 
   /// Get an array representation of the underlying data. Inheritors
   /// should implement this method to provide a StructuredArray subclass that
@@ -67,6 +71,9 @@ private:
   /// Method to be implemented by inheritors to define the data to be written to
   /// the dataset.
   virtual void writeImplementation( Dataset* dataset ) = 0;
+  /// Method to be implemented by inheritors to define how to read data in from
+  /// the specified dataset.
+  virtual void readImplementation( Dataset* dataset ) = 0;
 
   bool mIsDynamic;
   bool mNeedsUpdate;

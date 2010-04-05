@@ -23,8 +23,10 @@
 
 #include <xdmf/impl/XPathQuery.hpp>
 
+#include <xdm/ArrayAdapter.hpp>
 #include <xdm/Item.hpp>
 #include <xdm/UniformDataItem.hpp>
+#include <xdm/VectorStructuredArray.hpp>
 
 #include <xdmFormat/Reader.hpp>
 
@@ -131,7 +133,8 @@ TreeBuilder::buildUniformDataItem( xmlNode * node ) {
   } else {
     precision = 4;
   }
-  result->setDataType( type( typeString, precision ) );
+  xdm::primitiveType::Value dataType = type( typeString, precision );
+  result->setDataType( dataType );
 
   // Get the shape from the Dimensions attribute.
   XPathQuery dimensionsQuery( mXPathContext, node, "@Dimensions" );
@@ -147,6 +150,7 @@ TreeBuilder::buildUniformDataItem( xmlNode * node ) {
     format = formatQuery.textValue( 0 );
   }
   
+  // Build the dataset.
   if ( format == "HDF" ) {
     xdm::RefPtr< xdmHdf::HdfDataset > dataset( new xdmHdf::HdfDataset );
     XPathQuery datasetInfoQuery( mXPathContext, node, "text()" );
@@ -168,8 +172,14 @@ TreeBuilder::buildUniformDataItem( xmlNode * node ) {
     }
   } else {
     XDM_THROW( xdmFormat::ReadError(
-      "Only HDF datasets are currently supported" ) );
+      "Only HDF datasets are supported." ) );
   }
+
+  // Give the item an array to hold the data from the dataset should it be
+  // loaded into memory.
+  xdm::RefPtr< xdm::StructuredArray > array(
+    xdm::makeVectorStructuredArray( dataType ) );
+  result->setData( xdm::makeRefPtr( new xdm::ArrayAdapter( array ) ) );
 
   return result;
 }

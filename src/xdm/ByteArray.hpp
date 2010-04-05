@@ -32,25 +32,6 @@
 
 XDM_NAMESPACE_BEGIN
 
-/// Exception signalling that there is not enough memory to hold data with the
-/// given size.
-class NotEnoughMemoryError : public std::runtime_error {
-  size_t mRequested;
-public:
-  NotEnoughMemoryError( size_t requested ) :
-    std::runtime_error( "Not enough memory for this operation" ),
-    mRequested( requested ) {}
-  virtual const char* what() const throw () {
-    try {
-      std::stringstream ss;
-      ss << "Not enough memory for requested " << mRequested << " bytes";
-      return ss.str().c_str();
-    } catch ( ... ) {
-      return std::runtime_error::what();
-    }
-  }
-};
-
 /// StructuredArray that represents it's data internally as an array of bytes.
 /// The array elements are stored internally as an array of bytes, however
 /// this class provides an interface for setting the number and type of elements
@@ -92,7 +73,7 @@ public:
   /// ensures the array can hold 4*size bytes.
   /// @throw NotEnoughMemoryError The system cannot allocate enough memory to
   /// hold the given number of elements.
-  void setSize( size_t size ) {
+  void resize( size_t size ) {
     if ( mBuffer.size() < size * typeSize( mType ) ) {
       // allocate more space to hold the elements.
       try {

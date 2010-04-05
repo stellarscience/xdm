@@ -235,7 +235,7 @@ BinaryIStream& operator>>( BinaryIStream& istr, ByteArray& v ) {
   size_t size;
   istr >> type >> size;
   v.setDataType( type );
-  v.setSize( size );
+  v.resize( size );
   istr.read( v.buffer(), v.memorySize() );
   return istr;
 }

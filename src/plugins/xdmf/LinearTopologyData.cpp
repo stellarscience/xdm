@@ -63,6 +63,11 @@ void LinearTopologyData::writeImplementation( xdm::Dataset* dataset ) {
   dataset->serialize( values.get(), xdm::DataSelectionMap() );
 }
 
+void LinearTopologyData::readImplementation( xdm::Dataset* dataset ) {
+  xdm::RefPtr< xdm::StructuredArray > values = array();
+  dataset->deserialize( values.get(), xdm::DataSelectionMap() );
+}
+
 xdm::RefPtr< xdm::UniformDataItem > createLinearTopologyUniformDataItem(
   xdm::RefPtr<xdmGrid::Polyvertex>topology )
 {
