@@ -13,6 +13,7 @@ set( ${PROJECT_NAME}_HEADERS
     ByteArray.hpp
     CollectMetadataOperation.hpp
     CompositeDataItem.hpp
+    ContiguousArray.hpp
     CoordinateDataSelection.hpp
     DataItem.hpp
     DataSelection.hpp

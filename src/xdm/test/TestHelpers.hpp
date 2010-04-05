@@ -19,7 +19,7 @@
 //
 //------------------------------------------------------------------------------
 #include <xdm/DataShape.hpp>
-#include <xdm/TypedStructuredArray.hpp>
+#include <xdm/ContiguousArray.hpp>
 #include <xdm/UniformDataItem.hpp>
 #include <xdm/ArrayAdapter.hpp>
 

@@ -36,19 +36,21 @@ XDM_NAMESPACE_BEGIN
 template< typename T >
 class VectorStructuredArray : public TypedStructuredArray< T > {
 private:
+
+  typedef TypedStructuredArray< T > Base;
+
   std::vector< T > mVector;
 
 public:
 
-  //-- STL Access Types --//
-
-  typedef typename std::vector< T >::size_type size_type;
-  typedef typename std::vector< T >::value_type value_type;
-  typedef typename std::vector< T >::pointer pointer;
-  typedef typename std::vector< T >::iterator iterator;
-  typedef typename std::vector< T >::const_iterator const_iterator;
-  typedef typename std::vector< T >::reference reference;
-  typedef typename std::vector< T >::const_reference const_reference;
+  typedef typename Base::value_type value_type;
+  typedef typename Base::pointer pointer;
+  typedef typename Base::const_pointer const_pointer;
+  typedef typename Base::iterator iterator;
+  typedef typename Base::const_iterator const_iterator;
+  typedef typename Base::reference reference;
+  typedef typename Base::const_reference const_reference;
+  typedef typename Base::size_type size_type;
 
   /// Default constructor initializes with empty storage.
   VectorStructuredArray() :
@@ -68,35 +70,16 @@ public:
 
   virtual ~VectorStructuredArray() {}
 
-  iterator begin() { return mVector.begin(); }
-  const_iterator begin() const { return mVector.begin(); }
-  iterator end() { return mVector.end(); }
-  const_iterator end() const { return mVector.end(); }
-
-  reference operator[]( size_type i ) { return mVector[i]; }
-  const_reference operator[]( size_type i ) const { return mVector[i]; }
-
+  /// Resizes the underlying vector and updates the base class members.
   void resize( size_type n ) {
     mVector.resize( n );
     TypedStructuredArray< T >::setSize( n );
     TypedStructuredArray< T >::setData( &mVector[0] );
   }
+
+  /// Reserves space for the vector without resizing.
   void reserve( size_type n) { mVector.reserve( n ); }
 
-  //-- StructuredArray Query Interface --//
-  virtual primitiveType::Value dataType() const {
-    return PrimitiveTypeInfo< T >::kValue;
-  }
-  virtual size_t elementSize() const {
-    return PrimitiveTypeInfo< T >::kSize;
-  }
-  virtual size_t size() const {
-    return mVector.size();
-  }
-  virtual const void* data() const {
-    return &mVector[0];
-  }
-  using StructuredArray::data;
 };
 
 /// Create a vector structured array given a primitiveType::Value parameter.

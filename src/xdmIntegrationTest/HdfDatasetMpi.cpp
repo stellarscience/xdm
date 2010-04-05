@@ -22,13 +22,13 @@
 #include <boost/test/unit_test.hpp>
 
 #include <xdm/AllDataSelection.hpp>
+#include <xdm/ContiguousArray.hpp>
 #include <xdm/DataSelectionMap.hpp>
 #include <xdm/FileSystem.hpp>
 #include <xdm/HyperSlab.hpp>
 #include <xdm/HyperslabDataSelection.hpp>
 #include <xdm/DataShape.hpp>
 #include <xdm/RefPtr.hpp>
-#include <xdm/TypedStructuredArray.hpp>
 
 #include <xdmComm/MpiDatasetProxy.hpp>
 

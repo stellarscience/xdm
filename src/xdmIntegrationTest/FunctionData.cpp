@@ -21,12 +21,12 @@
 #include <xdmIntegrationTest/FunctionData.hpp>
 
 #include <xdm/AllDataSelection.hpp>
+#include <xdm/ContiguousArray.hpp>
 #include <xdm/DataShape.hpp>
 #include <xdm/HyperSlab.hpp>
 #include <xdm/HyperSlabBlockIterator.hpp>
 #include <xdm/HyperslabDataSelection.hpp>
 #include <xdm/UniformDataItem.hpp>
-#include <xdm/TypedStructuredArray.hpp>
 #include <xdm/ThrowMacro.hpp>
 #include <xdm/VectorStructuredArray.hpp>
 #include <xdm/ArrayAdapter.hpp>
@@ -131,7 +131,7 @@ FunctionData::FunctionData(
       mBlockSize.end(),
       1,
       MultiplySize() ) );
-  mStructuredArray = new xdm::TypedStructuredArray< double >(
+  mStructuredArray = new xdm::ContiguousArray< double >(
     &mStorage[0], mStorage.size() );
 }
 

@@ -25,10 +25,10 @@
 #include <boost/test/unit_test.hpp>
 
 #include <xdm/CollectMetadataOperation.hpp>
+#include <xdm/ContiguousArray.hpp>
 #include <xdm/FileSystem.hpp>
 #include <xdm/SerializeDataOperation.hpp>
 #include <xdm/StructuredArray.hpp>
-#include <xdm/TypedStructuredArray.hpp>
 #include <xdm/UniformDataItem.hpp>
 #include <xdm/ArrayAdapter.hpp>
 #include <xdm/XmlObject.hpp>

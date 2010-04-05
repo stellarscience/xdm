@@ -22,7 +22,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include <xdm/DataShape.hpp>
-#include <xdm/TypedStructuredArray.hpp>
+#include <xdm/ContiguousArray.hpp>
 #include <xdm/RefPtr.hpp>
 
 namespace {
@@ -30,8 +30,8 @@ namespace {
 template< typename T > 
 void test() {
   T value = T();
-  xdm::RefPtr< xdm::TypedStructuredArray< T > > array( 
-    new xdm::TypedStructuredArray< T >( &value, 1 ) );
+  xdm::RefPtr< xdm::ContiguousArray< T > > array(
+    new xdm::ContiguousArray< T >( &value, 1 ) );
   T* result = array->begin();
   BOOST_CHECK_EQUAL( result, &value );
 }

@@ -33,10 +33,17 @@
 
 XDM_NAMESPACE_BEGIN
 
-/// Presents a contiguous c-style array as a StructuredArray for use in the xdm
-/// interfaces. This class does not take ownership of the array.  This is to
-/// allow clients to pass their existing data structure to the xdm interfaces
-/// for I/O purposes.
+/// This abstract class defines an extension to the StructuredArray interface
+/// to access typed array data within a StructuredArray. This allows clients
+/// with knowledge of the underlying array data type write access to the array
+/// data itself in addition to the query interface provided by StructuredArray.
+/// Subclasses are responsible for providing the actual array implementation.
+///
+/// In order to maintain performance, this class holds a pointer to the
+/// underlying array. This means it is very important that clients implement
+/// the proper constructor behavior in setting the array location and size.
+/// In addition, upon a resize() request, inheritors are responsible for
+/// updating the location and size of the internal array as necessary.
 ///
 /// In addition to providing the StructuredArray interface for data, this class
 /// also provides STL compliant random access iterators for accessing the data
@@ -45,89 +52,46 @@ template< typename T >
 class TypedStructuredArray : public StructuredArray {
 public:
 
-  //-- STL Container Interface Types --//
-
-  typedef T value_type;
-  typedef T* pointer;
+  typedef T value_type; ///< The type of value held in the array.
+  typedef T* pointer; ///< The pointer type for the array.
+  typedef const T* const_pointer; ///< The immutable pointer type for the array.
   typedef T* iterator; ///< Random access iterator
   typedef const T* const_iterator; ///< Random access const iterator
+  typedef T& reference; ///< Reference type for array elements.
+  typedef const T& const_reference; ///< Constant reference type for array elements.
+  typedef size_t size_type;
 
-  /// Construct the array without initializing the data or size. The data
-  /// pointer will be NULL and the size will be 0.
-  TypedStructuredArray() :
-    StructuredArray(),
-    mData( 0 ),
-    mSize( 0 ) {
-  }
-
-  /// Construct the array with a pointer to its data and size.
-  TypedStructuredArray( T* data, size_t size ) :
-    StructuredArray(),
-    mData( data ),
-    mSize( size ) {
-  }
-
+  /// Destructor.
   virtual ~TypedStructuredArray() {}
 
   //-- StructuredArray Query Interface --//
 
+  /// Returns the data type corresponding to the value_type for the array.
   virtual primitiveType::Value dataType() const {
     return PrimitiveTypeInfo< T >::kValue;
   }
 
+  /// Returns the element size in bytes of the value_type.
   virtual size_t elementSize() const {
     return PrimitiveTypeInfo< T >::kSize;
   }
 
+  /// Returns the number of elements in the array.
   virtual size_t size() const {
     return mSize;
   }
 
+  /// Returns the untyped pointer to the beginning of the array.
   virtual const void* data() const {
     return mData;
   }
 
-  virtual void resize( size_t count ) {
-    if ( count < mSize ) {
-      // don't allocate, just reset the size.
-      mSize = count;
-    } else {
-      // try to reallocate the memory
-      T* tmp;
-      try {
-        tmp = new T[ count ];
-      } catch ( std::bad_alloc ) {
-        throw NotEnoughMemoryError( count * sizeof( T ) );
-      }
+  //-- Typed Data Access Interface --//
 
-      // try to copy the old memory over.
-      try {
-        // copy the the existing elements into place.
-        std::uninitialized_copy( mData, mData + mSize, tmp );
-        // fill the rest with default elements.
-        std::uninitialized_fill( tmp + mSize, tmp + count, T() );
-      } catch ( ... ) {
-        delete [] tmp;
-        throw;
-      }
-      // delete the old data and update internal state.
-      delete [] mData;
-      mData = tmp;
-      mSize = count;
-    }
-  }
-
-  //-- Data Access Interface --//
-
-  /// Set the pointer to the array data.
-  void setData( T* data ) {
-    mData = data;
-  }
-
-  /// Set the number of elements in the array.
-  void setSize( size_t size ) {
-    mSize = size;
-  }
+  /// Get the typed pointer for the data.
+  pointer typedData() { return mData; }
+  /// Get the constant typed pointer for the data.
+  const_pointer typedData() const { return mData; }
 
   /// Get an iterator pointing to the beginning of the data.
   iterator begin() {
@@ -141,39 +105,62 @@ public:
 
   /// Get an iterator pointing to the end of the data.
   iterator end() {
-    return mData + size();
+    return mData + mSize;
   }
 
   /// Get a const iterator pointing to the end of the data.
   const_iterator end() const {
-    return mData + size();
+    return mData + mSize;
   }
 
   /// Index the ith element of the array.
   value_type& operator[]( size_t i ) {
-    assert( i < size() );
+    assert( i < mSize );
     return mData[i];
   }
 
   /// Index the const ith element of the array.
   const value_type& operator[] ( size_t i ) const {
-    assert( i < size() );
+    assert( i < mSize );
     return mData[i];
+  }
+
+protected:
+  /// Construct the array with a NULL pointer and size 0.
+  TypedStructuredArray() :
+    mData( 0 ),
+    mSize( 0 ) {
+  }
+
+  /// Construct the array with a pointer to its data and size.
+  TypedStructuredArray( T* data, size_t size ) :
+    StructuredArray(),
+    mData( data ),
+    mSize( size ) {
+  }
+
+  /// Set the pointer to the array. Inheritors must call this when the memory
+  /// for the array is relocated.
+  void setData( T* data ) {
+    mData = data;
+  }
+
+  /// Set the number of elements in the array.  Inheritors must call this when
+  /// the array size changes.
+  void setSize( size_t size ) {
+    mSize = size;
+  }
+
+  /// Get the size of the array. This is in addition to the public size() method
+  /// because this one is protected and does not need to be virtual.
+  size_t protectedSize() const {
+    return mSize;
   }
 
 private:
   T* mData;
   size_t mSize;
 };
-
-/// Convenience template to construct a StructuredArray with the right type
-/// arguments. This function uses template deduction to determine the right type
-/// of TypedStructuredArray to instantiate.
-template< typename T >
-RefPtr< StructuredArray >
-createStructuredArray( T* data, size_t size ) {
-  return makeRefPtr( new TypedStructuredArray< T >( data, size ) );
-}
 
 XDM_NAMESPACE_END
 

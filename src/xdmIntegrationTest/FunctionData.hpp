@@ -21,10 +21,10 @@
 #ifndef xdmIntegrationTest_FunctionData_hpp
 #define xdmIntegrationTest_FunctionData_hpp
 
+#include <xdm/ContiguousArray.hpp>
 #include <xdm/DataShape.hpp>
 #include <xdm/HyperSlab.hpp>
 #include <xdm/RefPtr.hpp>
-#include <xdm/TypedStructuredArray.hpp>
 #include <xdm/MemoryAdapter.hpp>
 
 #include <algorithm>
@@ -123,7 +123,7 @@ private:
   GridBounds mGrid;
   xdm::HyperSlab<> mRegionOfInterest;
   std::vector< double > mStorage;
-  xdm::RefPtr< xdm::TypedStructuredArray< double > > mStructuredArray;
+  xdm::RefPtr< xdm::ContiguousArray< double > > mStructuredArray;
   xdm::RefPtr< Function > mFunction;
   xdm::DataShape<> mBlockSize;
 
