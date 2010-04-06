@@ -10,8 +10,33 @@
 #include <xdmf/NamespaceMacro.hpp>
 
 #include <memory>
+#include <sstream>
 
 XDMF_NAMESPACE_BEGIN
+
+class ValidationError : public xdmFormat::ReadError {
+  int mLine;
+  int mColumn;
+  std::string mReason;
+public:
+  ValidationError( int line, int column, const std::string& reason ) :
+    xdmFormat::ReadError( reason ),
+    mLine( line ),
+    mColumn( column ),
+    mReason( reason ) {}
+  virtual ~ValidationError() throw() {}
+
+  virtual const char * what() const throw() {
+    try {
+      std::stringstream msg;
+      msg << "Validation error at line " << mLine << " column " << mColumn;
+      msg << ": " << mReason;
+      return msg.str().c_str();
+    } catch( ... ) {
+      return xdmFormat::ReadError::what();
+    }
+  }
+};
 
 class XmfReader : public xdmFormat::Reader {
 public:

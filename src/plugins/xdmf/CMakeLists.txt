@@ -28,7 +28,7 @@ add_custom_command(
   ARGS XDMF_RNG_SCHEMA ${CMAKE_CURRENT_BINARY_DIR}/xdmf.rng > ${CMAKE_CURRENT_BINARY_DIR}/XdmfRng.hpp
   DEPENDS xmlToC ${CMAKE_CURRENT_BINARY_DIR}/xdmf.rng
 )
-add_custom_target( xdmf_rng_header 
+add_custom_target( xdmf_rng_header ALL 
   DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/XdmfRng.hpp" )
 add_dependencies( xdmf_rng_header copy_xdmf.rng )
 

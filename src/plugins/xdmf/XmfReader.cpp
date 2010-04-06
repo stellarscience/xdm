@@ -37,7 +37,7 @@ void validationErrorCallback( void * context, const char * msg, ... ) {
   va_start(ap, msg);
   vsnprintf(&newmessage[0], 512, msg, ap);
   va_end(ap);
-  XDM_THROW( xdmFormat::ReadError( newmessage ) );
+  XDM_THROW( ValidationError( 0, 0, newmessage ) );
 }
 
 // Validate an XDMF document.
@@ -63,6 +63,8 @@ bool validate( xmlDocPtr document ) {
     if (!validation) {
       throw xdmFormat::ReadError( "Error: unable to parse schema." );
     }
+
+    xmlRelaxNGSetValidErrors( validation, &validationErrorCallback, 0, 0 );
 
     int validationResult = xmlRelaxNGValidateDoc( validation, document );
     if ( validationResult == 0 ) {

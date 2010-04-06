@@ -59,7 +59,8 @@ public:
   /// Build the tree from the document.
   virtual xdm::RefPtr< xdm::Item > buildTree();
 
-  //-- Item builders --//
+  //-- Item build methods --//
+
   /// Build a grid from an XML node pointing to a Grid element.
   /// @todo Handle Hyperslab, coordinate, and function grids.
   xdm::RefPtr< xdmGrid::Grid > buildGrid( xmlNode * node );
@@ -83,6 +84,9 @@ public:
   xdm::RefPtr< xdm::UniformDataItem > buildUniformDataItem( xmlNode * node );
   xdm::RefPtr< xdm::DataItem > buildDataItem( xmlNode * node );
   xdm::RefPtr< xdmGrid::Time > buildTime( xmlNode * node );
+
+  //-- Item update methods --//
+
 
 private:
   xmlDocPtr mDocument;

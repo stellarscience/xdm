@@ -27,23 +27,24 @@
 
 #include <fstream>
 
-char const * const xml = 
-  "<Xdmf Version='2.1'>"
-  "</Xdmf>";
-
 BOOST_AUTO_TEST_CASE( parseFile ) {
-  xdm::FileSystemPath testFilePath( "xmfParseFileTest.xmf" );
-  if ( xdm::exists( testFilePath ) ) {
-    xdm::remove( testFilePath );
-  }
-  
-  {
-    // write the file for the test
-    std::ofstream out( testFilePath.pathString().c_str() );
-    out << xml;
-  }
+  xdm::FileSystemPath testFilePath( "test_document1.xmf" );
 
   xdmf::XmfReader reader;
   xdm::RefPtr< xdm::Item > result = reader.readItem( testFilePath );
   BOOST_CHECK( result );
+}
+
+BOOST_AUTO_TEST_CASE( invalidDocument ) {
+  const char * kXml = "<Xdmf Version='2.1'><foo/></Xdmf>";
+  const char * kTestFileName = "invalidDocumentFile.xmf";
+
+  {
+    std::ofstream testfile( kTestFileName );
+    testfile << kXml;
+  }
+
+  xdmf::XmfReader reader;
+  BOOST_CHECK_THROW( reader.readItem( xdm::FileSystemPath( kTestFileName ) ),
+    xdmf::ValidationError );
 }
