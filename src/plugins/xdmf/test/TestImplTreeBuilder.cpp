@@ -30,6 +30,8 @@
 #include <xdm/VectorStructuredArray.hpp>
 #include <xdm/UniformDataItem.hpp>
 
+#include <xdmGrid/StructuredTopology.hpp>
+
 #include <xdmHdf/HdfDataset.hpp>
 
 #include <libxml/parser.h>
@@ -116,6 +118,25 @@ BOOST_AUTO_TEST_CASE( buildUniformDataItem ) {
     resultData, resultData + 9 );
 
   xmlFreeDoc( document );
+}
+
+BOOST_AUTO_TEST_CASE( buildStructuredTopology ) {
+  const char * kXml =
+    "<Topology TopologyType='3DRectMesh' Dimensions='3 3 3'/>";
+
+  xmlDocPtr document = xmlParseDoc( reinterpret_cast< const xmlChar * >(kXml) );
+  xmlNode * rootNode = xmlDocGetRootElement( document );
+
+  xdmf::impl::TreeBuilder builder( document );
+  xdm::RefPtr< xdmGrid::Topology > result = builder.buildTopology( rootNode );
+
+  BOOST_REQUIRE( result );
+
+  xdm::RefPtr< xdmGrid::StructuredTopology > structured
+    = xdm::dynamic_pointer_cast< xdmGrid::StructuredTopology >( result );
+  BOOST_REQUIRE( structured );
+
+  BOOST_CHECK_EQUAL( structured->shape(), xdm::makeShape( 3, 3, 3) );
 }
 
 } // namespace

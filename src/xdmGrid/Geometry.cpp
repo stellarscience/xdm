@@ -24,6 +24,12 @@
 
 XDM_GRID_NAMESPACE_BEGIN
 
+Geometry::Geometry() :
+  mNumberOfNodes( 0 ),
+  mDimension( 0 ),
+  mSharedVectorImp() {
+}
+
 Geometry::Geometry( unsigned int dimension ) :
   mNumberOfNodes( 0 ),
   mDimension( dimension ),

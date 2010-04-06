@@ -120,4 +120,13 @@ BOOST_AUTO_TEST_CASE( unorderedCollectionsEqualDifferentElements ) {
     b.begin(), b.end() ) );
 }
 
+BOOST_AUTO_TEST_CASE( toUpper ) {
+  const char * input = "abcdefghijklmnopqrstuvwxyz";
+  const char * answer = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+  std::string result( input );
+  xdm::toUpper( result );
+  BOOST_CHECK_EQUAL( result, answer );
+}
+
 } // namespace

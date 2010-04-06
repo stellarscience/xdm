@@ -23,7 +23,9 @@
 
 #include <xdmf/impl/XPathQuery.hpp>
 
+#include <xdm/Algorithm.hpp>
 #include <xdm/ArrayAdapter.hpp>
+#include <xdm/DataShape.hpp>
 #include <xdm/Item.hpp>
 #include <xdm/UniformDataItem.hpp>
 #include <xdm/VectorStructuredArray.hpp>
@@ -34,6 +36,10 @@
 #include <xdmGrid/CollectionGrid.hpp>
 #include <xdmGrid/Geometry.hpp>
 #include <xdmGrid/Grid.hpp>
+#include <xdmGrid/InterlacedGeometry.hpp>
+#include <xdmGrid/MultiArrayGeometry.hpp>
+#include <xdmGrid/RectilinearMesh.hpp>
+#include <xdmGrid/TensorProductGeometry.hpp>
 #include <xdmGrid/Topology.hpp>
 #include <xdmGrid/UniformGrid.hpp>
 
@@ -42,9 +48,11 @@
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 
+#include <algorithm>
 #include <sstream>
 
 #include <cassert>
+#include <cstring>
 
 namespace xdmf {
 namespace impl {
@@ -186,12 +194,180 @@ TreeBuilder::buildUniformDataItem( xmlNode * node ) {
 
 //------------------------------------------------------------------------------
 xdm::RefPtr< xdmGrid::Geometry > TreeBuilder::buildGeometry( xmlNode * node ) {
-  return xdm::RefPtr< xdmGrid::Geometry >();
+  enum {
+    XYZ = 0,
+    XY,
+    X_Y_Z,
+    X_Y,
+    VXVYVZ,
+    VXVY,
+    ORIGIN_DXDYDZ,
+    ORIGIN_DXDY
+  } geometryType( XYZ );
+
+  static const char * strings[] = {
+    "XYZ",
+    "XY",
+    "X_Y_Z",
+    "X_Y",
+    "VXVYVZ",
+    "VXVY",
+    "ORIGIN_DXDYDZ",
+    "ORIGIN_DXDY"
+  };
+
+  // Get the geometry type from the GeometryType attribute.
+  XPathQuery geometryTypeQuery( mXPathContext, node, "@GeometryType" );
+  if ( geometryTypeQuery.size() > 0 ) {
+    std::string typeString = geometryTypeQuery.textValue( 0 );
+    xdm::toUpper( typeString );
+    if ( typeString == strings[XYZ] ) geometryType = XYZ;
+    else if ( typeString == strings[XY] ) geometryType = XY;
+    else if ( typeString == strings[X_Y_Z] ) geometryType = X_Y_Z;
+    else if ( typeString == strings[X_Y] ) geometryType = X_Y;
+    else if ( typeString == strings[VXVYVZ] ) geometryType = VXVYVZ;
+    else if ( typeString == strings[VXVY] ) geometryType = VXVY;
+    else if ( typeString == strings[ORIGIN_DXDYDZ] ) geometryType = ORIGIN_DXDYDZ;
+    else if ( typeString == strings[ORIGIN_DXDY] ) geometryType = ORIGIN_DXDY;
+    else XDM_THROW( xdmFormat::ReadError( "Unrecognized XDMF geometry type." ) );
+  }
+
+  // Choose the Geometry subclass based on the geometry type flag.
+  xdm::RefPtr< xdmGrid::Geometry > result;
+  switch ( geometryType ) {
+  case XYZ: result = new xdmGrid::InterlacedGeometry( 3 ); break;
+  case XY: result = new xdmGrid::InterlacedGeometry( 2 ); break;
+  case X_Y_Z: result = new xdmGrid::MultiArrayGeometry( 3 ); break;
+  case X_Y: result = new xdmGrid::MultiArrayGeometry( 2 ); break;
+  case VXVYVZ: result = new xdmGrid::TensorProductGeometry( 3 ); break;
+  case VXVY: result = new xdmGrid::TensorProductGeometry( 2 ); break;
+  default: XDM_THROW( "Unsupported XDMF Geometry type." ); break;
+  }
+
+  // Read the internal data items that make up the values for the geometry.
+  XPathQuery dataQuery( mXPathContext, node, kDataItemTag );
+  if ( dataQuery.size() == 0 ) {
+    XDM_THROW( xdmFormat::ReadError( "XDMF Geometry values unspecified." ) );
+  }
+  for ( int i = 0; i < dataQuery.size(); i++ ) {
+    result->appendChild( buildUniformDataItem( dataQuery.node( i ) ) );
+  }
+
+  return result;
 }
 
 //------------------------------------------------------------------------------
 xdm::RefPtr< xdmGrid::Topology > TreeBuilder::buildTopology( xmlNode * node ) {
-  return xdm::RefPtr< xdmGrid::Topology >();
+  enum {
+    POLYVERTEX = 0,
+    POLYLINE,
+    POLYGON,
+    TRIANGLE,
+    QUADRILATERAL,
+    TETRAHEDRON,
+    PYRAMID,
+    WEDGE,
+    HEXAHEDRON,
+    EDGE_3,
+    TRIANGLE_6,
+    QUADRILATERAL_8,
+    TETRAHEDRON_10,
+    PYRAMID_13,
+    WEDGE_15,
+    HEXAHEDRON_20,
+    MIXED,
+    SMESH2D,
+    RECTMESH2D,
+    CORECTMESH2D,
+    SMESH3D,
+    RECTMESH3D,
+    CORECTMESH3D
+  } topologyType;
+
+  static const char * strings[] = {
+    "POLYVERTEX",
+    "POLYLINE",
+    "POLYGON",
+    "TRIANGLE",
+    "QUADRILATERAL",
+    "TETRAHEDRON",
+    "PYRAMID",
+    "WEDGE",
+    "HEXAHEDRON",
+    "EDGE_3",
+    "TRIANGLE_6",
+    "QUADRILATERAL_8",
+    "TETRAHEDRON_10",
+    "PYRAMID_13",
+    "WEDGE_15",
+    "HEXAHEDRON_20",
+    "MIXED",
+    "2DSMESH",
+    "2DRECTMESH",
+    "2DCORECTMESH",
+    "3DSMESH",
+    "3DRECTMESH",
+    "3DCORECTMESH"
+  };
+
+  // Read the topology type attribute.
+  XPathQuery topologyTypeQuery( mXPathContext, node, "@TopologyType" );
+  if ( topologyTypeQuery.size() == 0 ) {
+    XDM_THROW( xdmFormat::ReadError( "No XDMF topology type specified." ) );
+  }
+  std::string typeString = topologyTypeQuery.textValue( 0 );
+  xdm::toUpper( typeString );
+  if ( typeString == strings[POLYVERTEX] ) topologyType = POLYVERTEX;
+  else if ( typeString == strings[POLYLINE] ) topologyType = POLYLINE;
+  else if ( typeString == strings[POLYGON] ) topologyType = POLYGON;
+  else if ( typeString == strings[TRIANGLE] ) topologyType = TRIANGLE;
+  else if ( typeString == strings[QUADRILATERAL] ) topologyType = QUADRILATERAL;
+  else if ( typeString == strings[TETRAHEDRON] ) topologyType = TETRAHEDRON;
+  else if ( typeString == strings[PYRAMID] ) topologyType = PYRAMID;
+  else if ( typeString == strings[WEDGE] ) topologyType = WEDGE;
+  else if ( typeString == strings[HEXAHEDRON] ) topologyType = HEXAHEDRON;
+  else if ( typeString == strings[EDGE_3] ) topologyType = EDGE_3;
+  else if ( typeString == strings[TRIANGLE_6] ) topologyType = TRIANGLE_6;
+  else if ( typeString == strings[QUADRILATERAL_8] ) topologyType = QUADRILATERAL_8;
+  else if ( typeString == strings[TETRAHEDRON_10] ) topologyType = TETRAHEDRON_10;
+  else if ( typeString == strings[PYRAMID_13] ) topologyType = PYRAMID_13;
+  else if ( typeString == strings[WEDGE_15] ) topologyType = WEDGE_15;
+  else if ( typeString == strings[HEXAHEDRON_20] ) topologyType = HEXAHEDRON_20;
+  else if ( typeString == strings[MIXED] ) topologyType = MIXED;
+  else if ( typeString == strings[SMESH2D] ) topologyType = SMESH2D;
+  else if ( typeString == strings[RECTMESH2D] ) topologyType = RECTMESH2D;
+  else if ( typeString == strings[CORECTMESH2D] ) topologyType = CORECTMESH2D;
+  else if ( typeString == strings[SMESH3D] ) topologyType = SMESH3D;
+  else if ( typeString == strings[RECTMESH3D] ) topologyType = RECTMESH3D;
+  else if ( typeString == strings[CORECTMESH3D] ) topologyType = CORECTMESH3D;
+  else XDM_THROW( xdmFormat::ReadError( "Unrecognized XDMF topology type" ) );
+
+  xdm::RefPtr< xdmGrid::Topology > result;
+  if ( topologyType <= MIXED ) {
+    // Unstructured topologies.
+    XDM_THROW( xdmFormat::ReadError( "Unstructured XDMF topologies are unsupported." ) );
+  } else {
+    xdm::RefPtr< xdmGrid::RectilinearMesh > structuredTopology(
+      new xdmGrid::RectilinearMesh );
+    // Get the attribute that specifies the shape of the structured topology
+    xdm::DataShape<> shape;
+    XPathQuery shapeQuery( mXPathContext, node, "@Dimensions|@NumberOfElements" );
+    if ( shapeQuery.size() > 0 ) {
+      structuredTopology->setShape( xdm::makeShape( shapeQuery.textValue( 0 ) ) );
+    } else {
+      XDM_THROW( xdmFormat::ReadError(
+        "No dimensions specified for XDMF structured topology" ) );
+    }
+    result = structuredTopology;
+  }
+
+  // Attach connectivity information specified in DataItem children.
+  XPathQuery connectivityQuery( mXPathContext, node, "DataItem" );
+  for ( size_t i = 0; i < connectivityQuery.size(); i++ ) {
+    result->appendChild( buildUniformDataItem( connectivityQuery.node( i ) ) );
+  }
+
+  return result;
 }
 
 //------------------------------------------------------------------------------

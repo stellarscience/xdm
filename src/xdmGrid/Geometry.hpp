@@ -40,6 +40,10 @@ class Geometry :
   public xdm::Item,
   public xdm::ObjectCompositionMixin< xdm::UniformDataItem > {
 public:
+
+  /// Constructor initializes the dimension of the space to 0.
+  Geometry();
+
   /// Constructor takes the dimension of the space.  That is, the size of a
   /// maximal set of linearly independent vectors in the space, and thus the
   /// number of components required to identify a point in space.

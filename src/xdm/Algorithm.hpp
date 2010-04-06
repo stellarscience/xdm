@@ -22,8 +22,8 @@
 #define xdm_Algorithm_hpp
 
 #include <algorithm>
-
 #include <string>
+#include <vector>
 
 #include <xdm/NamespaceMacro.hpp>
 
@@ -149,6 +149,13 @@ inline void trim( std::string& io ) {
     io.erase( pos + 1 );
     pos = io.find_first_not_of( " \t" );
     if ( pos != std::string::npos ) io.erase( 0, pos );
+  }
+}
+
+/// Convert a string to upper case.
+inline void toUpper( std::string& s ) {
+  for ( std::string::iterator c = s.begin(); c != s.end(); ++c ) {
+    if ( 'a' <= *c && *c <= 'z' ) *c -= ('a' - 'A');
   }
 }
 

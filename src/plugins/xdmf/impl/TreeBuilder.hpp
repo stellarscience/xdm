@@ -27,6 +27,7 @@
 #include <libxml/xpath.h>
 
 namespace xdm {
+class DataItem;
 class Item;
 class UniformDataItem;
 } // namespace xdm
@@ -60,10 +61,15 @@ public:
   //-- Item builders --//
   xdm::RefPtr< xdm::Item > buildTemporalCollectionGrid( xmlNode * node );
   xdm::RefPtr<xdmGrid::UniformGrid > buildUniformGrid( xmlNode * node );
+  /// Build the Geometry Item corresponding the the given XML node.
+  /// @todo Implement XDMF Origin_DxDyDz topology.
   xdm::RefPtr< xdmGrid::Geometry > buildGeometry( xmlNode * node );
+  /// Build the Topology Item corresponding to the given XML node.
+  /// @todo Implement XDMF unstructured topologies.
   xdm::RefPtr< xdmGrid::Topology > buildTopology( xmlNode * node );
   xdm::RefPtr< xdmGrid::Attribute > buildAttribute( xmlNode * node );
   xdm::RefPtr< xdm::UniformDataItem > buildUniformDataItem( xmlNode * node );
+  xdm::RefPtr< xdm::DataItem > buildDataItem( xmlNode * node );
 
 private:
   xmlDocPtr mDocument;
