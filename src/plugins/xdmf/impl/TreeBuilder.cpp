@@ -40,6 +40,7 @@
 #include <xdmGrid/MultiArrayGeometry.hpp>
 #include <xdmGrid/RectilinearMesh.hpp>
 #include <xdmGrid/TensorProductGeometry.hpp>
+#include <xdmGrid/Time.hpp>
 #include <xdmGrid/Topology.hpp>
 #include <xdmGrid/UniformGrid.hpp>
 
@@ -496,20 +497,30 @@ TreeBuilder::buildUniformGrid( xmlNode * node ) {
 
 //------------------------------------------------------------------------------
 xdm::RefPtr< xdmGrid::Grid > TreeBuilder::buildGrid( xmlNode * node ) {
+  xdm::RefPtr< xdmGrid::Grid > result;
   // Determine the grid type.
   XPathQuery typeQuery( mXPathContext, node, "@GridType" );
   if ( typeQuery.size() > 0 ) {
     std::string gridType = typeQuery.textValue( 0 );
     if ( gridType == "Uniform" ) {
-      return buildUniformGrid( node );
+      result = buildUniformGrid( node );
     } else if ( gridType == "Collection" ) {
-      return buildCollectionGrid( node );
+      result = buildCollectionGrid( node );
     } else {
       XDM_THROW( xdmFormat::ReadError( "Unsupported XDMF Grid type" ) );
     }
+  } else {
+    // UniformGrid is default
+    result = buildUniformGrid( node );
   }
-  // UniformGrid is default
-  return buildUniformGrid( node );
+
+  // Check for a Time child for the grid.
+  XPathQuery timeQuery( mXPathContext, node, "Time" );
+  if ( timeQuery.size() > 0 ) {
+    result->setTime( buildTime( timeQuery.node( 0 ) ) );
+  }
+
+  return result;
 }
 
 //------------------------------------------------------------------------------
@@ -541,9 +552,63 @@ TreeBuilder::buildSpatialCollectionGrid( xmlNode * node ) {
 }
 
 //------------------------------------------------------------------------------
+xdm::RefPtr< xdmGrid::Time > TreeBuilder::buildTime( xmlNode * node ) {
+  xdm::RefPtr< xdmGrid::Time > result( new xdmGrid::Time );
+
+  XPathQuery typeQuery( mXPathContext, node, "@TimeType" );
+  std::string timeType = (typeQuery.size() > 0)?typeQuery.textValue(0):"Single";
+
+  if ( timeType == "Single" ) {
+    XPathQuery valueQuery( mXPathContext, node, "@Value" );
+    if ( valueQuery.size() == 0 ) {
+      XDM_THROW( xdmFormat::ReadError(
+        "Single XDMF grid time specified with no Value" ) );
+    }
+    std::stringstream ss( valueQuery.textValue( 0 ) );
+    double value;
+    ss >> value;
+    if ( ss.bad() ) {
+      XDM_THROW( xdmFormat::ReadError( "Unable to read XDMF Time Value." ) );
+    }
+    result->setValue( value );
+  } else if ( timeType == "List" ) {
+    XPathQuery valuesQuery( mXPathContext, node, "DataItem" );
+    if ( valuesQuery.size() == 0 ) {
+      XDM_THROW( xdmFormat::ReadError( "No values found for XDMF Time." ) );
+    }
+
+    // Read the uniform data item containing the values.
+    xdm::RefPtr< xdm::UniformDataItem > data =
+      buildUniformDataItem( valuesQuery.node( 0 ) );
+    xdm::RefPtr< xdm::TypedStructuredArray< double > > array =
+      data->typedArray< double >();
+    std::vector< double > values( array->size() );
+    std::copy( array->begin(), array->end(), values.begin() );
+    result->setValues( values );
+  } else {
+    XDM_THROW( xdmFormat::ReadError( "Unrecognized XDMF Time type." ) );
+  }
+  return result;
+}
+
+//------------------------------------------------------------------------------
 xdm::RefPtr< xdmGrid::Grid >
 TreeBuilder::buildTemporalCollectionGrid( xmlNode * node ) {
-  return xdm::RefPtr< xdmGrid::Grid >();
+  typedef std::vector< xmlNode * > NodeList;
+  typedef std::map< xdmGrid::Grid, NodeList > GridNodeListMap;
+
+  // Find all child grids for the time series.
+  XPathQuery gridQuery( mXPathContext, node, "Grid" );
+  if ( gridQuery.size() == 0 ) {
+    XDM_THROW( xdmFormat::ReadError( "XDMF Temporal Collection contains no data" ) );
+  }
+
+  // Read the first child as the prototype for subsequent time steps.
+  xdm::RefPtr< xdmGrid::Grid > result = buildGrid( gridQuery.node( 0 ) );
+
+  // Do something to associate time steps with children.
+
+  return result;
 }
 
 

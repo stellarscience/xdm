@@ -37,6 +37,7 @@ class Attribute;
 class CollectionGrid;
 class Geometry;
 class Grid;
+class Time;
 class Topology;
 class UniformGrid;
 } // namespace xdmGrid
@@ -64,6 +65,12 @@ public:
   xdm::RefPtr< xdmGrid::Grid > buildGrid( xmlNode * node );
   xdm::RefPtr< xdmGrid::Grid > buildCollectionGrid( xmlNode * node );
   xdm::RefPtr< xdmGrid::CollectionGrid > buildSpatialCollectionGrid( xmlNode * node );
+  /// Build a temporal collection grid. The result of this operation is the
+  /// first grid in the time series, subsequent time steps are accessed by
+  /// updating the content within the grid structure.
+  ///
+  /// The implementation assumes that all direct grid children represent the
+  /// grid at different moments in time.
   xdm::RefPtr< xdmGrid::Grid > buildTemporalCollectionGrid( xmlNode * node );
   xdm::RefPtr<xdmGrid::UniformGrid > buildUniformGrid( xmlNode * node );
   /// Build the Geometry Item corresponding the the given XML node.
@@ -75,6 +82,7 @@ public:
   xdm::RefPtr< xdmGrid::Attribute > buildAttribute( xmlNode * node );
   xdm::RefPtr< xdm::UniformDataItem > buildUniformDataItem( xmlNode * node );
   xdm::RefPtr< xdm::DataItem > buildDataItem( xmlNode * node );
+  xdm::RefPtr< xdmGrid::Time > buildTime( xmlNode * node );
 
 private:
   xmlDocPtr mDocument;

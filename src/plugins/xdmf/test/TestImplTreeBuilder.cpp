@@ -156,6 +156,11 @@ BOOST_AUTO_TEST_CASE( buildStaticTree ) {
     = xdm::dynamic_pointer_cast< xdmGrid::UniformGrid >( result );
   BOOST_REQUIRE( grid );
 
+  // Check the time.
+  xdm::RefPtr< xdmGrid::Time > time = grid->time();
+  BOOST_REQUIRE( time );
+  BOOST_CHECK_EQUAL( time->value(), 0.0 );
+
   // Check the topology.
   xdm::RefPtr< xdmGrid::Topology > topology = grid->topology();
   BOOST_REQUIRE( topology );
