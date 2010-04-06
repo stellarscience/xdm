@@ -1,3 +1,4 @@
+<?xml version='1.0'?>
 <Xdmf Version='2.1'>
   <Domain>
     <Grid GridType='Uniform' Name='Particles'>

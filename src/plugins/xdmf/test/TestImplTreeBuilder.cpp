@@ -30,7 +30,10 @@
 #include <xdm/VectorStructuredArray.hpp>
 #include <xdm/UniformDataItem.hpp>
 
+#include <xdmGrid/Attribute.hpp>
 #include <xdmGrid/StructuredTopology.hpp>
+#include <xdmGrid/TensorProductGeometry.hpp>
+#include <xdmGrid/UniformGrid.hpp>
 
 #include <xdmHdf/HdfDataset.hpp>
 
@@ -137,6 +140,57 @@ BOOST_AUTO_TEST_CASE( buildStructuredTopology ) {
   BOOST_REQUIRE( structured );
 
   BOOST_CHECK_EQUAL( structured->shape(), xdm::makeShape( 3, 3, 3) );
+
+  xmlFreeDoc( document );
+}
+
+BOOST_AUTO_TEST_CASE( buildStaticTree ) {
+  xmlDocPtr document = xmlParseFile( "test_document1.xmf" );
+  BOOST_REQUIRE( document );
+
+  xdmf::impl::TreeBuilder builder( document );
+  xdm::RefPtr< xdm::Item > result = builder.buildTree();
+  BOOST_REQUIRE( result );
+
+  xdm::RefPtr< xdmGrid::UniformGrid > grid
+    = xdm::dynamic_pointer_cast< xdmGrid::UniformGrid >( result );
+  BOOST_REQUIRE( grid );
+
+  // Check the topology.
+  xdm::RefPtr< xdmGrid::Topology > topology = grid->topology();
+  BOOST_REQUIRE( topology );
+  xdm::RefPtr< xdmGrid::StructuredTopology > structured =
+    xdm::dynamic_pointer_cast< xdmGrid::StructuredTopology >( topology );
+  BOOST_REQUIRE( structured );
+  BOOST_CHECK_EQUAL( structured->shape(), xdm::makeShape( 383, 129, 129 ) );
+
+  // Check the geometry.
+  xdm::RefPtr< xdmGrid::Geometry > geometry = grid->geometry();
+  BOOST_REQUIRE( geometry );
+  xdm::RefPtr< xdmGrid::TensorProductGeometry > tpGeo =
+    xdm::dynamic_pointer_cast< xdmGrid::TensorProductGeometry >( geometry );
+  BOOST_REQUIRE( tpGeo );
+  BOOST_CHECK_EQUAL( tpGeo->dimension(), 3 );
+
+  // Check the attributes.
+  BOOST_REQUIRE_EQUAL( grid->numberOfChildren(), 3 );
+  char * names[] = { "E", "B", "InternalCell" };
+  xdmGrid::Attribute::Type types[] = {
+    xdmGrid::Attribute::kVector,
+    xdmGrid::Attribute::kVector,
+    xdmGrid::Attribute::kScalar
+  };
+  xdmGrid::Attribute::Center centers[] = {
+    xdmGrid::Attribute::kCell,
+    xdmGrid::Attribute::kCell,
+    xdmGrid::Attribute::kCell,
+  };
+  for ( int i = 0; i < 3; i++ ) {
+    xdm::RefPtr< xdmGrid::Attribute > attr = grid->child( i );
+    BOOST_CHECK_EQUAL( attr->name(), names[i] );
+    BOOST_CHECK_EQUAL( attr->dataType(), types[i] );
+    BOOST_CHECK_EQUAL( attr->centering(), centers[i] );
+  }
 }
 
 } // namespace

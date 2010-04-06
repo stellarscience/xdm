@@ -59,7 +59,12 @@ public:
   virtual xdm::RefPtr< xdm::Item > buildTree();
 
   //-- Item builders --//
-  xdm::RefPtr< xdm::Item > buildTemporalCollectionGrid( xmlNode * node );
+  /// Build a grid from an XML node pointing to a Grid element.
+  /// @todo Handle Hyperslab, coordinate, and function grids.
+  xdm::RefPtr< xdmGrid::Grid > buildGrid( xmlNode * node );
+  xdm::RefPtr< xdmGrid::Grid > buildCollectionGrid( xmlNode * node );
+  xdm::RefPtr< xdmGrid::CollectionGrid > buildSpatialCollectionGrid( xmlNode * node );
+  xdm::RefPtr< xdmGrid::Grid > buildTemporalCollectionGrid( xmlNode * node );
   xdm::RefPtr<xdmGrid::UniformGrid > buildUniformGrid( xmlNode * node );
   /// Build the Geometry Item corresponding the the given XML node.
   /// @todo Implement XDMF Origin_DxDyDz topology.

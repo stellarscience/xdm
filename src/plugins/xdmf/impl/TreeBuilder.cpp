@@ -71,11 +71,6 @@ char const * const kXdmfTag        = "Xdmf";
 char const * const kTopologyTag    = "Topology";
 char const * const kTimeTag        = "Time";
 
-//-- XPath queries used to access data in the XML document --//
-char const * const kTemporalCollectionGridQuery = 
-  "//Grid[@GridType='Collection' and @CollectionType='Temporal']";
-char const * const kUniformGridQuery = "//Grid[@GridType='Uniform']";
-
 // Assuming input has been validated, determine type from a string/precision
 // pair.
 xdm::primitiveType::Value type( const std::string& typeStr, size_t precision ) {
@@ -119,7 +114,28 @@ TreeBuilder::~TreeBuilder() {
 }
 
 xdm::RefPtr< xdm::Item > TreeBuilder::buildTree() {
-  return xdm::RefPtr< xdm::Item >();
+  xdm::RefPtr< xdm::Item > result;
+  xmlNode * rootNode = xmlDocGetRootElement( mDocument );
+
+  // Search for Grid children of the Domain element.
+  XPathQuery gridQuery( mXPathContext, rootNode, "Domain/Grid" );
+
+  if ( gridQuery.size() == 0 ) {
+    // If there are no grids, return a NULL item.
+    result.reset();
+  } else if ( gridQuery.size() == 1 ) {
+    // There is one grid.
+    result = buildGrid( gridQuery.node( 0 ) );
+  } else {
+    // There are multiple grids, build a spatial collection grid from them.
+    xdm::RefPtr< xdmGrid::CollectionGrid > collection( new xdmGrid::CollectionGrid );
+    for ( size_t i = 0; i < gridQuery.size(); i++ ) {
+      collection->appendChild( buildGrid( gridQuery.node( i ) ) );
+    }
+    result = collection;
+  }
+
+  return result;
 }
 
 //------------------------------------------------------------------------------
@@ -479,9 +495,55 @@ TreeBuilder::buildUniformGrid( xmlNode * node ) {
 }
 
 //------------------------------------------------------------------------------
-xdm::RefPtr< xdm::Item > 
+xdm::RefPtr< xdmGrid::Grid > TreeBuilder::buildGrid( xmlNode * node ) {
+  // Determine the grid type.
+  XPathQuery typeQuery( mXPathContext, node, "@GridType" );
+  if ( typeQuery.size() > 0 ) {
+    std::string gridType = typeQuery.textValue( 0 );
+    if ( gridType == "Uniform" ) {
+      return buildUniformGrid( node );
+    } else if ( gridType == "Collection" ) {
+      return buildCollectionGrid( node );
+    } else {
+      XDM_THROW( xdmFormat::ReadError( "Unsupported XDMF Grid type" ) );
+    }
+  }
+  // UniformGrid is default
+  return buildUniformGrid( node );
+}
+
+//------------------------------------------------------------------------------
+xdm::RefPtr< xdmGrid::Grid > TreeBuilder::buildCollectionGrid( xmlNode * node ) {
+  // Determine the collection type.
+  XPathQuery typeQuery( mXPathContext, node, "@CollectionType" );
+  if ( typeQuery.size() == 0 ) {
+    return buildSpatialCollectionGrid( node );
+  } else if ( typeQuery.textValue( 0 ) == "Spatial" ) {
+    return buildSpatialCollectionGrid( node );
+  } else if ( typeQuery.textValue( 0 ) == "Temporal" ) {
+    return buildTemporalCollectionGrid( node );
+  } else {
+    XDM_THROW( xdmFormat::ReadError( "Unrecognized XDMF Grid collection type" ) );
+  }
+}
+
+// -----------------------------------------------------------------------------
+xdm::RefPtr< xdmGrid::CollectionGrid >
+TreeBuilder::buildSpatialCollectionGrid( xmlNode * node ) {
+  xdm::RefPtr< xdmGrid::CollectionGrid > result(
+    new xdmGrid::CollectionGrid( xdmGrid::CollectionGrid::kSpatial ) );
+  // Find all grid children of the node.
+  XPathQuery childGridQuery( mXPathContext, node, "Grid" );
+  for ( size_t i = 0; i < childGridQuery.size(); i++ ) {
+    result->appendChild( buildGrid( childGridQuery.node( i ) ) );
+  }
+  return result;
+}
+
+//------------------------------------------------------------------------------
+xdm::RefPtr< xdmGrid::Grid >
 TreeBuilder::buildTemporalCollectionGrid( xmlNode * node ) {
-  return xdm::RefPtr< xdm::Item >();
+  return xdm::RefPtr< xdmGrid::Grid >();
 }
 
 
