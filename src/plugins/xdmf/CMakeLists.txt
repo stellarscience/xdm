@@ -10,7 +10,7 @@ add_custom_command(
   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/xdmf.rng ${CMAKE_CURRENT_BINARY_DIR}
   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/xdmf.rng
 )
-add_custom_target( copy_xdmf.rng 
+add_custom_target( copy_xdmf.rng ALL 
   DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/xdmf.rng" )
 
 add_executable( xmlToC xmlToC.cpp )
