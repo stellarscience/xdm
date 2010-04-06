@@ -80,8 +80,16 @@ Attribute::Type Attribute::dataType() const {
   return mType;
 }
 
+void Attribute::setDataType( Type type ) {
+  mType = type;
+}
+
 Attribute::Center Attribute::centering() const {
   return mCenter;
+}
+
+void Attribute::setCentering( Center center ) {
+  mCenter = center;
 }
 
 void Attribute::traverse( xdm::ItemVisitor& iv ) {

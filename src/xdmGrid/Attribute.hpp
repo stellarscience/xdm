@@ -38,7 +38,8 @@ public:
     kVector,
     kTensor,
     kTensor6,
-    kMatrix
+    kMatrix,
+    kGlobalId
   };
 
   /// Enumeration of attribute centering.
@@ -64,9 +65,13 @@ public:
 
   /// Get the type of the attribute.
   Type dataType() const;
+  /// Set the type of the attribute.
+  void setDataType( Type type );
 
   /// Get the centering.
   Center centering() const;
+  /// Set the attribute center.
+  void setCentering( Center center );
 
   virtual void traverse( xdm::ItemVisitor& iv );
 

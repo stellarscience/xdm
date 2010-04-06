@@ -49,6 +49,7 @@
 #include <libxml/xpath.h>
 
 #include <algorithm>
+#include <map>
 #include <sstream>
 
 #include <cassert>
@@ -373,12 +374,108 @@ xdm::RefPtr< xdmGrid::Topology > TreeBuilder::buildTopology( xmlNode * node ) {
 //------------------------------------------------------------------------------
 xdm::RefPtr< xdmGrid::Attribute > 
 TreeBuilder::buildAttribute( xmlNode * node ) {
+  // Mapping from XDMF XML attribute type values to enumeration of types.
+  typedef std::map< std::string, xdmGrid::Attribute::Type > TypeMap;
+  static TypeMap typeMap;
+  if ( typeMap.empty() ) {
+    typeMap["Scalar"] = xdmGrid::Attribute::kScalar;
+    typeMap["Vector"] = xdmGrid::Attribute::kVector;
+    typeMap["Tensor"] = xdmGrid::Attribute::kTensor;
+    typeMap["Tensor6"] = xdmGrid::Attribute::kTensor6;
+    typeMap["Matrix"] = xdmGrid::Attribute::kMatrix;
+    typeMap["GlobalID"] = xdmGrid::Attribute::kGlobalId;
+  }
+
+  // Mapping from XDMF XML attribute center values to enumeration of centering.
+  typedef std::map< std::string, xdmGrid::Attribute::Center > CenterMap;
+  static CenterMap centerMap;
+  if ( centerMap.empty() ) {
+    centerMap["Node"] = xdmGrid::Attribute::kNode;
+    centerMap["Cell"] = xdmGrid::Attribute::kCell;
+    centerMap["Grid"] = xdmGrid::Attribute::kGrid;
+    centerMap["Face"] = xdmGrid::Attribute::kFace;
+    centerMap["Edge"] = xdmGrid::Attribute::kEdge;
+  }
+
+  // create the result attribute.
+  xdm::RefPtr< xdmGrid::Attribute > result( new xdmGrid::Attribute );
+
+  // Get the name of the attribute.
+  XPathQuery nameQuery( mXPathContext, node, "@Name" );
+  if ( nameQuery.size() > 0 ) {
+    result->setName( nameQuery.textValue( 0 ) );
+  }
+
+  // Get the attribute type
+  XPathQuery typeQuery( mXPathContext, node, "@AttributeType" );
+  if ( typeQuery.size() > 0 ) {
+    TypeMap::const_iterator type = typeMap.find( typeQuery.textValue( 0 ) );
+    if ( type != typeMap.end() ) {
+      result->setDataType( type->second );
+    } else {
+      XDM_THROW( xdmFormat::ReadError( "Unrecognized XDMF attribute type" ) );
+    }
+  } else {
+    // default is scalar
+    result->setDataType( xdmGrid::Attribute::kScalar );
+  }
+
+  // Get the attribute center
+  XPathQuery centerQuery( mXPathContext, node, "@Center" );
+  if ( centerQuery.size() > 0 ) {
+    CenterMap::const_iterator center = centerMap.find( centerQuery.textValue( 0 ) );
+    if ( center != centerMap.end() ) {
+      result->setCentering( center->second );
+    } else {
+      XDM_THROW( xdmFormat::ReadError( "Unrecognized XDMF attribute center." ) );
+    }
+  } else {
+    // default is node centered.
+    result->setCentering( xdmGrid::Attribute::kNode );
+  }
+
+  // Create the attribute data items.
+  XPathQuery dataQuery( mXPathContext, node, "DataItem" );
+  if ( dataQuery.size() == 0 ) {
+    XDM_THROW( xdmFormat::ReadError( "XDMF Attribute contains no data." ) );
+  }
+  result->setDataItem( buildUniformDataItem( dataQuery.node( 0 ) ) );
+
+  return result;
 }
 
 //------------------------------------------------------------------------------
 xdm::RefPtr< xdmGrid::UniformGrid > 
 TreeBuilder::buildUniformGrid( xmlNode * node ) {
-  return xdm::RefPtr< xdmGrid::UniformGrid >();
+  xdm::RefPtr< xdmGrid::UniformGrid > result( new xdmGrid::UniformGrid );
+
+  // Get the topology.
+  XPathQuery topologyQuery( mXPathContext, node, "Topology" );
+  if ( topologyQuery.size() == 0 ) {
+    XDM_THROW( xdmFormat::ReadError( "XDMF Grid contains no Topology" ) );
+  }
+  if ( topologyQuery.size() > 1 ) {
+    XDM_THROW( xdmFormat::ReadError( "XDMF Grid contains more than one Topology" ) );
+  }
+  result->setTopology( buildTopology( topologyQuery.node( 0 ) ) );
+
+  // Get the geometry.
+  XPathQuery geometryQuery( mXPathContext, node, "Geometry" );
+  if ( geometryQuery.size() == 0 ) {
+    XDM_THROW( xdmFormat::ReadError( "XDMF Grid contains no geometry." ) );
+  }
+  if ( geometryQuery.size() > 1 ) {
+    XDM_THROW( xdmFormat::ReadError( "XDMF Grid contains more than one Geometry" ) );
+  }
+  result->setGeometry( buildGeometry( geometryQuery.node( 0 ) ) );
+
+  // Read all the attributes.
+  XPathQuery attributeQuery( mXPathContext, node, "Attribute" );
+  for ( size_t i = 0; i < attributeQuery.size(); i++ ) {
+    result->addAttribute( buildAttribute( attributeQuery.node( i ) ) );
+  }
+
+  return result;
 }
 
 //------------------------------------------------------------------------------
