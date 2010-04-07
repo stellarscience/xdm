@@ -29,15 +29,15 @@ namespace {
 char const * const kXdmfRngSchema = XDMF_RNG_SCHEMA;
 const unsigned int kXdmfRngSchemaLength = XDMF_RNG_SCHEMA_LENGTH;
 
-// Callback class to throw an exception upon validation errors.
-void validationErrorCallback( void * context, const char * msg, ... ) {
-  va_list ap;
-  std::string newmessage;
-  newmessage.resize( 512 );
-  va_start(ap, msg);
-  vsnprintf(&newmessage[0], 512, msg, ap);
-  va_end(ap);
-  XDM_THROW( ValidationError( 0, 0, newmessage ) );
+// Callback function to throw an exception with informative information upon
+// a validation error.
+void structuredValidationErrorCallback( void* userData, xmlErrorPtr error ) {
+  ValidationError exception(
+    error->file,
+    error->line,
+    error->int2,
+    error->message );
+  XDM_THROW( exception );
 }
 
 // Validate an XDMF document.
@@ -64,7 +64,11 @@ bool validate( xmlDocPtr document ) {
       throw xdmFormat::ReadError( "Error: unable to parse schema." );
     }
 
-    xmlRelaxNGSetValidErrors( validation, &validationErrorCallback, 0, 0 );
+    // Set the validation error callback function to handle invalid documents
+    xmlRelaxNGSetValidStructuredErrors(
+      validation,
+      &structuredValidationErrorCallback,
+      0 );
 
     int validationResult = xmlRelaxNGValidateDoc( validation, document );
     if ( validationResult == 0 ) {

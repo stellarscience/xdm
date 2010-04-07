@@ -15,12 +15,14 @@
 XDMF_NAMESPACE_BEGIN
 
 class ValidationError : public xdmFormat::ReadError {
+  std::string mFile;
   int mLine;
   int mColumn;
   std::string mReason;
 public:
-  ValidationError( int line, int column, const std::string& reason ) :
+  ValidationError( const std::string& file, int line, int column, const std::string& reason ) :
     xdmFormat::ReadError( reason ),
+    mFile( file ),
     mLine( line ),
     mColumn( column ),
     mReason( reason ) {}
@@ -28,10 +30,13 @@ public:
 
   virtual const char * what() const throw() {
     try {
+      static std::string result;
       std::stringstream msg;
-      msg << "Validation error at line " << mLine << " column " << mColumn;
+      msg << mFile;
+      msg << " validation error at line " << mLine << " column " << mColumn;
       msg << ": " << mReason;
-      return msg.str().c_str();
+      result = msg.str();
+      return result.c_str();
     } catch( ... ) {
       return xdmFormat::ReadError::what();
     }
