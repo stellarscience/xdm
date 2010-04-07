@@ -150,6 +150,9 @@ void UniformDataItem::writeMetadata( XmlMetadataWrapper& xml ) {
 }
 
 void UniformDataItem::initializeDataset( const Dataset::InitializeMode& mode ) {
+  if ( mDataspace.rank() == 0 ) {
+    XDM_THROW( std::runtime_error( "Data space is empty." )  );
+  }
   mDataspace = mDataset->initialize( mDataType, mDataspace, mode );
 }
 

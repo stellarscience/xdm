@@ -64,11 +64,7 @@ void TensorProductGeometry::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
   unsigned int dim = dimension();
   switch ( dim ) {
   case 1:
-    xml.setAttribute( "GeometryType", "Vx" );
-    break;
   case 2:
-    xml.setAttribute( "GeometryType", "VxVy" );
-    break;
   case 3:
     xml.setAttribute( "GeometryType", "VxVyVz" );
     break;

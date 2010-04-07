@@ -41,6 +41,7 @@ set( ${PROJECT_NAME}_HEADERS
   VirtualDataset.hpp
   XdmfHelpers.hpp
   XmfReader.hpp
+  XmfWriter.hpp
   impl/TreeBuilder.hpp
   impl/XPathQuery.hpp
 )
@@ -51,6 +52,7 @@ set( ${PROJECT_NAME}_SOURCES
   VirtualDataset.cpp
   XdmfHelpers.cpp
   XmfReader.cpp
+  XmfWriter.cpp
   impl/TreeBuilder.cpp
 )
 

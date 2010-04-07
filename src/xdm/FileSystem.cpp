@@ -56,6 +56,10 @@ void FileSystemPath::setPathString( const std::string& pathString )
   mPathString = pathString;
 }
 
+bool operator<( const FileSystemPath& lhs, const FileSystemPath& rhs ) {
+  return ( lhs.pathString() < rhs.pathString() );
+}
+
 bool exists( const FileSystemPath& path )
 {
   std::ifstream file( path.pathString().c_str() );

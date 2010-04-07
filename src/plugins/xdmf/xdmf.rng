@@ -142,7 +142,9 @@
         <ref name="OptionalInformation"/>
         <ref name="Geometry"/>
         <ref name="Topology"/>
-        <ref name="Time"/>
+        <optional>
+          <ref name="Time"/>
+        </optional>
         <zeroOrMore>
           <ref name="Attribute"/>
         </zeroOrMore>

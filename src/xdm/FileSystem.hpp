@@ -43,6 +43,9 @@ private:
   std::string mPathString;
 };
 
+/// Less than comparator for FileSystemPath objects.
+bool operator<( const FileSystemPath& lhs, const FileSystemPath& rhs );
+
 /// Determine if a file exists on disk.
 bool exists( const FileSystemPath& path );
 
