@@ -23,6 +23,7 @@
 
 #include <xdmGrid/Attribute.hpp>
 #include <xdmGrid/Forward.hpp>
+#include <xdmGrid/Geometry.hpp>
 #include <xdmGrid/Grid.hpp>
 
 #include <xdm/Forward.hpp>
@@ -63,6 +64,15 @@ public:
   Cell cell( std::size_t cellIndex );
   /// Get a const cell by index.
   ConstCell cell( std::size_t cellIndex ) const;
+
+  /// Get a node by index. This does not take connectivity into consideration.
+  /// This means that the input index is the index into the geometry directly,
+  /// not into the grid with a node order specified by the topology.
+  Node node( std::size_t nodeIndex );
+  /// Get a node by index. This does not take connectivity into consideration.
+  /// This means that the input index is the index into the geometry directly,
+  /// not into the grid with a node order specified by the topology.
+  ConstNode node( std::size_t nodeIndex ) const;
 
   /// Redefinition of visitor traversal from xdm::Item.
   virtual void traverse( xdm::ItemVisitor& iv );

@@ -116,6 +116,14 @@ ConstCell UniformGrid::cell( std::size_t cellIndex ) const
   return ConstCell( mCellImp, cellIndex );
 }
 
+Node UniformGrid::node( std::size_t nodeIndex ) {
+  return mGeometry->node( nodeIndex );
+}
+
+ConstNode UniformGrid::node( std::size_t nodeIndex ) const {
+  return mGeometry->node( nodeIndex );
+}
+
 void UniformGrid::traverse( xdm::ItemVisitor& iv ) {
   Grid::traverse( iv );
   // apply the visitor to my internal geometry and topology items
