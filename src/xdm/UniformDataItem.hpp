@@ -90,6 +90,11 @@ public:
   template< typename T >
   RefPtr< const TypedStructuredArray< T > > typedArray() const;
 
+  /// Get a value by reference indexed contiguously in the underlying data.
+  template< typename T > T& at( std::size_t index );
+  /// Get a value by const reference indexed contiguously in the underlying data.
+  template< typename T > const T& at( std::size_t index ) const;
+
   /// Clear all of my writable data.
   void clearData();
 
@@ -158,6 +163,16 @@ RefPtr< const TypedStructuredArray< T > > UniformDataItem::typedArray() const {
       " with the requested type: " + std::string( typeid( T ).name() ) ) );
   }
   return typed;
+}
+
+template< typename T >
+T& UniformDataItem::at( std::size_t index ) {
+  return (*typedArray< T >())[index];
+}
+
+template< typename T >
+const T& UniformDataItem::at( std::size_t index ) const {
+  return (*typedArray< T >())[index];
 }
 
 XDM_NAMESPACE_END

@@ -25,11 +25,30 @@
 
 #include <xdm/TypedStructuredArray.hpp>
 #include <xdm/UniformDataItem.hpp>
+#include <xdm/VectorStructuredArray.hpp>
 #include <xdm/ArrayAdapter.hpp>
 
 #include <algorithm>
 
 namespace {
+
+xdm::RefPtr< xdm::UniformDataItem > createData( int sizex, int sizey, int sizez ) {
+  xdm::RefPtr< xdm::UniformDataItem > result( new xdm::UniformDataItem );
+  result->setDataspace( xdm::makeShape( sizex, sizey, sizez ) );
+  result->setDataType( xdm::primitiveType::kInt );
+  xdm::RefPtr< xdm::VectorStructuredArray< int > > array(
+    new xdm::VectorStructuredArray< int >( sizex*sizey*sizez ) );
+  for ( int k = 0; k < sizez; k++ ) {
+    for ( int j = 0; j < sizey; j++ ) {
+      for ( int i = 0; i < sizex; i++ ) {
+        int index = k*sizex*sizey + j*sizex + i;
+        (*array)[index] = index;
+      }
+    }
+  }
+  result->setData( xdm::makeRefPtr( new xdm::ArrayAdapter( array ) ) );
+  return result;
+}
 
 BOOST_AUTO_TEST_CASE( writeMetadata ) {
   test::Fixture test;
@@ -45,6 +64,22 @@ BOOST_AUTO_TEST_CASE( writeMetadata ) {
   BOOST_CHECK_EQUAL( xml.attribute( "Precision" ), "4" );
   BOOST_CHECK_EQUAL( xml.attribute( "Format" ), "Dummy" );
   BOOST_CHECK_EQUAL( "DummyDatasetInitializationContent", xml.contentLine( 0 ) );
+}
+
+BOOST_AUTO_TEST_CASE( valueAtIndex ) {
+  xdm::RefPtr< xdm::UniformDataItem > test = createData( 2, 2, 3 );
+  int answer[] = {
+     0,  1,
+     2,  3, // end k = 0
+     4,  5,
+     6,  7, // end k = 1
+     8,  9,
+    10, 11
+  };
+
+  for ( int i = 0; i < 6; i++ ) {
+    BOOST_CHECK_EQUAL( test->at< int >( i ), answer[i] );
+  }
 }
 
 } // namespace
