@@ -26,6 +26,8 @@
 #include <sstream>
 #include <stdexcept>
 
+#include <iostream>
+
 namespace {
 
 typedef xdm::DataShape<> TestShape;
@@ -51,6 +53,34 @@ BOOST_AUTO_TEST_CASE( makeShape ) {
   BOOST_CHECK_EQUAL( 4, result[3] );
 
   BOOST_CHECK_THROW( xdm::makeShape( "1 jeff" ), std::invalid_argument );
+}
+
+BOOST_AUTO_TEST_CASE( linearizeShape ) {
+  // The answer is a 3x3x2 array.
+  std::size_t answer[3][3][2];
+  std::size_t index = 0;
+  for ( int i = 0; i < 3; ++i ) {
+    for ( int j = 0; j < 3; ++j ) {
+      for ( int k = 0; k < 2; ++k ) {
+        answer[i][j][k] = (index++);
+      }
+    }
+  }
+
+  xdm::DataShape<> context( 3 );
+  context[0] = 3;
+  context[1] = 3;
+  context[2] = 2;
+
+  for ( int i = 0; i < 3; ++i ) {
+    for ( int j = 0; j < 3; ++j ) {
+      for ( int k = 0; k < 2; ++k ) {
+        BOOST_CHECK_EQUAL(
+          linearize( xdm::makeShape( i, j, k ), context ),
+          answer[i][j][k] );
+      }
+    }
+  }
 }
 
 } // namespace

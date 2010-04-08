@@ -91,9 +91,41 @@ public:
   RefPtr< const TypedStructuredArray< T > > typedArray() const;
 
   /// Get a value by reference indexed contiguously in the underlying data.
-  template< typename T > T& at( std::size_t index );
+  template< typename T >
+  T& atIndex( std::size_t index );
   /// Get a value by const reference indexed contiguously in the underlying data.
-  template< typename T > const T& at( std::size_t index ) const;
+  template< typename T >
+  const T& atIndex( std::size_t index ) const;
+
+  /// Get a value by reference at a location specified by a DataShape.
+  template< typename T >
+  T& atLocation( const xdm::DataShape<>& location );
+  /// Get a value by const reference at a location specified by a DataShape.
+  template< typename T >
+  const T& atLocation( const xdm::DataShape<>& location ) const;
+
+  /// @defgroup Convenience functions for common data ranks.
+  /// @{
+  template< typename T >
+  T& atLocation( std::size_t i );
+  template< typename T >
+  const T& atLocation( std::size_t i ) const;
+
+  template< typename T >
+  T& atLocation( std::size_t i, std::size_t j );
+  template< typename T >
+  const T& atLocation( std::size_t i, std::size_t j ) const;
+
+  template< typename T >
+  T& atLocation( std::size_t i, std::size_t j, std::size_t k );
+  template< typename T >
+  const T& atLocation( std::size_t i, std::size_t j, std::size_t k ) const;
+
+  template< typename T >
+  T& atLocation( std::size_t i, std::size_t j, std::size_t k, std::size_t l );
+  template< typename T >
+  const T& atLocation( std::size_t i, std::size_t j, std::size_t k, std::size_t l ) const;
+  /// @}
 
   /// Clear all of my writable data.
   void clearData();
@@ -121,6 +153,8 @@ public:
   bool serializationRequired() const;
 
 private:
+  // check the shape bounds against this object's dataspace.
+  bool validateBounds( const xdm::DataShape<>& shape ) const;
   primitiveType::Value mDataType;
   DataShape<> mDataspace;
   RefPtr< Dataset > mDataset;
@@ -134,6 +168,8 @@ private:
 #include <stdexcept>
 #include <string>
 #include <typeinfo>
+
+#include <cassert>
 
 template< typename T >
 RefPtr< TypedStructuredArray< T > > UniformDataItem::typedArray() {
@@ -166,13 +202,86 @@ RefPtr< const TypedStructuredArray< T > > UniformDataItem::typedArray() const {
 }
 
 template< typename T >
-T& UniformDataItem::at( std::size_t index ) {
+T& UniformDataItem::atIndex( std::size_t index ) {
   return (*typedArray< T >())[index];
 }
 
 template< typename T >
-const T& UniformDataItem::at( std::size_t index ) const {
+const T& UniformDataItem::atIndex( std::size_t index ) const {
   return (*typedArray< T >())[index];
+}
+
+template< typename T >
+const T& UniformDataItem::atLocation( const xdm::DataShape<>& location ) const {
+  // Validate the input.
+  assert( validateBounds( location ) );
+  // Compute the linear index.
+  return atIndex< T >( linearize( location, mDataspace ) );
+}
+
+template< typename T >
+T& UniformDataItem::atLocation( const xdm::DataShape<>& location ) {
+  return const_cast< T& >(
+    static_cast< const UniformDataItem& >(*this).atLocation< T >( location )
+  );
+}
+
+template< typename T >
+const T& UniformDataItem::atLocation( std::size_t i ) const {
+  return atLocation< T >( xdm::makeShape( i ) );
+}
+template< typename T >
+T& UniformDataItem::atLocation( std::size_t i ) {
+  return const_cast< T& >(
+    static_cast< const UniformDataItem& >(*this).atLocation< T >( i )
+  );
+}
+
+template< typename T >
+const T& UniformDataItem::atLocation( std::size_t i, std::size_t j ) const {
+  return atLocation< T >( xdm::makeShape( i, j ) );
+}
+template< typename T >
+T& UniformDataItem::atLocation( std::size_t i, std::size_t j ) {
+  return const_cast< T& >(
+    static_cast< const UniformDataItem& >(*this).atLocation< T >( i, j )
+  );
+}
+
+template< typename T >
+const T& UniformDataItem::atLocation(
+  std::size_t i,
+  std::size_t j,
+  std::size_t k ) const {
+  return atLocation< T >( xdm::makeShape( i, j, k ) );
+}
+template< typename T >
+T& UniformDataItem::atLocation(
+  std::size_t i,
+  std::size_t j,
+  std::size_t k ) {
+  return const_cast< T& >(
+    static_cast< const UniformDataItem& >(*this).atLocation< T >( i, j, k )
+  );
+}
+
+template< typename T >
+const T& UniformDataItem::atLocation(
+  std::size_t i,
+  std::size_t j,
+  std::size_t k,
+  std::size_t l ) const {
+  return atLocation< T >( xdm::makeShape( i, j, k, l ) );
+}
+template< typename T >
+T& UniformDataItem::atLocation(
+  std::size_t i,
+  std::size_t j,
+  std::size_t k,
+  std::size_t l ) {
+  return const_cast< T& >(
+    static_cast< const UniformDataItem& >(*this).atLocation< T >( i, j, k, l )
+  );
 }
 
 XDM_NAMESPACE_END

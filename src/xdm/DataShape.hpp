@@ -24,6 +24,7 @@
 #include <algorithm>
 #include <cassert>
 #include <iterator>
+#include <numeric>
 #include <ostream>
 #include <string>
 #include <vector>
@@ -43,6 +44,8 @@ public:
   typedef std::vector< T > Index;
   typedef typename std::vector< T >::iterator DimensionIterator;
   typedef typename std::vector< T >::const_iterator ConstDimensionIterator;
+  typedef typename std::vector< T >::reverse_iterator ReverseDimensionIterator;
+  typedef typename std::vector< T >::const_reverse_iterator ConstReverseDimensionIterator;
 
 private:
   Index mDimensions;
@@ -100,6 +103,20 @@ public:
     return mDimensions.end();
   }
 
+  ReverseDimensionIterator rbegin() {
+    return mDimensions.rbegin();
+  }
+  ConstReverseDimensionIterator rbegin() const {
+    return mDimensions.rbegin();
+  }
+
+  ReverseDimensionIterator rend() {
+    return mDimensions.rend();
+  }
+  ConstReverseDimensionIterator rend() const {
+    return mDimensions.rend();
+  }
+
   /// Get the dimension of the data at the specified index.
   size_type& operator[]( size_type i ) {
     assert( i < mDimensions.size() );
@@ -140,10 +157,39 @@ bool operator!=( const DataShape< T >& lhs, const DataShape< T >& rhs ) {
 
 /// Reverse the dimension order in a data shape.  This will take the given
 /// DataShape and reverse the dimension order so that a shape with dimensions 
-/// [d(0) d(1) ...d(n)] becomes [d(n) d(n-1) ... d(1) d(0)].
+/// [d(0) d(1) ... d(n-1) d(n)] becomes [d(n) d(n-1) ... d(1) d(0)].
 template< typename T >
 void reverseDimensionOrder( DataShape< T >& shape ) {
   shape.reverseDimensionOrder();
+}
+
+/// Find the linear index for a shape within another shape that represents
+/// the maximum dimensions for the input shape. This follows the C (fastest
+/// varying dimension first) ordering convention.
+/// @param indexShape The index into the contextShape.
+/// @param contextShape The maximum index in each dimension.
+template< typename T >
+typename DataShape< T >::size_type linearize(
+  const DataShape< T >& indexShape,
+  const DataShape< T >& contextShape ) {
+  typedef typename DataShape< T >::ConstDimensionIterator Iterator;
+  typedef typename DataShape< T >::size_type SizeType;
+
+  assert( indexShape.rank() == contextShape.rank() );
+
+  SizeType lowerProduct;
+  SizeType result = 0;
+  Iterator indexBegin = indexShape.begin();
+  Iterator indexEnd = indexShape.end();
+  Iterator contextBegin = contextShape.begin();
+  Iterator contextEnd = contextShape.end();
+  for ( Iterator dim = indexBegin; dim != indexEnd; ++dim ) {
+    lowerProduct = std::accumulate(
+      contextBegin + (dim - indexBegin) + 1, contextEnd,
+      1, std::multiplies< T >() );
+    result += (*dim) * lowerProduct;
+  }
+  return result;
 }
 
 /// Make a DataShape given a space separated string with the dimensions.

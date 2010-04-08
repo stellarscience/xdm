@@ -172,5 +172,13 @@ bool UniformDataItem::serializationRequired() const {
   return mData->requiresWrite();
 }
 
+bool UniformDataItem::validateBounds( const xdm::DataShape<>& shape ) const {
+  if ( shape.rank() != mDataspace.rank() ) return false;
+  for ( xdm::DataShape<>::size_type i = 0; i < mDataspace.rank(); ++i ) {
+    if ( shape[i] >= mDataspace[i] ) return false;
+  }
+  return true;
+}
+
 XDM_NAMESPACE_END
 
