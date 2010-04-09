@@ -167,7 +167,10 @@ BOOST_AUTO_TEST_CASE( buildStaticTree ) {
   xdm::RefPtr< xdmGrid::StructuredTopology > structured =
     xdm::dynamic_pointer_cast< xdmGrid::StructuredTopology >( topology );
   BOOST_REQUIRE( structured );
-  BOOST_CHECK_EQUAL( structured->shape(), xdm::makeShape( 383, 129, 129 ) );
+  // the topology shape should be the reverse of the shape specified in the xmf
+  // file since XDMF stores the topology information in ZYX order, but the XDM
+  // api chooses the XYZ convention for consistency.
+  BOOST_CHECK_EQUAL( structured->shape(), xdm::makeShape( 129, 129, 383 ) );
 
   // Check the geometry.
   xdm::RefPtr< xdmGrid::Geometry > geometry = grid->geometry();
@@ -175,7 +178,14 @@ BOOST_AUTO_TEST_CASE( buildStaticTree ) {
   xdm::RefPtr< xdmGrid::TensorProductGeometry > tpGeo =
     xdm::dynamic_pointer_cast< xdmGrid::TensorProductGeometry >( geometry );
   BOOST_REQUIRE( tpGeo );
-  BOOST_CHECK_EQUAL( tpGeo->dimension(), 3 );
+  BOOST_REQUIRE_EQUAL( tpGeo->dimension(), 3 );
+  size_t sizes[] = {129, 129, 383};
+  for ( int i = 0; i < 3; i++ ) {
+    xdm::RefPtr< xdm::UniformDataItem > geoData = tpGeo->child( i );
+    BOOST_REQUIRE( geoData );
+    BOOST_REQUIRE_EQUAL( geoData->dataspace().rank(), 1 );
+    BOOST_CHECK_EQUAL( geoData->dataspace()[0], sizes[i] );
+  }
 
   // Check the attributes.
   BOOST_REQUIRE_EQUAL( grid->numberOfChildren(), 3 );

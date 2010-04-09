@@ -27,7 +27,8 @@ XDM_NAMESPACE_BEGIN
 MemoryAdapter::MemoryAdapter( bool isDynamic ) :
   ReferencedObject(),
   mIsDynamic( isDynamic ),
-  mNeedsUpdate( true )
+  mNeedsUpdate( true ),
+  mIsMemoryResident( true )
 {
 }
 
@@ -55,6 +56,14 @@ void MemoryAdapter::setNeedsUpdate( bool needsUpdate )
   mNeedsUpdate = needsUpdate;
 }
 
+bool MemoryAdapter::isMemoryResident() const {
+  return mIsMemoryResident;
+}
+
+void MemoryAdapter::setIsMemoryResident( bool isMemoryResident ) {
+  mIsMemoryResident = isMemoryResident;
+}
+
 bool MemoryAdapter::requiresWrite() const {
   return ( mIsDynamic || mNeedsUpdate );
 }
@@ -76,7 +85,8 @@ void MemoryAdapter::read( Dataset* dataset ) {
 
 RefPtr< StructuredArray > MemoryAdapter::array() {
   return const_pointer_cast< StructuredArray >(
-    static_cast< const MemoryAdapter& >( *this ).array() );
+    static_cast< const MemoryAdapter& >( *this ).array()
+  );
 }
 
 XDM_NAMESPACE_END

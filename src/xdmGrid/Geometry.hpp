@@ -74,6 +74,11 @@ public:
 
 protected:
 
+  /// Inform subclasses that the dimension of the geometry has been updated,
+  /// allowing them to perform any maintenance actions required to handle the
+  /// change.
+  virtual void updateDimension() = 0;
+
   /// Construct the vector implementation used by this geometry. Subclasses
   /// should override this method to return an appropriate VectorRefImpl for
   /// their internal geometry representation.

@@ -41,6 +41,7 @@ Geometry::~Geometry() {
 
 void Geometry::setDimension( unsigned int dimension ) {
   mDimension = dimension;
+  updateDimension();
 }
 
 unsigned int Geometry::dimension() const {

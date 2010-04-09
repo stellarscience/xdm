@@ -29,6 +29,10 @@
 
 XDM_NAMESPACE_BEGIN
 
+namespace {
+
+}
+
 UniformDataItem::UniformDataItem() :
   mDataType( primitiveType::kFloat ),
   mDataspace(),
@@ -157,10 +161,16 @@ void UniformDataItem::initializeDataset( const Dataset::InitializeMode& mode ) {
 }
 
 void UniformDataItem::serializeData() {
+  if ( !mData ) {
+    XDM_THROW( DataAccessError() );
+  }
   mData->write( mDataset.get() );
 }
 
 void UniformDataItem::deserializeData() {
+  if ( !mData ) {
+    XDM_THROW( DataAccessError() );
+  }
   mData->read( mDataset.get() );
 }
 
@@ -178,6 +188,25 @@ bool UniformDataItem::validateBounds( const xdm::DataShape<>& shape ) const {
     if ( shape[i] >= mDataspace[i] ) return false;
   }
   return true;
+}
+
+RefPtr< const StructuredArray > UniformDataItem::array() const {
+  if ( !mData ) {
+    XDM_THROW( DataAccessError() );
+  }
+  if ( !mData->isMemoryResident() && mData->requiresWrite() ) {
+    UniformDataItem* mutableThis = const_cast< UniformDataItem* >(this);
+    mutableThis->initializeDataset( Dataset::kRead );
+    mutableThis->deserializeData();
+    mutableThis->finalizeDataset();
+  }
+  return mData->array();
+}
+
+RefPtr< StructuredArray > UniformDataItem::array() {
+  return xdm::const_pointer_cast< StructuredArray >(
+    static_cast< const UniformDataItem& >(*this).array()
+  );
 }
 
 XDM_NAMESPACE_END

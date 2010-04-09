@@ -43,7 +43,7 @@ XDM_GRID_NAMESPACE_BEGIN
 ///
 class InterlacedGeometry : public Geometry {
 public:
-  InterlacedGeometry( unsigned int dimension );
+  InterlacedGeometry( unsigned int dimension = 0 );
   virtual ~InterlacedGeometry();
 
   XDM_META_ITEM( InterlacedGeometry );
@@ -56,6 +56,7 @@ public:
   virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
 
 protected:
+  virtual void updateDimension();
   virtual xdm::RefPtr< xdm::VectorRefImp< double > > createVectorImp();
 
 };

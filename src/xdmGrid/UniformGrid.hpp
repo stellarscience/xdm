@@ -59,6 +59,14 @@ public:
 
   /// Add an attribute definition to the grid.
   void addAttribute( xdm::RefPtr< Attribute > attribute );
+  /// Get an attribute by its index.
+  xdm::RefPtr< Attribute > attributeByIndex( std::size_t index );
+  /// Get a const attribute by its index.
+  xdm::RefPtr< const Attribute > attributeByIndex( std::size_t index ) const;
+  /// Get an attribute by name.
+  xdm::RefPtr< Attribute > attributeByName( const std::string& name );
+  /// Get a const attribute by name.
+  xdm::RefPtr< const Attribute > attributeByName( const std::string& name ) const;
 
   /// Get a cell by index.
   Cell cell( std::size_t cellIndex );

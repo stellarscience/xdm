@@ -144,10 +144,11 @@ bool unorderedCollectionsEqual(
 
 /// Trim leading and trailing white space from a string.
 inline void trim( std::string& io ) {
-  std::string::size_type pos = io.find_last_not_of( " \t" );
+  static const char * kWhitespace = " \t\n";
+  std::string::size_type pos = io.find_last_not_of( kWhitespace );
   if ( pos != std::string::npos ) {
     io.erase( pos + 1 );
-    pos = io.find_first_not_of( " \t" );
+    pos = io.find_first_not_of( kWhitespace );
     if ( pos != std::string::npos ) io.erase( 0, pos );
   }
 }

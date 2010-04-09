@@ -38,19 +38,26 @@
 
 #include <fstream>
 
+#include <cmath>
+
+double function( double x, double y ) {
+  double xrad = x * ( 6.28 / 360.0 );
+  double yrad = y * ( 6.28 / 360.0 );
+  return std::sin( xrad + yrad );
+}
+
+static const int kMeshSize[2] = { 10, 5 };
+static const double kRange[2][2] = { {0.0, 360.0}, {-90.0, 90.0} };
+
 // Function to build a 2D grid and write it to disk.
 void write2DGrid( const xdm::FileSystemPath& path ) {
-  static const int kMeshSize = 10;
-  static const double xrange[] = {0.0, 360.0};
-  static const double yrange[] = {-90.0, 90.0};
-  static const double * ranges[] = {xrange, yrange};
 
   xdm::RefPtr< xdmGrid::UniformGrid > grid( new xdmGrid::UniformGrid );
 
   // Topology
   {
     xdm::RefPtr< xdmGrid::RectilinearMesh > topology( new xdmGrid::RectilinearMesh );
-    topology->setShape( xdm::makeShape( kMeshSize, kMeshSize ) );
+    topology->setShape( xdm::makeShape( kMeshSize[1], kMeshSize[0] ) );
     grid->setTopology( topology );
   }
 
@@ -61,11 +68,12 @@ void write2DGrid( const xdm::FileSystemPath& path ) {
       new xdmGrid::TensorProductGeometry( 2 ) );
     for ( int i = 0; i < 2; i++ ) {
       xdm::RefPtr< xdm::UniformDataItem > dataItem( new xdm::UniformDataItem );
-      dataItem->setDataspace( xdm::makeShape( kMeshSize ) );
+      dataItem->setDataType( xdm::primitiveType::kDouble );
+      dataItem->setDataspace( xdm::makeShape( kMeshSize[i] ) );
       meshValues[i] = xdm::makeRefPtr(
-        new xdm::VectorStructuredArray< double >( kMeshSize ) );
-      for ( int j = 0; j < kMeshSize; j++ ) {
-        (*meshValues[i])[j] = ranges[i][0] + j * ( (ranges[i][1] - ranges[i][0]) / kMeshSize );
+        new xdm::VectorStructuredArray< double >( kMeshSize[i] ) );
+      for ( int j = 0; j < kMeshSize[i]; j++ ) {
+        (*meshValues[i])[j] = kRange[i][0] + j * ( (kRange[i][1] - kRange[i][0]) / kMeshSize[i] );
       }
       dataItem->setData( xdm::makeRefPtr( new xdm::ArrayAdapter( meshValues[i] ) ) );
       xdm::RefPtr< xdmHdf::HdfDataset > dataset( new xdmHdf::HdfDataset );
@@ -84,18 +92,18 @@ void write2DGrid( const xdm::FileSystemPath& path ) {
       xdmGrid::Attribute::kNode ) );
     attribute->setName( "attr" );
     xdm::RefPtr< xdm::VectorStructuredArray< double > > attrValues(
-      new xdm::VectorStructuredArray< double >( kMeshSize * kMeshSize ) );
-    for ( int i = 0; i < kMeshSize; i++ ) {
-      for ( int j = 0; j < kMeshSize; j++ ) {
+      new xdm::VectorStructuredArray< double >( kMeshSize[1] * kMeshSize[0] ) );
+    for ( int j = 0; j < kMeshSize[1]; j++ ) {
+      for ( int i = 0; i < kMeshSize[0]; i++ ) {
         double xpoint = (*meshValues[0])[i];
         double ypoint = (*meshValues[1])[j];
-        (*attrValues)[i*kMeshSize + j] = xpoint*xpoint + ypoint*ypoint;
+        (*attrValues)[j*kMeshSize[0] + i] = function( xpoint, ypoint );
       }
     }
     xdm::RefPtr< xdm::UniformDataItem > dataItem(
       new xdm::UniformDataItem(
         xdm::primitiveType::kDouble,
-        xdm::makeShape( kMeshSize, kMeshSize ) ) );
+        xdm::makeShape( kMeshSize[1], kMeshSize[0] ) ) );
     dataItem->setData( xdm::makeRefPtr( new xdm::ArrayAdapter( attrValues ) ) );
     xdm::RefPtr< xdmHdf::HdfDataset > dataset( new xdmHdf::HdfDataset );
     dataset->setFile( path.pathString() + ".h5" );
@@ -143,4 +151,40 @@ BOOST_AUTO_TEST_CASE( grid2DRoundtrip ) {
   xdm::RefPtr< xdmGrid::UniformGrid > grid =
     xdm::dynamic_pointer_cast< xdmGrid::UniformGrid >( result );
   BOOST_REQUIRE( grid );
+
+  xdm::RefPtr< xdmGrid::StructuredTopology > topology =
+    xdm::dynamic_pointer_cast< xdmGrid::StructuredTopology >( grid->topology() );
+  BOOST_REQUIRE( topology );
+  BOOST_CHECK_EQUAL( topology->shape(), xdm::makeShape( kMeshSize[0], kMeshSize[1] ) );
+
+  BOOST_CHECK_EQUAL( grid->geometry()->dimension(), 2 );
+  BOOST_CHECK_EQUAL( grid->geometry()->numberOfNodes(), kMeshSize[0] * kMeshSize[1] );
+
+  xdm::RefPtr< xdmGrid::Attribute > attribute = grid->attributeByName( "attr" );
+  BOOST_REQUIRE( attribute );
+  xdm::RefPtr< xdm::UniformDataItem > attributeData = attribute->dataItem();
+  BOOST_REQUIRE( attributeData );
+
+  double nodePositions[kMeshSize[0]][kMeshSize[1]][2];
+  for ( int i = 0; i < kMeshSize[0]; ++i ) {
+    for ( int j = 0; j < kMeshSize[1]; ++j ) {
+      nodePositions[i][j][0] = kRange[0][0] + i * (kRange[0][1] - kRange[0][0]) / kMeshSize[0];
+      nodePositions[i][j][1] = kRange[1][0] + j * (kRange[1][1] - kRange[1][0]) / kMeshSize[1];
+    }
+  }
+
+  // Check contiguous indexing. The loops below are in j-i order because the
+  // XDM convention is X varies fastest when indexing contiguously through the
+  // nodes.
+  int index = 0;
+  for ( int j = 0; j < kMeshSize[1]; ++j ) {
+    for ( int i = 0; i < kMeshSize[0]; ++i ) {
+      xdmGrid::Node node = grid->node( index );
+      BOOST_CHECK_EQUAL( nodePositions[i][j][0], node[0] );
+      BOOST_CHECK_EQUAL( nodePositions[i][j][1], node[1] );
+      BOOST_CHECK_EQUAL(
+        attributeData->atIndex< double >( index++ ),
+        function( node[0], node[1] ) );
+    }
+  }
 }

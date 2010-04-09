@@ -74,7 +74,7 @@ std::vector< float > createAttributeData(
   for ( int i = 0; i < sizex; ++i ) {
     for ( int j = 0; j < sizey; ++j ) {
       for ( int k = 0; k < sizez; ++k ) {
-        int location = k * sizex * sizey + j * sizey + i;
+        int location = k * sizex * sizey + j * sizex + i;
         float x = i * ( 6.28 / sizex );
         float y = j * ( 6.28 / sizey );
         float z = k * ( 6.28 / sizez );

@@ -31,17 +31,18 @@ XDM_GRID_NAMESPACE_BEGIN
 
 InterlacedGeometry::InterlacedGeometry( unsigned int dimension ) :
   Geometry( dimension ) {
+  setNumberOfChildren( 1 );
 }
 
 InterlacedGeometry::~InterlacedGeometry() {
 }
 
 void InterlacedGeometry::setCoordinateValues( xdm::RefPtr< xdm::UniformDataItem > data ) {
-  if ( numberOfChildren() > 0 ) {
+  if ( child( 0 ) ) {
     XDM_THROW( std::logic_error( "setCoordinateValues was called after the values had"
       " already been set by a previous call to setCoordinateValues." ) );
   }
-  appendChild( data );
+  setChild( 0, data );
 }
 
 void InterlacedGeometry::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
@@ -70,6 +71,10 @@ xdm::RefPtr< xdm::VectorRefImp< double > > InterlacedGeometry::createVectorImp()
     new xdm::SingleArrayOfVectorsImp< double >(
       child( 0 )->typedArray< double >()->begin(),
       dimension() ) );
+}
+
+void InterlacedGeometry::updateDimension() {
+  // do nothing.
 }
 
 XDM_GRID_NAMESPACE_END

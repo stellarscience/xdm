@@ -50,6 +50,7 @@ void writeItemImpl(
   domain->appendChild( metadata.result() );
 
   std::ofstream file( path.pathString().c_str() );
+  file << "<?xml version='1.0'?>" << std::endl;
   xdm::XmlOutputStream xmlStream( file );
   xmlStream.writeObject( xdmfRoot );
   xmlStream.closeStream();

@@ -54,10 +54,12 @@ void MultiArrayGeometry::setCoordinateValues(
     std::vector< double* > xyzArrays;
     std::vector< std::size_t > sizes;
     for ( int dim = 0; dim < dimension(); ++dim ) {
-      xdm::RefPtr< xdm::UniformDataItem > uniformItem =
-        xdm::dynamic_pointer_cast< xdm::UniformDataItem >( child( dim ) );
-      xyzArrays.push_back( uniformItem->typedArray< double >()->begin() );
-      sizes.push_back( uniformItem->typedArray< double >()->size() );
+      xdm::RefPtr< xdm::UniformDataItem > dataItem = child( dim );
+      xyzArrays.push_back( dataItem->typedArray< double >()->begin() );
+      xdm::DataShape<>::size_type size = std::accumulate(
+        dataItem->dataspace().begin(), dataItem->dataspace().end(),
+        1, std::multiplies< xdm::DataShape<>::size_type >() );
+      sizes.push_back( size );
     }
 
     // Need to pass this iterator by value to satisfy PGI's compiler.
@@ -101,6 +103,10 @@ xdm::RefPtr< xdm::VectorRefImp< double > > MultiArrayGeometry::createVectorImp()
   }
   return xdm::RefPtr< xdm::VectorRefImp< double > >(
     new xdm::MultipleArraysOfVectorElementsImp< double >( arrays ) );
+}
+
+void MultiArrayGeometry::updateDimension() {
+  setNumberOfChildren( dimension() );
 }
 
 XDM_GRID_NAMESPACE_END

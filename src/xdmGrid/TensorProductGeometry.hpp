@@ -41,7 +41,7 @@ XDM_GRID_NAMESPACE_BEGIN
 /// of the geometry will then be |S_0|*|S_1|*...*|S_N|.
 class TensorProductGeometry : public Geometry {
 public:
-  TensorProductGeometry( unsigned int dimension );
+  TensorProductGeometry( unsigned int dimension = 0 );
   virtual ~TensorProductGeometry();
 
   XDM_META_ITEM( TensorProductGeometry );
@@ -55,6 +55,7 @@ public:
   virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
 
 protected:
+  virtual void updateDimension();
   virtual xdm::RefPtr< xdm::VectorRefImp< double > > createVectorImp();
 
 };

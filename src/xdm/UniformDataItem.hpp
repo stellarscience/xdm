@@ -30,9 +30,19 @@
 
 #include <list>
 
+#include <cassert>
+
 #include <xdm/NamespaceMacro.hpp>
 
 XDM_NAMESPACE_BEGIN
+
+/// Base class for errors signalling problems when accessing data in memory or
+/// on disk.
+class DataAccessError : public std::runtime_error {
+public:
+  DataAccessError() : std::runtime_error( "Item could not access data." ) {}
+  virtual ~DataAccessError() throw() {}
+};
 
 /// Representation of a dataset on disk with corresponding shape and type
 /// information.  A UniformDataItem contains a data object that
@@ -152,6 +162,20 @@ public:
   /// true if any of the item's MemoryAdapter's is in need of an update.
   bool serializationRequired() const;
 
+protected:
+
+  /// Get the underlying data array as an untyped StructuredArray. Calls to this
+  /// when the underlying data requires an update will case data to be read from
+  /// disk. This version returns an immutable array.
+  /// @throw DataAccessError The item's data cannot be found.
+  virtual RefPtr< const StructuredArray > array() const;
+
+  /// Get the underlying data array as an untyped StructuredArray. Calls to this
+  /// when the underlying data requires an update will case data to be read from
+  /// disk. This version returns a mutable array.
+  /// @throw DataAccessError The item's data cannot be found.
+  virtual RefPtr< StructuredArray > array();
+
 private:
   // check the shape bounds against this object's dataspace.
   bool validateBounds( const xdm::DataShape<>& shape ) const;
@@ -161,8 +185,9 @@ private:
   RefPtr< MemoryAdapter > mData;
 };
 
-
+// -----------------------------------------------------------------------------
 // Implementations for the template functions.
+// -----------------------------------------------------------------------------
 #include <xdm/ThrowMacro.hpp>
 
 #include <stdexcept>
@@ -173,32 +198,23 @@ private:
 
 template< typename T >
 RefPtr< TypedStructuredArray< T > > UniformDataItem::typedArray() {
-  RefPtr< StructuredArray > untyped = data()->array();
-  if ( ! untyped ) {
-    XDM_THROW( std::logic_error( "typedArray was called on a NULL MemoryAdapter or array." ) );
-  }
-  RefPtr< TypedStructuredArray< T > > typed =
-    dynamic_pointer_cast< TypedStructuredArray< T > >( data()->array() );
-  if ( ! typed ) {
-    XDM_THROW( std::runtime_error( "In typedArray, the MemoryAdapter does not hold an array"
-      " with the requested type: " + std::string( typeid( T ).name() ) ) );
-  }
-  return typed;
+  return const_pointer_cast< TypedStructuredArray< T > >(
+    static_cast< const UniformDataItem& >(*this).typedArray< T >()
+  );
 }
 
 template< typename T >
 RefPtr< const TypedStructuredArray< T > > UniformDataItem::typedArray() const {
-  RefPtr< const StructuredArray > untyped = data()->array();
+  RefPtr< const StructuredArray > untyped = array();
   if ( ! untyped ) {
-    XDM_THROW( std::logic_error( "typedArray was called on a NULL MemoryAdapter or array." ) );
+    XDM_THROW( DataAccessError() );
   }
-  RefPtr< const TypedStructuredArray< T > > typed =
-    dynamic_pointer_cast< const TypedStructuredArray< T > >( data()->array() );
-  if ( ! typed ) {
-    XDM_THROW( std::runtime_error( "In typedArray, the MemoryAdapter does not hold an array"
-      " with the requested type: " + std::string( typeid( T ).name() ) ) );
-  }
-  return typed;
+  // Performance optimization: Clients are aware of the data type they should be
+  // accessing. Rather than a general dynamic cast below, we assert in debug
+  // the type and perform a static cast. This provides an error when
+  // debugging, while removing the dynamic_cast hit in release.
+  assert( dynamic_pointer_cast< const TypedStructuredArray< T > >( untyped ) );
+  return static_pointer_cast< const TypedStructuredArray< T > >( untyped );
 }
 
 template< typename T >
@@ -216,7 +232,7 @@ const T& UniformDataItem::atLocation( const xdm::DataShape<>& location ) const {
   // Validate the input.
   assert( validateBounds( location ) );
   // Compute the linear index.
-  return atIndex< T >( linearize( location, mDataspace ) );
+  return atIndex< T >( contiguousIndex( location, mDataspace ) );
 }
 
 template< typename T >

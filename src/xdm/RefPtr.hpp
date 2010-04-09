@@ -183,6 +183,18 @@ RefPtr< T > const_pointer_cast( const RefPtr< U >& p ) {
   return RefPtr< T >( const_cast< T* >( p.get() ) );
 }
 
+/// Reinterpret cast operator.
+template< typename T, typename U >
+RefPtr< T > reinterpret_pointer_cast( const RefPtr< U >& p ) {
+  return RefPtr< T >( reinterpret_cast< T* >( p.get() ) );
+}
+
+/// Static cast operator.
+template< typename T, typename U >
+RefPtr< T > static_pointer_cast( const RefPtr< U >& p ) {
+  return RefPtr< T >( static_cast< T* >( p.get() ) );
+}
+
 /// Determine if two RefPtr's point at the same object.
 template< typename T, typename U >
 bool operator==( const RefPtr< T >& lhs, const RefPtr< U >& rhs ) {

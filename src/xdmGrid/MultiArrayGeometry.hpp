@@ -44,7 +44,7 @@ XDM_GRID_NAMESPACE_BEGIN
 ///
 class MultiArrayGeometry : public Geometry {
 public:
-  MultiArrayGeometry( unsigned int dimension );
+  MultiArrayGeometry( unsigned int dimension = 0 );
   virtual ~MultiArrayGeometry();
 
   XDM_META_ITEM( MultiArrayGeometry );
@@ -61,6 +61,7 @@ public:
   virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
 
 protected:
+  virtual void updateDimension();
   virtual xdm::RefPtr< xdm::VectorRefImp< double > > createVectorImp();
 
 };

@@ -163,13 +163,14 @@ void reverseDimensionOrder( DataShape< T >& shape ) {
   shape.reverseDimensionOrder();
 }
 
-/// Find the linear index for a shape within another shape that represents
-/// the maximum dimensions for the input shape. This follows the C (fastest
-/// varying dimension first) ordering convention.
+/// Find the contiguous array index for a shape within another shape that
+/// represents the maximum dimensions for the input shape following the C array
+/// convention.
 /// @param indexShape The index into the contextShape.
 /// @param contextShape The maximum index in each dimension.
+/// @return A size_type with the array index.
 template< typename T >
-typename DataShape< T >::size_type linearize(
+typename DataShape< T >::size_type contiguousIndex(
   const DataShape< T >& indexShape,
   const DataShape< T >& contextShape ) {
   typedef typename DataShape< T >::ConstDimensionIterator Iterator;

@@ -55,14 +55,14 @@ BOOST_AUTO_TEST_CASE( makeShape ) {
   BOOST_CHECK_THROW( xdm::makeShape( "1 jeff" ), std::invalid_argument );
 }
 
-BOOST_AUTO_TEST_CASE( linearizeShape ) {
+BOOST_AUTO_TEST_CASE( contiguousIndexFromShape ) {
   // The answer is a 3x3x2 array.
   std::size_t answer[3][3][2];
   std::size_t index = 0;
   for ( int i = 0; i < 3; ++i ) {
     for ( int j = 0; j < 3; ++j ) {
       for ( int k = 0; k < 2; ++k ) {
-        answer[i][j][k] = (index++);
+        answer[i][j][k] = index++;
       }
     }
   }
@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE( linearizeShape ) {
     for ( int j = 0; j < 3; ++j ) {
       for ( int k = 0; k < 2; ++k ) {
         BOOST_CHECK_EQUAL(
-          linearize( xdm::makeShape( i, j, k ), context ),
+          contiguousIndex( xdm::makeShape( i, j, k ), context ),
           answer[i][j][k] );
       }
     }

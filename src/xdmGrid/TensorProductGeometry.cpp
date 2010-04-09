@@ -49,10 +49,11 @@ void TensorProductGeometry::setCoordinateValues(
     std::count_if( begin(), end(), std::mem_fun_ref( &xdm::RefPtr< xdm::Item >::valid ) );
   if ( dimensionCount == dimension() ) {
     std::size_t nodeProduct = 1;
-    for ( ConstIterator childIt = begin(); childIt != end(); ++childIt ) {
-      xdm::RefPtr< xdm::UniformDataItem > uniformItem =
-        xdm::dynamic_pointer_cast< xdm::UniformDataItem >( *childIt );
-      nodeProduct *= uniformItem->typedArray< double >()->size();
+    for ( ConstIterator dataItem = begin(); dataItem != end(); ++dataItem ) {
+      xdm::DataShape<>::size_type itemSize = std::accumulate(
+        (*dataItem)->dataspace().begin(), (*dataItem)->dataspace().end(),
+        1, std::multiplies< xdm::DataShape<>::size_type >() );
+      nodeProduct *= itemSize;
     }
     setNumberOfNodes( nodeProduct );
   }
@@ -85,6 +86,10 @@ xdm::RefPtr< xdm::VectorRefImp< double > > TensorProductGeometry::createVectorIm
   return xdm::RefPtr< xdm::VectorRefImp< double > >(
     new xdm::TensorProductArraysImp< double >(
       coordinateArrays, coordinateArraySizes ) );
+}
+
+void TensorProductGeometry::updateDimension() {
+  setNumberOfChildren( dimension() );
 }
 
 XDM_GRID_NAMESPACE_END

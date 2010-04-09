@@ -98,6 +98,35 @@ void UniformGrid::addAttribute( xdm::RefPtr< Attribute > attribute ) {
   appendChild( attribute );
 }
 
+xdm::RefPtr< const Attribute > UniformGrid::attributeByIndex( std::size_t index ) const {
+  if ( index < numberOfChildren() ) {
+    return child( index );
+  } else {
+    return xdm::RefPtr< const Attribute >();
+  }
+}
+
+xdm::RefPtr< Attribute > UniformGrid::attributeByIndex( std::size_t index ) {
+  return xdm::const_pointer_cast< Attribute >(
+    static_cast< const UniformGrid& >(*this).attributeByIndex( index )
+  );
+}
+
+xdm::RefPtr< const Attribute >
+UniformGrid::attributeByName( const std::string& name ) const {
+  for ( int i = 0; i < numberOfChildren(); ++i ) {
+    if ( child( i )->name() == name ) return child( i );
+  }
+  return xdm::RefPtr< const Attribute >();
+}
+
+xdm::RefPtr< Attribute >
+UniformGrid::attributeByName( const std::string& name ) {
+  return xdm::const_pointer_cast< Attribute >(
+    static_cast< const UniformGrid& >(*this).attributeByName( name )
+  );
+}
+
 Cell UniformGrid::cell( std::size_t cellIndex )
 {
   if ( ! mCellImp ) {

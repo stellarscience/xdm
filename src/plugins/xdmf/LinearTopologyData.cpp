@@ -33,6 +33,7 @@ LinearTopologyData::LinearTopologyData( xdm::RefPtr< xdmGrid::Polyvertex > topol
   MemoryAdapter( true ),
   mTopology( topology ),
   mArrayValues() {
+  setIsMemoryResident( true );
 }
 
 LinearTopologyData::~LinearTopologyData() {

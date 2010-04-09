@@ -38,6 +38,8 @@ public:
   {
     return xdm::RefPtr< xdm::VectorRefImp< double > >();
   }
+
+  virtual void updateDimension() {}
 };
 
 BOOST_AUTO_TEST_CASE( writeMetadata ) {

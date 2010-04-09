@@ -30,12 +30,15 @@ XDM_NAMESPACE_BEGIN
 
 class Dataset;
 
-/// Definition of the interface for writing data to a Dataset.  Implementations
-/// of this interface define the data to be written to the Dataset.  Writable
-/// can be tagged as dynamic if it evolves over time.  Dynamic data will invoke
-/// a write to the dataset upon every call to write().  If the data is not
-/// dynamic, then the data can be set as requiring an update if a new write is
-/// required.
+/// Base class for use when mapping application data to array accessible data.
+/// Client applications can implement this class to provide ordered data access
+/// to data layouts in memory with different organizational requirements. In
+/// addition to data access, this class defines the interface for reading and
+/// writing custom application memory layouts to and from Dataset objects.
+///
+/// The ArrayAdapter subclass provides an implementation for simple contiguous
+/// array based access.
+/// @see ArrayAdapter
 class MemoryAdapter : public xdm::ReferencedObject {
 public:
   MemoryAdapter( bool isDynamic = false );
@@ -47,14 +50,20 @@ public:
   /// Set whether or not the data changes as time evolves.
   void setIsDynamic( bool isDynamic );
 
-  /// Determine if the data needs an update.
+  /// Determine if the data needs to be updated to reflect external changes.
   bool needsUpdate() const;
-  /// Specify that the data needs an update.
+  /// Specify that the data needs to be updated to reflect external changes.
   void setNeedsUpdate( bool needsUpdate );
 
   /// Determine if the data currently requires writing.
-  /// @todo Rename this to dirty(), as it applies to both input and output.
   bool requiresWrite() const;
+
+  /// Determine if the data is memory resident and therefore never needs to be
+  /// read from disk.
+  bool isMemoryResident() const;
+  /// Specify that the data is memory resident and therefore never needs to be
+  /// read from disk.
+  void setIsMemoryResident( bool isMemoryResident );
 
   /// Write the data to the specified dataset.
   void write( Dataset* dataset );
@@ -71,7 +80,7 @@ public:
   /// implementation calls the const version.
   virtual RefPtr< StructuredArray > array();
 
-private:
+protected:
   /// Method to be implemented by inheritors to define the data to be written to
   /// the dataset.
   virtual void writeImplementation( Dataset* dataset ) = 0;
@@ -79,8 +88,10 @@ private:
   /// the specified dataset.
   virtual void readImplementation( Dataset* dataset ) = 0;
 
+private:
   bool mIsDynamic;
   bool mNeedsUpdate;
+  bool mIsMemoryResident;
 };
 
 XDM_NAMESPACE_END

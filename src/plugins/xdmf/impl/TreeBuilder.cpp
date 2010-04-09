@@ -72,6 +72,15 @@ char const * const kXdmfTag        = "Xdmf";
 char const * const kTopologyTag    = "Topology";
 char const * const kTimeTag        = "Time";
 
+// XDMF Geometry Types.
+enum XdmfGeometryType {
+  INTERLACED_3D = 0, // XYZ
+  INTERLACED_2D, // XY
+  MULTI_ARRAY, // X_Y_Z
+  TENSOR_PRODUCT, // VxVyVz
+  ORIGIN_OFFSET // Origin_DxDyDz
+};
+
 // Assuming input has been validated, determine type from a string/precision
 // pair.
 xdm::primitiveType::Value type( const std::string& typeStr, size_t precision ) {
@@ -172,7 +181,7 @@ TreeBuilder::buildUniformDataItem( xmlNode * node ) {
   // Get the format string for the dataset.
   XPathQuery formatQuery( mXPathContext, node, "@Format" );
   std::string format( "HDF" );
-  if ( formatQuery.size() == 0 ) {
+  if ( formatQuery.size() > 0 ) {
     format = formatQuery.textValue( 0 );
   }
   
@@ -205,61 +214,39 @@ TreeBuilder::buildUniformDataItem( xmlNode * node ) {
   // loaded into memory.
   xdm::RefPtr< xdm::StructuredArray > array(
     xdm::makeVectorStructuredArray( dataType ) );
-  result->setData( xdm::makeRefPtr( new xdm::ArrayAdapter( array ) ) );
+  xdm::RefPtr< xdm::ArrayAdapter > adapter( new xdm::ArrayAdapter( array ) );
+  adapter->setIsMemoryResident( false );
+  result->setData( adapter );
 
   return result;
 }
 
 //------------------------------------------------------------------------------
 xdm::RefPtr< xdmGrid::Geometry > TreeBuilder::buildGeometry( xmlNode * node ) {
-  enum {
-    XYZ = 0,
-    XY,
-    X_Y_Z,
-    X_Y,
-    VXVYVZ,
-    VXVY,
-    ORIGIN_DXDYDZ,
-    ORIGIN_DXDY
-  } geometryType( XYZ );
+  XdmfGeometryType geometryType( INTERLACED_3D );
 
-  static const char * strings[] = {
-    "XYZ",
-    "XY",
-    "X_Y_Z",
-    "X_Y",
-    "VXVYVZ",
-    "VXVY",
-    "ORIGIN_DXDYDZ",
-    "ORIGIN_DXDY"
-  };
+  // Mapping from 'GeometryType' attribute value to geometry type enum.
+  typedef std::map< std::string, XdmfGeometryType > TypeMap;
+  static TypeMap typeMap;
+  if ( typeMap.empty() ) {
+    typeMap["XYZ"] = INTERLACED_3D;
+    typeMap["XY"] = INTERLACED_2D;
+    typeMap["X_Y_Z"] = MULTI_ARRAY;
+    typeMap["VXVYVZ"] = TENSOR_PRODUCT;
+    typeMap["ORIGIN_DXDYDZ"] = ORIGIN_OFFSET;
+  }
 
   // Get the geometry type from the GeometryType attribute.
   XPathQuery geometryTypeQuery( mXPathContext, node, "@GeometryType" );
   if ( geometryTypeQuery.size() > 0 ) {
     std::string typeString = geometryTypeQuery.textValue( 0 );
     xdm::toUpper( typeString );
-    if ( typeString == strings[XYZ] ) geometryType = XYZ;
-    else if ( typeString == strings[XY] ) geometryType = XY;
-    else if ( typeString == strings[X_Y_Z] ) geometryType = X_Y_Z;
-    else if ( typeString == strings[X_Y] ) geometryType = X_Y;
-    else if ( typeString == strings[VXVYVZ] ) geometryType = VXVYVZ;
-    else if ( typeString == strings[VXVY] ) geometryType = VXVY;
-    else if ( typeString == strings[ORIGIN_DXDYDZ] ) geometryType = ORIGIN_DXDYDZ;
-    else if ( typeString == strings[ORIGIN_DXDY] ) geometryType = ORIGIN_DXDY;
-    else XDM_THROW( xdmFormat::ReadError( "Unrecognized XDMF geometry type." ) );
-  }
-
-  // Choose the Geometry subclass based on the geometry type flag.
-  xdm::RefPtr< xdmGrid::Geometry > result;
-  switch ( geometryType ) {
-  case XYZ: result = new xdmGrid::InterlacedGeometry( 3 ); break;
-  case XY: result = new xdmGrid::InterlacedGeometry( 2 ); break;
-  case X_Y_Z: result = new xdmGrid::MultiArrayGeometry( 3 ); break;
-  case X_Y: result = new xdmGrid::MultiArrayGeometry( 2 ); break;
-  case VXVYVZ: result = new xdmGrid::TensorProductGeometry( 3 ); break;
-  case VXVY: result = new xdmGrid::TensorProductGeometry( 2 ); break;
-  default: XDM_THROW( "Unsupported XDMF Geometry type." ); break;
+    TypeMap::const_iterator type = typeMap.find( typeString );
+    if ( type != typeMap.end() ) {
+      geometryType = type->second;
+    } else {
+      XDM_THROW( xdmFormat::ReadError( "Unrecognized XDMF GeometryType." ) );
+    }
   }
 
   // Read the internal data items that make up the values for the geometry.
@@ -267,11 +254,44 @@ xdm::RefPtr< xdmGrid::Geometry > TreeBuilder::buildGeometry( xmlNode * node ) {
   if ( dataQuery.size() == 0 ) {
     XDM_THROW( xdmFormat::ReadError( "XDMF Geometry values unspecified." ) );
   }
-  for ( int i = 0; i < dataQuery.size(); i++ ) {
-    result->appendChild( buildUniformDataItem( dataQuery.node( i ) ) );
+  size_t dataItemCount = dataQuery.size();
+
+  if ( geometryType == INTERLACED_3D ) {
+    xdm::RefPtr< xdmGrid::InterlacedGeometry > g(
+      new xdmGrid::InterlacedGeometry( 3 ) );
+    g->setCoordinateValues( buildUniformDataItem( dataQuery.node( 0 ) ) );
+    return g;
+  } else if ( geometryType == INTERLACED_2D ) {
+    xdm::RefPtr< xdmGrid::InterlacedGeometry > g(
+      new xdmGrid::InterlacedGeometry( 2 ) );
+    g->setCoordinateValues( buildUniformDataItem( dataQuery.node( 0 ) ) );
+    return g;
+  } else if ( geometryType == MULTI_ARRAY ) {
+    xdm::RefPtr< xdmGrid::MultiArrayGeometry > g(
+      new xdmGrid::MultiArrayGeometry );
+    // dimension is implicit from the number of DataItems under the Geometry
+    g->setDimension( dataItemCount );
+    for ( int i = 0; i < dataItemCount; ++i ) {
+      g->setCoordinateValues( i, buildUniformDataItem( dataQuery.node( i ) ) );
+    }
+    return g;
+  } else if ( geometryType == TENSOR_PRODUCT ) {
+    xdm::RefPtr< xdmGrid::TensorProductGeometry > g(
+      new xdmGrid::TensorProductGeometry );
+    // dimension is implicit from the number of DataItems under the Geometry
+    g->setDimension( dataItemCount );
+    for ( int i = 0; i < dataItemCount; ++i ) {
+      g->setCoordinateValues( i, buildUniformDataItem( dataQuery.node( i ) ) );
+    }
+    return g;
+  } else if ( geometryType == ORIGIN_OFFSET ) {
+    XDM_THROW( xdmFormat::ReadError( "Origin offset geometry not yet supported." ) );
+  } else {
+    XDM_THROW( xdmFormat::ReadError( "Unregognized XDMF GeometryType." ) );
   }
 
-  return result;
+  // The if block above didn't return, return an empty pointer.
+  return xdm::RefPtr< xdmGrid::Geometry >();
 }
 
 //------------------------------------------------------------------------------
@@ -368,10 +388,14 @@ xdm::RefPtr< xdmGrid::Topology > TreeBuilder::buildTopology( xmlNode * node ) {
     xdm::RefPtr< xdmGrid::RectilinearMesh > structuredTopology(
       new xdmGrid::RectilinearMesh );
     // Get the attribute that specifies the shape of the structured topology
-    xdm::DataShape<> shape;
     XPathQuery shapeQuery( mXPathContext, node, "@Dimensions|@NumberOfElements" );
     if ( shapeQuery.size() > 0 ) {
-      structuredTopology->setShape( xdm::makeShape( shapeQuery.textValue( 0 ) ) );
+      xdm::DataShape<> topologyShape = xdm::makeShape(shapeQuery.textValue(0));
+      // XDMF Specifies topology in ZYX order, which is the opposite of the
+      // geometry ordering. Reverse the shape to follow the XDM convention of
+      // XYZ ordering and match the grid geometry specification.
+      topologyShape.reverseDimensionOrder();
+      structuredTopology->setShape( topologyShape );
     } else {
       XDM_THROW( xdmFormat::ReadError(
         "No dimensions specified for XDMF structured topology" ) );
