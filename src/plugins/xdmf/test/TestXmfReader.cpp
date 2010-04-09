@@ -56,6 +56,7 @@ void write2DGrid( const xdm::FileSystemPath& path ) {
 
   // Topology
   {
+    // FIXME: Dimensions below are y-x order.
     xdm::RefPtr< xdmGrid::RectilinearMesh > topology( new xdmGrid::RectilinearMesh );
     topology->setShape( xdm::makeShape( kMeshSize[1], kMeshSize[0] ) );
     grid->setTopology( topology );
