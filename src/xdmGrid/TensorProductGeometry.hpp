@@ -52,6 +52,11 @@ public:
   /// @param data The data representing the coordinate values on the axis.
   void setCoordinateValues( unsigned int dim, xdm::RefPtr< xdm::UniformDataItem > data );
 
+  /// Get the number of coordinate values in a particular dimension. This function allows\
+  /// dimension-by-dimension size queries as an alternative to Grid::numberOfNodes().
+  /// @param dim The dimension.
+  std::size_t numberOfCoordinates( const std::size_t& dim ) const;
+
   virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
 
 protected:
