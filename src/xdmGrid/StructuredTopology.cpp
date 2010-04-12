@@ -79,6 +79,25 @@ void StructuredTopology::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
   std::stringstream ss;
   ss << mShape;
   xml.setAttribute( "Dimensions", ss.str() );
+
+
+  unsigned int rank = shape().rank();
+  switch ( rank ) {
+  case 2: 
+    xml.setAttribute( "TopologyType", "2DRectMesh" );
+    break;
+  case 3:
+    xml.setAttribute( "TopologyType", "3DRectMesh" );
+    break;
+  default:
+    {
+      std::stringstream msg;
+      msg << "Unsupported number of dimensions for rectinlinear mesh: ";
+      msg << rank;
+      XDM_THROW( std::domain_error( msg.str() ) );
+    }
+    break;
+  }
 }
 
 xdm::RefPtr< xdm::VectorRefImp< std::size_t > > StructuredTopology::createVectorImp() {
