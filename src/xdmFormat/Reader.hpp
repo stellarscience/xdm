@@ -7,6 +7,7 @@
 
 #include <xdm/FileSystem.hpp>
 #include <xdm/Forward.hpp>
+#include <xdm/ReferencedObject.hpp>
 
 #include <sstream>
 #include <stdexcept>
@@ -18,7 +19,7 @@ XDM_FORMAT_NAMESPACE_BEGIN
 /// Exception to be thrown when an error occurs while reading an input file.
 class ReadError : public std::runtime_error {
 public:
-  ReadError( const std::string& message ) : 
+  ReadError( const std::string& message ) :
     std::runtime_error( message.c_str() ) {}
   virtual ~ReadError() throw() {}
 };
@@ -30,7 +31,7 @@ class ParseError : public ReadError {
   int mLine;
   int mColumn;
 public:
-  ParseError( int line, int column ) : 
+  ParseError( int line, int column ) :
     ReadError( "Parse error:" ),
     mLine( line ),
     mColumn( column ) {}
@@ -50,7 +51,7 @@ public:
 
 /// Interface for types that read items from files. Implement this interface to
 /// read a tree of items from a file.
-class Reader {
+class Reader : public xdm::ReferencedObject {
 public:
   Reader();
   virtual ~Reader();
