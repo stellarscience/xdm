@@ -22,6 +22,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include <xdmf/impl/TreeBuilder.hpp>
+#include <xdmf/impl/XPathQuery.hpp>
 
 #include <xdm/AllDataSelection.hpp>
 #include <xdm/DataSelectionMap.hpp>
@@ -66,6 +67,52 @@ void createHdfFile() {
     xdm::Dataset::kCreate );
   dataset->serialize( array.get(), xdm::DataSelectionMap() );
   dataset->finalize();
+}
+
+BOOST_AUTO_TEST_CASE( nodePathToXPath ) {
+  char const * const kXml =
+  "<root>"
+  "  <group>"
+  "    <child name='fred'/>"
+  "    <another-child/>"
+  "    <child name='jeff'/>"
+  "  </group>"
+  "</root>";
+
+  xmlDocPtr document = xmlParseDoc( reinterpret_cast< const xmlChar *>(kXml) );
+  BOOST_REQUIRE( document );
+  xmlNode * rootNode = xmlDocGetRootElement( document );
+  BOOST_REQUIRE( rootNode );
+  xmlXPathContextPtr xpathContext = xmlXPathNewContext( document );
+  BOOST_REQUIRE( xpathContext );
+
+  xdmf::impl::NodePath path;
+
+  xdmf::impl::XPathQuery groupQuery( xpathContext, rootNode, "group");
+  BOOST_REQUIRE_EQUAL( groupQuery.size(), 1 );
+  xmlNode * groupNode = groupQuery.node( 0 );
+
+  xdmf::impl::pushNode( groupNode, 0, path );
+  std::string groupPathResult = xdmf::impl::makeXPathQuery( path );
+  BOOST_CHECK_EQUAL( groupPathResult, "group[1]" );
+
+  xdmf::impl::XPathQuery childQuery( xpathContext, groupNode, "child" );
+  BOOST_CHECK_EQUAL( childQuery.size(), 2 );
+  const char * exprAnswer[2] = {
+    "group[1]/child[1]",
+    "group[1]/child[2]"
+  };
+  for ( size_t i = 0; i < childQuery.size(); ++i ) {
+    xdmf::impl::pushNode( childQuery.node( i ), i, path );
+    {
+      std::string xpathExpr = xdmf::impl::makeXPathQuery( path );
+      BOOST_CHECK_EQUAL( xpathExpr, exprAnswer[i] );
+      xdmf::impl::XPathQuery checkQuery( xpathContext, rootNode, xpathExpr );
+      BOOST_REQUIRE_EQUAL( checkQuery.size(), 1 );
+      BOOST_CHECK_EQUAL( checkQuery.node( 0 ), childQuery.node( i ) );
+    }
+    xdmf::impl::popNode( path );
+  }
 }
 
 BOOST_AUTO_TEST_CASE( buildUniformDataItem ) {

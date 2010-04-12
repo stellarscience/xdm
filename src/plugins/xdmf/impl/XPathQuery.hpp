@@ -26,8 +26,54 @@
 
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include <cassert>
+
+namespace xdmf {
+namespace impl {
+
+/// Class to represent a node within a path. Contains a std::pair with a node
+/// and the child number within an XPath query it is in it's parent element.
+/// For example in an XML hierarchy that looks like:
+///
+/// @code
+/// <root>
+///   <child name='fred'/>
+///   <another-child/>
+///   <child name='jeff'/>
+/// </root>
+/// @endcode
+///
+/// And an XPath query @code /root/child @endcode, the 'child' element with
+/// name 'fred' will appear as a pair with (node, 0) and the 'child' element
+/// with name 'jeff' will appear as a pair with (node, 1) since that is the
+/// order they are encountered in within the /root/child XPathQuery.
+typedef std::vector< std::pair< xmlNode *, size_t > > NodePath;
+
+/// Push a node-index pair onto the back of a NodePath. The index is 0-based.
+inline void pushNode( xmlNode * node, size_t index, NodePath& nodePath ) {
+  nodePath.push_back( std::make_pair( node, index ) );
+}
+
+/// Pop a node-index pair from the back of a NodePath.
+inline void popNode( NodePath& nodePath ) {
+  nodePath.pop_back();
+}
+
+/// Make an XPath query from a NodePath. Since NodePaths are 0-based, but XPath
+/// enumeration predicates are 1-based, this function adds 1 to every index in
+/// the NodePath.
+inline std::string makeXPathQuery( const NodePath& nodePath ) {
+  std::ostringstream result;
+  NodePath::const_iterator node = nodePath.begin();
+  while( node != nodePath.end() ) {
+    // Add 1 to the index since XPath predicates are 1-based.
+    result << node->first->name << '[' << node->second + 1 << ']';
+    if ( ++node != nodePath.end() ) result << '/';
+  }
+  return result.str();
+}
 
 /// RAII class to manage an XPath query in LibXml and provide simplified access
 /// to its results. The lifetime of the underlying query object is tied to the
@@ -100,5 +146,8 @@ public:
     return mXPathObject->nodesetval->nodeTab[i];
   }
 };
+
+} // namespace impl
+} // namespace xdmf
 
 #endif // xdmf_impl_XPathQuery_hpp
