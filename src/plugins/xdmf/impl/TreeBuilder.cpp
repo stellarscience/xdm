@@ -139,6 +139,9 @@ xdm::RefPtr< xdm::Item > TreeBuilder::buildTree() {
     result.reset();
   } else if ( gridQuery.size() == 1 ) {
     // There is one grid.
+    // We assume this grid is the time collection root until we learn otherwise
+    // later.
+    mTimeCollectionRoot = gridQuery.node( 0 );
     result = buildGrid( gridQuery.node( 0 ) );
     if ( mTimestepNodes.empty() ) {
       // there is a single timestep in this file, no temporal collection.
@@ -160,72 +163,7 @@ xdm::RefPtr< xdm::Item > TreeBuilder::buildTree() {
 xdm::RefPtr< xdm::UniformDataItem > 
 TreeBuilder::buildUniformDataItem( xmlNode * node ) {
   xdm::RefPtr< xdm::UniformDataItem > result( new xdm::UniformDataItem );
-
-  // Get the number type from the NumberType attribute.
-  XPathQuery typeQuery( mXPathContext, node, "@NumberType" );
-  std::string typeString;
-  if ( typeQuery.size() > 0 ) {
-    typeString = typeQuery.textValue( 0 );
-  } else {
-    typeString = "Float";
-  }
-  XPathQuery precisionQuery( mXPathContext, node, "@Precision" );
-  size_t precision;
-  if ( precisionQuery.size() > 0 ) {
-    precision = precisionQuery.getValue( 0, 4 );
-  } else {
-    precision = 4;
-  }
-  xdm::primitiveType::Value dataType = type( typeString, precision );
-  result->setDataType( dataType );
-
-  // Get the shape from the Dimensions attribute.
-  XPathQuery dimensionsQuery( mXPathContext, node, "@Dimensions" );
-  if ( dimensionsQuery.size() == 0 ) {
-    XDM_THROW( xdmFormat::ReadError( "No dimensions for a UniformDataItem." ) );
-  }
-  result->setDataspace( xdm::makeShape( dimensionsQuery.textValue( 0 ) ) );
-
-  // Get the format string for the dataset.
-  XPathQuery formatQuery( mXPathContext, node, "@Format" );
-  std::string format( "HDF" );
-  if ( formatQuery.size() > 0 ) {
-    format = formatQuery.textValue( 0 );
-  }
-  
-  // Build the dataset.
-  if ( format == "HDF" ) {
-    xdm::RefPtr< xdmHdf::HdfDataset > dataset( new xdmHdf::HdfDataset );
-    XPathQuery datasetInfoQuery( mXPathContext, node, "text()" );
-    if ( datasetInfoQuery.size() == 0 ) {
-      XDM_THROW( "No information about requested HDF dataset." );
-    }
-    std::string datasetInfo = datasetInfoQuery.textValue( 0 );
-    std::string fileString;
-    xdmHdf::GroupPath groupPath;
-    std::string datasetString;
-    if ( xdmHdf::parseDatasetInfo( datasetInfo, fileString, groupPath, datasetString ) )
-    {
-      dataset->setFile( fileString );
-      dataset->setGroupPath( groupPath );
-      dataset->setDataset( datasetString );
-      result->setDataset( dataset );
-    } else {
-      XDM_THROW( xdmFormat::ReadError( "Invalid HDF dataset specification" ) );
-    }
-  } else {
-    XDM_THROW( xdmFormat::ReadError(
-      "Only HDF datasets are supported." ) );
-  }
-
-  // Give the item an array to hold the data from the dataset should it be
-  // loaded into memory.
-  xdm::RefPtr< xdm::StructuredArray > array(
-    xdm::makeVectorStructuredArray( dataType ) );
-  xdm::RefPtr< xdm::ArrayAdapter > adapter( new xdm::ArrayAdapter( array ) );
-  adapter->setIsMemoryResident( false );
-  result->setData( adapter );
-
+  configureUniformDataItem( result, node );
   return result;
 }
 
@@ -397,19 +335,7 @@ xdm::RefPtr< xdmGrid::Topology > TreeBuilder::buildTopology( xmlNode * node ) {
   } else {
     xdm::RefPtr< xdmGrid::RectilinearMesh > structuredTopology(
       new xdmGrid::RectilinearMesh );
-    // Get the attribute that specifies the shape of the structured topology
-    XPathQuery shapeQuery( mXPathContext, node, "@Dimensions|@NumberOfElements" );
-    if ( shapeQuery.size() > 0 ) {
-      xdm::DataShape<> topologyShape = xdm::makeShape(shapeQuery.textValue(0));
-      // XDMF Specifies topology in ZYX order, which is the opposite of the
-      // geometry ordering. Reverse the shape to follow the XDM convention of
-      // XYZ ordering and match the grid geometry specification.
-      topologyShape.reverseDimensionOrder();
-      structuredTopology->setShape( topologyShape );
-    } else {
-      XDM_THROW( xdmFormat::ReadError(
-        "No dimensions specified for XDMF structured topology" ) );
-    }
+    configureStructuredTopology( structuredTopology, node );
     result = structuredTopology;
   }
 
@@ -640,7 +566,9 @@ TreeBuilder::buildTemporalCollectionGrid( xmlNode * node ) {
     XDM_THROW( xdmFormat::ReadError( "XDMF Temporal Collection contains no data" ) );
   }
 
-  // Read the first child as the prototype for subsequent time steps.
+  // Read the first child as the prototype for subsequent time steps and set it
+  // as the time collection root.
+  mTimeCollectionRoot = gridQuery.node( 0 );
   xdm::RefPtr< xdmGrid::Grid > result = buildGrid( gridQuery.node( 0 ) );
 
   // Save each grid element as the root of a timestep tree.
@@ -649,6 +577,101 @@ TreeBuilder::buildTemporalCollectionGrid( xmlNode * node ) {
   }
 
   return result;
+}
+
+void TreeBuilder::configureStructuredTopology(
+  xdm::RefPtr<xdmGrid::StructuredTopology> topology,
+  xmlNode * content ) {
+  // Get the attribute that specifies the shape of the structured topology
+  XPathQuery shapeQuery( mXPathContext, content, "@Dimensions|@NumberOfElements" );
+  if ( shapeQuery.size() > 0 ) {
+    xdm::DataShape<> topologyShape = xdm::makeShape(shapeQuery.textValue(0));
+    // XDMF Specifies topology in ZYX order, which is the opposite of the
+    // geometry ordering. Reverse the shape to follow the XDM convention of
+    // XYZ ordering and match the grid geometry specification.
+    topologyShape.reverseDimensionOrder();
+    topology->setShape( topologyShape );
+  } else {
+    XDM_THROW( xdmFormat::ReadError(
+      "No dimensions specified for XDMF structured topology" ) );
+  }
+}
+
+void TreeBuilder::configureUniformDataItem(
+  xdm::RefPtr<xdm::UniformDataItem> item,
+  xmlNode * node ) {
+
+  // Get the number type from the NumberType attribute.
+  XPathQuery typeQuery( mXPathContext, node, "@NumberType" );
+  std::string typeString;
+  if ( typeQuery.size() > 0 ) {
+    typeString = typeQuery.textValue( 0 );
+  } else {
+    typeString = "Float";
+  }
+  XPathQuery precisionQuery( mXPathContext, node, "@Precision" );
+  size_t precision;
+  if ( precisionQuery.size() > 0 ) {
+    precision = precisionQuery.getValue( 0, 4 );
+  } else {
+    precision = 4;
+  }
+  xdm::primitiveType::Value dataType = type( typeString, precision );
+  item->setDataType( dataType );
+
+  // Get the shape from the Dimensions attribute.
+  XPathQuery dimensionsQuery( mXPathContext, node, "@Dimensions" );
+  if ( dimensionsQuery.size() == 0 ) {
+    XDM_THROW( xdmFormat::ReadError( "No dimensions for a UniformDataItem." ) );
+  }
+  item->setDataspace( xdm::makeShape( dimensionsQuery.textValue( 0 ) ) );
+
+  // Get the format string for the dataset.
+  XPathQuery formatQuery( mXPathContext, node, "@Format" );
+  std::string format( "HDF" );
+  if ( formatQuery.size() > 0 ) {
+    format = formatQuery.textValue( 0 );
+  }
+
+  // Build the dataset.
+  if ( format == "HDF" ) {
+    xdm::RefPtr< xdmHdf::HdfDataset > dataset;
+    if ( item->dataset() ) {
+      dataset = xdm::dynamic_pointer_cast< xdmHdf::HdfDataset >( item->dataset() );
+    } else {
+      dataset = new xdmHdf::HdfDataset;
+    }
+    XPathQuery datasetInfoQuery( mXPathContext, node, "text()" );
+    if ( datasetInfoQuery.size() == 0 ) {
+      XDM_THROW( "No information about requested HDF dataset." );
+    }
+    std::string datasetInfo = datasetInfoQuery.textValue( 0 );
+    std::string fileString;
+    xdmHdf::GroupPath groupPath;
+    std::string datasetString;
+    if ( xdmHdf::parseDatasetInfo( datasetInfo, fileString, groupPath, datasetString ) )
+    {
+      dataset->setFile( fileString );
+      dataset->setGroupPath( groupPath );
+      dataset->setDataset( datasetString );
+      item->setDataset( dataset );
+    } else {
+      XDM_THROW( xdmFormat::ReadError( "Invalid HDF dataset specification" ) );
+    }
+  } else {
+    XDM_THROW( xdmFormat::ReadError(
+      "Only HDF datasets are supported." ) );
+  }
+
+  // Give the item an array to hold the data from the dataset should it be
+  // loaded into memory.
+  if ( !item->data() ) {
+    xdm::RefPtr< xdm::StructuredArray > array(
+      xdm::makeVectorStructuredArray( dataType ) );
+    xdm::RefPtr< xdm::ArrayAdapter > adapter( new xdm::ArrayAdapter( array ) );
+    adapter->setIsMemoryResident( false );
+    item->setData( adapter );
+  }
 }
 
 NodeList TreeBuilder::timestepNodes() const {

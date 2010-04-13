@@ -41,6 +41,7 @@ class Attribute;
 class CollectionGrid;
 class Geometry;
 class Grid;
+class StructuredTopology;
 class Time;
 class Topology;
 class UniformGrid;
@@ -104,6 +105,16 @@ public:
 
   xdm::RefPtr< xdmGrid::Time > buildTime( xmlNode * node );
   //@}
+
+  /// Configure a StructuredTopology given an XML node with XDMF Topology content.
+  void configureStructuredTopology(
+    xdm::RefPtr< xdmGrid::StructuredTopology > t,
+    xmlNode * content );
+
+  /// Configure a UniformDataItem given an XML node with XDMF UniformDataItem content.
+  void configureUniformDataItem(
+    xdm::RefPtr< xdm::UniformDataItem > item,
+    xmlNode * content );
 
   /// After the tree has been built, get a list of the XML nodes corresponding
   /// to each time step.
