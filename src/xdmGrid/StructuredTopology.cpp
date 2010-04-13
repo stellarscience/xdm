@@ -20,7 +20,9 @@
 //------------------------------------------------------------------------------
 #include <xdmGrid/StructuredTopology.hpp>
 
+#include <algorithm>
 #include <cmath>
+#include <numeric>
 #include <sstream>
 #include <stdexcept>
 #include <vector>
@@ -44,6 +46,8 @@ NodeOrderingConvention::Type StructuredTopology::nodeOrdering() const {
 
 void StructuredTopology::setShape( const xdm::DataShape<>& shape ) {
   mShape = shape;
+  setNumberOfCells(
+    std::accumulate( shape.begin(), shape.end(), 1, std::multiplies< std::size_t>() ) );
   std::size_t rank = mShape.rank();
   switch( rank ) {
     case 2:
@@ -75,14 +79,33 @@ void StructuredTopology::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
   std::stringstream ss;
   ss << mShape;
   xml.setAttribute( "Dimensions", ss.str() );
+
+
+  unsigned int rank = shape().rank();
+  switch ( rank ) {
+  case 2: 
+    xml.setAttribute( "TopologyType", "2DRectMesh" );
+    break;
+  case 3:
+    xml.setAttribute( "TopologyType", "3DRectMesh" );
+    break;
+  default:
+    {
+      std::stringstream msg;
+      msg << "Unsupported number of dimensions for rectinlinear mesh: ";
+      msg << rank;
+      XDM_THROW( std::domain_error( msg.str() ) );
+    }
+    break;
+  }
 }
 
 xdm::RefPtr< xdm::VectorRefImp< std::size_t > > StructuredTopology::createVectorImp() {
   mNodes.clear();
   switch( mShape.rank() ) {
     case 2:
-      for ( std::size_t x = 0; x < mShape[0]; ++x ) {
-        for ( std::size_t y = 0; y < mShape[1]; ++y ) {
+      for ( std::size_t y = 0; y < mShape[1]; ++y ) {
+        for ( std::size_t x = 0; x < mShape[0]; ++x ) {
           std::size_t xNodes = mShape[0] + 1;
           mNodes.push_back( ( x + 0 ) + ( y + 0 ) * xNodes );
           mNodes.push_back( ( x + 1 ) + ( y + 0 ) * xNodes );
@@ -92,9 +115,9 @@ xdm::RefPtr< xdm::VectorRefImp< std::size_t > > StructuredTopology::createVector
       }
       break;
     case 3:
-      for ( std::size_t x = 0; x < mShape[0]; ++x ) {
+      for ( std::size_t z = 0; z < mShape[2]; ++z ) {
         for ( std::size_t y = 0; y < mShape[1]; ++y ) {
-          for ( std::size_t z = 0; z < mShape[2]; ++z ) {
+          for ( std::size_t x = 0; x < mShape[0]; ++x ) {
             std::size_t xNodes = mShape[0] + 1;
             std::size_t yNodes = mShape[1] + 1;
             mNodes.push_back( ( x + 0 ) + ( y + 0 ) * xNodes + ( z + 0 ) * xNodes * yNodes );

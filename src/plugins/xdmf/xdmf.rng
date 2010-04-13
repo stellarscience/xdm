@@ -6,7 +6,7 @@
   <start>
     <ref name="XdmfRoot"/>
   </start>
-  
+
   <!-- The Root Xdmf Element -->
   <define name="XdmfRoot">
     <element name="Xdmf">
@@ -155,6 +155,7 @@
   <!-- XDMF Geometry Specification -->
   <define name="Geometry">
     <element name="Geometry">
+      <ref name="NameAttribute"/>
       <optional>
         <attribute name="GeometryType">
           <choice>

@@ -28,6 +28,8 @@
 #include <xdm/XmlObject.hpp>
 #include <xdm/XmlOutputStream.hpp>
 
+#include <xdmHdf/AttachHdfDatasetOperation.hpp>
+
 #include <fstream>
 
 #include <stdexcept>
@@ -39,6 +41,11 @@ namespace {
 void writeItemImpl(
   xdm::RefPtr< xdm::Item > item,
   const xdm::FileSystemPath& path ) {
+
+  // Attach an HDF dataset to UniformDataItems that don't yet have one.
+  xdmHdf::AttachHdfDatasetOperation attachDatasets( path.pathString() + ".h5", "unnamed_data" );
+  item->accept( attachDatasets );
+
   xdm::RefPtr< xdm::XmlObject > xdmfRoot( new xdm::XmlObject( "Xdmf" ) );
   xdmfRoot->appendAttribute( "Version", "2.1" );
 

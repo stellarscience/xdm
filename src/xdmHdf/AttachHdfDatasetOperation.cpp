@@ -63,11 +63,17 @@ void AttachHdfDatasetOperation::apply( xdm::UniformDataItem& item ) {
     return;
   }
 
+  // Try to choose a good name for the dataset.
+  std::string name = mCommonName;
+  if ( !item.name().empty() ) {
+    name = item.name();
+  }
+
   // The item has no dataset, build an HDF dataset for the current group path.
   xdm::RefPtr< xdmHdf::HdfDataset > dataset( new xdmHdf::HdfDataset );
   dataset->setFile( mFileName ),
   dataset->setGroupPath( mCurrentPath );
-  dataset->setDataset( mCommonName );
+  dataset->setDataset( name );
   item.setDataset( dataset );
 }
 

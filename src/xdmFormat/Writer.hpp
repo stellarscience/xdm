@@ -7,6 +7,7 @@
 
 #include <xdm/FileSystem.hpp>
 #include <xdm/Forward.hpp>
+#include <xdm/ReferencedObject.hpp>
 
 #include <xdmFormat/NamespaceMacro.hpp>
 
@@ -14,7 +15,7 @@ XDM_FORMAT_NAMESPACE_BEGIN
 
 /// Interface for types that write items to files. Implement this interface to
 /// write a tree of items to a file.
-class Writer {
+class Writer : public xdm::ReferencedObject {
 public:
   Writer();
   virtual ~Writer();

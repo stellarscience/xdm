@@ -22,9 +22,8 @@
 
 #include <xdmGrid/Attribute.hpp>
 #include <xdmGrid/Cell.hpp>
-#include <xdmGrid/Geometry.hpp>
 #include <xdmGrid/StructuredTopology.hpp>
-#include <xdmGrid/Topology.hpp>
+#include <xdmGrid/TensorProductGeometry.hpp>
 #include <xdmGrid/UnstructuredTopologyConventions.hpp>
 
 #include <xdm/ItemVisitor.hpp>
@@ -186,32 +185,40 @@ createAttribute(
   xdm::RefPtr< Attribute > attribute( new Attribute( type, center ) );
   attribute->setName( name );
 
-  // construct a UniformDataItem to hold the attribute data
+  xdm::RefPtr< const Geometry > geometry = grid->geometry();
   xdm::RefPtr< const Topology > topology = grid->topology();
+  xdm::DataShape<> attributeSpace;
 
-  // Determine the type of topology in order to determine what it's shape
-  // information looks like.
-  xdm::RefPtr< const StructuredTopology > structuredTopology =
-    xdm::dynamic_pointer_cast< const StructuredTopology >( topology );
-  if ( structuredTopology ) {
-    xdm::DataShape<> attributeSpace;
-
-    // generate the base space for the attribute depending on it's center
-    switch( center ) {
-    case Attribute::kNode:
-      attributeSpace = structuredTopology->shape();
-      break;
-    case Attribute::kCell:
-      attributeSpace = xdm::makeContraction( structuredTopology->shape(), 1 );
-      break;
-    default:
-      XDM_THROW( std::logic_error(
-        "Cell or node centered values are currently only supported" ) );
+  // The shape of the attribute array depends on whether we are doing dimension-by-dimension
+  // access, as in structured meshes, or node-by-node and cell-by-cell access, as in
+  // unstructured meshes.
+  switch ( center ) {
+    case Attribute::kNode: {
+      xdm::RefPtr< const TensorProductGeometry > tpGeometry =
+        xdm::dynamic_pointer_cast< const TensorProductGeometry >( geometry );
+      if ( tpGeometry ) {
+        for ( std::size_t dim = 0; dim < geometry->dimension(); ++dim ) {
+          attributeSpace.push_back( tpGeometry->numberOfCoordinates( dim ) );
+        }
+      } else {
+        attributeSpace.push_back( geometry->numberOfNodes() );
+      }
       break;
     }
+    case Attribute::kCell: {
+      xdm::RefPtr< const StructuredTopology > structTopology =
+        xdm::dynamic_pointer_cast< const StructuredTopology >( topology );
+      if ( structTopology ) {
+        attributeSpace = structTopology->shape();
+      } else {
+        attributeSpace.push_back( topology->numberOfCells() );
+      }
+      break;
+    }
+  }
 
-    // append a dimension if necessary depending upon the attribute type
-    switch( type ) {
+  // If the type is not a scalar, then add another dimension to the shape.
+  switch( type ) {
     case Attribute::kScalar:
       //no-op
       break;
@@ -222,17 +229,13 @@ createAttribute(
       XDM_THROW( std::logic_error(
         "Only scalar and vector attributes are currently supported" ) );
       break;
-    }
-
-    // create the data item for the attribute values
-    xdm::RefPtr< xdm::UniformDataItem > attributeDataItem(
-      new xdm::UniformDataItem( dataType, attributeSpace ) );
-    attribute->setDataItem( attributeDataItem );
-
-  } else {
-    XDM_THROW( std::logic_error(
-      "Unstructured topologies are not yet supported" ) );
   }
+
+  // create the data item for the attribute values
+  xdm::RefPtr< xdm::UniformDataItem > attributeDataItem(
+    new xdm::UniformDataItem( dataType, attributeSpace ) );
+  attribute->setDataItem( attributeDataItem );
+
   return attribute;
 }
 

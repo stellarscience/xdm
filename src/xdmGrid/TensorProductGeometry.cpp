@@ -22,8 +22,10 @@
 
 #include <xdm/VectorRef.hpp>
 
-#include <stdexcept>
+#include <algorithm>
 #include <cassert>
+#include <functional>
+#include <stdexcept>
 
 #include <xdm/ThrowMacro.hpp>
 
@@ -50,12 +52,19 @@ void TensorProductGeometry::setCoordinateValues(
   if ( dimensionCount == dimension() ) {
     std::size_t nodeProduct = 1;
     for ( ConstIterator dataItem = begin(); dataItem != end(); ++dataItem ) {
-      xdm::DataShape<>::size_type itemSize = std::accumulate(
-        (*dataItem)->dataspace().begin(), (*dataItem)->dataspace().end(),
-        1, std::multiplies< xdm::DataShape<>::size_type >() );
-      nodeProduct *= itemSize;
+      assert( (*dataItem)->dataspace().rank() == 1 );
+      nodeProduct *= (*dataItem)->dataspace()[0];
     }
     setNumberOfNodes( nodeProduct );
+  }
+}
+
+std::size_t TensorProductGeometry::numberOfCoordinates( const std::size_t& dim ) const {
+  xdm::RefPtr< const xdm::UniformDataItem > coords = child( dim );
+  if ( coords.valid() ) {
+    return coords->dataspace()[0];
+  } else {
+    return 0;
   }
 }
 
