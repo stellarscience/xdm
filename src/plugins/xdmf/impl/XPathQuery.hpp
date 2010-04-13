@@ -24,9 +24,9 @@
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 
+#include <deque>
 #include <sstream>
 #include <string>
-#include <vector>
 
 #include <cassert>
 
@@ -49,7 +49,7 @@ namespace impl {
 /// name 'fred' will appear as a pair with (node, 0) and the 'child' element
 /// with name 'jeff' will appear as a pair with (node, 1) since that is the
 /// order they are encountered in within the /root/child XPathQuery.
-typedef std::vector< std::pair< xmlNode *, size_t > > NodePath;
+typedef std::deque< std::pair< xmlNode *, size_t > > NodePath;
 
 /// Push a node-index pair onto the back of a NodePath. The index is 0-based.
 inline void pushNode( xmlNode * node, size_t index, NodePath& nodePath ) {
@@ -146,6 +146,55 @@ public:
     return mXPathObject->nodesetval->nodeTab[i];
   }
 };
+
+/// Find a path to an ancestor (tail recursive implementation).
+inline void findPathToAncestor(
+  xmlDoc * doc,
+  xmlNode * descendant,
+  xmlNode * ancestor,
+  xmlXPathContext * xpathContext,
+  NodePath& accumulator )
+{
+  if ( descendant == (xmlNode*)doc || descendant == NULL ) {
+    accumulator.clear();
+    return;
+  }
+
+  if ( descendant == ancestor ) {
+    return;
+  }
+
+  // Determine which child of it's parent the descendant is
+  std::string queryString( (char *)descendant->name );
+  XPathQuery child( xpathContext, descendant->parent, queryString );
+  size_t index = 0;
+  while( child.node(index) != descendant ) {
+    index++;
+  }
+  pushNode( descendant, index, accumulator );
+
+  // Recurse to find the parent's path.
+  findPathToAncestor(
+    doc,
+    descendant->parent,
+    ancestor,
+    xpathContext,
+    accumulator );
+}
+
+/// Find a path to an ancestor (entry point).
+inline NodePath findPathToAncestor( xmlDoc * doc, xmlNode * descendant, xmlNode * ancestor ) {
+  NodePath result;
+  xmlXPathContext * context = xmlXPathNewContext( doc );
+  try {
+    findPathToAncestor( doc, descendant, ancestor, context, result );
+  } catch ( ... ) {
+    xmlXPathFreeContext( context );
+    throw;
+  }
+  xmlXPathFreeContext( context );
+  return result;
+}
 
 } // namespace impl
 } // namespace xdmf

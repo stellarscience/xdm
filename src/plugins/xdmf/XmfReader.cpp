@@ -10,6 +10,7 @@
 #include <XdmfRng.hpp>
 
 #include <xdm/Item.hpp>
+#include <xdm/ItemVisitor.hpp>
 #include <xdm/RefPtr.hpp>
 #include <xdm/StaticAssert.hpp>
 
@@ -90,16 +91,24 @@ bool validate( xmlDocPtr document ) {
   return result;
 }
 
-//------------------------------------------------------------------------------
-// Tree Construction
-//------------------------------------------------------------------------------
+class UpdateXdmfTreeVisitor : public xdm::ItemVisitor {
+public:
+  UpdateXdmfTreeVisitor( xmlDocPtr document, xmlNode * node ) : mNode( node ) {
+    mXPathContext = xmlXPathNewContext( document );
+  }
+  virtual ~UpdateXdmfTreeVisitor() {
+    xmlXPathFreeContext( mXPathContext );
+  }
 
-// Build an XDM tree given a parsed and validated XDMF document.
-xdm::RefPtr< xdm::Item > buildTree( xmlDocPtr document ) {
-  return xdm::RefPtr< xdm::Item >();
-}
+  virtual void apply( xdm::UniformDataItem& item ) {
+  }
 
-} // namespace anon
+private:
+  xmlNode * mNode;
+  xmlXPathContextPtr mXPathContext;
+};
+
+} // namespace
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
@@ -107,9 +116,11 @@ xdm::RefPtr< xdm::Item > buildTree( xmlDocPtr document ) {
 class XmfReader::Private {
 public:
   xmlDocPtr mDocument;
+  std::vector< xmlNode * > mTimestepNodes;
 
   Private() :
-    mDocument() {
+    mDocument(),
+    mTimestepNodes() {
   }
 
   ~Private() {
@@ -143,14 +154,22 @@ XmfReader::readItem( const xdm::FileSystemPath& path ) {
 
   // Build the tree given the root node of the validated document as input.
   impl::TreeBuilder builder( mImp->mDocument );
-  return builder.buildTree();
+
+  xdm::RefPtr< xdm::Item > result = builder.buildTree();
+  mImp->mTimestepNodes = builder.timestepNodes();
+  return result;
 }
 
 bool XmfReader::update( 
   xdm::RefPtr< xdm::Item > item,
   const xdm::FileSystemPath& path,
   std::size_t timeStep ) {
-  return false;
+  if ( mImp->mTimestepNodes.size() < timeStep ) {
+    return false;
+  }
+
+  // Get the XML node corresponding to the requested time step.
+  xmlNode * stepNode = mImp->mTimestepNodes[timeStep];
 }
 
 XDMF_NAMESPACE_END

@@ -21,10 +21,14 @@
 #ifndef xdmf_impl_TreeBuilder_hpp
 #define xdmf_impl_TreeBuildter_hpp
 
+#include <xdmf/impl/XPathQuery.hpp>
+
 #include <xdm/RefPtr.hpp>
 
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
+
+#include <vector>
 
 namespace xdm {
 class DataItem;
@@ -45,6 +49,9 @@ class UniformGrid;
 namespace xdmf {
 namespace impl {
 
+/// A list of XML nodes.
+typedef std::vector< xmlNode * > NodeList;
+
 /// Implementation class for building an XDM tree given a parsed and validated
 /// XDMF libXml document pointer.
 class TreeBuilder {
@@ -59,39 +66,54 @@ public:
   /// Build the tree from the document.
   virtual xdm::RefPtr< xdm::Item > buildTree();
 
-  //-- Item build methods --//
+  /// Item build methods. These methods build individual xdm::Item types.
+  //@{
 
   /// Build a grid from an XML node pointing to a Grid element.
   /// @todo Handle Hyperslab, coordinate, and function grids.
   xdm::RefPtr< xdmGrid::Grid > buildGrid( xmlNode * node );
+
   xdm::RefPtr< xdmGrid::Grid > buildCollectionGrid( xmlNode * node );
+
   xdm::RefPtr< xdmGrid::CollectionGrid > buildSpatialCollectionGrid( xmlNode * node );
+
   /// Build a temporal collection grid. The result of this operation is the
   /// first grid in the time series, subsequent time steps are accessed by
   /// updating the content within the grid structure.
   ///
   /// The implementation assumes that all direct grid children represent the
   /// grid at different moments in time.
+
   xdm::RefPtr< xdmGrid::Grid > buildTemporalCollectionGrid( xmlNode * node );
+
   xdm::RefPtr<xdmGrid::UniformGrid > buildUniformGrid( xmlNode * node );
   /// Build the Geometry Item corresponding the the given XML node.
   /// @todo Implement XDMF Origin_DxDyDz topology.
+
   xdm::RefPtr< xdmGrid::Geometry > buildGeometry( xmlNode * node );
   /// Build the Topology Item corresponding to the given XML node.
   /// @todo Implement XDMF unstructured topologies.
+
   xdm::RefPtr< xdmGrid::Topology > buildTopology( xmlNode * node );
+
   xdm::RefPtr< xdmGrid::Attribute > buildAttribute( xmlNode * node );
+  \
   xdm::RefPtr< xdm::UniformDataItem > buildUniformDataItem( xmlNode * node );
+
   xdm::RefPtr< xdm::DataItem > buildDataItem( xmlNode * node );
+
   xdm::RefPtr< xdmGrid::Time > buildTime( xmlNode * node );
+  //@}
 
-  //-- Item update methods --//
-
+  /// After the tree has been built, get a list of the XML nodes corresponding
+  /// to each time step.
+  NodeList timestepNodes() const;
 
 private:
   xmlDocPtr mDocument;
   xmlXPathContextPtr mXPathContext;
-
+  xmlNode * mTimeCollectionRoot;
+  std::vector< xmlNode * > mTimestepNodes;
 };
 
 } // namespace impl

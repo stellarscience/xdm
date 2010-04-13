@@ -69,49 +69,44 @@ void createHdfFile() {
   dataset->finalize();
 }
 
-BOOST_AUTO_TEST_CASE( nodePathToXPath ) {
+BOOST_AUTO_TEST_CASE( findPathToAncestorTest ) {
   char const * const kXml =
-  "<root>"
-  "  <group>"
-  "    <child name='fred'/>"
-  "    <another-child/>"
-  "    <child name='jeff'/>"
-  "  </group>"
-  "</root>";
+    "<grid>"
+    "  <topology/>"
+    "  <geometry>"
+    "    <dataitem/>"
+    "    <dataitem/>"
+    "  </geometry>"
+    "  <attribute name='jim'>"
+    "    <dataitem/>"
+    "  </attribute>"
+    "  <attribute name='jeff'>"
+    "    <dataitem/>"
+    "  </attribute>"
+    "</grid>";
 
-  xmlDocPtr document = xmlParseDoc( reinterpret_cast< const xmlChar *>(kXml) );
-  BOOST_REQUIRE( document );
+  xmlDocPtr document = xmlParseDoc( (xmlChar*)kXml );
   xmlNode * rootNode = xmlDocGetRootElement( document );
-  BOOST_REQUIRE( rootNode );
-  xmlXPathContextPtr xpathContext = xmlXPathNewContext( document );
-  BOOST_REQUIRE( xpathContext );
 
-  xdmf::impl::NodePath path;
+  xmlXPathContextPtr context = xmlXPathNewContext( document );
 
-  xdmf::impl::XPathQuery groupQuery( xpathContext, rootNode, "group");
-  BOOST_REQUIRE_EQUAL( groupQuery.size(), 1 );
-  xmlNode * groupNode = groupQuery.node( 0 );
+  xdmf::impl::XPathQuery query( context, rootNode, "//dataitem" );
+  BOOST_CHECK_EQUAL( query.size(), 4 );
 
-  xdmf::impl::pushNode( groupNode, 0, path );
-  std::string groupPathResult = xdmf::impl::makeXPathQuery( path );
-  BOOST_CHECK_EQUAL( groupPathResult, "group[1]" );
-
-  xdmf::impl::XPathQuery childQuery( xpathContext, groupNode, "child" );
-  BOOST_CHECK_EQUAL( childQuery.size(), 2 );
-  const char * exprAnswer[2] = {
-    "group[1]/child[1]",
-    "group[1]/child[2]"
+  const char * answer[4] = {
+    "geometry[1]/dataitem[1]",
+    "geometry[1]/dataitem[2]",
+    "attribute[1]/dataitem[1]",
+    "attribute[2]/dataitem[1]"
   };
-  for ( size_t i = 0; i < childQuery.size(); ++i ) {
-    xdmf::impl::pushNode( childQuery.node( i ), i, path );
-    {
-      std::string xpathExpr = xdmf::impl::makeXPathQuery( path );
-      BOOST_CHECK_EQUAL( xpathExpr, exprAnswer[i] );
-      xdmf::impl::XPathQuery checkQuery( xpathContext, rootNode, xpathExpr );
-      BOOST_REQUIRE_EQUAL( checkQuery.size(), 1 );
-      BOOST_CHECK_EQUAL( checkQuery.node( 0 ), childQuery.node( i ) );
-    }
-    xdmf::impl::popNode( path );
+
+  for ( size_t i = 0; i < query.size(); ++i ) {
+    using xdmf::impl::NodePath;
+    using xdmf::impl::findPathToAncestor;
+    NodePath path = findPathToAncestor( document, query.node(i), rootNode );
+    std::reverse( path.begin(), path.end() );
+    std::string result = xdmf::impl::makeXPathQuery( path );
+    BOOST_CHECK_EQUAL( result, answer[i] );
   }
 }
 
@@ -236,7 +231,7 @@ BOOST_AUTO_TEST_CASE( buildStaticTree ) {
 
   // Check the attributes.
   BOOST_REQUIRE_EQUAL( grid->numberOfChildren(), 3 );
-  char * names[] = { "E", "B", "InternalCell" };
+  char * names[3] = { "E", "B", "InternalCell" };
   xdmGrid::Attribute::Type types[] = {
     xdmGrid::Attribute::kVector,
     xdmGrid::Attribute::kVector,
@@ -252,6 +247,8 @@ BOOST_AUTO_TEST_CASE( buildStaticTree ) {
     BOOST_CHECK_EQUAL( attr->name(), names[i] );
     BOOST_CHECK_EQUAL( attr->dataType(), types[i] );
     BOOST_CHECK_EQUAL( attr->centering(), centers[i] );
+    xdm::RefPtr< xdm::UniformDataItem > attrData = attr->dataItem();
+    BOOST_REQUIRE( attrData );
   }
 }
 

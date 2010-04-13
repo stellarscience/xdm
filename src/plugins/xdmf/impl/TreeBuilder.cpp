@@ -52,6 +52,7 @@
 #include <algorithm>
 #include <map>
 #include <sstream>
+#include <string>
 
 #include <cassert>
 #include <cstring>
@@ -114,6 +115,7 @@ xdm::primitiveType::Value type( const std::string& typeStr, size_t precision ) {
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
+
 TreeBuilder::TreeBuilder( xmlDocPtr document ) :
   mDocument( document ) {
   mXPathContext = xmlXPathNewContext( document );
@@ -124,11 +126,13 @@ TreeBuilder::~TreeBuilder() {
 }
 
 xdm::RefPtr< xdm::Item > TreeBuilder::buildTree() {
+  static const char * kGridQuery = "Domain/Grid";
+
   xdm::RefPtr< xdm::Item > result;
   xmlNode * rootNode = xmlDocGetRootElement( mDocument );
 
   // Search for Grid children of the Domain element.
-  XPathQuery gridQuery( mXPathContext, rootNode, "Domain/Grid" );
+  XPathQuery gridQuery( mXPathContext, rootNode, kGridQuery );
 
   if ( gridQuery.size() == 0 ) {
     // If there are no grids, return a NULL item.
@@ -136,6 +140,10 @@ xdm::RefPtr< xdm::Item > TreeBuilder::buildTree() {
   } else if ( gridQuery.size() == 1 ) {
     // There is one grid.
     result = buildGrid( gridQuery.node( 0 ) );
+    if ( mTimestepNodes.empty() ) {
+      // there is a single timestep in this file, no temporal collection.
+      mTimestepNodes.push_back( gridQuery.node( 0 ) );
+    }
   } else {
     // There are multiple grids, build a spatial collection grid from them.
     xdm::RefPtr< xdmGrid::CollectionGrid > collection( new xdmGrid::CollectionGrid );
@@ -223,6 +231,7 @@ TreeBuilder::buildUniformDataItem( xmlNode * node ) {
 
 //------------------------------------------------------------------------------
 xdm::RefPtr< xdmGrid::Geometry > TreeBuilder::buildGeometry( xmlNode * node ) {
+
   XdmfGeometryType geometryType( INTERLACED_3D );
 
   // Mapping from 'GeometryType' attribute value to geometry type enum.
@@ -296,6 +305,7 @@ xdm::RefPtr< xdmGrid::Geometry > TreeBuilder::buildGeometry( xmlNode * node ) {
 
 //------------------------------------------------------------------------------
 xdm::RefPtr< xdmGrid::Topology > TreeBuilder::buildTopology( xmlNode * node ) {
+
   enum {
     POLYVERTEX = 0,
     POLYLINE,
@@ -488,6 +498,7 @@ TreeBuilder::buildAttribute( xmlNode * node ) {
 //------------------------------------------------------------------------------
 xdm::RefPtr< xdmGrid::UniformGrid > 
 TreeBuilder::buildUniformGrid( xmlNode * node ) {
+
   xdm::RefPtr< xdmGrid::UniformGrid > result( new xdmGrid::UniformGrid );
 
   // Get the topology.
@@ -565,6 +576,7 @@ xdm::RefPtr< xdmGrid::Grid > TreeBuilder::buildCollectionGrid( xmlNode * node ) 
 // -----------------------------------------------------------------------------
 xdm::RefPtr< xdmGrid::CollectionGrid >
 TreeBuilder::buildSpatialCollectionGrid( xmlNode * node ) {
+
   xdm::RefPtr< xdmGrid::CollectionGrid > result(
     new xdmGrid::CollectionGrid( xdmGrid::CollectionGrid::kSpatial ) );
   // Find all grid children of the node.
@@ -577,6 +589,7 @@ TreeBuilder::buildSpatialCollectionGrid( xmlNode * node ) {
 
 //------------------------------------------------------------------------------
 xdm::RefPtr< xdmGrid::Time > TreeBuilder::buildTime( xmlNode * node ) {
+
   xdm::RefPtr< xdmGrid::Time > result( new xdmGrid::Time );
 
   XPathQuery typeQuery( mXPathContext, node, "@TimeType" );
@@ -630,11 +643,17 @@ TreeBuilder::buildTemporalCollectionGrid( xmlNode * node ) {
   // Read the first child as the prototype for subsequent time steps.
   xdm::RefPtr< xdmGrid::Grid > result = buildGrid( gridQuery.node( 0 ) );
 
-  // Do something to associate time steps with children.
+  // Save each grid element as the root of a timestep tree.
+  for ( int i = 0; i < gridQuery.size(); ++i ) {
+    mTimestepNodes.push_back( gridQuery.node( i ) );
+  }
 
   return result;
 }
 
+NodeList TreeBuilder::timestepNodes() const {
+  return mTimestepNodes;
+}
 
 } // namespace impl
 } // namespace xdmf

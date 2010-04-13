@@ -19,6 +19,7 @@ macro( copy_test_file _file )
 endmacro()
 
 copy_test_file( test_document1.xmf )
+copy_test_file( test_document2.xmf )
 
 xdmfPlugin_serial_test( XdmfGridCompatibility TestXdmfGridCompatibility.cpp )
 xdmfPlugin_serial_test( XmfReader TestXmfReader.cpp )
