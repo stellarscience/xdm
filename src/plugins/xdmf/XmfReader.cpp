@@ -35,7 +35,7 @@ const unsigned int kXdmfRngSchemaLength = XDMF_RNG_SCHEMA_LENGTH;
 // Callback function to throw an exception with informative information upon
 // a validation error.
 void structuredValidationErrorCallback( void* userData, xmlErrorPtr error ) {
-  ValidationError exception(
+  xdmFormat::FileReadError exception(
     error->file,
     error->line,
     error->int2,
@@ -178,7 +178,7 @@ XmfReader::XmfReader() :
 XmfReader::~XmfReader() {
 }
 
-xdm::RefPtr< xdm::Item > 
+xdmFormat::Reader::ReadResult
 XmfReader::readItem( const xdm::FileSystemPath& path ) {
   static const char * kTemporalCollectionExpr =
     "/Xdmf/Grid[@GridType=\"Collection\" and @CollectionType=\"Temporal\"]";
@@ -217,11 +217,13 @@ XmfReader::readItem( const xdm::FileSystemPath& path ) {
     impl::XPathQuery gridQuery( mImp->mDocument, rootNode, "/Xdmf/Domain/Grid" );
     if ( gridQuery.size() != 0 ) {
       // FIXME handle multiple grids in a single Domain.
-      impl::TreeBuilder builder( gridQuery.node( 0 ) );
+      xmlNode * gridNode = gridQuery.node( 0 );
+      impl::TreeBuilder builder( gridNode );
       result = builder.buildTree();
+      mImp->mTimestepNodes.push_back( gridNode );
     }
   }
-  return result;
+  return xdmFormat::Reader::ReadResult( result, mImp->mTimestepNodes.size() );
 }
 
 bool XmfReader::update( 

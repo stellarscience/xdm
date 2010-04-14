@@ -14,41 +14,12 @@
 
 XDMF_NAMESPACE_BEGIN
 
-class ValidationError : public xdmFormat::ReadError {
-  std::string mFile;
-  int mLine;
-  int mColumn;
-  std::string mReason;
-public:
-  ValidationError( const std::string& file, int line, int column, const std::string& reason ) :
-    xdmFormat::ReadError( reason ),
-    mFile( file ),
-    mLine( line ),
-    mColumn( column ),
-    mReason( reason ) {}
-  virtual ~ValidationError() throw() {}
-
-  virtual const char * what() const throw() {
-    try {
-      static std::string result;
-      std::stringstream msg;
-      msg << mFile;
-      msg << " validation error at line " << mLine << " column " << mColumn;
-      msg << ": " << mReason;
-      result = msg.str();
-      return result.c_str();
-    } catch( ... ) {
-      return xdmFormat::ReadError::what();
-    }
-  }
-};
-
 class XmfReader : public xdmFormat::Reader {
 public:
   XmfReader();
   virtual ~XmfReader();
 
-  virtual xdm::RefPtr< xdm::Item > readItem( 
+  virtual xdmFormat::Reader::ReadResult readItem(
     const xdm::FileSystemPath& path );
 
   virtual bool update(

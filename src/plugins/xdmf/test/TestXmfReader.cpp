@@ -117,8 +117,8 @@ BOOST_AUTO_TEST_CASE( parseFile ) {
   xdm::FileSystemPath testFilePath( "test_document1.xmf" );
 
   xdmf::XmfReader reader;
-  xdm::RefPtr< xdm::Item > result = reader.readItem( testFilePath );
-  BOOST_CHECK( result );
+  xdmFormat::Reader::ReadResult result = reader.readItem( testFilePath );
+  BOOST_CHECK( result.first );
 }
 
 BOOST_AUTO_TEST_CASE( invalidDocument ) {
@@ -132,7 +132,7 @@ BOOST_AUTO_TEST_CASE( invalidDocument ) {
 
   xdmf::XmfReader reader;
   BOOST_CHECK_THROW( reader.readItem( xdm::FileSystemPath( kTestFileName ) ),
-    xdmf::ValidationError );
+    xdmFormat::FileReadError );
 }
 
 BOOST_AUTO_TEST_CASE( grid2DRoundtrip ) {
@@ -145,11 +145,13 @@ BOOST_AUTO_TEST_CASE( grid2DRoundtrip ) {
   write2DGrid( testFilePath );
 
   xdmf::XmfReader reader;
-  xdm::RefPtr< xdm::Item > result = reader.readItem( testFilePath );
-  BOOST_REQUIRE( result );
+  xdmFormat::Reader::ReadResult result = reader.readItem( testFilePath );
+  BOOST_CHECK_EQUAL( result.second, 1 ); // one timestep in that file
+  xdm::RefPtr< xdm::Item > item = result.first;
+  BOOST_REQUIRE( item );
 
   xdm::RefPtr< xdmGrid::UniformGrid > grid =
-    xdm::dynamic_pointer_cast< xdmGrid::UniformGrid >( result );
+    xdm::dynamic_pointer_cast< xdmGrid::UniformGrid >( item );
   BOOST_REQUIRE( grid );
 
   xdm::RefPtr< xdmGrid::StructuredTopology > topology =

@@ -11,6 +11,7 @@
 
 #include <sstream>
 #include <stdexcept>
+#include <utility>
 
 #include <xdmFormat/NamespaceMacro.hpp>
 
@@ -24,27 +25,40 @@ public:
   virtual ~ReadError() throw() {}
 };
 
-/// Exception to be thrown when an error is encountered while parsing a text
-/// input file. Contains information about the line and column number of the
-/// parse error.
-class ParseError : public ReadError {
+/// Exception to be thrown when a read error with knowledge of file structure,
+/// including a line and column number is encountered.
+class FileReadError : public ReadError {
+  std::string mFile;
   int mLine;
   int mColumn;
+
 public:
-  ParseError( int line, int column ) :
-    ReadError( "Parse error:" ),
+  FileReadError(
+    const std::string& file,
+    int line,
+    int column,
+    const std::string& reason ) :
+    ReadError( reason ),
+    mFile( file ),
     mLine( line ),
     mColumn( column ) {}
-  virtual ~ParseError() throw() {}
+  virtual ~FileReadError() throw() {}
   virtual const char* what() const throw() {
     try {
-      std::stringstream ss;
-      ss << ReadError::what() << "Line " << mLine << ", Column" << mColumn;
-      return ss.str().c_str();
+      static std::string message;
+      if ( message.empty() ) {
+        std::stringstream ss;
+        ss << "Error reading " << mFile << " at line ";
+        ss << mLine << ", column" << mColumn;
+        ss << ": " << ReadError::what();
+        message = ss.str();
+      }
+      return message.c_str();
     } catch ( ... ) {
-      return "Parse error";
+      return ReadError::what();
     }
   }
+
   int line() const { return mLine; }
   int column() const { return mColumn; }
 };
@@ -53,14 +67,21 @@ public:
 /// read a tree of items from a file.
 class Reader : public xdm::ReferencedObject {
 public:
+
+  /// The result type for reading a file. The first element is the newly
+  /// constructed Item, the second element is the number of series indices read.
+  typedef std::pair< xdm::RefPtr< xdm::Item >, std::size_t > ReadResult;
+
   Reader();
   virtual ~Reader();
 
   /// Read an Item from the file with the given path.
   /// @param path Path to the file to read.
-  /// @return A new Item on success, an invalid RefPtr on failure.
-  virtual xdm::RefPtr< xdm::Item >
-  readItem( const xdm::FileSystemPath& path ) = 0;
+  /// @return A ReadResult with the Item and the number of series elements read.
+  /// @throw ReadError There was an error reading from the path.
+  /// @throw FileReadError There was an error reading at a line and column in
+  ///        the file.
+  virtual ReadResult readItem( const xdm::FileSystemPath& path ) = 0;
 
   /// Update an existing Item and it's subtree for a new time step, if possible.
   /// @pre The input item was read eariler with readItem.
