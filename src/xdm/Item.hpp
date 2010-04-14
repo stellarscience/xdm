@@ -28,6 +28,7 @@
 #include <stdexcept>
 #include <string>
 #include <typeinfo>
+#include <utility>
 
 #include <xdm/NamespaceMacro.hpp>
 
@@ -51,8 +52,13 @@ class BasicItemUpdateCallback : public ReferencedObject {
 public:
   /// Update the Item during an update traversal. This method provides a
   /// customization point for library clients to define custom update behavior
-  /// for an object.
-  virtual void update( Item& item ) = 0;
+  /// for an object. The update method takes a integral series index parameter
+  /// to identify the series index the Item should be updated to. This allows
+  /// random access updates to an xdm tree for traversing data series.
+  /// @param item The Item to be updated.
+  /// @param seriesIndex An integer identifying the index in the series to
+  ///        update to.
+  virtual void update( Item& item, std::size_t seriesIndex ) = 0;
 };
 
 /// BasicItemUpdateCallback that uses the template argument to pass a concrete
@@ -65,10 +71,10 @@ public:
   /// Update the Item if it is a subclass of both Item and the template
   /// parameter. If the Item is not a subclass of the template parameter, an
   /// exception will be thrown.
-  void update( Item& item ) {
+  void update( Item& item, std::size_t seriesIndex ) {
     try {
       ItemT& typedItem = dynamic_cast< ItemT& >( item );
-      this->update( typedItem );
+      this->update( typedItem, seriesIndex );
     } catch ( std::bad_cast ) {
       XDM_THROW( std::runtime_error( "Invalid Item type for callback" ) );
     }
@@ -76,7 +82,7 @@ public:
 
   /// Update the specific subclass of Dataset that the callback is designed to
   /// operate upon.
-  virtual void update( ItemT& dataset ) = 0;
+  virtual void update( ItemT& dataset, std::size_t seriesIndex ) = 0;
 };
 
 /// Base class for all elements of the data hierarchy.

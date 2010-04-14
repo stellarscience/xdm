@@ -65,9 +65,9 @@ void TemporalCollection::open()
   mXmlStream.openContext( xdmf );
 }
 
-void TemporalCollection::updateGrid( xdm::RefPtr< xdmGrid::Grid > grid ) {
+void TemporalCollection::updateGrid( xdm::RefPtr< xdmGrid::Grid > grid, std::size_t step ) {
   // update the data tree for a new timestep.
-  xdm::UpdateVisitor update;
+  xdm::UpdateVisitor update( step );
   grid->accept( update );
 }
 

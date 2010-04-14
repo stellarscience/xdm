@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
     new xdmf::VirtualDataset( xmfFile, xdm::Dataset::kCreate ) );
   
   timeSeries->open();
-  xdmf::writeTimestepGrid( timeSeries, problem.first );
+  xdmf::writeTimestepGrid( timeSeries, problem.first, 0 );
   timeSeries->close();
 }
 

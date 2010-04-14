@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
   grid->accept( parallelize );
 
   timeSeries->open();
-  xdmf::writeTimestepGrid( timeSeries, grid );
+  xdmf::writeTimestepGrid( timeSeries, grid, 0 );
   timeSeries->close();
 }
 

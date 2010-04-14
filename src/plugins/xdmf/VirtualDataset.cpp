@@ -58,9 +58,9 @@ void VirtualDataset::open()
   mTimeStep = 0;
 }
 
-void VirtualDataset::updateGrid( xdm::RefPtr< xdmGrid::Grid > grid ) {
+void VirtualDataset::updateGrid( xdm::RefPtr< xdmGrid::Grid > grid, std::size_t step ) {
   // update the grid for the new timestep.
-  xdm::UpdateVisitor update;
+  xdm::UpdateVisitor update( step );
   grid->accept( update );
 }
 

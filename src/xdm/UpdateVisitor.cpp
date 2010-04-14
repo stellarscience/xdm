@@ -25,9 +25,16 @@
 
 XDM_NAMESPACE_BEGIN
 
+UpdateVisitor::UpdateVisitor( std::size_t seriesIndex ) :
+  mSeriesIndex( seriesIndex ) {
+}
+
+UpdateVisitor::~UpdateVisitor() {
+}
+
 void UpdateVisitor::apply( Item& item ) {
   if ( RefPtr< BasicItemUpdateCallback > callback = item.updateCallback() ) {
-    callback->update( item );
+    callback->update( item, mSeriesIndex );
   }
   traverse( item );
 }
@@ -39,7 +46,7 @@ void UpdateVisitor::apply( UniformDataItem& item ) {
   // If the Item has been assigned a dataset, call its callback too.
   RefPtr< Dataset > itemDataset = item.dataset();
   if ( itemDataset ) {
-    itemDataset->update();
+    itemDataset->update( mSeriesIndex );
   }
 
   traverse( item );

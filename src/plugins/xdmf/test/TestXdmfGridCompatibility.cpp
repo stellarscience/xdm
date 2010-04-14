@@ -241,8 +241,8 @@ BOOST_AUTO_TEST_CASE( timeSeries ) {
     attribute->setDataItem( attrData );
     
     // write the grid for this step to the TimeSeries files
-    xdmf::writeTimestepGrid( temporalCollection, grid );
-    // xdmf::writeTimestepGrid( virtualDataset, grid );
+    xdmf::writeTimestepGrid( temporalCollection, grid, step );
+    // xdmf::writeTimestepGrid( virtualDataset, grid, step );
   }
   temporalCollection->close();
   // virtualDataset->close();

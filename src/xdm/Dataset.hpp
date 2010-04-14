@@ -50,11 +50,14 @@ class Dataset;
 /// generic Dataset.  For a callback with knowledge of specific Dataset
 /// subclasses, see DatasetUpdateCallback.
 /// @see DatasetUpdateCallback
+/// @see BasicItemUpdateCallback
 class BasicDatasetUpdateCallback : public ReferencedObject {
 public:
   /// Update a dataset.  This method provides a customization point for library
   /// clients to specify custom behavior when updating a dataset.
-  virtual void update( Dataset* dataset ) = 0;
+  /// @param dataset The Dataset to update.
+  /// @param seriesIndex The index in a series the Dataset should be updated to.
+  virtual void update( Dataset* dataset, std::size_t seriesIndex ) = 0;
 };
 
 /// UpdateCallback subclass that uses the input template argument to pass a
@@ -74,10 +77,10 @@ public:
   // unmerged branch that implements dataset input, exceptions are broken into
   // an identifiable hierarchy.
   // -- Will Dicharry 2010-01-19
-  void update( Dataset* dataset ) {
+  void update( Dataset* dataset, std::size_t seriesIndex ) {
     T* typedDataset = dynamic_cast< T* >( dataset );
     if ( typedDataset ) {
-      this->update( typedDataset );
+      this->update( typedDataset, seriesIndex );
     } else {
 
       // Code Review Matter (open): XDM_THROW disabled?
@@ -91,7 +94,7 @@ public:
 
   /// Update the specific subclass of Dataset that the callback is designed to
   /// operate on.
-  virtual void update( T* dataset ) = 0;
+  virtual void update( T* dataset, std::size_t seriesIndex ) = 0;
 };
 
 // Code Review Matter (open): Database Definition
@@ -147,7 +150,7 @@ public:
   
   /// Invoke the update callback for the dataset.
   /// @see BasicDatasetUpdateCallback
-  virtual void update();
+  virtual void update( std::size_t seriesIndex );
 
   // Determine if the dataset has been initialized.
   bool isInitialized() const;

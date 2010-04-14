@@ -43,7 +43,7 @@ public:
   virtual void open() = 0;
 
   /// Update the grid for a new timestep.
-  virtual void updateGrid( xdm::RefPtr< xdmGrid::Grid > grid ) = 0;
+  virtual void updateGrid( xdm::RefPtr< xdmGrid::Grid > grid, std::size_t step ) = 0;
 
   /// Write the metadata for a grid.
   virtual void writeGridMetadata( xdm::RefPtr< xdmGrid::Grid > grid ) = 0;
@@ -64,9 +64,10 @@ private:
 /// Convenience function to perform all steps of writing a TimeSeries grid.
 inline void writeTimestepGrid( 
   xdm::RefPtr< TimeSeries > timeSeries, 
-  xdm::RefPtr< xdmGrid::Grid > grid ) {
+  xdm::RefPtr< xdmGrid::Grid > grid,
+  std::size_t step ) {
 
-  timeSeries->updateGrid( grid );
+  timeSeries->updateGrid( grid, step );
   timeSeries->writeGridMetadata( grid );
   timeSeries->writeGridData( grid );
 

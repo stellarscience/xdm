@@ -36,9 +36,9 @@ RefPtr< Dataset > ProxyDataset::innerDataset() {
   return mDataset;
 }
 
-void ProxyDataset::update() {
-  Dataset::update();
-  mDataset->update();
+void ProxyDataset::update( std::size_t seriesIndex ) {
+  Dataset::update( seriesIndex );
+  mDataset->update( seriesIndex );
 }
 
 const char* ProxyDataset::format() {

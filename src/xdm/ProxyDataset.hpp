@@ -44,7 +44,7 @@ public:
   RefPtr< Dataset > innerDataset();
 
   /// Pass through implementation to update the proxy and the inner Dataset.
-  virtual void update();
+  virtual void update( std::size_t seriesIndex );
 
   /// Pass through implementation to get the format of the inner Dataset.
   virtual const char* format();

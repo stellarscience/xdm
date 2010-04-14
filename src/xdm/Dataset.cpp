@@ -44,9 +44,9 @@ void Dataset::setUpdateCallback( RefPtr< BasicDatasetUpdateCallback > callback )
 }
   
 
-void Dataset::update() {
+void Dataset::update( std::size_t seriesIndex ) {
   if ( mUpdateCallback.valid() ) {
-    mUpdateCallback->update( this );
+    mUpdateCallback->update( this, seriesIndex );
   }
 }
 

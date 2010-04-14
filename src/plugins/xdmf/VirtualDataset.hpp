@@ -44,7 +44,7 @@ public:
   virtual ~VirtualDataset();
 
   virtual void open();
-  virtual void updateGrid( xdm::RefPtr< xdmGrid::Grid > grid );
+  virtual void updateGrid( xdm::RefPtr< xdmGrid::Grid > grid, std::size_t step );
   virtual void writeGridMetadata( xdm::RefPtr< xdmGrid::Grid > grid );
   virtual void writeGridData( xdm::RefPtr< xdmGrid::Grid > grid );
   virtual void close();

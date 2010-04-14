@@ -84,15 +84,12 @@ bool evolve( float* position, float* velocity, float dt ) {
 
 // Update callback to tell a HDF5 dataset to rename itself on every time step
 class NameDataset : public xdm::DatasetUpdateCallback< xdmHdf::HdfDataset > {
-private:
-  unsigned int mCount;
-
 public:
-  NameDataset() : mCount( 0 ) {}
+  NameDataset() {}
 
-  virtual void update( xdmHdf::HdfDataset* dataset ) {
+  virtual void update( xdmHdf::HdfDataset* dataset, std::size_t step ) {
     std::stringstream name;
-    name << std::setfill( '0' ) << std::setw( 7 ) << mCount++;
+    name << std::setfill( '0' ) << std::setw( 7 ) << step;
     dataset->setDataset( name.str() );
   }
 };
@@ -243,13 +240,13 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
   series->open();
 
   // write the first timestep
-  writeTimestepGrid( series, grid );
+  writeTimestepGrid( series, grid, 0 );
 
   // evolve the particles
   float t = 0.0f;
   float dt = kEndTime / kSteps;
   float cosDt = kEndTime;
-  for ( unsigned int i = 0; i < kSteps; i++ ) {
+  for ( unsigned int step = 1; step < kSteps; step++ ) {
     t += dt;
     grid->time()->setValue( t );
 
@@ -259,7 +256,7 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
     }
 
     // write the data for this timestep to disk.
-    writeTimestepGrid( series, grid );
+    writeTimestepGrid( series, grid, step );
   }
 
   series->close();
