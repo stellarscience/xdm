@@ -15,6 +15,7 @@
 #include <xdm/RefPtr.hpp>
 #include <xdm/StaticAssert.hpp>
 #include <xdm/UniformDataItem.hpp>
+#include <xdm/UpdateVisitor.hpp>
 
 #include <libxml/parser.h>
 #include <libxml/relaxng.h>
@@ -113,40 +114,80 @@ xmlDoc * readDocument( const xdm::FileSystemPath& path ) {
   return document;
 }
 
-// Visitor that knows how to update items for a new timestep.
-class UpdateXdmfTreeVisitor : public xdm::ItemVisitor {
+// A ref counted std vector of xmlNodes.
+class SharedNodeVector :
+  public xdm::ReferencedObject,
+  private std::vector< xmlNode * >
+{
+  typedef std::vector< xmlNode * > VectorBase;
 public:
-  UpdateXdmfTreeVisitor( xmlDocPtr document, xmlNode * node ) :
-    mDocument( document ),
-    mNode( node ),
-    mNewData( false ) {
+  SharedNodeVector() : VectorBase() {}
+  virtual ~SharedNodeVector() {}
+
+  using VectorBase::push_back;
+  using VectorBase::operator[];
+  using VectorBase::size;
+};
+
+// A ref counted RAII class for an XML document.
+class XmlDocumentManager : public xdm::ReferencedObject {
+public:
+  XmlDocumentManager( xmlDoc * document ) : mDocument( document ) {}
+  virtual ~XmlDocumentManager() {
+    xmlFreeDoc( mDocument );
   }
-
-  virtual ~UpdateXdmfTreeVisitor() {
-  }
-
-  virtual void apply( xdm::UniformDataItem& item ) {
-    try {
-      typedef impl::InputItem< xdm::UniformDataItem > InputUDI;
-      InputUDI& inputItem = dynamic_cast< InputUDI& >( item );
-      // Find the corresponding node in the new node context.
-      impl::XPathQuery nodeQuery( mDocument, mNode, inputItem.xpathExpr() );
-      if ( nodeQuery.size() > 0 ) {
-        impl::TreeBuilder builder( mNode );
-        builder.configureUniformDataItem( inputItem, nodeQuery.node( 0 ) );
-        mNewData = true;
-      }
-    } catch ( const std::bad_cast& ) {
-      // we don't know how to update this item, leave it alone.
-    }
-  }
-
-  bool newData() const { return mNewData; }
-
+  xmlDoc * get() { return mDocument; }
 private:
   xmlDoc * mDocument;
-  xmlNode * mNode;
-  bool mNewData;
+};
+
+// Update callback for an impl::InputItem< UniformDataItem >.
+class InputUDIUpdateCallback :
+  public xdm::ItemUpdateCallback< impl::InputItem< xdm::UniformDataItem > >
+{
+public:
+  InputUDIUpdateCallback(
+    xdm::RefPtr< XmlDocumentManager > document,
+    xdm::RefPtr< SharedNodeVector > nodes ) :
+    mDocument( document ),
+    mNodeVector( nodes ) {}
+  virtual ~InputUDIUpdateCallback() {}
+
+  virtual void update(
+    impl::InputItem< xdm::UniformDataItem >& item,
+    size_t seriesIndex )
+  {
+    if ( seriesIndex >= mNodeVector->size() ) {
+      XDM_THROW( xdmFormat::ReadError( "Time step out of bounds" ) );
+    }
+    xmlNode * stepNode = (*mNodeVector)[seriesIndex];
+    std::string expr = item.xpathExpr();
+    impl::XPathQuery itemQuery( mDocument->get(), stepNode, expr );
+    if ( itemQuery.size() != 0 ) {
+      impl::TreeBuilder build( stepNode );
+      build.configureUniformDataItem( item, itemQuery.node( 0 ) );
+    }
+  }
+private:
+  xdm::RefPtr< XmlDocumentManager > mDocument;
+  xdm::RefPtr< SharedNodeVector > mNodeVector;
+};
+
+// Visitor to attach update callbacks to the items in the tree.
+class AttachCallbacks : public xdm::ItemVisitor {
+public:
+  xdm::RefPtr< XmlDocumentManager > mDocument;
+  xdm::RefPtr< SharedNodeVector > mNodeVector;
+  virtual void apply( xdm::UniformDataItem& item ) {
+    typedef impl::InputItem< xdm::UniformDataItem > InputUDI;
+    try {
+      InputUDI& input = dynamic_cast< InputUDI& >( item );
+      item.setUpdateCallback( xdm::makeRefPtr(
+        new InputUDIUpdateCallback( mDocument, mNodeVector ) ) );
+    } catch ( const std::bad_cast& ) {
+      // do nothing
+    }
+  }
 };
 
 } // namespace
@@ -156,18 +197,6 @@ private:
 // -----------------------------------------------------------------------------
 class XmfReader::Private {
 public:
-  xmlDocPtr mDocument;
-  std::vector< xmlNode * > mTimestepNodes;
-  xdm::FileSystemPath mInitialFilePath;
-
-  Private() :
-    mDocument(),
-    mTimestepNodes(),
-    mInitialFilePath() {
-  }
-
-  ~Private() {
-  }
 };
 
 XmfReader::XmfReader() : 
@@ -186,27 +215,29 @@ XmfReader::readItem( const xdm::FileSystemPath& path ) {
   xdm::RefPtr< xdm::Item > result;
 
   // Read the document.
-  mImp->mDocument = readDocument( path );
-  xmlNode * rootNode = xmlDocGetRootElement( mImp->mDocument );
+  xdm::RefPtr< XmlDocumentManager > doc(
+    new XmlDocumentManager( readDocument( path ) ) );
+  xmlNode * rootNode = xmlDocGetRootElement( doc->get() );
 
   // Determine if the XDMF document contains a single time step or a temporal
   // collection.
   impl::XPathQuery temporalCollectionQuery(
-    mImp->mDocument,
+   doc->get(),
     rootNode,
     kTemporalCollectionExpr );
 
+  xdm::RefPtr< SharedNodeVector > timestepNodes( new SharedNodeVector );
   if ( temporalCollectionQuery.size() > 0 ) {
     // The XDMF file contains a temporal collection.
     xmlNode * temporalCollectionRoot = temporalCollectionQuery.node( 0 );
-    impl::XPathQuery stepGridQuery( mImp->mDocument, temporalCollectionRoot, "Grid" );
+    impl::XPathQuery stepGridQuery( doc->get(), temporalCollectionRoot, "Grid" );
     if ( stepGridQuery.size() == 0 ) {
       XDM_THROW( xdmFormat::ReadError(
         "XDMF Temporal collection contains no time steps" ) );
     }
     // Set the XML node for each time step.
     for ( size_t i = 0; i < temporalCollectionQuery.size(); ++i ) {
-      mImp->mTimestepNodes.push_back( temporalCollectionQuery.node( i ) );
+      timestepNodes->push_back( temporalCollectionQuery.node( i ) );
     }
     // Build the tree using the first grid as the structure prototype.
     impl::TreeBuilder builder( stepGridQuery.node( 0 ) );
@@ -214,16 +245,23 @@ XmfReader::readItem( const xdm::FileSystemPath& path ) {
   } else {
     // The file does not contain a temporal collection. Search the Domain
     // element for Grid children.
-    impl::XPathQuery gridQuery( mImp->mDocument, rootNode, "/Xdmf/Domain/Grid" );
+    impl::XPathQuery gridQuery( doc->get(), rootNode, "/Xdmf/Domain/Grid" );
     if ( gridQuery.size() != 0 ) {
       // FIXME handle multiple grids in a single Domain.
       xmlNode * gridNode = gridQuery.node( 0 );
       impl::TreeBuilder builder( gridNode );
       result = builder.buildTree();
-      mImp->mTimestepNodes.push_back( gridNode );
+      timestepNodes->push_back( gridNode );
     }
   }
-  return xdmFormat::Reader::ReadResult( result, mImp->mTimestepNodes.size() );
+
+  // Attach update callbacks to allow series-varying behavior.
+  AttachCallbacks visitor;
+  visitor.mDocument = doc;
+  visitor.mNodeVector = timestepNodes;
+  result->accept( visitor );
+
+  return xdmFormat::Reader::ReadResult( result, timestepNodes->size() );
 }
 
 bool XmfReader::update( 
@@ -231,16 +269,13 @@ bool XmfReader::update(
   const xdm::FileSystemPath& path,
   std::size_t timeStep )
 {
-  if ( mImp->mTimestepNodes.size() < timeStep ) {
+  try {
+    xdm::UpdateVisitor update( timeStep );
+    item->accept( update );
+    return true;
+  } catch ( const xdmFormat::ReadError& ) {
     return false;
   }
-
-  // Get the XML node corresponding to the requested time step.
-  xmlNode * stepNode = mImp->mTimestepNodes[timeStep];
-
-  UpdateXdmfTreeVisitor v( mImp->mDocument, stepNode );
-  item->accept( v );
-  return v.newData();
 }
 
 XDMF_NAMESPACE_END
