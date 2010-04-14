@@ -93,17 +93,36 @@ bool validate( xmlDocPtr document ) {
   return result;
 }
 
+// Read an XML document at the specified path.
+xmlDoc * readDocument( const xdm::FileSystemPath& path ) {
+  // Check the file exists.
+  if ( !exists( path ) ) {
+    XDM_THROW( xdmFormat::ReadError( "Requested path does not exist." ) );
+  }
+
+  xmlDoc * document = 0;
+  // Parse the document into a tree that can be traversed.
+  document = xmlParseFile( path.pathString().c_str() );
+  if ( !document ) {
+    XDM_THROW( xdmFormat::ReadError( "Unable to parse XDMF document." ) );
+  }
+
+  if ( !validate( document ) ) {
+    XDM_THROW( xdmFormat::ReadError( "Invalid XDMF document." ) );
+  }
+  return document;
+}
+
+// Visitor that knows how to update items for a new timestep.
 class UpdateXdmfTreeVisitor : public xdm::ItemVisitor {
 public:
   UpdateXdmfTreeVisitor( xmlDocPtr document, xmlNode * node ) :
     mDocument( document ),
     mNode( node ),
     mNewData( false ) {
-    mXPathContext = xmlXPathNewContext( mDocument );
   }
 
   virtual ~UpdateXdmfTreeVisitor() {
-    xmlXPathFreeContext( mXPathContext );
   }
 
   virtual void apply( xdm::UniformDataItem& item ) {
@@ -111,9 +130,9 @@ public:
       typedef impl::InputItem< xdm::UniformDataItem > InputUDI;
       InputUDI& inputItem = dynamic_cast< InputUDI& >( item );
       // Find the corresponding node in the new node context.
-      impl::XPathQuery nodeQuery( mXPathContext, mNode, inputItem.xpathExpr() );
+      impl::XPathQuery nodeQuery( mDocument, mNode, inputItem.xpathExpr() );
       if ( nodeQuery.size() > 0 ) {
-        impl::TreeBuilder builder( mDocument );
+        impl::TreeBuilder builder( mNode );
         builder.configureUniformDataItem( inputItem, nodeQuery.node( 0 ) );
         mNewData = true;
       }
@@ -127,7 +146,6 @@ public:
 private:
   xmlDoc * mDocument;
   xmlNode * mNode;
-  xmlXPathContext * mXPathContext;
   bool mNewData;
 };
 
@@ -162,26 +180,47 @@ XmfReader::~XmfReader() {
 
 xdm::RefPtr< xdm::Item > 
 XmfReader::readItem( const xdm::FileSystemPath& path ) {
-  // Check the file exists.
-  if ( !exists( path ) ) {
-    XDM_THROW( xdmFormat::ReadError( "Requested path does not exist." ) );
-  }
-  
-  // Parse the document into a tree that can be traversed.
-  mImp->mDocument = xmlParseFile( path.pathString().c_str() );
-  if ( !mImp->mDocument ) {
-    XDM_THROW( xdmFormat::ReadError( "Unable to parse XDMF document." ) );
-  }
+  static const char * kTemporalCollectionExpr =
+    "/Xdmf/Grid[@GridType=\"Collection\" and @CollectionType=\"Temporal\"]";
 
-  if ( !validate( mImp->mDocument ) ) {
-    XDM_THROW( xdmFormat::ReadError( "Invalid XDMF document." ) );
+  xdm::RefPtr< xdm::Item > result;
+
+  // Read the document.
+  mImp->mDocument = readDocument( path );
+  xmlNode * rootNode = xmlDocGetRootElement( mImp->mDocument );
+
+  // Determine if the XDMF document contains a single time step or a temporal
+  // collection.
+  impl::XPathQuery temporalCollectionQuery(
+    mImp->mDocument,
+    rootNode,
+    kTemporalCollectionExpr );
+
+  if ( temporalCollectionQuery.size() > 0 ) {
+    // The XDMF file contains a temporal collection.
+    xmlNode * temporalCollectionRoot = temporalCollectionQuery.node( 0 );
+    impl::XPathQuery stepGridQuery( mImp->mDocument, temporalCollectionRoot, "Grid" );
+    if ( stepGridQuery.size() == 0 ) {
+      XDM_THROW( xdmFormat::ReadError(
+        "XDMF Temporal collection contains no time steps" ) );
+    }
+    // Set the XML node for each time step.
+    for ( size_t i = 0; i < temporalCollectionQuery.size(); ++i ) {
+      mImp->mTimestepNodes.push_back( temporalCollectionQuery.node( i ) );
+    }
+    // Build the tree using the first grid as the structure prototype.
+    impl::TreeBuilder builder( stepGridQuery.node( 0 ) );
+    result = builder.buildTree();
+  } else {
+    // The file does not contain a temporal collection. Search the Domain
+    // element for Grid children.
+    impl::XPathQuery gridQuery( mImp->mDocument, rootNode, "/Xdmf/Domain/Grid" );
+    if ( gridQuery.size() != 0 ) {
+      // FIXME handle multiple grids in a single Domain.
+      impl::TreeBuilder builder( gridQuery.node( 0 ) );
+      result = builder.buildTree();
+    }
   }
-
-  // Build the tree given the root node of the validated document as input.
-  impl::TreeBuilder builder( mImp->mDocument );
-
-  xdm::RefPtr< xdm::Item > result = builder.buildTree();
-  mImp->mTimestepNodes = builder.timestepNodes();
   return result;
 }
 

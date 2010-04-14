@@ -66,15 +66,14 @@ private:
   std::string mXPathExpr;
 };
 
-/// Implementation class for building an XDM tree given a parsed and validated
-/// XDMF libXml document pointer.
+/// Class to construct an XDM tree given an XML node that points to the root
+/// of an XDMF grid for a single time step.
 class TreeBuilder {
 public:
   
-  /// Constructor takes a validated XDMF document. Does not take ownership of
-  /// the document.  
-  /// @pre document has been validated against the XDMF schema.
-  TreeBuilder( xmlDocPtr document );
+  /// Construct with the given node representing the root of the time step grid
+  /// in the XML document.
+  TreeBuilder( xmlNode * gridRoot );
   virtual ~TreeBuilder();
 
   /// Build the tree from the document.
@@ -87,18 +86,7 @@ public:
   /// @todo Handle Hyperslab, coordinate, and function grids.
   xdm::RefPtr< xdmGrid::Grid > buildGrid( xmlNode * node );
 
-  xdm::RefPtr< xdmGrid::Grid > buildCollectionGrid( xmlNode * node );
-
   xdm::RefPtr< xdmGrid::CollectionGrid > buildSpatialCollectionGrid( xmlNode * node );
-
-  /// Build a temporal collection grid. The result of this operation is the
-  /// first grid in the time series, subsequent time steps are accessed by
-  /// updating the content within the grid structure.
-  ///
-  /// The implementation assumes that all direct grid children represent the
-  /// grid at different moments in time.
-
-  xdm::RefPtr< xdmGrid::Grid > buildTemporalCollectionGrid( xmlNode * node );
 
   xdm::RefPtr<xdmGrid::UniformGrid > buildUniformGrid( xmlNode * node );
   /// Build the Geometry Item corresponding the the given XML node.
@@ -125,15 +113,10 @@ public:
   /// Configure a UniformDataItem given an XML node with XDMF UniformDataItem content.
   void configureUniformDataItem( xdm::UniformDataItem& item, xmlNode * content );
 
-  /// After the tree has been built, get a list of the XML nodes corresponding
-  /// to each time step.
-  NodeList timestepNodes() const;
-
 private:
-  xmlDocPtr mDocument;
+  xmlNode * mGridRoot;
+  xmlDoc * mDocument;
   xmlXPathContextPtr mXPathContext;
-  xmlNode * mTimeCollectionRoot;
-  std::vector< xmlNode * > mTimestepNodes;
 };
 
 } // namespace impl

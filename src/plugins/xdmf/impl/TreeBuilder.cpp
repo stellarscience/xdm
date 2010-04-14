@@ -116,9 +116,19 @@ xdm::primitiveType::Value type( const std::string& typeStr, size_t precision ) {
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 
-TreeBuilder::TreeBuilder( xmlDocPtr document ) :
-  mDocument( document ) {
-  mXPathContext = xmlXPathNewContext( document );
+TreeBuilder::TreeBuilder( xmlNode * gridRoot ) :
+  mGridRoot( gridRoot ) {
+  // find the document node that the grid root node belongs to.
+  xmlNode * node = gridRoot;
+  while ( node && (node->type != XML_DOCUMENT_NODE ) ) {
+    node = node->parent;
+  }
+  if ( !node ) {
+    XDM_THROW( xdmFormat::ReadError( "Grid root does not belong to any document." ) );
+  }
+  mDocument = (xmlDoc*)node;
+  // construct an XPath query context from the document.
+  mXPathContext = xmlXPathNewContext( mDocument );
 }
 
 TreeBuilder::~TreeBuilder() {
@@ -126,37 +136,7 @@ TreeBuilder::~TreeBuilder() {
 }
 
 xdm::RefPtr< xdm::Item > TreeBuilder::buildTree() {
-  static const char * kGridQuery = "Domain/Grid";
-
-  xdm::RefPtr< xdm::Item > result;
-  xmlNode * rootNode = xmlDocGetRootElement( mDocument );
-
-  // Search for Grid children of the Domain element.
-  XPathQuery gridQuery( mXPathContext, rootNode, kGridQuery );
-
-  if ( gridQuery.size() == 0 ) {
-    // If there are no grids, return a NULL item.
-    result.reset();
-  } else if ( gridQuery.size() == 1 ) {
-    // There is one grid.
-    // We assume this grid is the time collection root until we learn otherwise
-    // later.
-    mTimeCollectionRoot = gridQuery.node( 0 );
-    result = buildGrid( gridQuery.node( 0 ) );
-    if ( mTimestepNodes.empty() ) {
-      // there is a single timestep in this file, no temporal collection.
-      mTimestepNodes.push_back( gridQuery.node( 0 ) );
-    }
-  } else {
-    // There are multiple grids, build a spatial collection grid from them.
-    xdm::RefPtr< xdmGrid::CollectionGrid > collection( new xdmGrid::CollectionGrid );
-    for ( size_t i = 0; i < gridQuery.size(); i++ ) {
-      collection->appendChild( buildGrid( gridQuery.node( i ) ) );
-    }
-    result = collection;
-  }
-
-  return result;
+  return buildGrid( mGridRoot );
 }
 
 //------------------------------------------------------------------------------
@@ -167,11 +147,11 @@ TreeBuilder::buildUniformDataItem( xmlNode * node ) {
   configureUniformDataItem( *result, node );
 
   // determine the path to the time step root.
-  NodePath pathToTimestepRoot = findPathToAncestor( mDocument, node, mTimeCollectionRoot );
-  // reverse it so we can find the path from the time step root to the node.
-  std::reverse( pathToTimestepRoot.begin(), pathToTimestepRoot.end() );
+  NodePath gridRootPath = findPathToAncestor( mDocument, node, mGridRoot );
+  // reverse it so we can find the path from the grid root to the node.
+  std::reverse( gridRootPath.begin(), gridRootPath.end() );
   // Set the path on the InputItem.
-  result->setXPathExpr( makeXPathQuery( pathToTimestepRoot ) );
+  result->setXPathExpr( makeXPathQuery( gridRootPath ) );
 
   return result;
 }
@@ -193,7 +173,7 @@ xdm::RefPtr< xdmGrid::Geometry > TreeBuilder::buildGeometry( xmlNode * node ) {
   }
 
   // Get the geometry type from the GeometryType attribute.
-  XPathQuery geometryTypeQuery( mXPathContext, node, "@GeometryType" );
+  XPathQuery geometryTypeQuery( mDocument, node, "@GeometryType" );
   if ( geometryTypeQuery.size() > 0 ) {
     std::string typeString = geometryTypeQuery.textValue( 0 );
     xdm::toUpper( typeString );
@@ -206,7 +186,7 @@ xdm::RefPtr< xdmGrid::Geometry > TreeBuilder::buildGeometry( xmlNode * node ) {
   }
 
   // Read the internal data items that make up the values for the geometry.
-  XPathQuery dataQuery( mXPathContext, node, kDataItemTag );
+  XPathQuery dataQuery( mDocument, node, kDataItemTag );
   if ( dataQuery.size() == 0 ) {
     XDM_THROW( xdmFormat::ReadError( "XDMF Geometry values unspecified." ) );
   }
@@ -306,7 +286,7 @@ xdm::RefPtr< xdmGrid::Topology > TreeBuilder::buildTopology( xmlNode * node ) {
   };
 
   // Read the topology type attribute.
-  XPathQuery topologyTypeQuery( mXPathContext, node, "@TopologyType" );
+  XPathQuery topologyTypeQuery( mDocument, node, "@TopologyType" );
   if ( topologyTypeQuery.size() == 0 ) {
     XDM_THROW( xdmFormat::ReadError( "No XDMF topology type specified." ) );
   }
@@ -349,7 +329,7 @@ xdm::RefPtr< xdmGrid::Topology > TreeBuilder::buildTopology( xmlNode * node ) {
   }
 
   // Attach connectivity information specified in DataItem children.
-  XPathQuery connectivityQuery( mXPathContext, node, "DataItem" );
+  XPathQuery connectivityQuery( mDocument, node, "DataItem" );
   for ( size_t i = 0; i < connectivityQuery.size(); i++ ) {
     result->appendChild( buildUniformDataItem( connectivityQuery.node( i ) ) );
   }
@@ -387,13 +367,13 @@ TreeBuilder::buildAttribute( xmlNode * node ) {
   xdm::RefPtr< xdmGrid::Attribute > result( new xdmGrid::Attribute );
 
   // Get the name of the attribute.
-  XPathQuery nameQuery( mXPathContext, node, "@Name" );
+  XPathQuery nameQuery( mDocument, node, "@Name" );
   if ( nameQuery.size() > 0 ) {
     result->setName( nameQuery.textValue( 0 ) );
   }
 
   // Get the attribute type
-  XPathQuery typeQuery( mXPathContext, node, "@AttributeType" );
+  XPathQuery typeQuery( mDocument, node, "@AttributeType" );
   if ( typeQuery.size() > 0 ) {
     TypeMap::const_iterator type = typeMap.find( typeQuery.textValue( 0 ) );
     if ( type != typeMap.end() ) {
@@ -407,7 +387,7 @@ TreeBuilder::buildAttribute( xmlNode * node ) {
   }
 
   // Get the attribute center
-  XPathQuery centerQuery( mXPathContext, node, "@Center" );
+  XPathQuery centerQuery( mDocument, node, "@Center" );
   if ( centerQuery.size() > 0 ) {
     CenterMap::const_iterator center = centerMap.find( centerQuery.textValue( 0 ) );
     if ( center != centerMap.end() ) {
@@ -421,7 +401,7 @@ TreeBuilder::buildAttribute( xmlNode * node ) {
   }
 
   // Create the attribute data items.
-  XPathQuery dataQuery( mXPathContext, node, "DataItem" );
+  XPathQuery dataQuery( mDocument, node, "DataItem" );
   if ( dataQuery.size() == 0 ) {
     XDM_THROW( xdmFormat::ReadError( "XDMF Attribute contains no data." ) );
   }
@@ -437,7 +417,7 @@ TreeBuilder::buildUniformGrid( xmlNode * node ) {
   xdm::RefPtr< xdmGrid::UniformGrid > result( new xdmGrid::UniformGrid );
 
   // Get the topology.
-  XPathQuery topologyQuery( mXPathContext, node, "Topology" );
+  XPathQuery topologyQuery( mDocument, node, "Topology" );
   if ( topologyQuery.size() == 0 ) {
     XDM_THROW( xdmFormat::ReadError( "XDMF Grid contains no Topology" ) );
   }
@@ -447,7 +427,7 @@ TreeBuilder::buildUniformGrid( xmlNode * node ) {
   result->setTopology( buildTopology( topologyQuery.node( 0 ) ) );
 
   // Get the geometry.
-  XPathQuery geometryQuery( mXPathContext, node, "Geometry" );
+  XPathQuery geometryQuery( mDocument, node, "Geometry" );
   if ( geometryQuery.size() == 0 ) {
     XDM_THROW( xdmFormat::ReadError( "XDMF Grid contains no geometry." ) );
   }
@@ -457,7 +437,7 @@ TreeBuilder::buildUniformGrid( xmlNode * node ) {
   result->setGeometry( buildGeometry( geometryQuery.node( 0 ) ) );
 
   // Read all the attributes.
-  XPathQuery attributeQuery( mXPathContext, node, "Attribute" );
+  XPathQuery attributeQuery( mDocument, node, "Attribute" );
   for ( size_t i = 0; i < attributeQuery.size(); i++ ) {
     result->addAttribute( buildAttribute( attributeQuery.node( i ) ) );
   }
@@ -469,13 +449,13 @@ TreeBuilder::buildUniformGrid( xmlNode * node ) {
 xdm::RefPtr< xdmGrid::Grid > TreeBuilder::buildGrid( xmlNode * node ) {
   xdm::RefPtr< xdmGrid::Grid > result;
   // Determine the grid type.
-  XPathQuery typeQuery( mXPathContext, node, "@GridType" );
+  XPathQuery typeQuery( mDocument, node, "@GridType" );
   if ( typeQuery.size() > 0 ) {
     std::string gridType = typeQuery.textValue( 0 );
     if ( gridType == "Uniform" ) {
       result = buildUniformGrid( node );
     } else if ( gridType == "Collection" ) {
-      result = buildCollectionGrid( node );
+      result = buildSpatialCollectionGrid( node );
     } else {
       XDM_THROW( xdmFormat::ReadError( "Unsupported XDMF Grid type" ) );
     }
@@ -485,27 +465,12 @@ xdm::RefPtr< xdmGrid::Grid > TreeBuilder::buildGrid( xmlNode * node ) {
   }
 
   // Check for a Time child for the grid.
-  XPathQuery timeQuery( mXPathContext, node, "Time" );
+  XPathQuery timeQuery( mDocument, node, "Time" );
   if ( timeQuery.size() > 0 ) {
     result->setTime( buildTime( timeQuery.node( 0 ) ) );
   }
 
   return result;
-}
-
-//------------------------------------------------------------------------------
-xdm::RefPtr< xdmGrid::Grid > TreeBuilder::buildCollectionGrid( xmlNode * node ) {
-  // Determine the collection type.
-  XPathQuery typeQuery( mXPathContext, node, "@CollectionType" );
-  if ( typeQuery.size() == 0 ) {
-    return buildSpatialCollectionGrid( node );
-  } else if ( typeQuery.textValue( 0 ) == "Spatial" ) {
-    return buildSpatialCollectionGrid( node );
-  } else if ( typeQuery.textValue( 0 ) == "Temporal" ) {
-    return buildTemporalCollectionGrid( node );
-  } else {
-    XDM_THROW( xdmFormat::ReadError( "Unrecognized XDMF Grid collection type" ) );
-  }
 }
 
 // -----------------------------------------------------------------------------
@@ -515,7 +480,7 @@ TreeBuilder::buildSpatialCollectionGrid( xmlNode * node ) {
   xdm::RefPtr< xdmGrid::CollectionGrid > result(
     new xdmGrid::CollectionGrid( xdmGrid::CollectionGrid::kSpatial ) );
   // Find all grid children of the node.
-  XPathQuery childGridQuery( mXPathContext, node, "Grid" );
+  XPathQuery childGridQuery( mDocument, node, "Grid" );
   for ( size_t i = 0; i < childGridQuery.size(); i++ ) {
     result->appendChild( buildGrid( childGridQuery.node( i ) ) );
   }
@@ -527,11 +492,11 @@ xdm::RefPtr< xdmGrid::Time > TreeBuilder::buildTime( xmlNode * node ) {
 
   xdm::RefPtr< xdmGrid::Time > result( new xdmGrid::Time );
 
-  XPathQuery typeQuery( mXPathContext, node, "@TimeType" );
+  XPathQuery typeQuery( mDocument, node, "@TimeType" );
   std::string timeType = (typeQuery.size() > 0)?typeQuery.textValue(0):"Single";
 
   if ( timeType == "Single" ) {
-    XPathQuery valueQuery( mXPathContext, node, "@Value" );
+    XPathQuery valueQuery( mDocument, node, "@Value" );
     if ( valueQuery.size() == 0 ) {
       XDM_THROW( xdmFormat::ReadError(
         "Single XDMF grid time specified with no Value" ) );
@@ -544,7 +509,7 @@ xdm::RefPtr< xdmGrid::Time > TreeBuilder::buildTime( xmlNode * node ) {
     }
     result->setValue( value );
   } else if ( timeType == "List" ) {
-    XPathQuery valuesQuery( mXPathContext, node, "DataItem" );
+    XPathQuery valuesQuery( mDocument, node, "DataItem" );
     if ( valuesQuery.size() == 0 ) {
       XDM_THROW( xdmFormat::ReadError( "No values found for XDMF Time." ) );
     }
@@ -563,36 +528,11 @@ xdm::RefPtr< xdmGrid::Time > TreeBuilder::buildTime( xmlNode * node ) {
   return result;
 }
 
-//------------------------------------------------------------------------------
-xdm::RefPtr< xdmGrid::Grid >
-TreeBuilder::buildTemporalCollectionGrid( xmlNode * node ) {
-  typedef std::vector< xmlNode * > NodeList;
-  typedef std::map< xdmGrid::Grid, NodeList > GridNodeListMap;
-
-  // Find all child grids for the time series.
-  XPathQuery gridQuery( mXPathContext, node, "Grid" );
-  if ( gridQuery.size() == 0 ) {
-    XDM_THROW( xdmFormat::ReadError( "XDMF Temporal Collection contains no data" ) );
-  }
-
-  // Read the first child as the prototype for subsequent time steps and set it
-  // as the time collection root.
-  mTimeCollectionRoot = gridQuery.node( 0 );
-  xdm::RefPtr< xdmGrid::Grid > result = buildGrid( gridQuery.node( 0 ) );
-
-  // Save each grid element as the root of a timestep tree.
-  for ( int i = 0; i < gridQuery.size(); ++i ) {
-    mTimestepNodes.push_back( gridQuery.node( i ) );
-  }
-
-  return result;
-}
-
 void TreeBuilder::configureStructuredTopology(
   xdmGrid::StructuredTopology& topology,
   xmlNode * content ) {
   // Get the attribute that specifies the shape of the structured topology
-  XPathQuery shapeQuery( mXPathContext, content, "@Dimensions|@NumberOfElements" );
+  XPathQuery shapeQuery( mDocument, content, "@Dimensions|@NumberOfElements" );
   if ( shapeQuery.size() > 0 ) {
     xdm::DataShape<> topologyShape = xdm::makeShape(shapeQuery.textValue(0));
     // XDMF Specifies topology in ZYX order, which is the opposite of the
@@ -611,14 +551,14 @@ void TreeBuilder::configureUniformDataItem(
   xmlNode * node ) {
 
   // Get the number type from the NumberType attribute.
-  XPathQuery typeQuery( mXPathContext, node, "@NumberType" );
+  XPathQuery typeQuery( mDocument, node, "@NumberType" );
   std::string typeString;
   if ( typeQuery.size() > 0 ) {
     typeString = typeQuery.textValue( 0 );
   } else {
     typeString = "Float";
   }
-  XPathQuery precisionQuery( mXPathContext, node, "@Precision" );
+  XPathQuery precisionQuery( mDocument, node, "@Precision" );
   size_t precision;
   if ( precisionQuery.size() > 0 ) {
     precision = precisionQuery.getValue( 0, 4 );
@@ -629,14 +569,14 @@ void TreeBuilder::configureUniformDataItem(
   item.setDataType( dataType );
 
   // Get the shape from the Dimensions attribute.
-  XPathQuery dimensionsQuery( mXPathContext, node, "@Dimensions" );
+  XPathQuery dimensionsQuery( mDocument, node, "@Dimensions" );
   if ( dimensionsQuery.size() == 0 ) {
     XDM_THROW( xdmFormat::ReadError( "No dimensions for a UniformDataItem." ) );
   }
   item.setDataspace( xdm::makeShape( dimensionsQuery.textValue( 0 ) ) );
 
   // Get the format string for the dataset.
-  XPathQuery formatQuery( mXPathContext, node, "@Format" );
+  XPathQuery formatQuery( mDocument, node, "@Format" );
   std::string format( "HDF" );
   if ( formatQuery.size() > 0 ) {
     format = formatQuery.textValue( 0 );
@@ -650,7 +590,7 @@ void TreeBuilder::configureUniformDataItem(
     } else {
       dataset = new xdmHdf::HdfDataset;
     }
-    XPathQuery datasetInfoQuery( mXPathContext, node, "text()" );
+    XPathQuery datasetInfoQuery( mDocument, node, "text()" );
     if ( datasetInfoQuery.size() == 0 ) {
       XDM_THROW( "No information about requested HDF dataset." );
     }
@@ -681,10 +621,6 @@ void TreeBuilder::configureUniformDataItem(
     adapter->setIsMemoryResident( false );
     item.setData( adapter );
   }
-}
-
-NodeList TreeBuilder::timestepNodes() const {
-  return mTimestepNodes;
 }
 
 } // namespace impl

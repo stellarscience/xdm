@@ -88,9 +88,7 @@ BOOST_AUTO_TEST_CASE( findPathToAncestorTest ) {
   xmlDocPtr document = xmlParseDoc( (xmlChar*)kXml );
   xmlNode * rootNode = xmlDocGetRootElement( document );
 
-  xmlXPathContextPtr context = xmlXPathNewContext( document );
-
-  xdmf::impl::XPathQuery query( context, rootNode, "//dataitem" );
+  xdmf::impl::XPathQuery query( document, rootNode, "//dataitem" );
   BOOST_CHECK_EQUAL( query.size(), 4 );
 
   const char * answer[4] = {
@@ -108,6 +106,8 @@ BOOST_AUTO_TEST_CASE( findPathToAncestorTest ) {
     std::string result = xdmf::impl::makeXPathQuery( path );
     BOOST_CHECK_EQUAL( result, answer[i] );
   }
+
+  xmlFreeDoc( document );
 }
 
 BOOST_AUTO_TEST_CASE( buildUniformDataItem ) {
@@ -127,7 +127,7 @@ BOOST_AUTO_TEST_CASE( buildUniformDataItem ) {
   xmlDocPtr document = xmlParseDoc( reinterpret_cast< const xmlChar *>(kXml) );
   xmlNode * rootNode = xmlDocGetRootElement( document );
 
-  xdmf::impl::TreeBuilder builder( document );
+  xdmf::impl::TreeBuilder builder( rootNode );
   xdm::RefPtr< xdm::UniformDataItem > item 
     = builder.buildUniformDataItem( rootNode );
   BOOST_REQUIRE( item );
@@ -172,7 +172,7 @@ BOOST_AUTO_TEST_CASE( buildStructuredTopology ) {
   xmlDocPtr document = xmlParseDoc( reinterpret_cast< const xmlChar * >(kXml) );
   xmlNode * rootNode = xmlDocGetRootElement( document );
 
-  xdmf::impl::TreeBuilder builder( document );
+  xdmf::impl::TreeBuilder builder( rootNode );
   xdm::RefPtr< xdmGrid::Topology > result = builder.buildTopology( rootNode );
 
   BOOST_REQUIRE( result );
@@ -191,8 +191,12 @@ BOOST_AUTO_TEST_CASE( buildStaticTree ) {
 
   xmlDocPtr document = xmlParseFile( "test_document1.xmf" );
   BOOST_REQUIRE( document );
+  xmlNode * root = xmlDocGetRootElement( document );
 
-  xdmf::impl::TreeBuilder builder( document );
+  xdmf::impl::XPathQuery gridQuery( document, root, "/Xdmf/Domain/Grid" );
+  BOOST_REQUIRE_EQUAL( gridQuery.size(), 1 );
+
+  xdmf::impl::TreeBuilder builder( gridQuery.node( 0 ) );
   xdm::RefPtr< xdm::Item > result = builder.buildTree();
   BOOST_REQUIRE( result );
 

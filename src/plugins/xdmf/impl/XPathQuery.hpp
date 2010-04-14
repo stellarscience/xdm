@@ -80,31 +80,35 @@ inline std::string makeXPathQuery( const NodePath& nodePath ) {
 /// lifetime of the XPathQuery object.
 class XPathQuery {
 private:
+  xmlXPathContextPtr mXPathContext;
   xmlXPathObjectPtr mXPathObject;
   size_t mSize;
+
 public:
   /// Constructor takes a context, an XML node in which to query, and a query
   /// string.  If the query is invalid, the resulting size of the query will
   /// be 0.
   XPathQuery(
-    xmlXPathContextPtr context,
+    xmlDoc * document,
     xmlNode * node,
     const std::string& query ) :
     mXPathObject( NULL )
   {
-    xmlNode * oldNode = context->node;
-    context->node = node;
+    mXPathContext = xmlXPathNewContext( document );
+    mXPathContext->node = node;
     mXPathObject = xmlXPathEvalExpression(
-      (xmlChar *)query.c_str(), context );
+      (xmlChar *)query.c_str(), mXPathContext );
     if ( mXPathObject && mXPathObject->nodesetval ) {
       mSize = mXPathObject->nodesetval->nodeNr;
     } else {
       mSize = 0;
     }
-    context->node = oldNode;
   }
 
-  ~XPathQuery() { xmlXPathFreeObject( mXPathObject ); }
+  ~XPathQuery() {
+    xmlXPathFreeObject( mXPathObject );
+    xmlXPathFreeContext( mXPathContext );
+  }
 
   size_t size() const {
     return mSize;
@@ -152,7 +156,6 @@ inline void findPathToAncestor(
   xmlDoc * doc,
   xmlNode * descendant,
   xmlNode * ancestor,
-  xmlXPathContext * xpathContext,
   NodePath& accumulator )
 {
   if ( descendant == (xmlNode*)doc || descendant == NULL ) {
@@ -166,7 +169,7 @@ inline void findPathToAncestor(
 
   // Determine which child of it's parent the descendant is
   std::string queryString( (char *)descendant->name );
-  XPathQuery child( xpathContext, descendant->parent, queryString );
+  XPathQuery child( doc, descendant->parent, queryString );
   size_t index = 0;
   while( child.node(index) != descendant ) {
     index++;
@@ -178,21 +181,13 @@ inline void findPathToAncestor(
     doc,
     descendant->parent,
     ancestor,
-    xpathContext,
     accumulator );
 }
 
 /// Find a path to an ancestor (entry point).
 inline NodePath findPathToAncestor( xmlDoc * doc, xmlNode * descendant, xmlNode * ancestor ) {
   NodePath result;
-  xmlXPathContext * context = xmlXPathNewContext( doc );
-  try {
-    findPathToAncestor( doc, descendant, ancestor, context, result );
-  } catch ( ... ) {
-    xmlXPathFreeContext( context );
-    throw;
-  }
-  xmlXPathFreeContext( context );
+  findPathToAncestor( doc, descendant, ancestor, result );
   return result;
 }
 
