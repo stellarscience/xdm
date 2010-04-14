@@ -172,10 +172,10 @@ BOOST_AUTO_TEST_CASE( timeSeries ) {
       xdm::Dataset::kCreate ) );
   temporalCollection->open();
 
-  xdm::RefPtr< xdmf::TimeSeries > virtualDataset(
-    new xdmf::VirtualDataset( "XdmfGridCompatibility.virtualDataset",
-      xdm::Dataset::kCreate ) );
-  virtualDataset->open();
+  // xdm::RefPtr< xdmf::TimeSeries > virtualDataset(
+  //  new xdmf::VirtualDataset( "XdmfGridCompatibility.virtualDataset",
+  //    xdm::Dataset::kCreate ) );
+  // virtualDataset->open();
 
   // since the geometry and topology of the grid will remain constant throughout
   // the simulation, we make a single object here to share.
@@ -242,10 +242,10 @@ BOOST_AUTO_TEST_CASE( timeSeries ) {
     
     // write the grid for this step to the TimeSeries files
     xdmf::writeTimestepGrid( temporalCollection, grid );
-    xdmf::writeTimestepGrid( virtualDataset, grid );
+    // xdmf::writeTimestepGrid( virtualDataset, grid );
   }
   temporalCollection->close();
-  virtualDataset->close();
+  // virtualDataset->close();
 }
 
 } // namespace

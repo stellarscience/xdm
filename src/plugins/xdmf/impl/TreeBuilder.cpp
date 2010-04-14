@@ -162,8 +162,17 @@ xdm::RefPtr< xdm::Item > TreeBuilder::buildTree() {
 //------------------------------------------------------------------------------
 xdm::RefPtr< xdm::UniformDataItem > 
 TreeBuilder::buildUniformDataItem( xmlNode * node ) {
-  xdm::RefPtr< xdm::UniformDataItem > result( new xdm::UniformDataItem );
-  configureUniformDataItem( result, node );
+  xdm::RefPtr< InputItem< xdm::UniformDataItem > > result(
+    new InputItem< xdm::UniformDataItem > );
+  configureUniformDataItem( *result, node );
+
+  // determine the path to the time step root.
+  NodePath pathToTimestepRoot = findPathToAncestor( mDocument, node, mTimeCollectionRoot );
+  // reverse it so we can find the path from the time step root to the node.
+  std::reverse( pathToTimestepRoot.begin(), pathToTimestepRoot.end() );
+  // Set the path on the InputItem.
+  result->setXPathExpr( makeXPathQuery( pathToTimestepRoot ) );
+
   return result;
 }
 
@@ -335,7 +344,7 @@ xdm::RefPtr< xdmGrid::Topology > TreeBuilder::buildTopology( xmlNode * node ) {
   } else {
     xdm::RefPtr< xdmGrid::RectilinearMesh > structuredTopology(
       new xdmGrid::RectilinearMesh );
-    configureStructuredTopology( structuredTopology, node );
+    configureStructuredTopology( *structuredTopology, node );
     result = structuredTopology;
   }
 
@@ -580,7 +589,7 @@ TreeBuilder::buildTemporalCollectionGrid( xmlNode * node ) {
 }
 
 void TreeBuilder::configureStructuredTopology(
-  xdm::RefPtr<xdmGrid::StructuredTopology> topology,
+  xdmGrid::StructuredTopology& topology,
   xmlNode * content ) {
   // Get the attribute that specifies the shape of the structured topology
   XPathQuery shapeQuery( mXPathContext, content, "@Dimensions|@NumberOfElements" );
@@ -590,7 +599,7 @@ void TreeBuilder::configureStructuredTopology(
     // geometry ordering. Reverse the shape to follow the XDM convention of
     // XYZ ordering and match the grid geometry specification.
     topologyShape.reverseDimensionOrder();
-    topology->setShape( topologyShape );
+    topology.setShape( topologyShape );
   } else {
     XDM_THROW( xdmFormat::ReadError(
       "No dimensions specified for XDMF structured topology" ) );
@@ -598,7 +607,7 @@ void TreeBuilder::configureStructuredTopology(
 }
 
 void TreeBuilder::configureUniformDataItem(
-  xdm::RefPtr<xdm::UniformDataItem> item,
+  xdm::UniformDataItem& item,
   xmlNode * node ) {
 
   // Get the number type from the NumberType attribute.
@@ -617,14 +626,14 @@ void TreeBuilder::configureUniformDataItem(
     precision = 4;
   }
   xdm::primitiveType::Value dataType = type( typeString, precision );
-  item->setDataType( dataType );
+  item.setDataType( dataType );
 
   // Get the shape from the Dimensions attribute.
   XPathQuery dimensionsQuery( mXPathContext, node, "@Dimensions" );
   if ( dimensionsQuery.size() == 0 ) {
     XDM_THROW( xdmFormat::ReadError( "No dimensions for a UniformDataItem." ) );
   }
-  item->setDataspace( xdm::makeShape( dimensionsQuery.textValue( 0 ) ) );
+  item.setDataspace( xdm::makeShape( dimensionsQuery.textValue( 0 ) ) );
 
   // Get the format string for the dataset.
   XPathQuery formatQuery( mXPathContext, node, "@Format" );
@@ -636,8 +645,8 @@ void TreeBuilder::configureUniformDataItem(
   // Build the dataset.
   if ( format == "HDF" ) {
     xdm::RefPtr< xdmHdf::HdfDataset > dataset;
-    if ( item->dataset() ) {
-      dataset = xdm::dynamic_pointer_cast< xdmHdf::HdfDataset >( item->dataset() );
+    if ( item.dataset() ) {
+      dataset = xdm::dynamic_pointer_cast< xdmHdf::HdfDataset >( item.dataset() );
     } else {
       dataset = new xdmHdf::HdfDataset;
     }
@@ -654,7 +663,7 @@ void TreeBuilder::configureUniformDataItem(
       dataset->setFile( fileString );
       dataset->setGroupPath( groupPath );
       dataset->setDataset( datasetString );
-      item->setDataset( dataset );
+      item.setDataset( dataset );
     } else {
       XDM_THROW( xdmFormat::ReadError( "Invalid HDF dataset specification" ) );
     }
@@ -665,12 +674,12 @@ void TreeBuilder::configureUniformDataItem(
 
   // Give the item an array to hold the data from the dataset should it be
   // loaded into memory.
-  if ( !item->data() ) {
+  if ( !item.data() ) {
     xdm::RefPtr< xdm::StructuredArray > array(
       xdm::makeVectorStructuredArray( dataType ) );
     xdm::RefPtr< xdm::ArrayAdapter > adapter( new xdm::ArrayAdapter( array ) );
     adapter->setIsMemoryResident( false );
-    item->setData( adapter );
+    item.setData( adapter );
   }
 }
 

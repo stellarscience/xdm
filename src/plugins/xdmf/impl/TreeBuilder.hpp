@@ -53,6 +53,19 @@ namespace impl {
 /// A list of XML nodes.
 typedef std::vector< xmlNode * > NodeList;
 
+template< typename ItemT >
+class InputItem : public ItemT {
+public:
+  InputItem() : ItemT() {}
+  virtual ~InputItem() {}
+
+  void setXPathExpr( const std::string& xpathExpr ) { mXPathExpr = xpathExpr; }
+  const std::string& xpathExpr() const { return mXPathExpr; }
+
+private:
+  std::string mXPathExpr;
+};
+
 /// Implementation class for building an XDM tree given a parsed and validated
 /// XDMF libXml document pointer.
 class TreeBuilder {
@@ -98,7 +111,7 @@ public:
   xdm::RefPtr< xdmGrid::Topology > buildTopology( xmlNode * node );
 
   xdm::RefPtr< xdmGrid::Attribute > buildAttribute( xmlNode * node );
-  \
+
   xdm::RefPtr< xdm::UniformDataItem > buildUniformDataItem( xmlNode * node );
 
   xdm::RefPtr< xdm::DataItem > buildDataItem( xmlNode * node );
@@ -107,14 +120,10 @@ public:
   //@}
 
   /// Configure a StructuredTopology given an XML node with XDMF Topology content.
-  void configureStructuredTopology(
-    xdm::RefPtr< xdmGrid::StructuredTopology > t,
-    xmlNode * content );
+  void configureStructuredTopology( xdmGrid::StructuredTopology& t, xmlNode * content );
 
   /// Configure a UniformDataItem given an XML node with XDMF UniformDataItem content.
-  void configureUniformDataItem(
-    xdm::RefPtr< xdm::UniformDataItem > item,
-    xmlNode * content );
+  void configureUniformDataItem( xdm::UniformDataItem& item, xmlNode * content );
 
   /// After the tree has been built, get a list of the XML nodes corresponding
   /// to each time step.

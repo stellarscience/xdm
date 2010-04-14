@@ -49,9 +49,7 @@ double function( double x, double y ) {
 static const int kMeshSize[2] = { 10, 5 };
 static const double kRange[2][2] = { {0.0, 360.0}, {-90.0, 90.0} };
 
-// Function to build a 2D grid and write it to disk.
-void write2DGrid( const xdm::FileSystemPath& path ) {
-
+xdm::RefPtr< xdmGrid::UniformGrid > build2DGrid() {
   xdm::RefPtr< xdmGrid::UniformGrid > grid( new xdmGrid::UniformGrid );
 
   // Topology
@@ -77,10 +75,6 @@ void write2DGrid( const xdm::FileSystemPath& path ) {
         (*meshValues[i])[j] = kRange[i][0] + j * ( (kRange[i][1] - kRange[i][0]) / kMeshSize[i] );
       }
       dataItem->setData( xdm::makeRefPtr( new xdm::ArrayAdapter( meshValues[i] ) ) );
-      xdm::RefPtr< xdmHdf::HdfDataset > dataset( new xdmHdf::HdfDataset );
-      dataset->setFile( path.pathString() + ".h5" );
-      dataset->setDataset( (i == 0) ? "xgrid" : "ygrid" );
-      dataItem->setDataset( dataset );
       geometry->setCoordinateValues( i, dataItem );
     }
     grid->setGeometry( geometry );
@@ -106,16 +100,17 @@ void write2DGrid( const xdm::FileSystemPath& path ) {
         xdm::primitiveType::kDouble,
         xdm::makeShape( kMeshSize[1], kMeshSize[0] ) ) );
     dataItem->setData( xdm::makeRefPtr( new xdm::ArrayAdapter( attrValues ) ) );
-    xdm::RefPtr< xdmHdf::HdfDataset > dataset( new xdmHdf::HdfDataset );
-    dataset->setFile( path.pathString() + ".h5" );
-    dataset->setDataset( "attr" );
-    dataItem->setDataset( dataset );
     attribute->setDataItem( dataItem );
     grid->addAttribute( attribute );
   }
 
+  return grid;
+}
+
+// Function to build a 2D grid and write it to disk.
+void write2DGrid( const xdm::FileSystemPath& path ) {
   xdmf::XmfWriter writer;
-  writer.writeItem( grid, xdm::FileSystemPath( path.pathString() ) );
+  writer.writeItem( build2DGrid(), path );
 }
 
 BOOST_AUTO_TEST_CASE( parseFile ) {
@@ -142,6 +137,10 @@ BOOST_AUTO_TEST_CASE( invalidDocument ) {
 
 BOOST_AUTO_TEST_CASE( grid2DRoundtrip ) {
   const xdm::FileSystemPath testFilePath( "grid2DRoundtrip.xmf" );
+  const xdm::FileSystemPath testHdfFilePath( "grid2DRoundtrip.xmf.h5" );
+
+  xdm::remove( testFilePath );
+  xdm::remove( testHdfFilePath );
 
   write2DGrid( testFilePath );
 

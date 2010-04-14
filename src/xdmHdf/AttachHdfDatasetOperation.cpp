@@ -63,10 +63,15 @@ void AttachHdfDatasetOperation::apply( xdm::UniformDataItem& item ) {
     return;
   }
 
-  // Try to choose a good name for the dataset.
-  std::string name = mCommonName;
+  // If the data item has a name use it, otherwise generate a unique name with
+  // the string value of the pointer to the data item.
+  std::string name;
   if ( !item.name().empty() ) {
     name = item.name();
+  } else {
+    std::ostringstream ss;
+    ss << &item;
+    name = ss.str();
   }
 
   // The item has no dataset, build an HDF dataset for the current group path.

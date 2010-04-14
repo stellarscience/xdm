@@ -187,6 +187,8 @@ BOOST_AUTO_TEST_CASE( buildStructuredTopology ) {
 }
 
 BOOST_AUTO_TEST_CASE( buildStaticTree ) {
+  typedef xdmf::impl::InputItem< xdm::UniformDataItem > InputUDI;
+
   xmlDocPtr document = xmlParseFile( "test_document1.xmf" );
   BOOST_REQUIRE( document );
 
@@ -222,16 +224,30 @@ BOOST_AUTO_TEST_CASE( buildStaticTree ) {
   BOOST_REQUIRE( tpGeo );
   BOOST_REQUIRE_EQUAL( tpGeo->dimension(), 3 );
   size_t sizes[] = {129, 129, 383};
+  const char * paths[3] = {
+    "Geometry[1]/DataItem[1]",
+    "Geometry[1]/DataItem[2]",
+    "Geometry[1]/DataItem[3]"
+  };
   for ( int i = 0; i < 3; i++ ) {
     xdm::RefPtr< xdm::UniformDataItem > geoData = tpGeo->child( i );
     BOOST_REQUIRE( geoData );
     BOOST_REQUIRE_EQUAL( geoData->dataspace().rank(), 1 );
     BOOST_CHECK_EQUAL( geoData->dataspace()[0], sizes[i] );
+    xdm::RefPtr< InputUDI > inputItem =
+      xdm::dynamic_pointer_cast< InputUDI >( geoData );
+    BOOST_REQUIRE( inputItem );
+    BOOST_CHECK_EQUAL( inputItem->xpathExpr(), paths[i] );
   }
 
   // Check the attributes.
   BOOST_REQUIRE_EQUAL( grid->numberOfChildren(), 3 );
   char * names[3] = { "E", "B", "InternalCell" };
+  const char * dataPaths[3] = {
+    "Attribute[1]/DataItem[1]",
+    "Attribute[2]/DataItem[1]",
+    "Attribute[3]/DataItem[1]"
+  };
   xdmGrid::Attribute::Type types[] = {
     xdmGrid::Attribute::kVector,
     xdmGrid::Attribute::kVector,
@@ -249,6 +265,10 @@ BOOST_AUTO_TEST_CASE( buildStaticTree ) {
     BOOST_CHECK_EQUAL( attr->centering(), centers[i] );
     xdm::RefPtr< xdm::UniformDataItem > attrData = attr->dataItem();
     BOOST_REQUIRE( attrData );
+    xdm::RefPtr< InputUDI > inputItem =
+      xdm::dynamic_pointer_cast< InputUDI >( attrData );
+    BOOST_REQUIRE( inputItem );
+    BOOST_CHECK_EQUAL( inputItem->xpathExpr(), dataPaths[i] );
   }
 }
 
