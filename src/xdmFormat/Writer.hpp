@@ -5,37 +5,48 @@
 #ifndef xdmFormat_Writer_hpp
 #define xdmFormat_Writer_hpp
 
+#include <xdm/Dataset.hpp>
 #include <xdm/FileSystem.hpp>
 #include <xdm/Forward.hpp>
 #include <xdm/ReferencedObject.hpp>
+
+#include <stdexcept>
 
 #include <xdmFormat/NamespaceMacro.hpp>
 
 XDM_FORMAT_NAMESPACE_BEGIN
 
-/// Interface for types that write items to files. Implement this interface to
-/// write a tree of items to a file.
+/// Base exception for errors that occur while writing data to disk.
+class WriteError : public std::runtime_error {
+public:
+  WriteError( const std::string& message ) :
+    std::runtime_error( message.c_str() ) {}
+  virtual ~WriteError() throw() {}
+};
+
+/// Interface for streaming a series of data to one or more files. Inheritors
+/// should implement this interface to stream a data series to a file.
 class Writer : public xdm::ReferencedObject {
 public:
   Writer();
   virtual ~Writer();
 
+  /// Begin a series of data.
+  /// @param path The path to open.
+  virtual void open(
+    const xdm::FileSystemPath& path,
+    xdm::Dataset::InitializeMode mode ) = 0;
+
   /// Write an Item to the file with the given path.
-  /// @param path Path to the file to write.
   /// @param item The tree to write. It is non-const because writing may change the
   ///        state of some of the data items.
-  virtual void writeItem( xdm::RefPtr< xdm::Item > item, const xdm::FileSystemPath& path ) = 0;
+  /// @pre The stream was opened with a call to open.
+  /// @throw WriteError Data could not be written to the stream.
+  virtual void write( xdm::RefPtr< xdm::Item > item ) = 0;
 
-  /// Write an existing Item and it's subtree at a new time step. If there is no dynamic
-  /// data in the tree, then this function does nothing.
-  /// @pre The item was written eariler with writeItem.
-  /// @post The data in the output file is updated to reflect the new time step.
-  /// @param item An existing item tree.
-  /// @return True if new data was written, false otherwise.
-  virtual bool update(
-    xdm::RefPtr< xdm::Item > item,
-    const xdm::FileSystemPath& path,
-    std::size_t timeStep = 0 ) = 0;
+  /// Close a series that was previously opened, cleaning up any resources that
+  /// were required for streaming data.
+  virtual void close() = 0;
 
 };
 

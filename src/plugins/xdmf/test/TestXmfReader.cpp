@@ -110,7 +110,9 @@ xdm::RefPtr< xdmGrid::UniformGrid > build2DGrid() {
 // Function to build a 2D grid and write it to disk.
 void write2DGrid( const xdm::FileSystemPath& path ) {
   xdmf::XmfWriter writer;
-  writer.writeItem( build2DGrid(), path );
+  writer.open( path, xdm::Dataset::kCreate );
+  writer.write( build2DGrid() );
+  writer.close();
 }
 
 BOOST_AUTO_TEST_CASE( parseFile ) {

@@ -46,6 +46,7 @@ struct WriteFormattedXml {
 XmlOutputStream::XmlOutputStream( std::ostream& output ) :
   mOutput( output ),
   mContextStack() {
+  output << "<?xml version='1.0'?>\n";
 }
 
 XmlOutputStream::~XmlOutputStream() {

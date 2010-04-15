@@ -4,42 +4,11 @@
    datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 
   <start>
-    <ref name="XdmfRoot"/>
+    <ref name="xdmf-root"/>
   </start>
 
-  <!-- The Root Xdmf Element -->
-  <define name="XdmfRoot">
-    <element name="Xdmf">
-      <optional>
-        <attribute name="Version"><text/></attribute>
-      </optional>
-      <zeroOrMore>
-        <choice>
-          <ref name="DataItem"/>
-          <ref name="Domain"/>
-          <ref name="Information"/>
-        </choice>
-      </zeroOrMore>
-    </element>
-  </define>
-
-  <!-- XDMF Information Specification -->
-  <define name="Information">
-    <element name="Information">
-      <ref name="NameAttribute"/>
-      <attribute name="Value"><text/></attribute>
-    </element>
-  </define>
-
-  <!-- Information can be used anywhere in the tree -->
-  <define name="OptionalInformation">
-    <zeroOrMore>
-      <ref name="Information"/>
-    </zeroOrMore>
-  </define>
-
-  <!-- Name attribute specification -->
-  <define name="NameAttribute">
+  <!-- A name attribute -->
+  <define name="name-attribute">
     <optional>
       <attribute name="Name">
         <text/>
@@ -47,15 +16,49 @@
     </optional>
   </define>
 
+  <!-- Any Element in the tree can have a name or information -->
+  <define name="xdmf-base">
+    <ref name="name-attribute"/>
+    <zeroOrMore>
+      <ref name="information"/>
+    </zeroOrMore>
+  </define>
+
+  <!-- The Root Xdmf Element -->
+  <define name="xdmf-root">
+    <element name="Xdmf">
+      <ref name="xdmf-base"/>
+      <optional>
+        <attribute name="Version"><text/></attribute>
+      </optional>
+      <zeroOrMore>
+        <choice>
+          <ref name="dataitem"/>
+          <ref name="domain"/>
+        </choice>
+      </zeroOrMore>
+    </element>
+  </define>
+
+  <!-- XDMF Information Specification -->
+  <define name="information">
+    <element name="Information">
+      <ref name="xdmf-base"/>
+      <optional>
+        <attribute name="Value"><text/></attribute>
+      </optional>
+    </element>
+  </define>
+
   <!-- XDMF DataItem Specification -->
-  <define name="DataItem">
+  <define name="dataitem">
     <element name="DataItem">
+      <ref name="xdmf-base"/>
       <optional>
         <attribute name="Dimensions">
           <data type="string"/>
         </attribute> <!-- Dimensions -->
       </optional>
-      <ref name="NameAttribute"/>
       <optional>
         <attribute name="ItemType">
           <choice>
@@ -94,33 +97,31 @@
   </define>
 
   <!-- XDMF Domain Specification -->
-  <define name="Domain">
+  <define name="domain">
     <element name="Domain">
-      <optional>
-        <ref name="NameAttribute"/>
-      </optional>
+      <ref name="xdmf-base"/>
       <zeroOrMore>
         <choice>
-          <ref name="Grid"/>
-          <ref name="DataItem"/>
-          <ref name="Information"/>
+          <ref name="grid"/>
+          <ref name="dataitem"/>
         </choice>
       </zeroOrMore>
     </element>
   </define>
 
   <!-- XDMF Grid Specification -->
-  <define name="Grid">
+  <define name="grid">
     <element name="Grid">
-      <ref name="NameAttribute"/>
-      <attribute name="GridType">
-        <choice>
-          <value>Uniform</value>
-          <value>Collection</value>
-          <value>Tree</value>
-          <value>Subset</value>
-        </choice>
-      </attribute>
+      <optional>
+        <attribute name="GridType">
+          <choice>
+            <value>Uniform</value>
+            <value>Collection</value>
+            <value>Tree</value>
+            <value>Subset</value>
+          </choice>
+        </attribute>
+      </optional>
       <optional>
         <attribute name="CollectionType">
           <choice>
@@ -139,23 +140,29 @@
       </optional>
       <!-- Element Children -->
       <interleave>
-        <ref name="OptionalInformation"/>
-        <ref name="Geometry"/>
-        <ref name="Topology"/>
         <optional>
-          <ref name="Time"/>
+          <ref name="grid"/>
+        </optional>
+        <optional>
+          <ref name="geometry"/>
+        </optional>
+        <optional>
+          <ref name="topology"/>
+        </optional>
+        <optional>
+          <ref name="time"/>
         </optional>
         <zeroOrMore>
-          <ref name="Attribute"/>
+          <ref name="attribute"/>
         </zeroOrMore>
       </interleave>
     </element>
   </define>
 
   <!-- XDMF Geometry Specification -->
-  <define name="Geometry">
+  <define name="geometry">
     <element name="Geometry">
-      <ref name="NameAttribute"/>
+      <ref name="xdmf-base"/>
       <optional>
         <attribute name="GeometryType">
           <choice>
@@ -171,17 +178,15 @@
         </attribute>
       </optional>
       <oneOrMore>
-        <ref name="DataItem"/>
+        <ref name="dataitem"/>
       </oneOrMore>
     </element>
   </define>
 
   <!-- XDMF Topology Specification -->
-  <define name="Topology">
+  <define name="topology">
     <element name="Topology">
-      <optional>
-        <ref name="NameAttribute"/>
-      </optional>
+      <ref name="xdmf-base"/>
       <attribute name="TopologyType">
         <choice>
           <value>Polyvertex</value>
@@ -227,15 +232,15 @@
         </attribute>
       </choice>
       <zeroOrMore>
-        <ref name="DataItem"/>
+        <ref name="dataitem"/>
       </zeroOrMore>
     </element>
   </define>
 
   <!-- XDMF Attribute Specification -->
-  <define name="Attribute">
+  <define name="attribute">
     <element name="Attribute">
-      <ref name="NameAttribute"/>
+      <ref name="xdmf-base"/>
       <optional>
         <attribute name="AttributeType">
           <choice>
@@ -259,12 +264,13 @@
           </choice>
         </attribute>
       </optional>
-      <ref name="DataItem"/>
+      <ref name="dataitem"/>
     </element>
   </define>
 
   <!-- XDMF Time Specification -->
-  <define name="Time">
+  <define name="time">
+    <ref name="xdmf-base"/>
     <element name="Time">
       <optional>
         <attribute name="TimeType">
@@ -282,7 +288,7 @@
         </attribute>
       </optional>
       <optional>
-        <ref name="DataItem"/>
+        <ref name="dataitem"/>
       </optional>
     </element>
   </define>

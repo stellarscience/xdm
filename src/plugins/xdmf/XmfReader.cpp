@@ -210,7 +210,7 @@ XmfReader::~XmfReader() {
 xdmFormat::Reader::ReadResult
 XmfReader::readItem( const xdm::FileSystemPath& path ) {
   static const char * kTemporalCollectionExpr =
-    "/Xdmf/Grid[@GridType=\"Collection\" and @CollectionType=\"Temporal\"]";
+    "/Xdmf/Domain/Grid[@GridType=\"Collection\" and @CollectionType=\"Temporal\"]";
 
   xdm::RefPtr< xdm::Item > result;
 

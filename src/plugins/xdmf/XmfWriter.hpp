@@ -21,6 +21,8 @@
 #ifndef xdmf_XmfWriter_hpp
 #define xdmf_XmfWriter_hpp
 
+#include <xdmf/TimeSeries.hpp>
+
 #include <xdmFormat/Writer.hpp>
 
 #include <map>
@@ -29,26 +31,22 @@
 
 XDMF_NAMESPACE_BEGIN
 
-class TimeSeries;
-
 /// Implementation of xdmFormat::Writer for writing XDMF files.
 class XmfWriter : public xdmFormat::Writer {
 public:
   XmfWriter();
   virtual ~XmfWriter();
 
-  /// Write an item to and XDMF file.
-  virtual void writeItem( xdm::RefPtr< xdm::Item > item, const xdm::FileSystemPath& path );
-
-  /// Write an existing Item at a new time step;
-  virtual bool update(
-    xdm::RefPtr<xdm::Item>item,
-    const xdm::FileSystemPath &path,
-    std::size_t timeStep );
+  virtual void open(
+    const xdm::FileSystemPath& path,
+    xdm::Dataset::InitializeMode mode );
+  virtual void write( xdm::RefPtr< xdm::Item > item );
+  virtual void close();
 
 private:
-  typedef std::map< xdm::FileSystemPath, xdm::RefPtr< TimeSeries > > FileMap;
-  FileMap mWriters;
+  xdm::RefPtr< TimeSeries > mSeries;
+  bool mIsOpen;
+  xdm::FileSystemPath mCurrentFilePath;
 };
 
 XDMF_NAMESPACE_END
