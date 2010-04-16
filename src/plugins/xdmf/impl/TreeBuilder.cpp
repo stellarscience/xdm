@@ -140,7 +140,7 @@ xdm::RefPtr< xdm::Item > TreeBuilder::buildTree() {
 }
 
 //------------------------------------------------------------------------------
-xdm::RefPtr< xdm::UniformDataItem > 
+xdm::RefPtr< xdm::UniformDataItem >
 TreeBuilder::buildUniformDataItem( xmlNode * node ) {
   xdm::RefPtr< InputItem< xdm::UniformDataItem > > result(
     new InputItem< xdm::UniformDataItem > );
@@ -338,7 +338,7 @@ xdm::RefPtr< xdmGrid::Topology > TreeBuilder::buildTopology( xmlNode * node ) {
 }
 
 //------------------------------------------------------------------------------
-xdm::RefPtr< xdmGrid::Attribute > 
+xdm::RefPtr< xdmGrid::Attribute >
 TreeBuilder::buildAttribute( xmlNode * node ) {
   // Mapping from XDMF XML attribute type values to enumeration of types.
   typedef std::map< std::string, xdmGrid::Attribute::Type > TypeMap;
@@ -357,7 +357,7 @@ TreeBuilder::buildAttribute( xmlNode * node ) {
   static CenterMap centerMap;
   if ( centerMap.empty() ) {
     centerMap["Node"] = xdmGrid::Attribute::kNode;
-    centerMap["Cell"] = xdmGrid::Attribute::kCell;
+    centerMap["Cell"] = xdmGrid::Attribute::kElement;
     centerMap["Grid"] = xdmGrid::Attribute::kGrid;
     centerMap["Face"] = xdmGrid::Attribute::kFace;
     centerMap["Edge"] = xdmGrid::Attribute::kEdge;
@@ -411,7 +411,7 @@ TreeBuilder::buildAttribute( xmlNode * node ) {
 }
 
 //------------------------------------------------------------------------------
-xdm::RefPtr< xdmGrid::UniformGrid > 
+xdm::RefPtr< xdmGrid::UniformGrid >
 TreeBuilder::buildUniformGrid( xmlNode * node ) {
 
   xdm::RefPtr< xdmGrid::UniformGrid > result( new xdmGrid::UniformGrid );

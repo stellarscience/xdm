@@ -36,7 +36,7 @@ public:
 
   std::size_t numberOfNodes() { return 8; }
 
-  std::size_t numberOfCells() { return 5; }
+  std::size_t numberOfElements() { return 5; }
 
   CubeOfTets() {
     mNodeX[0] = 0.;
@@ -73,7 +73,7 @@ public:
       mNodes[i*3+2] = mNodeZ[i];
     }
 
-    // Tetrahedra have 4 nodes each. The array goes cell0node0, cell0node1, ...cell5node3. Ordering
+    // Tetrahedra have 4 nodes each. The array goes element0node0, element0node1, ...element5node3. Ordering
     // is ExodusII style (right hand rule on one face points thumb toward 4th node).
     mConnectivity[ 0] = 0; // tet 0
     mConnectivity[ 1] = 2;

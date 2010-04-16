@@ -93,7 +93,7 @@ constructFunctionGrid( const GridBounds& bounds, const std::string& hdfFile ) {
   // construct an attribute to hold the function values
   xdm::RefPtr< xdmGrid::Attribute > attribute = xdmGrid::createAttribute (
     grid,
-    xdmGrid::Attribute::kCell,
+    xdmGrid::Attribute::kElement,
     xdmGrid::Attribute::kScalar,
     "FunctionValues",
     xdm::primitiveType::kDouble );
@@ -157,11 +157,11 @@ void FunctionData::writeImplementation( xdm::Dataset* dataset ) {
     int sizeK = block->count(2);
 
     for ( int k = 0; k < sizeK; k++ ) {
-      double z = mGrid.cellCoordinate( 2, startK + k );
+      double z = mGrid.elementCoordinate( 2, startK + k );
       for ( int j = 0; j < sizeJ; j++ ) {
-        double y = mGrid.cellCoordinate( 1, startJ + j );
+        double y = mGrid.elementCoordinate( 1, startJ + j );
         for ( int i = 0; i < sizeI; i++ ) {
-          double x = mGrid.cellCoordinate( 0, startI + i );
+          double x = mGrid.elementCoordinate( 0, startI + i );
           double result = (*mFunction)( x, y, z );
           int arrayLocation = i + j*sizeI + k*sizeI*sizeJ;
           mStorage[arrayLocation] = result;

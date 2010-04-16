@@ -29,7 +29,7 @@ BOOST_AUTO_TEST_CASE( writeMetadata ) {
   xdmGrid::Polyvertex t;
   xdm::XmlMetadataWrapper xml( xdm::makeRefPtr( new xdm::XmlObject ) );
 
-  t.setNumberOfCells( 12 );
+  t.setNumberOfElements( 12 );
 
   t.writeMetadata( xml );
 

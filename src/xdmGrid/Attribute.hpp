@@ -47,7 +47,7 @@ public:
     kNode = 0,
     kEdge,
     kFace,
-    kCell,
+    kElement,
     kGrid
   };
 

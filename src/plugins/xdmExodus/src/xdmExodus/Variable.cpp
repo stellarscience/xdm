@@ -35,7 +35,7 @@ Variable::Variable(
   int objectId,
   std::size_t numberOfEntries ) :
 
-  xdmGrid::Attribute( xdmGrid::Attribute::kScalar, xdmGrid::Attribute::kCell ),
+  xdmGrid::Attribute( xdmGrid::Attribute::kScalar, xdmGrid::Attribute::kElement ),
   mExodusObjectType( exodusObjectType ),
   mVariableIndex( variableIndex ),
   mObjectId( objectId ) {

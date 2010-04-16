@@ -34,7 +34,7 @@ XDM_GRID_NAMESPACE_BEGIN
 StructuredTopology::StructuredTopology() :
   Topology(),
   mShape(),
-  mCellType( CellType::Default ) {
+  mElementType( ElementType::Default ) {
 }
 
 StructuredTopology::~StructuredTopology() {
@@ -46,15 +46,15 @@ NodeOrderingConvention::Type StructuredTopology::nodeOrdering() const {
 
 void StructuredTopology::setShape( const xdm::DataShape<>& shape ) {
   mShape = shape;
-  setNumberOfCells(
+  setNumberOfElements(
     std::accumulate( shape.begin(), shape.end(), 1, std::multiplies< std::size_t>() ) );
   std::size_t rank = mShape.rank();
   switch( rank ) {
     case 2:
-      mCellType = CellType::Quad;
+      mElementType = ElementType::Quad;
       break;
     case 3:
-      mCellType = CellType::Hex;
+      mElementType = ElementType::Hex;
       break;
     default:
       std::stringstream ss;
@@ -68,8 +68,8 @@ const xdm::DataShape<>& StructuredTopology::shape() const {
   return mShape;
 }
 
-const CellType::Type& StructuredTopology::cellType( std::size_t /* cellIndex */ ) const {
-  return mCellType;
+const ElementType::Type& StructuredTopology::elementType( std::size_t /* elementIndex */ ) const {
+  return mElementType;
 }
 
 void StructuredTopology::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
@@ -83,7 +83,7 @@ void StructuredTopology::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
 
   unsigned int rank = shape().rank();
   switch ( rank ) {
-  case 2: 
+  case 2:
     xml.setAttribute( "TopologyType", "2DRectMesh" );
     break;
   case 3:
@@ -140,7 +140,7 @@ xdm::RefPtr< xdm::VectorRefImp< std::size_t > > StructuredTopology::createVector
   }
 
   return xdm::RefPtr< xdm::VectorRefImp< std::size_t > >(
-    new xdm::SingleArrayOfVectorsImp< std::size_t >( &mNodes[0], mCellType.nodesPerCell() ) );
+    new xdm::SingleArrayOfVectorsImp< std::size_t >( &mNodes[0], mElementType.nodesPerElement() ) );
 }
 
 XDM_GRID_NAMESPACE_END

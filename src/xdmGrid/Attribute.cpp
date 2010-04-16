@@ -49,7 +49,7 @@ namespace {
       insert( make_pair( Attribute::kNode, "Node" ) );
       insert( make_pair( Attribute::kEdge, "Edge" ) );
       insert( make_pair( Attribute::kFace, "Face" ) );
-      insert( make_pair( Attribute::kCell, "Cell" ) );
+      insert( make_pair( Attribute::kElement, "Element" ) );
       insert( make_pair( Attribute::kGrid, "Grid" ) );
     }
   };

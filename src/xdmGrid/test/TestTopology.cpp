@@ -27,21 +27,21 @@ namespace {
 
 class ConcreteTopology : public xdmGrid::Topology {
 public:
-  ConcreteTopology() : mCellType( xdmGrid::CellType::Default ) {}
+  ConcreteTopology() : mElementType( xdmGrid::ElementType::Default ) {}
 
   virtual xdmGrid::NodeOrderingConvention::Type nodeOrdering() const {
     return xdmGrid::NodeOrderingConvention::ExodusII;
   }
 
-  virtual const xdmGrid::CellType::Type& cellType( std::size_t cellIndex ) const {
-    return mCellType;
+  virtual const xdmGrid::ElementType::Type& elementType( std::size_t elementIndex ) const {
+    return mElementType;
   }
 
   virtual xdm::RefPtr< xdm::VectorRefImp< std::size_t > > createVectorImp() {
     return xdm::RefPtr< xdm::VectorRefImp< std::size_t > >( NULL );
   }
 private:
-  xdmGrid::CellType::Type mCellType;
+  xdmGrid::ElementType::Type mElementType;
 };
 
 BOOST_AUTO_TEST_CASE( writeMetadata ) {

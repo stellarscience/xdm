@@ -26,27 +26,27 @@ XDM_GRID_NAMESPACE_BEGIN
 
 Topology::Topology() :
   xdm::Item(),
-  mNumberOfCells( 0 ),
+  mNumberOfElements( 0 ),
   mSharedVectorImp() {
 }
 
 Topology::~Topology() {
 }
 
-void Topology::setNumberOfCells( std::size_t numberOfCells ) {
-  mNumberOfCells = numberOfCells;
+void Topology::setNumberOfElements( std::size_t numberOfElements ) {
+  mNumberOfElements = numberOfElements;
 }
 
-std::size_t Topology::numberOfCells() const {
-  return mNumberOfCells;
+std::size_t Topology::numberOfElements() const {
+  return mNumberOfElements;
 }
 
-ConstCellConnectivity Topology::cellConnections( std::size_t cellIndex ) const {
+ConstElementConnectivity Topology::elementConnections( std::size_t elementIndex ) const {
   if ( ! mSharedVectorImp ) {
     Topology& mutableThis = const_cast< Topology& >( *this );
     mutableThis.mSharedVectorImp = mutableThis.createVectorImp();
   }
-  return ConstCellConnectivity( mSharedVectorImp, cellIndex );
+  return ConstElementConnectivity( mSharedVectorImp, elementIndex );
 }
 
 void Topology::traverse( xdm::ItemVisitor& iv ) {

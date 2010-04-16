@@ -33,7 +33,7 @@ namespace NodeOrderingConvention {
   };
 }
 
-namespace CellShape {
+namespace ElementShape {
   enum Type {
     Default = 0,
     Beam,
@@ -49,54 +49,54 @@ namespace CellShape {
   };
 }
 
-class CellClass {
-  CellShape::Type mShape;
-  std::size_t mNodesPerCell;
+class ElementClass {
+  ElementShape::Type mShape;
+  std::size_t mNodesPerElement;
   std::string mShapeName;
 public:
-  CellClass() : mShape( CellShape::Default ), mNodesPerCell(), mShapeName( "Default" ) {}
+  ElementClass() : mShape( ElementShape::Default ), mNodesPerElement(), mShapeName( "Default" ) {}
 
-    CellClass( CellShape::Type sh, std::size_t nodes, const std::string& shapeName ) :
-    mShape( sh ), mNodesPerCell( nodes ), mShapeName( shapeName ) {}
+    ElementClass( ElementShape::Type sh, std::size_t nodes, const std::string& shapeName ) :
+    mShape( sh ), mNodesPerElement( nodes ), mShapeName( shapeName ) {}
 
-  inline CellShape::Type shape() const { return mShape; }
-  inline std::size_t nodesPerCell() const { return mNodesPerCell; }
+  inline ElementShape::Type shape() const { return mShape; }
+  inline std::size_t nodesPerElement() const { return mNodesPerElement; }
   inline std::string shapeName() const { return mShapeName; }
 };
 
-namespace CellType {
-  typedef CellClass Type;
-  const CellClass Default;
+namespace ElementType {
+  typedef ElementClass Type;
+  const ElementClass Default;
 
   /// Degenerate types
-  const CellClass Circle( CellShape::Circle, 1, "Circle" );
-  const CellClass Polyvertex( CellShape::Polyvertex, 1, "Polyvertex" );
-  const CellClass Sphere( CellShape::Sphere, 1, "Sphere" );
+  const ElementClass Circle( ElementShape::Circle, 1, "Circle" );
+  const ElementClass Polyvertex( ElementShape::Polyvertex, 1, "Polyvertex" );
+  const ElementClass Sphere( ElementShape::Sphere, 1, "Sphere" );
 
-  /// Linear cells
-  const CellClass Beam( CellShape::Beam, 2, "Beam" );
-  const CellClass Hex( CellShape::Hex, 8, "Hexahedron" );
-  const CellClass Pyramid( CellShape::Pyramid, 5, "Pyramid" );
-  const CellClass Quad( CellShape::Quad, 4, "Quadrilateral" );
-  const CellClass Tetra( CellShape::Tetra, 4, "Tetrahedron" );
-  const CellClass Triangle( CellShape::Triangle, 3, "Triangle" );
-  const CellClass Wedge( CellShape::Wedge, 6, "Wedge" );
+  /// Linear Elements
+  const ElementClass Beam( ElementShape::Beam, 2, "Beam" );
+  const ElementClass Hex( ElementShape::Hex, 8, "Hexahedron" );
+  const ElementClass Pyramid( ElementShape::Pyramid, 5, "Pyramid" );
+  const ElementClass Quad( ElementShape::Quad, 4, "Quadrilateral" );
+  const ElementClass Tetra( ElementShape::Tetra, 4, "Tetrahedron" );
+  const ElementClass Triangle( ElementShape::Triangle, 3, "Triangle" );
+  const ElementClass Wedge( ElementShape::Wedge, 6, "Wedge" );
 
-  /// Quadratic cells
-  const CellClass QuadraticBeam( CellShape::Beam, 3, "QuadraticBeam" );
-  const CellClass QuadraticHex( CellShape::Hex, 21, "QuadraticHexahedron" );
-  const CellClass QuadraticPyramid( CellShape::Pyramid, 13, "QuadraticPyramid" );
-  const CellClass QuadraticQuad( CellShape::Quad, 9, "QuadraticQuadrilateral" );
-  const CellClass QuadraticTetra( CellShape::Tetra, 11, "QuadraticTetrahedron" );
-  const CellClass QuadraticTriangle( CellShape::Triangle, 7, "QuadraticTriangle" );
-  const CellClass QuadraticWedge( CellShape::Wedge, 16, "QuadraticWedge" );
+  /// Quadratic Elements
+  const ElementClass QuadraticBeam( ElementShape::Beam, 3, "QuadraticBeam" );
+  const ElementClass QuadraticHex( ElementShape::Hex, 21, "QuadraticHexahedron" );
+  const ElementClass QuadraticPyramid( ElementShape::Pyramid, 13, "QuadraticPyramid" );
+  const ElementClass QuadraticQuad( ElementShape::Quad, 9, "QuadraticQuadrilateral" );
+  const ElementClass QuadraticTetra( ElementShape::Tetra, 11, "QuadraticTetrahedron" );
+  const ElementClass QuadraticTriangle( ElementShape::Triangle, 7, "QuadraticTriangle" );
+  const ElementClass QuadraticWedge( ElementShape::Wedge, 16, "QuadraticWedge" );
 }
 
-/// Get the CellClass that corresponds to an Exodus shape string.
-CellType::Type exodusCellType( std::size_t nodesPerCell, const std::string& cellName );
+/// Get the ElementClass that corresponds to an Exodus shape string.
+ElementType::Type exodusElementType( std::size_t nodesPerElement, const std::string& elementName );
 
-/// Get the Exodus shape string the corresponds to a CellClass.
-std::string exodusShapeString( const CellType::Type& cell );
+/// Get the Exodus shape string the corresponds to an elementClass.
+std::string exodusShapeString( const ElementType::Type& element );
 
 XDM_GRID_NAMESPACE_END
 

@@ -40,18 +40,18 @@ public:
 
   XDM_META_ITEM( UnstructuredTopology );
 
-  /// Set the type of the cells.
-  void setCellType( const CellType::Type& type );
+  /// Set the type of the Elements.
+  void setElementType( const ElementType::Type& type );
 
-  /// Get the type of the cells. For now, this ignores the cellIndex and assumes all
-  /// cells are of the same type.
-  virtual const CellType::Type& cellType( std::size_t cellIndex ) const;
+  /// Get the type of the Elements. For now, this ignores the elementIndex and assumes all
+  /// Elements are of the same type.
+  virtual const ElementType::Type& elementType( std::size_t elementIndex ) const;
 
-  /// Set the node ordering convention for the shape of the Cells. For example,
+  /// Set the node ordering convention for the shape of the Elements. For example,
   /// Exodus II orders the nodes of a linear tetrahedron differently than some
   /// other formats.
   void setNodeOrdering( const NodeOrderingConvention::Type& order );
-  /// Get the node odering for the shape of these Cells.
+  /// Get the node odering for the shape of these Elements.
   NodeOrderingConvention::Type nodeOrdering() const;
 
   /// Set the connectivity values to the input DataItem. If the connectivity
@@ -68,7 +68,7 @@ protected:
 
 private:
   xdm::RefPtr< xdm::UniformDataItem > mConnectivity;
-  CellType::Type mCellType;
+  ElementType::Type mElementType;
   NodeOrderingConvention::Type mOrdering;
 };
 

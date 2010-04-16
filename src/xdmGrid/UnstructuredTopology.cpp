@@ -24,26 +24,26 @@
 
 //namespace {
 //
-//class TrivialCellRefImpl : public xdmGrid::CellSharedImp {
+//class TrivialElementRefImpl : public xdmGrid::ElementSharedImp {
 //public:
-//  TrivialCellRefImpl(
-//    const xdmGrid::CellType::Type& type,
+//  TrivialElementRefImpl(
+//    const xdmGrid::ElementType::Type& type,
 //    xdm::RefPtr< xdmGrid::Geometry > geometry,
 //    std::size_t* nodeIndexArray ) :
 //    mType( type ), mGeometry( geometry ), mNodeIds( nodeIndexArray ) {
 //  }
 //
-//  virtual xdmGrid::ConstNode node( std::size_t cellIndex, std::size_t nodeIndex ) const {
-//    std::size_t nodeID = mNodeIds[ cellIndex * mType.nodesPerCell() + nodeIndex ];
+//  virtual xdmGrid::ConstNode node( std::size_t elementIndex, std::size_t nodeIndex ) const {
+//    std::size_t nodeID = mNodeIds[ elementIndex * mType.nodesPerElement() + nodeIndex ];
 //    return mGeometry->node( nodeID );
 //  }
 //
-//  virtual xdmGrid::CellType::Type cellType( std::size_t cellIndex ) const {
+//  virtual xdmGrid::ElementType::Type ElementType( std::size_t elementIndex ) const {
 //    return mType;
 //  }
 //
 //private:
-//  xdmGrid::CellType::Type mType;
+//  xdmGrid::ElementType::Type mType;
 //  xdm::RefPtr< xdmGrid::Geometry > mGeometry;
 //  std::size_t* mNodeIds;
 //};
@@ -55,19 +55,19 @@ XDM_GRID_NAMESPACE_BEGIN
 UnstructuredTopology::UnstructuredTopology() :
   Topology(),
   mConnectivity(),
-  mCellType( CellType::Default ),
+  mElementType( ElementType::Default ),
   mOrdering() {
 }
 
 UnstructuredTopology::~UnstructuredTopology() {
 }
 
-void UnstructuredTopology::setCellType( const CellType::Type& type ) {
-  mCellType = type;
+void UnstructuredTopology::setElementType( const ElementType::Type& type ) {
+  mElementType = type;
 }
 
-const CellType::Type& UnstructuredTopology::cellType( std::size_t ) const {
-  return mCellType;
+const ElementType::Type& UnstructuredTopology::elementType( std::size_t /* elementIndex */) const {
+  return mElementType;
 }
 
 void UnstructuredTopology::setNodeOrdering( const NodeOrderingConvention::Type& order )
@@ -93,20 +93,20 @@ void UnstructuredTopology::traverse( xdm::ItemVisitor& iv ) {
 void UnstructuredTopology::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
   Topology::writeMetadata( xml );
 
-  // Write the number of cells
-  xml.setAttribute( "NumberOfElements", numberOfCells() );
+  // Write the number of Elements
+  xml.setAttribute( "NumberOfElements", numberOfElements() );
 
-  // Write the cell type
-  xml.setAttribute( "ElementType", mCellType.shapeName() );
+  // Write the Element type
+  xml.setAttribute( "ElementType", mElementType.shapeName() );
 
-  // Write the nodes per cell
-  xml.setAttribute( "NodesPerElement", mCellType.nodesPerCell() );
+  // Write the nodes per Element
+  xml.setAttribute( "NodesPerElement", mElementType.nodesPerElement() );
 }
 
 xdm::RefPtr< xdm::VectorRefImp< std::size_t > > UnstructuredTopology::createVectorImp() {
   return xdm::RefPtr< xdm::VectorRefImp< std::size_t > >(
     new xdm::SingleArrayOfVectorsImp< std::size_t >(
-        mConnectivity->typedArray< std::size_t >()->begin(), mCellType.nodesPerCell() ) );
+        mConnectivity->typedArray< std::size_t >()->begin(), mElementType.nodesPerElement() ) );
 }
 
 XDM_GRID_NAMESPACE_END

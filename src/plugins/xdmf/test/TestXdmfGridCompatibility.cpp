@@ -213,11 +213,11 @@ BOOST_AUTO_TEST_CASE( timeSeries ) {
     time->setValue( timeval );
     grid->setTime( time );
 
-    // construct a cell centered scalar attribute for this time step.
+    // construct a element centered scalar attribute for this time step.
     xdm::RefPtr< xdmGrid::Attribute > attribute( 
       new xdmGrid::Attribute( 
         xdmGrid::Attribute::kScalar,
-        xdmGrid::Attribute::kCell ) );
+        xdmGrid::Attribute::kElement ) );
     attribute->setName( "FunctionValues" );
     grid->appendChild( attribute );
 

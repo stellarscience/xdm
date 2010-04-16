@@ -145,7 +145,7 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
 
   // topology is polyvertex
   xdm::RefPtr< xdmGrid::Polyvertex > topology( new xdmGrid::Polyvertex() );
-  topology->setNumberOfCells( kParticleCount );
+  topology->setNumberOfElements( kParticleCount );
   xdm::RefPtr< xdm::UniformDataItem > topologyConn =
     xdmf::createLinearTopologyUniformDataItem( topology );
   topology->setConnectivity( topologyConn );
