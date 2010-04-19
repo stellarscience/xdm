@@ -25,7 +25,7 @@
 XDM_EXODUS_NAMESPACE_BEGIN
 
 std::size_t Set::numberOfEntries() const {
-  return numberOfCells();
+  return numberOfElements();
 }
 
 void Set::addVariable( xdm::RefPtr< Variable > variable ) {

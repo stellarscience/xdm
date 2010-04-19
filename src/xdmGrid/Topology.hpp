@@ -33,15 +33,15 @@
 
 XDM_GRID_NAMESPACE_BEGIN
 
-typedef xdm::VectorRef< std::size_t > CellConnectivity;
-typedef xdm::ConstVectorRef< std::size_t > ConstCellConnectivity;
+typedef xdm::VectorRef< std::size_t > ElementConnectivity;
+typedef xdm::ConstVectorRef< std::size_t > ConstElementConnectivity;
 
 /// Base class for topological descriptions of a grid.  The topological
 /// properties of a grid are those which are invariant under rotations,
 /// translations, and scale.  Connectivity is the most important topological
 /// property.
 ///
-/// A Grid consists of elements (or cells) and nodes.
+/// A Grid consists of elements (or Elements) and nodes.
 class Topology :
   public xdm::Item,
   public xdm::ObjectCompositionMixin< xdm::DataItem > {
@@ -49,19 +49,19 @@ public:
   Topology();
   virtual ~Topology();
 
-  /// Get the node odering for the shape of these Cells.
+  /// Get the node odering for the shape of these Elements.
   virtual NodeOrderingConvention::Type nodeOrdering() const = 0;
 
-  /// Set the number of cells in the topology.
-  void setNumberOfCells( std::size_t numberOfCells );
-  /// Get the number of cells in the topology.
-  virtual std::size_t numberOfCells() const;
+  /// Set the number of Elements in the topology.
+  void setNumberOfElements( std::size_t numberOfElements );
+  /// Get the number of Elements in the topology.
+  virtual std::size_t numberOfElements() const;
 
-  /// Get the const connectivity of a single cell.
-  ConstCellConnectivity cellConnections( std::size_t cellIndex ) const;
+  /// Get the const connectivity of a single Element.
+  ConstElementConnectivity elementConnections( std::size_t elementIndex ) const;
 
-  /// Get the type of a particular cell.
-  virtual const CellType::Type& cellType( std::size_t cellIndex ) const = 0;
+  /// Get the type of a particular Element.
+  virtual const ElementType::Type& elementType( std::size_t elementIndex ) const = 0;
 
   XDM_META_ITEM( Topology );
 
@@ -72,12 +72,12 @@ public:
 protected:
   /// Construct the vector implementation for node IDs used by this topology.
   /// Subclasses should override this method to return an appropriate VectorRefImp
-  /// for their internal cell representation.
+  /// for their internal Element representation.
   virtual xdm::RefPtr< xdm::VectorRefImp< std::size_t > > createVectorImp() = 0;
 
 private:
   xdm::RefPtr< xdm::VectorRefImp< std::size_t > > mSharedVectorImp;
-  std::size_t mNumberOfCells;
+  std::size_t mNumberOfElements;
 };
 
 XDM_GRID_NAMESPACE_END

@@ -39,7 +39,7 @@ private:
   size_t mNumberOfPoints;
 
   // Cannot change the type from Polyvertex.
-  void setCellType( const CellType::Type& type );
+  void setElementType( const ElementType::Type& type );
 };
 
 XDM_GRID_NAMESPACE_END

@@ -29,8 +29,8 @@ BOOST_AUTO_TEST_CASE( writeMetadata ) {
   xdmGrid::UnstructuredTopology t;
   xdm::XmlMetadataWrapper xml( xdm::makeRefPtr( new xdm::XmlObject ) );
 
-  t.setNumberOfCells( 42 );
-  t.setCellType( xdmGrid::CellType::Tetra );
+  t.setNumberOfElements( 42 );
+  t.setElementType( xdmGrid::ElementType::Tetra );
 
   t.writeMetadata( xml );
 

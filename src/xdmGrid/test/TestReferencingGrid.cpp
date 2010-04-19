@@ -23,7 +23,7 @@
 
 #include <xdmGrid/test/Cube.hpp>
 
-#include <xdmGrid/Cell.hpp>
+#include <xdmGrid/Element.hpp>
 #include <xdmGrid/InterlacedGeometry.hpp>
 #include <xdmGrid/ReferencingGrid.hpp>
 #include <xdmGrid/UniformGrid.hpp>
@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE( writeMetadata ) {
   BOOST_CHECK_EQUAL( "Referencing", xml.attribute( "GridType" ) );
 }
 
-BOOST_AUTO_TEST_CASE( indirectCellAccess ) {
+BOOST_AUTO_TEST_CASE( indirectElementAccess ) {
   CubeOfTets cube;
   xdm::RefPtr< xdmGrid::InterlacedGeometry > g( new xdmGrid::InterlacedGeometry(3) );
   xdm::RefPtr< xdm::UniformDataItem > nodeList = test::createUniformDataItem(
@@ -55,19 +55,19 @@ BOOST_AUTO_TEST_CASE( indirectCellAccess ) {
 
   // There are 5 tetrahedra in the cube. This test will separate these into 3 topologies
   // as follows:
-  //  1. Cells 0, 4
-  //  2. Cells 3, 2
-  //  4. Cell 1
+  //  1. Elements 0, 4
+  //  2. Elements 3, 2
+  //  4. Element 1
   //
   // For testing, we compare these to the values that come from the original cube.
 
   // Original cube
   xdm::RefPtr< xdmGrid::UnstructuredTopology > t0( new xdmGrid::UnstructuredTopology() );
-  xdm::RefPtr< xdm::UniformDataItem > cellList0 = test::createUniformDataItem(
-    cube.connectivityArray(), cube.numberOfCells() * 4, xdm::primitiveType::kLongUnsignedInt );
-  t0->setConnectivity( cellList0 );
-  t0->setNumberOfCells( 5 );
-  t0->setCellType( xdmGrid::CellType::Tetra );
+  xdm::RefPtr< xdm::UniformDataItem > elementList0 = test::createUniformDataItem(
+    cube.connectivityArray(), cube.numberOfElements() * 4, xdm::primitiveType::kLongUnsignedInt );
+  t0->setConnectivity( elementList0 );
+  t0->setNumberOfElements( 5 );
+  t0->setElementType( xdmGrid::ElementType::Tetra );
   xdm::RefPtr< xdmGrid::UniformGrid > grid0( new xdmGrid::UniformGrid );
   grid0->setGeometry( g );
   grid0->setTopology( t0 );
@@ -77,11 +77,11 @@ BOOST_AUTO_TEST_CASE( indirectCellAccess ) {
   std::size_t connectivity1[ 8 ];
   std::copy( cube.connectivityArray(), cube.connectivityArray() + 4, connectivity1 );
   std::copy( cube.connectivityArray() + 16, cube.connectivityArray() + 20, connectivity1 + 4 );
-  xdm::RefPtr< xdm::UniformDataItem > cellList1 = test::createUniformDataItem(
+  xdm::RefPtr< xdm::UniformDataItem > elementList1 = test::createUniformDataItem(
     connectivity1, 8, xdm::primitiveType::kLongUnsignedInt );
-  t1->setConnectivity( cellList1 );
-  t1->setNumberOfCells( 2 );
-  t1->setCellType( xdmGrid::CellType::Tetra );
+  t1->setConnectivity( elementList1 );
+  t1->setNumberOfElements( 2 );
+  t1->setElementType( xdmGrid::ElementType::Tetra );
   xdm::RefPtr< xdmGrid::UniformGrid > grid1( new xdmGrid::UniformGrid );
   grid1->setGeometry( g );
   grid1->setTopology( t1 );
@@ -91,11 +91,11 @@ BOOST_AUTO_TEST_CASE( indirectCellAccess ) {
   std::size_t connectivity2[ 8 ];
   std::copy( cube.connectivityArray() + 12, cube.connectivityArray() + 16, connectivity2 );
   std::copy( cube.connectivityArray() + 8, cube.connectivityArray() + 12, connectivity2 + 4 );
-  xdm::RefPtr< xdm::UniformDataItem > cellList2 = test::createUniformDataItem(
+  xdm::RefPtr< xdm::UniformDataItem > elementList2 = test::createUniformDataItem(
     connectivity2, 8, xdm::primitiveType::kLongUnsignedInt );
-  t2->setConnectivity( cellList2 );
-  t2->setNumberOfCells( 2 );
-  t2->setCellType( xdmGrid::CellType::Tetra );
+  t2->setConnectivity( elementList2 );
+  t2->setNumberOfElements( 2 );
+  t2->setElementType( xdmGrid::ElementType::Tetra );
   xdm::RefPtr< xdmGrid::UniformGrid > grid2( new xdmGrid::UniformGrid );
   grid2->setGeometry( g );
   grid2->setTopology( t2 );
@@ -104,61 +104,61 @@ BOOST_AUTO_TEST_CASE( indirectCellAccess ) {
   xdm::RefPtr< xdmGrid::UnstructuredTopology > t3( new xdmGrid::UnstructuredTopology() );
   std::size_t connectivity3[ 4 ];
   std::copy( cube.connectivityArray() + 4, cube.connectivityArray() + 8, connectivity3 );
-  xdm::RefPtr< xdm::UniformDataItem > cellList3 = test::createUniformDataItem(
+  xdm::RefPtr< xdm::UniformDataItem > elementList3 = test::createUniformDataItem(
     connectivity3, 4, xdm::primitiveType::kLongUnsignedInt );
-  t3->setConnectivity( cellList3 );
-  t3->setNumberOfCells( 1 );
-  t3->setCellType( xdmGrid::CellType::Tetra );
+  t3->setConnectivity( elementList3 );
+  t3->setNumberOfElements( 1 );
+  t3->setElementType( xdmGrid::ElementType::Tetra );
   xdm::RefPtr< xdmGrid::UniformGrid > grid3( new xdmGrid::UniformGrid );
   grid3->setGeometry( g );
   grid3->setTopology( t3 );
 
-  // The referenced grid takes data items that list the cell indices. We just take them in
+  // The referenced grid takes data items that list the element indices. We just take them in
   // order.
-  std::size_t cellOrdering[] = { 0, 1 };
-  xdm::RefPtr< xdm::UniformDataItem > cells1Item = test::createUniformDataItem(
-    cellOrdering, 2, xdm::primitiveType::kLongUnsignedInt );
-  xdm::RefPtr< xdm::UniformDataItem > cells2Item = test::createUniformDataItem(
-    cellOrdering, 2, xdm::primitiveType::kLongUnsignedInt );
-  xdm::RefPtr< xdm::UniformDataItem > cells3Item = test::createUniformDataItem(
-    cellOrdering, 1, xdm::primitiveType::kLongUnsignedInt );
+  std::size_t elementOrdering[] = { 0, 1 };
+  xdm::RefPtr< xdm::UniformDataItem > elements1Item = test::createUniformDataItem(
+    elementOrdering, 2, xdm::primitiveType::kLongUnsignedInt );
+  xdm::RefPtr< xdm::UniformDataItem > elements2Item = test::createUniformDataItem(
+    elementOrdering, 2, xdm::primitiveType::kLongUnsignedInt );
+  xdm::RefPtr< xdm::UniformDataItem > elements3Item = test::createUniformDataItem(
+    elementOrdering, 1, xdm::primitiveType::kLongUnsignedInt );
 
   xdmGrid::ReferencingGrid refGrid1;
-  refGrid1.appendReferenceGrid( grid1, cells1Item );
-  refGrid1.appendReferenceGrid( grid2, cells2Item );
-  refGrid1.appendReferenceGrid( grid3, cells3Item );
+  refGrid1.appendReferenceGrid( grid1, elements1Item );
+  refGrid1.appendReferenceGrid( grid2, elements2Item );
+  refGrid1.appendReferenceGrid( grid3, elements3Item );
 
   // Check to see if the node values from the referenced grid match the original
   // nodes.
-  std::size_t cellMap[] = { 0, 4, 3, 2, 1 };
-  BOOST_CHECK_EQUAL( refGrid1.numberOfCells(), 5 );
-  for ( std::size_t cellIndex = 0; cellIndex < 5; ++cellIndex ) {
-    xdmGrid::ConstCell cellOrig = grid0->cell( cellMap[ cellIndex ] );
-    xdmGrid::ConstCell cellRef = refGrid1.cell( cellIndex );
+  std::size_t elementMap[] = { 0, 4, 3, 2, 1 };
+  BOOST_CHECK_EQUAL( refGrid1.numberOfElements(), 5 );
+  for ( std::size_t elementIndex = 0; elementIndex < 5; ++elementIndex ) {
+    xdmGrid::ConstElement elementOrig = grid0->element( elementMap[ elementIndex ] );
+    xdmGrid::ConstElement elementRef = refGrid1.element( elementIndex );
     for ( std::size_t nodeIndex = 0; nodeIndex < 4; ++nodeIndex ) {
       for ( std::size_t dim = 0; dim < 3; ++dim ) {
-        double refValue = cellRef.node( nodeIndex )[ dim ];
-        double origValue = cellOrig.node( nodeIndex )[ dim ];
+        double refValue = elementRef.node( nodeIndex )[ dim ];
+        double origValue = elementOrig.node( nodeIndex )[ dim ];
         BOOST_CHECK_EQUAL( origValue, refValue );
       }
     }
   }
 
-  // Test again, this time without providing the data items. Because cellOrdering is just
+  // Test again, this time without providing the data items. Because elementOrdering is just
   // default ordering, this new grid should reference the original grids in exactly the
   // same way.
   xdmGrid::ReferencingGrid refGrid2;
   refGrid2.appendReferenceGrid( grid1 );
   refGrid2.appendReferenceGrid( grid2 );
   refGrid2.appendReferenceGrid( grid3 );
-  BOOST_CHECK_EQUAL( refGrid2.numberOfCells(), 5 );
-  for ( std::size_t cellIndex = 0; cellIndex < 5; ++cellIndex ) {
-    xdmGrid::ConstCell cellOrig = grid0->cell( cellMap[ cellIndex ] );
-    xdmGrid::ConstCell cellRef = refGrid2.cell( cellIndex );
+  BOOST_CHECK_EQUAL( refGrid2.numberOfElements(), 5 );
+  for ( std::size_t elementIndex = 0; elementIndex < 5; ++elementIndex ) {
+    xdmGrid::ConstElement elementOrig = grid0->element( elementMap[ elementIndex ] );
+    xdmGrid::ConstElement elementRef = refGrid2.element( elementIndex );
     for ( std::size_t nodeIndex = 0; nodeIndex < 4; ++nodeIndex ) {
       for ( std::size_t dim = 0; dim < 3; ++dim ) {
-        double refValue = cellRef.node( nodeIndex )[ dim ];
-        double origValue = cellOrig.node( nodeIndex )[ dim ];
+        double refValue = elementRef.node( nodeIndex )[ dim ];
+        double origValue = elementOrig.node( nodeIndex )[ dim ];
         BOOST_CHECK_EQUAL( origValue, refValue );
       }
     }
@@ -167,14 +167,14 @@ BOOST_AUTO_TEST_CASE( indirectCellAccess ) {
   // May as well also test it with just one grid.
   xdmGrid::ReferencingGrid refGrid3;
   refGrid3.appendReferenceGrid( grid0 );
-  BOOST_CHECK_EQUAL( refGrid3.numberOfCells(), 5 );
-  for ( std::size_t cellIndex = 0; cellIndex < 5; ++cellIndex ) {
-    xdmGrid::ConstCell cellOrig = grid0->cell( cellIndex );
-    xdmGrid::ConstCell cellRef = refGrid3.cell( cellIndex );
+  BOOST_CHECK_EQUAL( refGrid3.numberOfElements(), 5 );
+  for ( std::size_t elementIndex = 0; elementIndex < 5; ++elementIndex ) {
+    xdmGrid::ConstElement elementOrig = grid0->element( elementIndex );
+    xdmGrid::ConstElement elementRef = refGrid3.element( elementIndex );
     for ( std::size_t nodeIndex = 0; nodeIndex < 4; ++nodeIndex ) {
       for ( std::size_t dim = 0; dim < 3; ++dim ) {
-        double refValue = cellRef.node( nodeIndex )[ dim ];
-        double origValue = cellOrig.node( nodeIndex )[ dim ];
+        double refValue = elementRef.node( nodeIndex )[ dim ];
+        double origValue = elementOrig.node( nodeIndex )[ dim ];
         BOOST_CHECK_EQUAL( origValue, refValue );
       }
     }

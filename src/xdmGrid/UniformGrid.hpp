@@ -68,10 +68,10 @@ public:
   /// Get a const attribute by name.
   xdm::RefPtr< const Attribute > attributeByName( const std::string& name ) const;
 
-  /// Get a cell by index.
-  Cell cell( std::size_t cellIndex );
-  /// Get a const cell by index.
-  ConstCell cell( std::size_t cellIndex ) const;
+  /// Get an element by index.
+  Element element( std::size_t elementIndex );
+  /// Get a const element by index.
+  ConstElement element( std::size_t elementIndex ) const;
 
   /// Get a node by index. This does not take connectivity into consideration.
   /// This means that the input index is the index into the geometry directly,
@@ -91,12 +91,12 @@ public:
 protected:
   /// If a class inherits from this class, it can set the shared imp for ease
   /// of implementation.
-  void setCellSharedImp( xdm::RefPtr< CellSharedImp > cellImp );
+  void setElementSharedImp( xdm::RefPtr< ElementSharedImp > elementImp );
 
 private:
   xdm::RefPtr< Geometry > mGeometry;
   xdm::RefPtr< Topology > mTopology;
-  xdm::RefPtr< CellSharedImp > mCellImp;
+  xdm::RefPtr< ElementSharedImp > mElementImp;
 };
 
 /// Construct an attribute on a uniform grid with the given center.

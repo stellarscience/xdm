@@ -42,19 +42,19 @@ public:
 
   XDM_META_ITEM( StructuredTopology );
 
-  /// Get the node odering for the shape of these Cells. Always returns ExodusII because
-  /// the cells are either quads or hexes.
+  /// Get the node odering for the shape of these elements. Always returns ExodusII because
+  /// the elements are either quads or hexes.
   virtual NodeOrderingConvention::Type nodeOrdering() const;
 
-  /// Set the shape defined by the cells in the topology.  This shape should
-  /// correspond to the arrangement of cells in n-dimensional space.
+  /// Set the shape defined by the elements in the topology.  This shape should
+  /// correspond to the arrangement of elements in n-dimensional space.
   void setShape( const xdm::DataShape<>& shape );
-  /// Get the shape defined by the cells in the topology.
+  /// Get the shape defined by the Elements in the topology.
   const xdm::DataShape<>& shape() const;
 
-  /// Get the type of a particular cell. For structured meshes this always returns
+  /// Get the type of a particular element. For structured meshes this always returns
   /// a quad or hex.
-  virtual const CellType::Type& cellType( std::size_t cellIndex ) const;
+  virtual const ElementType::Type& elementType( std::size_t elementIndex ) const;
 
   virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
 
@@ -64,7 +64,7 @@ protected:
 private:
   std::vector< std::size_t > mNodes;
   xdm::DataShape<> mShape;
-  CellType::Type mCellType;
+  ElementType::Type mElementType;
 };
 
 XDM_GRID_NAMESPACE_END

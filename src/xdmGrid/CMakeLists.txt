@@ -2,9 +2,9 @@ project( xdmGrid )
 
 set( ${PROJECT_NAME}_HEADERS 
     Attribute.hpp
-    Cell.hpp
     CollectionGrid.hpp
     Domain.hpp
+    Element.hpp
     Forward.hpp
     Geometry.hpp
     Grid.hpp
@@ -25,9 +25,9 @@ set( ${PROJECT_NAME}_HEADERS
 
 set( ${PROJECT_NAME}_SOURCES
     Attribute.cpp
-    Cell.cpp
     CollectionGrid.cpp
     Domain.cpp
+    Element.cpp
     Geometry.cpp
     Grid.cpp
     InterlacedGeometry.cpp

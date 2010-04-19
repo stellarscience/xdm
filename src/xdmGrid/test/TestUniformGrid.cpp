@@ -23,7 +23,7 @@
 
 #include <xdmGrid/test/Cube.hpp>
 
-#include <xdmGrid/Cell.hpp>
+#include <xdmGrid/Element.hpp>
 #include <xdmGrid/InterlacedGeometry.hpp>
 #include <xdmGrid/MultiArrayGeometry.hpp>
 #include <xdmGrid/UniformGrid.hpp>
@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE( writeMetadata ) {
   BOOST_CHECK_EQUAL( "Uniform", xml.attribute( "GridType" ) );
 }
 
-BOOST_AUTO_TEST_CASE( cellAccessSingleNodeArray ) {
+BOOST_AUTO_TEST_CASE( elementAccessSingleNodeArray ) {
   CubeOfTets cube;
   xdm::RefPtr< xdmGrid::InterlacedGeometry > g( new xdmGrid::InterlacedGeometry(3) );
   xdm::RefPtr< xdm::UniformDataItem > nodeList = test::createUniformDataItem(
@@ -52,25 +52,25 @@ BOOST_AUTO_TEST_CASE( cellAccessSingleNodeArray ) {
   g->setCoordinateValues( nodeList );
 
   xdm::RefPtr< xdmGrid::UnstructuredTopology > t( new xdmGrid::UnstructuredTopology() );
-  xdm::RefPtr< xdm::UniformDataItem > cellList = test::createUniformDataItem(
-    cube.connectivityArray(), cube.numberOfCells() * 4, xdm::primitiveType::kLongUnsignedInt );
-  t->setConnectivity( cellList );
-  t->setNumberOfCells( 5 );
-  t->setCellType( xdmGrid::CellType::Tetra );
+  xdm::RefPtr< xdm::UniformDataItem > elementList = test::createUniformDataItem(
+    cube.connectivityArray(), cube.numberOfElements() * 4, xdm::primitiveType::kLongUnsignedInt );
+  t->setConnectivity( elementList );
+  t->setNumberOfElements( 5 );
+  t->setElementType( xdmGrid::ElementType::Tetra );
 
   xdmGrid::UniformGrid grid;
   grid.setGeometry( g );
   grid.setTopology( t );
 
-  // Check 2nd node of 2nd cell.
-  xdmGrid::ConstCell cell1 = grid.cell( 1 );
-  BOOST_CHECK_EQUAL( 1., cell1.node( 1 )[0] );
-  BOOST_CHECK_EQUAL( 0., cell1.node( 1 )[1] );
-  BOOST_CHECK_EQUAL( 1., cell1.node( 1 )[2] );
+  // Check 2nd node of 2nd element.
+  xdmGrid::ConstElement element1 = grid.element( 1 );
+  BOOST_CHECK_EQUAL( 1., element1.node( 1 )[0] );
+  BOOST_CHECK_EQUAL( 0., element1.node( 1 )[1] );
+  BOOST_CHECK_EQUAL( 1., element1.node( 1 )[2] );
 
   // Change a node's location and check back in the geometry to see if it changed.
-  xdmGrid::Cell cell3 = grid.cell( 3 );
-  xdmGrid::Node node3 = cell3.node( 2 );
+  xdmGrid::Element element3 = grid.element( 3 );
+  xdmGrid::Node node3 = element3.node( 2 );
   node3[0] = 0.1;
   node3[1] = 1.1;
   node3[2] = 0.9;
@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE( cellAccessSingleNodeArray ) {
   BOOST_CHECK_CLOSE( 0.9, g->node( 7 )[2], 1.e-8 );
 }
 
-BOOST_AUTO_TEST_CASE( cellAccessMultiNodeArray ) {
+BOOST_AUTO_TEST_CASE( elementAccessMultiNodeArray ) {
   CubeOfTets cube;
   xdm::RefPtr< xdmGrid::MultiArrayGeometry > g( new xdmGrid::MultiArrayGeometry(3) );
   xdm::RefPtr< xdm::UniformDataItem > nodeListX = test::createUniformDataItem(
@@ -93,25 +93,25 @@ BOOST_AUTO_TEST_CASE( cellAccessMultiNodeArray ) {
   g->setCoordinateValues( 2, nodeListZ );
 
   xdm::RefPtr< xdmGrid::UnstructuredTopology > t( new xdmGrid::UnstructuredTopology() );
-  xdm::RefPtr< xdm::UniformDataItem > cellList = test::createUniformDataItem(
-    cube.connectivityArray(), cube.numberOfCells() * 4, xdm::primitiveType::kLongUnsignedInt );
-  t->setConnectivity( cellList );
-  t->setNumberOfCells( 5 );
-  t->setCellType( xdmGrid::CellType::Tetra );
+  xdm::RefPtr< xdm::UniformDataItem > elementList = test::createUniformDataItem(
+    cube.connectivityArray(), cube.numberOfElements() * 4, xdm::primitiveType::kLongUnsignedInt );
+  t->setConnectivity( elementList );
+  t->setNumberOfElements( 5 );
+  t->setElementType( xdmGrid::ElementType::Tetra );
 
   xdmGrid::UniformGrid grid;
   grid.setGeometry( g );
   grid.setTopology( t );
 
-  // Check 2nd node of 2nd cell.
-  xdmGrid::ConstCell cell1 = grid.cell( 1 );
-  BOOST_CHECK_EQUAL( 1., cell1.node( 1 )[0] );
-  BOOST_CHECK_EQUAL( 0., cell1.node( 1 )[1] );
-  BOOST_CHECK_EQUAL( 1., cell1.node( 1 )[2] );
+  // Check 2nd node of 2nd element.
+  xdmGrid::ConstElement element1 = grid.element( 1 );
+  BOOST_CHECK_EQUAL( 1., element1.node( 1 )[0] );
+  BOOST_CHECK_EQUAL( 0., element1.node( 1 )[1] );
+  BOOST_CHECK_EQUAL( 1., element1.node( 1 )[2] );
 
   // Change a node's location and check back in the geometry to see if it changed.
-  xdmGrid::Cell cell3 = grid.cell( 3 );
-  xdmGrid::Node node3 = cell3.node( 2 );
+  xdmGrid::Element element3 = grid.element( 3 );
+  xdmGrid::Node node3 = element3.node( 2 );
   node3[0] = 0.1;
   node3[1] = 1.1;
   node3[2] = 0.9;

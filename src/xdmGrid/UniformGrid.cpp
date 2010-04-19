@@ -21,7 +21,7 @@
 #include <xdmGrid/UniformGrid.hpp>
 
 #include <xdmGrid/Attribute.hpp>
-#include <xdmGrid/Cell.hpp>
+#include <xdmGrid/Element.hpp>
 #include <xdmGrid/StructuredTopology.hpp>
 #include <xdmGrid/TensorProductGeometry.hpp>
 #include <xdmGrid/UnstructuredTopologyConventions.hpp>
@@ -36,18 +36,18 @@
 
 namespace {
 
-// A helper class for accessing cells from the geometry and topology.
-class SimpleCellImp : public xdmGrid::CellSharedImp {
+// A helper class for accessing elements from the geometry and topology.
+class SimpleElementImp : public xdmGrid::ElementSharedImp {
 public:
-  SimpleCellImp( xdm::RefPtr< xdmGrid::Geometry > g, xdm::RefPtr< xdmGrid::Topology > t ) :
+  SimpleElementImp( xdm::RefPtr< xdmGrid::Geometry > g, xdm::RefPtr< xdmGrid::Topology > t ) :
     mGeometry( g ), mTopology( t ) {}
 
-  virtual xdmGrid::ConstNode node( std::size_t cellIndex, std::size_t nodeIndex ) const {
-    return mGeometry->node( mTopology->cellConnections( cellIndex )[ nodeIndex ] );
+  virtual xdmGrid::ConstNode node( std::size_t elementIndex, std::size_t nodeIndex ) const {
+    return mGeometry->node( mTopology->elementConnections( elementIndex )[ nodeIndex ] );
   }
 
-  virtual xdmGrid::CellType::Type cellType( std::size_t cellIndex ) const {
-    return mTopology->cellType( cellIndex );
+  virtual xdmGrid::ElementType::Type elementType( std::size_t elementIndex ) const {
+    return mTopology->elementType( elementIndex );
   }
 
 private:
@@ -63,7 +63,7 @@ UniformGrid::UniformGrid() :
   Grid(),
   mGeometry(),
   mTopology(),
-  mCellImp() {
+  mElementImp() {
 }
 
 UniformGrid::~UniformGrid() {
@@ -126,22 +126,22 @@ UniformGrid::attributeByName( const std::string& name ) {
   );
 }
 
-Cell UniformGrid::cell( std::size_t cellIndex )
+Element UniformGrid::element( std::size_t elementIndex )
 {
-  if ( ! mCellImp ) {
-    setCellSharedImp( xdm::makeRefPtr( new SimpleCellImp( mGeometry, mTopology ) ) );
+  if ( ! mElementImp ) {
+    setElementSharedImp( xdm::makeRefPtr( new SimpleElementImp( mGeometry, mTopology ) ) );
   }
-  return Cell( mCellImp, cellIndex );
+  return Element( mElementImp, elementIndex );
 }
 
-ConstCell UniformGrid::cell( std::size_t cellIndex ) const
+ConstElement UniformGrid::element( std::size_t elementIndex ) const
 {
-  if ( ! mCellImp ) {
+  if ( ! mElementImp ) {
     UniformGrid& mutableThis = const_cast< UniformGrid& >( *this );
-    mutableThis.setCellSharedImp(
-      xdm::makeRefPtr( new SimpleCellImp( mutableThis.mGeometry, mutableThis.mTopology ) ) );
+    mutableThis.setElementSharedImp(
+      xdm::makeRefPtr( new SimpleElementImp( mutableThis.mGeometry, mutableThis.mTopology ) ) );
   }
-  return ConstCell( mCellImp, cellIndex );
+  return ConstElement( mElementImp, elementIndex );
 }
 
 Node UniformGrid::node( std::size_t nodeIndex ) {
@@ -170,8 +170,8 @@ void UniformGrid::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
   xml.setAttribute( "GridType", "Uniform" );
 }
 
-void UniformGrid::setCellSharedImp( xdm::RefPtr< CellSharedImp > cellImp ) {
-  mCellImp = cellImp;
+void UniformGrid::setElementSharedImp( xdm::RefPtr< ElementSharedImp > elementImp ) {
+  mElementImp = elementImp;
 }
 
 xdm::RefPtr< xdmGrid::Attribute >
@@ -190,7 +190,7 @@ createAttribute(
   xdm::DataShape<> attributeSpace;
 
   // The shape of the attribute array depends on whether we are doing dimension-by-dimension
-  // access, as in structured meshes, or node-by-node and cell-by-cell access, as in
+  // access, as in structured meshes, or node-by-node and element-by-element access, as in
   // unstructured meshes.
   switch ( center ) {
     case Attribute::kNode: {
@@ -205,13 +205,13 @@ createAttribute(
       }
       break;
     }
-    case Attribute::kCell: {
+    case Attribute::kElement: {
       xdm::RefPtr< const StructuredTopology > structTopology =
         xdm::dynamic_pointer_cast< const StructuredTopology >( topology );
       if ( structTopology ) {
         attributeSpace = structTopology->shape();
       } else {
-        attributeSpace.push_back( topology->numberOfCells() );
+        attributeSpace.push_back( topology->numberOfElements() );
       }
       break;
     }

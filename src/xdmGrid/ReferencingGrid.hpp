@@ -40,37 +40,37 @@ public:
   XDM_META_ITEM( ReferencingGrid );
 
   /// Since the ReferencingGrid can contain subsets of many different topologies,
-  /// this function returns the total number of referenced cells. This is an
-  /// expensive call because it recomputes the total number of cells at each
+  /// this function returns the total number of referenced elements. This is an
+  /// expensive call because it recomputes the total number of elements at each
   /// function call.
-  std::size_t numberOfCells() const;
+  std::size_t numberOfElements() const;
 
   /// Set the number of referenced grids.
   void setNumberOfReferencedGrids( const std::size_t n );
 
-  /// Append a reference grid with the corresponding cell indices.
+  /// Append a reference grid with the corresponding element indices.
   /// @param grid The grid that will be referenced.
-  /// @param cellIndices An integer array containing the cell indices for the cells
-  ///        that are referenced in @arg grid. If this array is omitted, then all
-  ///        cells in the corresponding grid will be referenced, in default order.
+  /// @param elementIndices An integer array containing the element indices for the elements
+  ///        that are referenced in grid. If this array is omitted, then all
+  ///        elements in the corresponding grid will be referenced, in default order.
   void appendReferenceGrid(
     xdm::RefPtr< UniformGrid > grid,
-    xdm::RefPtr< xdm::UniformDataItem > cellIndices = xdm::RefPtr< xdm::UniformDataItem >() );
+    xdm::RefPtr< xdm::UniformDataItem > elementIndices = xdm::RefPtr< xdm::UniformDataItem >() );
 
-  /// Set a reference grid with the corresponding cell indices.
+  /// Set a reference grid with the corresponding element indices.
   /// @param grid The grid that will be referenced.
-  /// @param cellIndices An integer array containing the cell indices for the cells
-  ///        that are referenced in @arg grid.
+  /// @param elementIndices An integer array containing the element indices for the elements
+  ///        that are referenced in grid.
   /// @param gridIndex The index of the reference grid. Note that the order of the
-  ///        grids directly affects the ordering of the refernced cells. For example,
-  ///        calling cell( 0 ) returns a cell from the first grid, with whatever index
-  ///        is in the @arg cellIndices corresponding to the first grid.
+  ///        grids directly affects the ordering of the refernced elements. For example,
+  ///        calling element( 0 ) returns an element from the first grid, with whatever index
+  ///        is in the elementIndices corresponding to the first grid.
   /// @pre setNumberOfReferencedGrids() must have been called and gridIndex must be less
   ///      than the number of grids.
   void setReferenceGrid(
     const std::size_t gridIndex,
     xdm::RefPtr< UniformGrid > grid,
-    xdm::RefPtr< xdm::UniformDataItem > cellIndices = xdm::RefPtr< xdm::UniformDataItem >() );
+    xdm::RefPtr< xdm::UniformDataItem > elementIndices = xdm::RefPtr< xdm::UniformDataItem >() );
 
   /// Redefinition of visitor traversal from xdm::Item.
   virtual void traverse( xdm::ItemVisitor& iv );

@@ -75,7 +75,7 @@ public:
       mSize[dimension];
   }
 
-  double cellCoordinate( int dimension, int index ) const {
+  double elementCoordinate( int dimension, int index ) const {
     return 0.5 * (
       nodeCoordinate( dimension, index ) +
       nodeCoordinate( dimension, index + 1 ) );

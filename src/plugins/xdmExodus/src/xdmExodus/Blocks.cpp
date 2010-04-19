@@ -43,7 +43,7 @@ void Block::setEntryGlobalOffset( std::size_t offset ) {
 }
 
 std::size_t Block::numberOfEntries() const {
-  return topology()->numberOfCells();
+  return topology()->numberOfElements();
 }
 
 void Block::addVariable( xdm::RefPtr< Variable > variable ) {
@@ -78,7 +78,7 @@ void Block::readAttributes( int exodusFileId, std::size_t attributesPerEntry ) {
     xdm::RefPtr< xdm::UniformDataItem > dataItem = makeDataItem(
       attribute, xdm::primitiveType::kDouble, numberOfEntries() );
     xdm::RefPtr< xdmGrid::Attribute > attr(
-      new xdmGrid::Attribute( xdmGrid::Attribute::kScalar, xdmGrid::Attribute::kCell ) );
+      new xdmGrid::Attribute( xdmGrid::Attribute::kScalar, xdmGrid::Attribute::kElement ) );
     attr->setDataItem( dataItem );
     attr->setName( attributeNames[ attributeIndex ].string() );
     addAttribute( attr );
@@ -179,8 +179,8 @@ void Block::readFromFile(
   xdm::RefPtr< xdmGrid::UnstructuredTopology > topo(
     new xdmGrid::UnstructuredTopology() );
   topo->setConnectivity( dataItem );
-  topo->setNumberOfCells( numberOfEntries );
-  topo->setCellType( xdmGrid::exodusCellType( nodesPerEntry, entryType.string() ) );
+  topo->setNumberOfElements( numberOfEntries );
+  topo->setElementType( xdmGrid::exodusElementType( nodesPerEntry, entryType.string() ) );
   topo->setNodeOrdering( xdmGrid::NodeOrderingConvention::ExodusII );
   setTopology( topo );
 
@@ -208,9 +208,9 @@ void Block::writeToFile( int exodusFileId, int* variableTruthTable ) {
       exodusFileId,
       exodusObjectType(),
       id(),
-      xdmGrid::exodusShapeString( topology()->cellType( 0 ) ).c_str(),
+      xdmGrid::exodusShapeString( topology()->elementType( 0 ) ).c_str(),
       (int)numberOfEntries(),
-      (int)topology()->cellType( 0 ).nodesPerCell(),
+      (int)topology()->elementType( 0 ).nodesPerElement(),
       0, // edges per entry
       0, // faces per entry
       (int)attribs.size() ),
@@ -218,7 +218,7 @@ void Block::writeToFile( int exodusFileId, int* variableTruthTable ) {
 
   std::vector< int > connections;
   for ( std::size_t entry = 0; entry < numberOfEntries(); ++entry ) {
-    xdmGrid::ConstCellConnectivity entryNodes = topology()->cellConnections( entry );
+    xdmGrid::ConstElementConnectivity entryNodes = topology()->elementConnections( entry );
     for ( std::size_t node = 0; node < entryNodes.size(); ++node ) {
       connections.push_back( (int)entryNodes[ node ] + 1 );
     }
