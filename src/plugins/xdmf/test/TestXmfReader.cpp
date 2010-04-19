@@ -33,6 +33,7 @@
 #include <xdmGrid/Attribute.hpp>
 #include <xdmGrid/RectilinearMesh.hpp>
 #include <xdmGrid/TensorProductGeometry.hpp>
+#include <xdmGrid/Time.hpp>
 #include <xdmGrid/UniformGrid.hpp>
 
 #include <xdmHdf/HdfDataset.hpp>
@@ -57,6 +58,11 @@ static const double kRange[2][2] = { {0.0, 360.0}, {-90.0, 90.0} };
 
 xdm::RefPtr< xdmGrid::UniformGrid > build2DGrid() {
   xdm::RefPtr< xdmGrid::UniformGrid > grid( new xdmGrid::UniformGrid );
+
+  // Time
+  {
+    grid->setTime( xdm::makeRefPtr( new xdmGrid::Time( 0.0 ) ) );
+  }
 
   // Topology
   {
@@ -131,6 +137,7 @@ void writeTimeGrid( const xdm::FileSystemPath& path ) {
   xdm::RefPtr< xdm::UniformDataItem > data = attr->dataItem();
   xdm::RefPtr< xdm::TypedStructuredArray< double > > array = data->typedArray<double>();
   for ( int step = 0; step < 5; ++step ) {
+    grid->time()->setValue( static_cast< double >( step ) );
     std::fill( array->begin(), array->end(), timeFunction( step ) );
     writer.write( grid, step );
   }
@@ -141,8 +148,8 @@ BOOST_AUTO_TEST_CASE( parseFile ) {
   xdm::FileSystemPath testFilePath( "test_document1.xmf" );
 
   xdmf::XmfReader reader;
-  xdmFormat::Reader::ReadResult result = reader.readItem( testFilePath );
-  BOOST_CHECK( result.first );
+  xdmFormat::ReadResult result = reader.readItem( testFilePath );
+  BOOST_CHECK( result.item() );
 }
 
 BOOST_AUTO_TEST_CASE( invalidDocument ) {
@@ -169,9 +176,9 @@ BOOST_AUTO_TEST_CASE( grid2DRoundtrip ) {
   write2DGrid( testFilePath );
 
   xdmf::XmfReader reader;
-  xdmFormat::Reader::ReadResult result = reader.readItem( testFilePath );
-  BOOST_CHECK_EQUAL( result.second, 1 ); // one timestep in that file
-  xdm::RefPtr< xdm::Item > item = result.first;
+  xdmFormat::ReadResult result = reader.readItem( testFilePath );
+  BOOST_CHECK_EQUAL( result.seriesSteps(), 1 ); // one timestep in that file
+  xdm::RefPtr< xdm::Item > item = result.item();
   BOOST_REQUIRE( item );
 
   xdm::RefPtr< xdmGrid::UniformGrid > grid =
@@ -225,12 +232,12 @@ BOOST_AUTO_TEST_CASE( temporalCollectionRoundtrip ) {
   writeTimeGrid( testFilePath );
 
   xdmf::XmfReader reader;
-  xdmFormat::Reader::ReadResult result = reader.readItem( testFilePath );
-  BOOST_CHECK_EQUAL( result.second, 5 );
-  BOOST_REQUIRE( result.first );
+  xdmFormat::ReadResult result = reader.readItem( testFilePath );
+  BOOST_CHECK_EQUAL( result.seriesSteps(), 5 );
+  BOOST_REQUIRE( result.item() );
 
   xdm::RefPtr< xdmGrid::UniformGrid > g =
-    xdm::dynamic_pointer_cast< xdmGrid::UniformGrid >( result.first );
+    xdm::dynamic_pointer_cast< xdmGrid::UniformGrid >( result.item() );
   BOOST_REQUIRE( g );
 
   xdm::RefPtr< xdm::UniformDataItem > data = g->attributeByName( "attr" )->dataItem();
@@ -240,6 +247,7 @@ BOOST_AUTO_TEST_CASE( temporalCollectionRoundtrip ) {
   for ( size_t step = 0; step < 5; ++step ) {
     xdm::UpdateVisitor update( step );
     g->accept( update );
+    // BOOST_CHECK_EQUAL( g->time()->value(), step );
     double value = data->atLocation< double >( 2, 5 );
     BOOST_CHECK_EQUAL( value, step );
   }

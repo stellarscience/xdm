@@ -35,7 +35,7 @@ public:
   XmfReader();
   virtual ~XmfReader();
 
-  virtual xdmFormat::Reader::ReadResult readItem(
+  virtual xdmFormat::ReadResult readItem(
     const xdm::FileSystemPath& path );
 
   virtual bool update(

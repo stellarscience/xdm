@@ -205,8 +205,7 @@ XmfReader::XmfReader() :
 XmfReader::~XmfReader() {
 }
 
-xdmFormat::Reader::ReadResult
-XmfReader::readItem( const xdm::FileSystemPath& path ) {
+xdmFormat::ReadResult XmfReader::readItem( const xdm::FileSystemPath& path ) {
   static const char * kTemporalCollectionExpr =
     "/Xdmf/Domain/Grid["
     "  @GridType=\"Collection\" and @CollectionType=\"Temporal\""
@@ -261,7 +260,7 @@ XmfReader::readItem( const xdm::FileSystemPath& path ) {
   visitor.mNodeVector = timestepNodes;
   result->accept( visitor );
 
-  return xdmFormat::Reader::ReadResult( result, timestepNodes->size() );
+  return xdmFormat::ReadResult( result, timestepNodes->size() );
 }
 
 bool XmfReader::update( 

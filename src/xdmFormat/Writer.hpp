@@ -5,24 +5,16 @@
 #ifndef xdmFormat_Writer_hpp
 #define xdmFormat_Writer_hpp
 
+#include <xdmFormat/IoExcept.hpp>
+
 #include <xdm/Dataset.hpp>
 #include <xdm/FileSystem.hpp>
 #include <xdm/Forward.hpp>
 #include <xdm/ReferencedObject.hpp>
 
-#include <stdexcept>
-
 #include <xdmFormat/NamespaceMacro.hpp>
 
 XDM_FORMAT_NAMESPACE_BEGIN
-
-/// Base exception for errors that occur while writing data to disk.
-class WriteError : public std::runtime_error {
-public:
-  WriteError( const std::string& message ) :
-    std::runtime_error( message.c_str() ) {}
-  virtual ~WriteError() throw() {}
-};
 
 /// Interface for streaming a series of data to one or more files. Inheritors
 /// should implement this interface to stream a data series to a file.
