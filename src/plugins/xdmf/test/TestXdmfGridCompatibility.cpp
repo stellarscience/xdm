@@ -142,7 +142,7 @@ BOOST_AUTO_TEST_CASE( staticGrid ) {
 
   // attach an HDF dataset to all UniformDataItems
   xdmHdf::AttachHdfDatasetOperation attachHdfDataset( 
-    hdfFile, "data" );
+    hdfFile, false );
   domain->accept( attachHdfDataset );
 
   // write the tree's data to disk

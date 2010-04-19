@@ -40,6 +40,11 @@ if ( CMAKE_COMPILER_IS_GNUC OR CMAKE_COMPILER_IS_GNUCXX )
   set( CMAKE_C_FLAGS_COVERAGE "-g -O0 -fno-default-inline -fprofile-arcs -ftest-coverage" )
   set( CMAKE_CXX_FLAGS_COVERAGE "-g -O0 -fno-default-inline -fprofile-arcs -ftest-coverage" )
   set( CMAKE_LD_FLAGS_COVERAGE "-g -O0 -fno-default-inline -fprofile-arcs -ftest-coverage" )
+
+  # Use -Wall when building for Debug.
+  set( CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wall" )
+  set( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall" )
+
 endif()
 
 add_subdirectory( src )

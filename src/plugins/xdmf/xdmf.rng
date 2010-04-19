@@ -140,9 +140,9 @@
       </optional>
       <!-- Element Children -->
       <interleave>
-        <optional>
+        <zeroOrMore>
           <ref name="grid"/>
-        </optional>
+        </zeroOrMore>
         <optional>
           <ref name="geometry"/>
         </optional>

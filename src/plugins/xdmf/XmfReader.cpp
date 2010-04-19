@@ -36,11 +36,9 @@ const unsigned int kXdmfRngSchemaLength = XDMF_RNG_SCHEMA_LENGTH;
 // Callback function to throw an exception with informative information upon
 // a validation error.
 void structuredValidationErrorCallback( void* userData, xmlErrorPtr error ) {
-  xdmFormat::FileReadError exception(
-    error->file,
-    error->line,
-    error->int2,
-    error->message );
+  std::string file( error->file ? error->file : "unknown file" );
+  std::string reason( error->message ? error->message : "Unknown reason" );
+  xdmFormat::FileReadError exception( file, error->line, error->int2, reason );
   XDM_THROW( exception );
 }
 
@@ -210,7 +208,9 @@ XmfReader::~XmfReader() {
 xdmFormat::Reader::ReadResult
 XmfReader::readItem( const xdm::FileSystemPath& path ) {
   static const char * kTemporalCollectionExpr =
-    "/Xdmf/Domain/Grid[@GridType=\"Collection\" and @CollectionType=\"Temporal\"]";
+    "/Xdmf/Domain/Grid["
+    "  @GridType=\"Collection\" and @CollectionType=\"Temporal\""
+    "]";
 
   xdm::RefPtr< xdm::Item > result;
 
@@ -236,8 +236,8 @@ XmfReader::readItem( const xdm::FileSystemPath& path ) {
         "XDMF Temporal collection contains no time steps" ) );
     }
     // Set the XML node for each time step.
-    for ( size_t i = 0; i < temporalCollectionQuery.size(); ++i ) {
-      timestepNodes->push_back( temporalCollectionQuery.node( i ) );
+    for ( size_t i = 0; i < stepGridQuery.size(); ++i ) {
+      timestepNodes->push_back( stepGridQuery.node( i ) );
     }
     // Build the tree using the first grid as the structure prototype.
     impl::TreeBuilder builder( stepGridQuery.node( 0 ) );

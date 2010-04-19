@@ -108,6 +108,7 @@ xdm::primitiveType::Value type( const std::string& typeStr, size_t precision ) {
     return xdm::primitiveType::kFloat;
     break;
   }
+  return xdm::primitiveType::kFloat;
 }
 
 } // namespace
@@ -207,7 +208,7 @@ xdm::RefPtr< xdmGrid::Geometry > TreeBuilder::buildGeometry( xmlNode * node ) {
       new xdmGrid::MultiArrayGeometry );
     // dimension is implicit from the number of DataItems under the Geometry
     g->setDimension( dataItemCount );
-    for ( int i = 0; i < dataItemCount; ++i ) {
+    for ( size_t i = 0; i < dataItemCount; ++i ) {
       g->setCoordinateValues( i, buildUniformDataItem( dataQuery.node( i ) ) );
     }
     return g;
@@ -216,7 +217,7 @@ xdm::RefPtr< xdmGrid::Geometry > TreeBuilder::buildGeometry( xmlNode * node ) {
       new xdmGrid::TensorProductGeometry );
     // dimension is implicit from the number of DataItems under the Geometry
     g->setDimension( dataItemCount );
-    for ( int i = 0; i < dataItemCount; ++i ) {
+    for ( size_t i = 0; i < dataItemCount; ++i ) {
       g->setCoordinateValues( i, buildUniformDataItem( dataQuery.node( i ) ) );
     }
     return g;
@@ -614,12 +615,15 @@ void TreeBuilder::configureUniformDataItem(
 
   // Give the item an array to hold the data from the dataset should it be
   // loaded into memory.
-  if ( !item.data() ) {
+  xdm::RefPtr< xdm::MemoryAdapter > itemData = item.data();
+  if ( !itemData ) {
     xdm::RefPtr< xdm::StructuredArray > array(
       xdm::makeVectorStructuredArray( dataType ) );
     xdm::RefPtr< xdm::ArrayAdapter > adapter( new xdm::ArrayAdapter( array ) );
     adapter->setIsMemoryResident( false );
     item.setData( adapter );
+  } else {
+    itemData->setNeedsUpdate( true );
   }
 }
 

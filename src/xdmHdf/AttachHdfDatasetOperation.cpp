@@ -31,14 +31,30 @@
 XDM_HDF_NAMESPACE_BEGIN
 
 namespace {
+
+class GroupDatasetForSeriesIndex :
+  public xdm::DatasetUpdateCallback< HdfDataset > {
+  virtual void update( HdfDataset * dataset, std::size_t seriesIndex) {
+    GroupPath gpath = dataset->groupPath();
+    std::ostringstream ss;
+    ss << seriesIndex;
+    gpath[0] = ss.str();
+    dataset->setGroupPath( gpath );
+  }
+};
+
 } // namespace anon
 
 AttachHdfDatasetOperation::AttachHdfDatasetOperation( 
   const std::string& fileName,
-  const std::string& commonName ) :
+  bool groupBySeriesIndex ) :
   mFileName( fileName ),
-  mCommonName( commonName ),
+  mGroupBySeriesIndex( groupBySeriesIndex ),
   mCurrentPath() {
+  if ( mGroupBySeriesIndex ) {
+    // put a place holder in for the series index top level group.
+    mCurrentPath.push_back( "seriesIndex" );
+  }
 }
 
 AttachHdfDatasetOperation::~AttachHdfDatasetOperation() {
@@ -80,6 +96,11 @@ void AttachHdfDatasetOperation::apply( xdm::UniformDataItem& item ) {
   dataset->setGroupPath( mCurrentPath );
   dataset->setDataset( name );
   item.setDataset( dataset );
+
+  // If requested, group the datasets by series index.
+  if ( mGroupBySeriesIndex ) {
+    dataset->setUpdateCallback( xdm::makeRefPtr( new GroupDatasetForSeriesIndex ) );
+  }
 }
 
 XDM_HDF_NAMESPACE_END

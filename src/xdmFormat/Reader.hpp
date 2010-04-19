@@ -49,7 +49,7 @@ public:
       if ( message.empty() ) {
         std::stringstream ss;
         ss << "Error reading " << mFile << " at line ";
-        ss << mLine << ", column" << mColumn;
+        ss << mLine << ", column " << mColumn;
         ss << ": " << ReadError::what();
         message = ss.str();
       }

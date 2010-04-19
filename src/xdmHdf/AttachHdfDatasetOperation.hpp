@@ -36,17 +36,14 @@ XDM_HDF_NAMESPACE_BEGIN
 /// Applying this visitor to an XDM tree will force all UniformDataItems to
 /// write their arrays to an HDF database.  The path to the database in the HDF
 /// file will be determined by the Item name, or failing that, the class name
-/// for the parents of the UniformDataItem.  The dataset will be named according
-/// to the name passed into the constructor.
+/// for the parents of the UniformDataItem. The Dataset will take either the
+/// name of the UniformDataItem it belongs to (if it has one), or a unique
+/// identifier generated automatically based on the UniformDataItem it belongs
+/// to.
 ///
-/// For example, a the UniformDataItem at the end of the hierarchy
-///
-///   <Grid>
-///     <Attribute Name='pressure'>
-///       <DataItem Type='Uniform'>
-///
-/// will receive an HDF dataset in the file at the location
-/// Grid/pressure/given_name.
+/// In addition, this visitor takes a parameter that allows HDF datasets to
+/// be grouped by series index, allowing new data to be written as a series
+/// progresses.
 ///
 /// If the UniformDataItem already has a dataset attached, no action will be
 /// taken.
@@ -55,7 +52,7 @@ public:
   /// Takes a file name and a common name for all datasets.
   AttachHdfDatasetOperation( 
     const std::string& fileName,
-    const std::string& commonName );
+    bool groupBySeriesIndex );
   virtual ~AttachHdfDatasetOperation();
 
   //-- ItemVisitor implementations --//
@@ -64,8 +61,8 @@ public:
 
 private:
   std::string mFileName;
-  std::string mCommonName;
-  std::vector< std::string > mCurrentPath;
+  bool mGroupBySeriesIndex;
+  GroupPath mCurrentPath;
 };
 
 XDM_HDF_NAMESPACE_END

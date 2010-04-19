@@ -40,7 +40,7 @@ public:
   virtual void open(
     const xdm::FileSystemPath& path,
     xdm::Dataset::InitializeMode mode );
-  virtual void write( xdm::RefPtr< xdm::Item > item );
+  virtual void write( xdm::RefPtr< xdm::Item > item, std::size_t seriesIndex );
   virtual void close();
 
 private:

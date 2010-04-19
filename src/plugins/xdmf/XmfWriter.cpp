@@ -57,7 +57,7 @@ void XmfWriter::open(
   mIsOpen = true;
 }
 
-void XmfWriter::write( xdm::RefPtr< xdm::Item > item ) {
+void XmfWriter::write( xdm::RefPtr< xdm::Item > item, std::size_t seriesIndex ) {
   using xdm::RefPtr;
   using xdmGrid::Grid;
 
@@ -71,9 +71,10 @@ void XmfWriter::write( xdm::RefPtr< xdm::Item > item ) {
   }
 
   // Attach datasets to items that do not yet have them.
-  xdmHdf::AttachHdfDatasetOperation attach( mCurrentFilePath.pathString() + ".h5", "unnamed" );
+  xdmHdf::AttachHdfDatasetOperation attach( mCurrentFilePath.pathString() + ".h5", true );
   grid->accept( attach );
 
+  mSeries->updateGrid( grid, seriesIndex );
   mSeries->writeGridMetadata( grid );
   mSeries->writeGridData( grid );
 }

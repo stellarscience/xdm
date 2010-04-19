@@ -27,6 +27,7 @@
 #include <xdm/ArrayAdapter.hpp>
 #include <xdm/Item.hpp>
 #include <xdm/UniformDataItem.hpp>
+#include <xdm/UpdateVisitor.hpp>
 #include <xdm/VectorStructuredArray.hpp>
 
 #include <xdmGrid/Attribute.hpp>
@@ -36,6 +37,7 @@
 
 #include <xdmHdf/HdfDataset.hpp>
 
+#include <algorithm>
 #include <fstream>
 
 #include <cmath>
@@ -44,6 +46,10 @@ double function( double x, double y ) {
   double xrad = x * ( 6.28 / 360.0 );
   double yrad = y * ( 6.28 / 360.0 );
   return std::sin( xrad + yrad );
+}
+
+double timeFunction( size_t step ) {
+  return step;
 }
 
 static const int kMeshSize[2] = { 10, 5 };
@@ -99,7 +105,7 @@ xdm::RefPtr< xdmGrid::UniformGrid > build2DGrid() {
       new xdm::UniformDataItem(
         xdm::primitiveType::kDouble,
         xdm::makeShape( kMeshSize[1], kMeshSize[0] ) ) );
-    dataItem->setData( xdm::makeRefPtr( new xdm::ArrayAdapter( attrValues ) ) );
+    dataItem->setData( xdm::makeRefPtr( new xdm::ArrayAdapter( attrValues, true ) ) );
     attribute->setDataItem( dataItem );
     grid->addAttribute( attribute );
   }
@@ -111,7 +117,23 @@ xdm::RefPtr< xdmGrid::UniformGrid > build2DGrid() {
 void write2DGrid( const xdm::FileSystemPath& path ) {
   xdmf::XmfWriter writer;
   writer.open( path, xdm::Dataset::kCreate );
-  writer.write( build2DGrid() );
+  writer.write( build2DGrid(), 0 );
+  writer.close();
+}
+
+// Write time dependent data.
+void writeTimeGrid( const xdm::FileSystemPath& path ) {
+  xdm::RefPtr< xdmGrid::UniformGrid > grid = build2DGrid();
+
+  xdmf::XmfWriter writer;
+  writer.open( path, xdm::Dataset::kCreate );
+  xdm::RefPtr< xdmGrid::Attribute > attr = grid->attributeByName( "attr" );
+  xdm::RefPtr< xdm::UniformDataItem > data = attr->dataItem();
+  xdm::RefPtr< xdm::TypedStructuredArray< double > > array = data->typedArray<double>();
+  for ( int step = 0; step < 5; ++step ) {
+    std::fill( array->begin(), array->end(), timeFunction( step ) );
+    writer.write( grid, step );
+  }
   writer.close();
 }
 
@@ -190,5 +212,35 @@ BOOST_AUTO_TEST_CASE( grid2DRoundtrip ) {
         attributeData->atIndex< double >( index++ ),
         function( node[0], node[1] ) );
     }
+  }
+}
+
+BOOST_AUTO_TEST_CASE( temporalCollectionRoundtrip ) {
+  const xdm::FileSystemPath testFilePath( "temporalCollectionRoundtrip.xmf" );
+  const xdm::FileSystemPath hdfFilePath( "temporalCollectionRoundtrip.xmf.h5" );
+
+  xdm::remove( testFilePath );
+  xdm::remove( hdfFilePath );
+
+  writeTimeGrid( testFilePath );
+
+  xdmf::XmfReader reader;
+  xdmFormat::Reader::ReadResult result = reader.readItem( testFilePath );
+  BOOST_CHECK_EQUAL( result.second, 5 );
+  BOOST_REQUIRE( result.first );
+
+  xdm::RefPtr< xdmGrid::UniformGrid > g =
+    xdm::dynamic_pointer_cast< xdmGrid::UniformGrid >( result.first );
+  BOOST_REQUIRE( g );
+
+  xdm::RefPtr< xdm::UniformDataItem > data = g->attributeByName( "attr" )->dataItem();
+  // The bounds below are Y-X order.
+  BOOST_CHECK_EQUAL( data->dataspace(),
+    xdm::makeShape( kMeshSize[1], kMeshSize[0] ) );
+  for ( size_t step = 0; step < 5; ++step ) {
+    xdm::UpdateVisitor update( step );
+    g->accept( update );
+    double value = data->atLocation< double >( 2, 5 );
+    BOOST_CHECK_EQUAL( value, step );
   }
 }

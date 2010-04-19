@@ -23,16 +23,16 @@
 
 #include <xdm/Dataset.hpp>
 
+#include <deque>
 #include <memory>
 #include <string>
-#include <vector>
 
 #include <xdmHdf/NamespaceMacro.hpp>
 
 XDM_HDF_NAMESPACE_BEGIN
 
 /// Path of groups identifying a location in the HDF file.
-typedef std::vector< std::string > GroupPath;
+typedef std::deque< std::string > GroupPath;
 
 // Code Review Matter (open): Doxygen comment.
 // Did you consider providing documentation for this class so that others may
