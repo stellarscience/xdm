@@ -27,11 +27,14 @@
 
 XDM_NAMESPACE_BEGIN
 
-/// Visitor class that traverses the tree invoking all BasicItemUpdateCallbacks
-/// with an integer series index passed into the constructor. This allows
-/// client applications to define application specific update behavior but pass
-/// the management of invoking that behavior to the library.
-/// @see BasicItemUpdateCallback.
+/// Visitor class that traverses the tree invoking all series update behaviors
+/// provided by Item subclasses and application defined
+/// BasicItemUpdateCallbacks with an integer series index passed into the
+/// constructor. This allows library extensions and client applications to
+/// define application specific update behavior but pass the management of
+/// invoking that behavior to the library.
+/// @see Item
+/// @see BasicItemUpdateCallback
 class UpdateVisitor : public xdm::ItemVisitor {
 public:
   UpdateVisitor( std::size_t seriesIndex );

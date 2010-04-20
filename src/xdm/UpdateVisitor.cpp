@@ -33,9 +33,15 @@ UpdateVisitor::~UpdateVisitor() {
 }
 
 void UpdateVisitor::apply( Item& item ) {
+  // Tell the Item to update its internal state.
+  item.updateState( mSeriesIndex );
+
+  // Call an application defined callback if it exists.
   if ( RefPtr< BasicItemUpdateCallback > callback = item.updateCallback() ) {
     callback->update( item, mSeriesIndex );
   }
+
+  // Continue with this Item's
   traverse( item );
 }
 

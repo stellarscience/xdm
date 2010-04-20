@@ -43,6 +43,7 @@ XDM_NAMESPACE_BEGIN
 
 class Item;
 class ItemVisitor;
+class UpdateVisitor;
 
 /// Callback class for updating a generic Item dynamically. These callbacks
 /// can be attached to items in the xdm data tree to add behavior that is
@@ -119,6 +120,21 @@ public:
   /// is reserved for visitor classes so that the communication, memory
   /// referencing, and cacheing can be managed by client applications.
   virtual void writeMetadata( XmlMetadataWrapper& metadata );
+
+protected:
+
+  /// Update an item's internal data for a new series index. This method is
+  /// called to notify an Item that it is time to update it's internal data to
+  /// reflect a new series index. Library extensions and plugins should
+  /// implement this method for dynamic Items. Application library clients
+  /// should use ItemUpdateCallback objects to attach update behavior
+  /// dynamically. The default implementation does nothing.
+  ///
+  /// @param seriesIndex The index to update the internal state to.
+  virtual void updateState( std::size_t seriesIndex );
+
+  /// Allow the UpdateVisitor to invoke the updateState method.
+  friend class UpdateVisitor;
 
 private:
   std::string mName;
