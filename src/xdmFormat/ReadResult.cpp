@@ -24,6 +24,11 @@
 
 XDM_FORMAT_NAMESPACE_BEGIN
 
+ReadResult::ReadResult() :
+  mItem(),
+  mSeriesSteps( 5 ) {
+}
+
 ReadResult::ReadResult( xdm::RefPtr< xdm::Item > item, size_t seriesSteps ) :
   mItem( item ),
   mSeriesSteps( seriesSteps ) {

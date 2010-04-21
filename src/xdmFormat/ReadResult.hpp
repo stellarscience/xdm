@@ -37,6 +37,8 @@ XDM_FORMAT_NAMESPACE_BEGIN
 /// series steps.
 class ReadResult {
 public:
+  /// Constructor initializes with empty results.
+  ReadResult();
   /// Constructor takes a RefPtr to the read item and the number of steps read.
   ReadResult( xdm::RefPtr< xdm::Item > item, size_t seriesSteps );
   ~ReadResult();

@@ -19,6 +19,9 @@
 //
 //------------------------------------------------------------------------------
 #include <xdmf/impl/UniformDataItem.hpp>
+
+#include <xdmf/impl/TreeBuilder.hpp>
+#include <xdmf/impl/XmlDocumentManager.hpp>
 #include <xdmf/impl/XPathQuery.hpp>
 
 #include <xdm/ArrayAdapter.hpp>
@@ -154,23 +157,12 @@ UniformDataItem::UniformDataItem(
 UniformDataItem::~UniformDataItem() {
 }
 
-void UniformDataItem::read( xmlNode * node ) {
+void UniformDataItem::read( xmlNode * node, TreeBuilder& builder ) {
   setContent( *this, document()->get(), node );
 }
 
 void UniformDataItem::updateState( std::size_t seriesIndex ) {
-  xmlNode * gridNode = nodes()->at( seriesIndex );
-  xmlDoc * doc = document()->get();
-
-  // Find the new XML node within the requested grid context.
-  XPathQuery nodeQuery( doc, gridNode, xpathExpr() );
-  if ( nodeQuery.size() == 0 ) {
-    std::ostringstream ss;
-    ss << "XDMF object not found at series index " << seriesIndex;
-    XDM_THROW( xdmFormat::ReadError( ss.str() ) );
-  }
-  xmlNode * node = nodeQuery.node( 0 );
-  setContent( *this, doc, node );
+  setContent( *this, document()->get(), findNode( seriesIndex ) );
 }
 
 } // namespace impl

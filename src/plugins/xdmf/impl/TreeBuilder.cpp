@@ -24,6 +24,7 @@
 #include <xdmf/impl/XmlDocumentManager.hpp>
 #include <xdmf/impl/XPathQuery.hpp>
 
+#include <xdmf/impl/Time.hpp>
 #include <xdmf/impl/UniformDataItem.hpp>
 
 #include <xdm/Algorithm.hpp>
@@ -40,7 +41,6 @@
 #include <xdmGrid/MultiArrayGeometry.hpp>
 #include <xdmGrid/RectilinearMesh.hpp>
 #include <xdmGrid/TensorProductGeometry.hpp>
-#include <xdmGrid/Time.hpp>
 #include <xdmGrid/Topology.hpp>
 #include <xdmGrid/UniformGrid.hpp>
 
@@ -80,6 +80,21 @@ enum XdmfGeometryType {
   ORIGIN_OFFSET // Origin_DxDyDz
 };
 
+// Generate an XPath expression that references descendant in the context of
+// ancestor.
+std::string generateXPathExpr(
+  xmlDoc * doc,
+  xmlNode * descendant,
+  xmlNode * ancestor )
+{
+  // Find the path from the descendant to the ancestor.
+  NodePath path = findPathToAncestor( doc, descendant, ancestor );
+  // Reverse the result to get the path from the ancestor to the descendant.
+  std::reverse( path.begin(), path.end() );
+  // Return the query string.
+  return makeXPathQuery( path );
+}
+
 } // namespace
 
 // -----------------------------------------------------------------------------
@@ -106,15 +121,13 @@ xdm::RefPtr< xdm::Item > TreeBuilder::buildTree() {
 //------------------------------------------------------------------------------
 xdm::RefPtr< xdm::UniformDataItem >
 TreeBuilder::buildUniformDataItem( xmlNode * node ) {
-  // determine the path to the time step root.
-  NodePath gridRootPath = findPathToAncestor( mDoc->get(), node, mSeriesGrids->at( 0 ) );
-  // reverse it so we can find the path from the grid root to the node.
-  std::reverse( gridRootPath.begin(), gridRootPath.end() );
-
+  std::string path = generateXPathExpr( mDoc->get(), node, mSeriesGrids->at( 0 ) );
   // Build the implementation item and return it.
   xdm::RefPtr< UniformDataItem > result( new UniformDataItem(
-    mDoc, mSeriesGrids, makeXPathQuery( gridRootPath ) ) );
-  result->read( node );
+    mDoc,
+    mSeriesGrids,
+    path ) );
+  result->read( node, *this );
   return result;
 }
 
@@ -463,42 +476,8 @@ TreeBuilder::buildSpatialCollectionGrid( xmlNode * node ) {
 
 //------------------------------------------------------------------------------
 xdm::RefPtr< xdmGrid::Time > TreeBuilder::buildTime( xmlNode * node ) {
-
-  xdm::RefPtr< xdmGrid::Time > result( new xdmGrid::Time );
-
-  XPathQuery typeQuery( mDoc->get(), node, "@TimeType" );
-  std::string timeType = (typeQuery.size() > 0)?typeQuery.textValue(0):"Single";
-
-  if ( timeType == "Single" ) {
-    XPathQuery valueQuery( mDoc->get(), node, "@Value" );
-    if ( valueQuery.size() == 0 ) {
-      XDM_THROW( xdmFormat::ReadError(
-        "Single XDMF grid time specified with no Value" ) );
-    }
-    std::stringstream ss( valueQuery.textValue( 0 ) );
-    double value;
-    ss >> value;
-    if ( ss.bad() ) {
-      XDM_THROW( xdmFormat::ReadError( "Unable to read XDMF Time Value." ) );
-    }
-    result->setValue( value );
-  } else if ( timeType == "List" ) {
-    XPathQuery valuesQuery( mDoc->get(), node, "DataItem" );
-    if ( valuesQuery.size() == 0 ) {
-      XDM_THROW( xdmFormat::ReadError( "No values found for XDMF Time." ) );
-    }
-
-    // Read the uniform data item containing the values.
-    xdm::RefPtr< xdm::UniformDataItem > data =
-      buildUniformDataItem( valuesQuery.node( 0 ) );
-    xdm::RefPtr< xdm::TypedStructuredArray< double > > array =
-      data->typedArray< double >();
-    std::vector< double > values( array->size() );
-    std::copy( array->begin(), array->end(), values.begin() );
-    result->setValues( values );
-  } else {
-    XDM_THROW( xdmFormat::ReadError( "Unrecognized XDMF Time type." ) );
-  }
+  std::string path = generateXPathExpr( mDoc->get(), node, mSeriesGrids->at( 0 ) );
+  xdm::RefPtr< Time > result( new Time( mDoc, mSeriesGrids, path ) );
   return result;
 }
 

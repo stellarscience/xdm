@@ -231,8 +231,12 @@ BOOST_AUTO_TEST_CASE( temporalCollectionRoundtrip ) {
 
   writeTimeGrid( testFilePath );
 
-  xdmf::XmfReader reader;
-  xdmFormat::ReadResult result = reader.readItem( testFilePath );
+  xdmFormat::ReadResult result;
+  {
+    // make sure data is valid outside the scope of the reader.
+    xdmf::XmfReader reader;
+    result = reader.readItem( testFilePath );
+  }
   BOOST_CHECK_EQUAL( result.seriesSteps(), 5 );
   BOOST_REQUIRE( result.item() );
 
@@ -247,8 +251,14 @@ BOOST_AUTO_TEST_CASE( temporalCollectionRoundtrip ) {
   for ( size_t step = 0; step < 5; ++step ) {
     xdm::UpdateVisitor update( step );
     g->accept( update );
-    // BOOST_CHECK_EQUAL( g->time()->value(), step );
+    BOOST_CHECK_EQUAL( g->time()->value(), step );
     double value = data->atLocation< double >( 2, 5 );
     BOOST_CHECK_EQUAL( value, step );
   }
+
+  // Go back in time.
+  xdm::UpdateVisitor update( 2 );
+  g->accept( update );
+  BOOST_CHECK_EQUAL( g->time()->value(), 2.0 );
+  BOOST_CHECK_EQUAL( data->atLocation< double >( 2, 5 ), 2.0 );
 }

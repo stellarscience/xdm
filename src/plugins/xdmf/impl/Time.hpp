@@ -18,54 +18,35 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //------------------------------------------------------------------------------
-#ifndef xdmf_impl_Input_hpp
-#define xdmf_impl_Input_hpp
+#ifndef xdmf_impl_Time_hpp
+#define xdmf_impl_Time_hpp
 
-#include <xdm/RefPtr.hpp>
+#include <xdmf/impl/Input.hpp>
 
-#include <libxml/tree.h>
-
-#include <string>
+#include <xdmGrid/Time.hpp>
 
 namespace xdmf {
 namespace impl {
 
-class TreeBuilder;
-class XmlDocumentManager;
-class SharedNodeVector;
-
-/// Class containing a shared document and a shared list of nodes to hold on to
-/// for stepping an XDMF item in a series.
-/// @param doc The document containing the XDMF description.
-/// @param nodes The nodes containing the description of the item at each step.
-class Input {
+/// XDMF implementation of Time to handle time stepping.
+class Time :
+  public xdmGrid::Time,
+  public Input {
 public:
-  Input(
+  Time(
     xdm::RefPtr< XmlDocumentManager > doc,
     xdm::RefPtr< SharedNodeVector > stepNodes,
     const std::string& xpathExpr );
-  virtual ~Input();
+  virtual ~Time();
 
-  /// Read implementation to build an item from a node.
-  virtual void read( xmlNode * node, TreeBuilder& builder ) = 0;
+  virtual void read( xmlNode * node, TreeBuilder& builder );
 
-  /// Find the node for this object at the given series index.
-  xmlNode * findNode( std::size_t index );
+protected:
+  virtual void updateState( std::size_t seriesIndex );
 
-  xdm::RefPtr< XmlDocumentManager > document() { return mDocument; }
-  xdm::RefPtr< SharedNodeVector > nodes() { return mNodes; }
-  const std::string& xpathExpr() const { return mXPathExpr; }
-
-private:
-  Input( const Input& );
-  Input& operator=( const Input& );
-
-  xdm::RefPtr< XmlDocumentManager > mDocument;
-  xdm::RefPtr< SharedNodeVector > mNodes;
-  std::string mXPathExpr;
 };
 
 } // namespace impl
 } // namespace xdmf
 
-#endif // xdmf_impl_Input_hpp
+#endif // xdmf_impl_Time_hpp

@@ -19,7 +19,7 @@
 //
 //------------------------------------------------------------------------------
 #ifndef xdmf_impl_TreeBuilder_hpp
-#define xdmf_impl_TreeBuildter_hpp
+#define xdmf_impl_TreeBuilder_hpp
 
 #include <xdmf/impl/XPathQuery.hpp>
 

@@ -55,6 +55,7 @@ set( ${PROJECT_NAME}_SOURCES
   XdmfHelpers.cpp
   XmfReader.cpp
   XmfWriter.cpp
+  impl/Input.cpp
   impl/TreeBuilder.cpp
 )
 
@@ -63,10 +64,12 @@ set( ${PROJECT_NAME}_SOURCES
 #
 
 set( ${PROJECT_NAME}_HEADERS ${${PROJECT_NAME}_HEADERS}
+  impl/Time.hpp
   impl/UniformDataItem.hpp
 )
 
 set( ${PROJECT_NAME}_SOURCES ${${PROJECT_NAME}_SOURCES}
+  impl/Time.cpp
   impl/UniformDataItem.cpp
 )
 

@@ -18,35 +18,43 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //------------------------------------------------------------------------------
-#ifndef xdmf_impl_UniformDataItem_hpp
-#define xdmf_impl_UniformDataItem_hpp
-
 #include <xdmf/impl/Input.hpp>
 
-#include <xdm/UniformDataItem.hpp>
+#include <xdmf/impl/TreeBuilder.hpp>
+#include <xdmf/impl/XmlDocumentManager.hpp>
+
+#include <xdmFormat/IoExcept.hpp>
+
+#include <xdm/ThrowMacro.hpp>
 
 namespace xdmf {
 namespace impl {
 
-/// XDMF implementation of UniformDataItem to handle time stepping.
-class UniformDataItem :
-  public xdm::UniformDataItem,
-  public Input {
-public:
-  UniformDataItem(
-    xdm::RefPtr< XmlDocumentManager > doc,
-    xdm::RefPtr< SharedNodeVector > stepNodes,
-    const std::string& xpathExpr );
-  virtual ~UniformDataItem();
+Input::Input(
+ xdm::RefPtr< XmlDocumentManager > doc,
+ xdm::RefPtr< SharedNodeVector > stepNodes,
+ const std::string& xpathExpr ) :
+  mDocument( doc ),
+  mNodes( stepNodes ),
+  mXPathExpr( xpathExpr ) {
+}
 
-  virtual void read( xmlNode * node, TreeBuilder& builder );
+Input::~Input() {
+}
 
-protected:
-  virtual void updateState( std::size_t seriesIndex );
+xmlNode * Input::findNode( std::size_t index ) {
+  xmlNode * gridNode = nodes()->at( index );
+  xmlDoc * doc = document()->get();
 
-};
+  // Find the new XML node within the requested grid context.
+  XPathQuery nodeQuery( doc, gridNode, xpathExpr() );
+  if ( nodeQuery.size() == 0 ) {
+    std::ostringstream ss;
+    ss << "XDMF object not found at series index " << index;
+    XDM_THROW( xdmFormat::ReadError( ss.str() ) );
+  }
+  return nodeQuery.node( 0 );
+}
 
-} // namespace impl
-} // namespace xdmf
-
-#endif // xdmf_impl_UniformDataItem_hpp
+}
+}
