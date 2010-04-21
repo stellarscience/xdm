@@ -47,6 +47,12 @@ private:
   std::size_t mSeriesIndex;
 };
 
+/// Convenience function to update an Item and its subtrees to a given series
+/// index.
+/// @param item The root item to update.
+/// @param seriesIndex The index in the series to update the data to.
+void updateToIndex( Item& item, std::size_t seriesIndex );
+
 XDM_NAMESPACE_END
 
 #endif // xdm_UpdateVisitor_hpp

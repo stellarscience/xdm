@@ -58,5 +58,10 @@ void UpdateVisitor::apply( UniformDataItem& item ) {
   traverse( item );
 }
 
+void updateToIndex( Item& item, std::size_t seriesIndex ) {
+  UpdateVisitor v( seriesIndex );
+  item.accept( v );
+}
+
 XDM_NAMESPACE_END
 

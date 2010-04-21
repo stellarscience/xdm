@@ -249,16 +249,14 @@ BOOST_AUTO_TEST_CASE( temporalCollectionRoundtrip ) {
   BOOST_CHECK_EQUAL( data->dataspace(),
     xdm::makeShape( kMeshSize[1], kMeshSize[0] ) );
   for ( size_t step = 0; step < 5; ++step ) {
-    xdm::UpdateVisitor update( step );
-    g->accept( update );
+    xdm::updateToIndex( *g, step );
     BOOST_CHECK_EQUAL( g->time()->value(), step );
     double value = data->atLocation< double >( 2, 5 );
     BOOST_CHECK_EQUAL( value, step );
   }
 
   // Go back in time.
-  xdm::UpdateVisitor update( 2 );
-  g->accept( update );
+  xdm::updateToIndex( *g, 2 );
   BOOST_CHECK_EQUAL( g->time()->value(), 2.0 );
   BOOST_CHECK_EQUAL( data->atLocation< double >( 2, 5 ), 2.0 );
 }
