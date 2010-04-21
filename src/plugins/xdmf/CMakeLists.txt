@@ -42,7 +42,9 @@ set( ${PROJECT_NAME}_HEADERS
   XdmfHelpers.hpp
   XmfReader.hpp
   XmfWriter.hpp
+  impl/Input.hpp
   impl/TreeBuilder.hpp
+  impl/XmlDocumentManager.hpp
   impl/XPathQuery.hpp
 )
 
@@ -54,6 +56,18 @@ set( ${PROJECT_NAME}_SOURCES
   XmfReader.cpp
   XmfWriter.cpp
   impl/TreeBuilder.cpp
+)
+
+#
+# XDMF Item implementations
+#
+
+set( ${PROJECT_NAME}_HEADERS ${${PROJECT_NAME}_HEADERS}
+  impl/UniformDataItem.hpp
+)
+
+set( ${PROJECT_NAME}_SOURCES ${${PROJECT_NAME}_SOURCES}
+  impl/UniformDataItem.cpp
 )
 
 # Tell CMake that the RNG schema header is generated.

@@ -22,7 +22,10 @@
 #include <boost/test/unit_test.hpp>
 
 #include <xdmf/impl/TreeBuilder.hpp>
+#include <xdmf/impl/XmlDocumentManager.hpp>
 #include <xdmf/impl/XPathQuery.hpp>
+
+#include <xdmf/impl/UniformDataItem.hpp>
 
 #include <xdm/AllDataSelection.hpp>
 #include <xdm/DataSelectionMap.hpp>
@@ -42,6 +45,10 @@
 #include <libxml/tree.h>
 
 namespace {
+
+using xdm::RefPtr;
+using xdmf::impl::XmlDocumentManager;
+using xdmf::impl::SharedNodeVector;
 
 char const * const kTestDatasetFilename = "BuildTreeTest.h5";
 
@@ -67,6 +74,12 @@ void createHdfFile() {
     xdm::Dataset::kCreate );
   dataset->serialize( array.get(), xdm::DataSelectionMap() );
   dataset->finalize();
+}
+
+RefPtr< XmlDocumentManager > loadXml( const char * xml ) {
+  RefPtr< XmlDocumentManager > result( new XmlDocumentManager(
+    xmlParseDoc( reinterpret_cast< const xmlChar *>(xml) ) ) );
+  return result;
 }
 
 BOOST_AUTO_TEST_CASE( findPathToAncestorTest ) {
@@ -124,12 +137,13 @@ BOOST_AUTO_TEST_CASE( buildUniformDataItem ) {
 
   createHdfFile();
 
-  xmlDocPtr document = xmlParseDoc( reinterpret_cast< const xmlChar *>(kXml) );
-  xmlNode * rootNode = xmlDocGetRootElement( document );
+  RefPtr< XmlDocumentManager > document = loadXml( kXml );
+  RefPtr< SharedNodeVector > nodes( new SharedNodeVector );
+  nodes->push_back( xmlDocGetRootElement( document->get() ) );
 
-  xdmf::impl::TreeBuilder builder( rootNode );
+  xdmf::impl::TreeBuilder builder( document, nodes );
   xdm::RefPtr< xdm::UniformDataItem > item
-    = builder.buildUniformDataItem( rootNode );
+    = builder.buildUniformDataItem( nodes->at( 0 ) );
   BOOST_REQUIRE( item );
 
   BOOST_CHECK_EQUAL( item->dataType(), xdm::primitiveType::kDouble );
@@ -161,19 +175,18 @@ BOOST_AUTO_TEST_CASE( buildUniformDataItem ) {
   BOOST_CHECK_EQUAL_COLLECTIONS(
     array->begin(), array->end(),
     resultData, resultData + 9 );
-
-  xmlFreeDoc( document );
 }
 
 BOOST_AUTO_TEST_CASE( buildStructuredTopology ) {
   const char * kXml =
     "<Topology TopologyType='3DRectMesh' Dimensions='3 3 3'/>";
 
-  xmlDocPtr document = xmlParseDoc( reinterpret_cast< const xmlChar * >(kXml) );
-  xmlNode * rootNode = xmlDocGetRootElement( document );
+  RefPtr< XmlDocumentManager > document = loadXml( kXml );
+  RefPtr< SharedNodeVector > nodes( new SharedNodeVector );
+  nodes->push_back( xmlDocGetRootElement( document->get() ) );
 
-  xdmf::impl::TreeBuilder builder( rootNode );
-  xdm::RefPtr< xdmGrid::Topology > result = builder.buildTopology( rootNode );
+  xdmf::impl::TreeBuilder builder( document, nodes );
+  xdm::RefPtr< xdmGrid::Topology > result = builder.buildTopology( nodes->at(0) );
 
   BOOST_REQUIRE( result );
 
@@ -183,11 +196,10 @@ BOOST_AUTO_TEST_CASE( buildStructuredTopology ) {
 
   BOOST_CHECK_EQUAL( structured->shape(), xdm::makeShape( 3, 3, 3) );
 
-  xmlFreeDoc( document );
 }
 
 BOOST_AUTO_TEST_CASE( buildStaticTree ) {
-  typedef xdmf::impl::InputItem< xdm::UniformDataItem > InputUDI;
+  typedef xdmf::impl::UniformDataItem InputUDI;
 
   xmlDocPtr document = xmlParseFile( "test_document1.xmf" );
   BOOST_REQUIRE( document );
@@ -196,7 +208,10 @@ BOOST_AUTO_TEST_CASE( buildStaticTree ) {
   xdmf::impl::XPathQuery gridQuery( document, root, "/Xdmf/Domain/Grid" );
   BOOST_REQUIRE_EQUAL( gridQuery.size(), 1 );
 
-  xdmf::impl::TreeBuilder builder( gridQuery.node( 0 ) );
+  RefPtr< XmlDocumentManager > doc( new XmlDocumentManager( document ) );
+  RefPtr< SharedNodeVector > nodes( new SharedNodeVector );
+  nodes->push_back( gridQuery.node( 0 ) );
+  xdmf::impl::TreeBuilder builder( doc, nodes );
   xdm::RefPtr< xdm::Item > result = builder.buildTree();
   BOOST_REQUIRE( result );
 
