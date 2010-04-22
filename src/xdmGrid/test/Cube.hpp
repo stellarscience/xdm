@@ -76,8 +76,8 @@ public:
     // Tetrahedra have 4 nodes each. The array goes element0node0, element0node1, ...element5node3. Ordering
     // is ExodusII style (right hand rule on one face points thumb toward 4th node).
     mConnectivity[ 0] = 0; // tet 0
-    mConnectivity[ 1] = 2;
-    mConnectivity[ 2] = 5;
+    mConnectivity[ 1] = 5;
+    mConnectivity[ 2] = 2;
     mConnectivity[ 3] = 7;
     mConnectivity[ 4] = 2; // tet 1
     mConnectivity[ 5] = 5;
