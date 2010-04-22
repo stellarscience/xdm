@@ -1,6 +1,6 @@
 //==============================================================================
 // This software developed by Stellar Science Ltd Co and the U.S. Government.
-// Copyright (C) 2009 Stellar Science. Government-purpose rights granted.
+// Copyright (C) 2009-2010 Stellar Science. Government-purpose rights granted.
 //
 // This file is part of XDM
 //
@@ -21,8 +21,8 @@
 #ifndef xdmGrid_UnstructuredTopology_hpp
 #define xdmGrid_UnstructuredTopology_hpp
 
-#include <xdmGrid/Topology.hpp>
 #include <xdmGrid/ElementTopology.hpp>
+#include <xdmGrid/Topology.hpp>
 
 #include <xdm/RefPtr.hpp>
 #include <xdm/UniformDataItem.hpp>

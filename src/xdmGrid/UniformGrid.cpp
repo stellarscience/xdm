@@ -22,10 +22,10 @@
 
 #include <xdmGrid/Attribute.hpp>
 #include <xdmGrid/Element.hpp>
+#include <xdmGrid/ElementTopology.hpp>
 #include <xdmGrid/Geometry.hpp>
 #include <xdmGrid/StructuredTopology.hpp>
 #include <xdmGrid/TensorProductGeometry.hpp>
-#include <xdmGrid/ElementTopology.hpp>
 
 #include <xdm/ItemVisitor.hpp>
 #include <xdm/RefPtr.hpp>

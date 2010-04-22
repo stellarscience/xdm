@@ -33,16 +33,33 @@
 
 XDM_GRID_NAMESPACE_BEGIN
 
+/// A shared lookup class for Elements. Elements refer connectivity and geometry queries to this
+/// shared class.
 class ElementSharedConnectivityLookup : public xdm::ReferencedObject {
 public:
+
+  /// Get the geometry node index for a particular element and local node index.
+  /// @param elementIndex The index of a particular element in a particular topology.
+  /// @param nodeIndex The local index of a node on the element (for example, a triangle might
+  ///        have three nodes, with indices 0, 1, and 2.
+  /// @returns The node index into a geometry that corresponds to the local element node index.
   virtual std::size_t at( const std::size_t& elementIndex, const std::size_t& nodeIndex ) const = 0;
 
+  /// Get the geometry that pertains to a particular element in the topology.
   virtual const Geometry& geometry( const std::size_t& elementIndex ) const = 0;
 };
 
-
+/// A lightweight class that provides useful functions for element access, but that does not hold
+/// onto any global connectivity data. All functions are const, which means all Elements are const.
 class Element {
 public:
+  /// @brief Constructor.
+  /// @param connections The shared connectivity class that will be used to lookup nodes in a
+  ///        big topology connectivity array.
+  /// @param elementTopology The topology of this element. Use xdmGrid::elementFactory() to grab
+  ///        the relevant topology.
+  /// @param elementIndex The index of this element that will be used when making calls to the
+  ///        shared connectivity class.
   Element(
     xdm::RefPtr< const ElementSharedConnectivityLookup > connections,
     xdm::RefPtr< const ElementTopology > elementTopology,
@@ -50,34 +67,48 @@ public:
       mConnectivity( connections ), mTopo( elementTopology ), mIndex( elementIndex ) {
   }
 
+  /// Get a ConstNode that corresponds to a local node index on the element.
   ConstNode node( const std::size_t& nodeIndex ) const {
     return mConnectivity->geometry( mIndex ).node( nodeIndexInGeometry( nodeIndex ) );
   }
 
+  /// Get the type of shape.
   ElementShape::Type shape() const {
     return mTopo->shape();
   }
 
+  /// Get the number of faces. This will be zero if the element is not a volume element.
   std::size_t numberOfFaces() const {
     return mTopo->numberOfFaces();
   }
 
+  /// Get the number of edges. This will be zero if the element is not a volume or surface element.
   std::size_t numberOfEdges() const {
     return mTopo->numberOfEdges();
   }
 
+  /// Get the number of nodes on this element.
   std::size_t numberOfNodes() const {
     return mTopo->numberOfNodes();
   }
 
+  /// Get a particular face. The returned Element has full Element capabilities, including the
+  /// ability to export its edges as Elements. Any node lookups for this face or any of its
+  /// edges will refer to nodes from the original volume element, and these can be mapped back
+  /// via Element::nodeIndexInGeometry() to give the correct global node indices.
   Element face( const std::size_t& faceIndex ) const {
     return Element( mConnectivity, mTopo->face( faceIndex ), mIndex );
   }
 
+  /// Get a particular edge. Any node lookups for this edge will refer to nodes from the original
+  /// volume or face element, and these can be mapped back via Element::nodeIndexInGeometry() to
+  /// give the correct global node indices.
   Element edge( const std::size_t& edgeIndex ) const {
     return Element( mConnectivity, mTopo->edge( edgeIndex ), mIndex );
   }
 
+  /// Get the global node index into the geometry that corresponds to a local node index for this
+  /// element.
   std::size_t nodeIndexInGeometry( const std::size_t& localNodeIndex ) const {
     return mConnectivity->at( mIndex, mTopo->node( localNodeIndex ) );
   }
@@ -87,82 +118,6 @@ private:
   xdm::RefPtr< const ElementTopology > mTopo;
   std::size_t mIndex;
 };
-
-
-
-//class Element;
-//class ConstElement;
-//class ElementSharedImp;
-//
-//class ElementBase
-//{
-//public:
-//  ElementBase( xdm::RefPtr< ElementSharedImp > imp, std::size_t elementIndex );
-//
-//  /// Get a single const node.
-//  ConstNode node( std::size_t nodeIndex ) const;
-//
-//  /// The type of element.
-//  ElementType::Type elementType() const;
-//
-//protected:
-//  ElementBase( const ElementBase& copyMe );
-//
-//  static void copyReference( const ElementBase& source, ElementBase& dest );
-//
-//private:
-//  xdm::RefPtr< ElementSharedImp > mImp;
-//  std::size_t mIndex;
-//};
-//
-///// A element class that references data in a presumably large dataset. The element acts as
-///// self-contained element, but it actually just refers most requests to an implementation
-///// class. Thus, the element is lightweight and copying is cheap.
-//class Element : public ElementBase
-//{
-//public:
-//  Element( xdm::RefPtr< ElementSharedImp > imp, std::size_t elementIndex );
-//  Element( const Element& copyMe );
-//
-//  /// Get a single node.
-//  Node node( std::size_t nodeIndex );
-//
-//  using ElementBase::node;
-//
-//private:
-//  // Referencing a const element with a non-const element is not safe.
-//  Element( const ConstElement& copyMe );
-//};
-//
-///// Const version of an element.
-//class ConstElement : public ElementBase
-//{
-//public:
-//  ConstElement( xdm::RefPtr< ElementSharedImp > imp, std::size_t elementIndex );
-//  ConstElement( const Element& copyMe );
-//  ConstElement( const ConstElement& copyMe );
-//
-//  /// This is intended to be a const_cast for elements.
-//  Element removeConstness() const;
-//
-//  using ElementBase::node;
-//
-//private:
-//  // No non-const node access.
-//};
-//
-///// Shared implementation class for referencing element data that is not stored in a self-contained
-///// element structure. All elements that use a given shared implementation should be of the same
-///// type, have the same number of nodes, etc. However, that is not required.
-//class ElementSharedImp : public xdm::ReferencedObject
-//{
-//public:
-//  /// Get a single node.
-//  virtual ConstNode node( std::size_t elementIndex, std::size_t nodeIndex ) const = 0;
-//
-//  /// The element type for all elements that this shared implementation refers to.
-//  virtual ElementType::Type elementType( std::size_t elementIndex ) const = 0;
-//};
 
 XDM_GRID_NAMESPACE_END
 

@@ -1,6 +1,6 @@
 //==============================================================================
 // This software developed by Stellar Science Ltd Co and the U.S. Government.
-// Copyright (C) 2010 Stellar Science. Government-purpose rights granted.
+// Copyright (C) 2009-2010 Stellar Science. Government-purpose rights granted.
 //
 // This file is part of XDM
 //
@@ -128,34 +128,6 @@ xdm::RefPtr< const ElementTopology > wedgeFactory(
 xdm::RefPtr< const ElementTopology > hexahedronFactory(
   const std::size_t& order,
   std::string name = "" );
-
-//namespace ElementType {
-//  typedef ElementClass Type;
-//  const ElementClass Default;
-//
-//  /// Degenerate types
-//  const ElementClass Circle( ElementShape::Circle, 1, "Circle" );
-//  const ElementClass Polyvertex( ElementShape::Polyvertex, 1, "Polyvertex" );
-//  const ElementClass Sphere( ElementShape::Sphere, 1, "Sphere" );
-//
-//  /// Linear Elements
-//  const ElementClass Beam( ElementShape::Beam, 2, "Beam" );
-//  const ElementClass Hex( ElementShape::Hex, 8, "Hexahedron" );
-//  const ElementClass Pyramid( ElementShape::Pyramid, 5, "Pyramid" );
-//  const ElementClass Quad( ElementShape::Quad, 4, "Quadrilateral" );
-//  const ElementClass Tetra( ElementShape::Tetra, 4, "Tetrahedron" );
-//  const ElementClass Triangle( ElementShape::Triangle, 3, "Triangle" );
-//  const ElementClass Wedge( ElementShape::Wedge, 6, "Wedge" );
-//
-//  /// Quadratic Elements
-//  const ElementClass QuadraticBeam( ElementShape::Beam, 3, "QuadraticBeam" );
-//  const ElementClass QuadraticHex( ElementShape::Hex, 21, "QuadraticHexahedron" );
-//  const ElementClass QuadraticPyramid( ElementShape::Pyramid, 13, "QuadraticPyramid" );
-//  const ElementClass QuadraticQuad( ElementShape::Quad, 9, "QuadraticQuadrilateral" );
-//  const ElementClass QuadraticTetra( ElementShape::Tetra, 11, "QuadraticTetrahedron" );
-//  const ElementClass QuadraticTriangle( ElementShape::Triangle, 7, "QuadraticTriangle" );
-//  const ElementClass QuadraticWedge( ElementShape::Wedge, 16, "QuadraticWedge" );
-//}
 
 ///// Get the ElementTopology that corresponds to an Exodus shape string.
 //xdm::RefPtr< const ElementTopology > exodusElementType(
