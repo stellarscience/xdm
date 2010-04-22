@@ -21,16 +21,17 @@
 
 #include <xdmf/impl/TreeBuilder.hpp>
 
+#include <xdmf/impl/XmlDocumentManager.hpp>
 #include <xdmf/impl/XPathQuery.hpp>
 
+#include <xdmf/impl/Time.hpp>
+#include <xdmf/impl/UniformDataItem.hpp>
+
 #include <xdm/Algorithm.hpp>
-#include <xdm/ArrayAdapter.hpp>
 #include <xdm/DataShape.hpp>
 #include <xdm/Item.hpp>
-#include <xdm/UniformDataItem.hpp>
-#include <xdm/VectorStructuredArray.hpp>
 
-#include <xdmFormat/Reader.hpp>
+#include <xdmFormat/IoExcept.hpp>
 
 #include <xdmGrid/Attribute.hpp>
 #include <xdmGrid/CollectionGrid.hpp>
@@ -40,11 +41,8 @@
 #include <xdmGrid/MultiArrayGeometry.hpp>
 #include <xdmGrid/RectilinearMesh.hpp>
 #include <xdmGrid/TensorProductGeometry.hpp>
-#include <xdmGrid/Time.hpp>
 #include <xdmGrid/Topology.hpp>
 #include <xdmGrid/UniformGrid.hpp>
-
-#include <xdmHdf/HdfDataset.hpp>
 
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
@@ -82,32 +80,19 @@ enum XdmfGeometryType {
   ORIGIN_OFFSET // Origin_DxDyDz
 };
 
-// Assuming input has been validated, determine type from a string/precision
-// pair.
-xdm::primitiveType::Value type( const std::string& typeStr, size_t precision ) {
-  switch ( precision ) {
-  case 1:
-    if ( typeStr == "Float" ) return xdm::primitiveType::kFloat;
-    if ( typeStr == "Int" ) return xdm::primitiveType::kChar;
-    if ( typeStr == "UInt" ) return xdm::primitiveType::kUnsignedChar;
-    if ( typeStr == "Char" ) return xdm::primitiveType::kChar;
-    break;
-  case 4:
-    if ( typeStr == "Float" ) return xdm::primitiveType::kFloat;
-    if ( typeStr == "Int" ) return xdm::primitiveType::kInt;
-    if ( typeStr == "UInt" ) return xdm::primitiveType::kUnsignedInt;
-    if ( typeStr == "Char" ) return xdm::primitiveType::kInt;
-    break;
-  case 8:
-    if ( typeStr == "Float" ) return xdm::primitiveType::kDouble;
-    if ( typeStr == "Int" ) return xdm::primitiveType::kLongInt;
-    if ( typeStr == "UInt" ) return xdm::primitiveType::kLongUnsignedInt;
-    if ( typeStr == "Char" ) return xdm::primitiveType::kLongInt;
-    break;
-  default:
-    return xdm::primitiveType::kFloat;
-    break;
-  }
+// Generate an XPath expression that references descendant in the context of
+// ancestor.
+std::string generateXPathExpr(
+  xmlDoc * doc,
+  xmlNode * descendant,
+  xmlNode * ancestor )
+{
+  // Find the path from the descendant to the ancestor.
+  NodePath path = findPathToAncestor( doc, descendant, ancestor );
+  // Reverse the result to get the path from the ancestor to the descendant.
+  std::reverse( path.begin(), path.end() );
+  // Return the query string.
+  return makeXPathQuery( path );
 }
 
 } // namespace
@@ -116,43 +101,33 @@ xdm::primitiveType::Value type( const std::string& typeStr, size_t precision ) {
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 
-TreeBuilder::TreeBuilder( xmlNode * gridRoot ) :
-  mGridRoot( gridRoot ) {
-  // find the document node that the grid root node belongs to.
-  xmlNode * node = gridRoot;
-  while ( node && (node->type != XML_DOCUMENT_NODE ) ) {
-    node = node->parent;
-  }
-  if ( !node ) {
-    XDM_THROW( xdmFormat::ReadError( "Grid root does not belong to any document." ) );
-  }
-  mDocument = (xmlDoc*)node;
-  // construct an XPath query context from the document.
-  mXPathContext = xmlXPathNewContext( mDocument );
+TreeBuilder::TreeBuilder(
+  xdm::RefPtr< XmlDocumentManager > doc,
+  xdm::RefPtr< SharedNodeVector > seriesGrids ) :
+  mDoc( doc ),
+  mSeriesGrids( seriesGrids ) {
 }
 
 TreeBuilder::~TreeBuilder() {
-  xmlXPathFreeContext( mXPathContext );
 }
 
 xdm::RefPtr< xdm::Item > TreeBuilder::buildTree() {
-  return buildGrid( mGridRoot );
+  if ( mSeriesGrids->size() < 1 ) {
+    XDM_THROW( xdmFormat::ReadError( "XDMF file contains no data.") );
+  }
+  return buildGrid( mSeriesGrids->at( 0 ) );
 }
 
 //------------------------------------------------------------------------------
 xdm::RefPtr< xdm::UniformDataItem >
 TreeBuilder::buildUniformDataItem( xmlNode * node ) {
-  xdm::RefPtr< InputItem< xdm::UniformDataItem > > result(
-    new InputItem< xdm::UniformDataItem > );
-  configureUniformDataItem( *result, node );
-
-  // determine the path to the time step root.
-  NodePath gridRootPath = findPathToAncestor( mDocument, node, mGridRoot );
-  // reverse it so we can find the path from the grid root to the node.
-  std::reverse( gridRootPath.begin(), gridRootPath.end() );
-  // Set the path on the InputItem.
-  result->setXPathExpr( makeXPathQuery( gridRootPath ) );
-
+  std::string path = generateXPathExpr( mDoc->get(), node, mSeriesGrids->at( 0 ) );
+  // Build the implementation item and return it.
+  xdm::RefPtr< UniformDataItem > result( new UniformDataItem(
+    mDoc,
+    mSeriesGrids,
+    path ) );
+  result->read( node, *this );
   return result;
 }
 
@@ -173,7 +148,7 @@ xdm::RefPtr< xdmGrid::Geometry > TreeBuilder::buildGeometry( xmlNode * node ) {
   }
 
   // Get the geometry type from the GeometryType attribute.
-  XPathQuery geometryTypeQuery( mDocument, node, "@GeometryType" );
+  XPathQuery geometryTypeQuery( mDoc->get(), node, "@GeometryType" );
   if ( geometryTypeQuery.size() > 0 ) {
     std::string typeString = geometryTypeQuery.textValue( 0 );
     xdm::toUpper( typeString );
@@ -186,7 +161,7 @@ xdm::RefPtr< xdmGrid::Geometry > TreeBuilder::buildGeometry( xmlNode * node ) {
   }
 
   // Read the internal data items that make up the values for the geometry.
-  XPathQuery dataQuery( mDocument, node, kDataItemTag );
+  XPathQuery dataQuery( mDoc->get(), node, kDataItemTag );
   if ( dataQuery.size() == 0 ) {
     XDM_THROW( xdmFormat::ReadError( "XDMF Geometry values unspecified." ) );
   }
@@ -207,7 +182,7 @@ xdm::RefPtr< xdmGrid::Geometry > TreeBuilder::buildGeometry( xmlNode * node ) {
       new xdmGrid::MultiArrayGeometry );
     // dimension is implicit from the number of DataItems under the Geometry
     g->setDimension( dataItemCount );
-    for ( int i = 0; i < dataItemCount; ++i ) {
+    for ( size_t i = 0; i < dataItemCount; ++i ) {
       g->setCoordinateValues( i, buildUniformDataItem( dataQuery.node( i ) ) );
     }
     return g;
@@ -216,7 +191,7 @@ xdm::RefPtr< xdmGrid::Geometry > TreeBuilder::buildGeometry( xmlNode * node ) {
       new xdmGrid::TensorProductGeometry );
     // dimension is implicit from the number of DataItems under the Geometry
     g->setDimension( dataItemCount );
-    for ( int i = 0; i < dataItemCount; ++i ) {
+    for ( size_t i = 0; i < dataItemCount; ++i ) {
       g->setCoordinateValues( i, buildUniformDataItem( dataQuery.node( i ) ) );
     }
     return g;
@@ -286,7 +261,7 @@ xdm::RefPtr< xdmGrid::Topology > TreeBuilder::buildTopology( xmlNode * node ) {
   };
 
   // Read the topology type attribute.
-  XPathQuery topologyTypeQuery( mDocument, node, "@TopologyType" );
+  XPathQuery topologyTypeQuery( mDoc->get(), node, "@TopologyType" );
   if ( topologyTypeQuery.size() == 0 ) {
     XDM_THROW( xdmFormat::ReadError( "No XDMF topology type specified." ) );
   }
@@ -324,12 +299,24 @@ xdm::RefPtr< xdmGrid::Topology > TreeBuilder::buildTopology( xmlNode * node ) {
   } else {
     xdm::RefPtr< xdmGrid::RectilinearMesh > structuredTopology(
       new xdmGrid::RectilinearMesh );
-    configureStructuredTopology( *structuredTopology, node );
+      // Get the attribute that specifies the shape of the structured topology
+    XPathQuery shapeQuery( mDoc->get(), node, "@Dimensions|@NumberOfElements" );
+    if ( shapeQuery.size() > 0 ) {
+      xdm::DataShape<> topologyShape = xdm::makeShape(shapeQuery.textValue(0));
+      // XDMF Specifies topology in ZYX order, which is the opposite of the
+      // geometry ordering. Reverse the shape to follow the XDM convention of
+      // XYZ ordering and match the grid geometry specification.
+      topologyShape.reverseDimensionOrder();
+      structuredTopology->setShape( topologyShape );
+    } else {
+      XDM_THROW( xdmFormat::ReadError(
+        "No dimensions specified for XDMF structured topology" ) );
+    }
     result = structuredTopology;
   }
 
   // Attach connectivity information specified in DataItem children.
-  XPathQuery connectivityQuery( mDocument, node, "DataItem" );
+  XPathQuery connectivityQuery( mDoc->get(), node, "DataItem" );
   for ( size_t i = 0; i < connectivityQuery.size(); i++ ) {
     result->appendChild( buildUniformDataItem( connectivityQuery.node( i ) ) );
   }
@@ -367,13 +354,13 @@ TreeBuilder::buildAttribute( xmlNode * node ) {
   xdm::RefPtr< xdmGrid::Attribute > result( new xdmGrid::Attribute );
 
   // Get the name of the attribute.
-  XPathQuery nameQuery( mDocument, node, "@Name" );
+  XPathQuery nameQuery( mDoc->get(), node, "@Name" );
   if ( nameQuery.size() > 0 ) {
     result->setName( nameQuery.textValue( 0 ) );
   }
 
   // Get the attribute type
-  XPathQuery typeQuery( mDocument, node, "@AttributeType" );
+  XPathQuery typeQuery( mDoc->get(), node, "@AttributeType" );
   if ( typeQuery.size() > 0 ) {
     TypeMap::const_iterator type = typeMap.find( typeQuery.textValue( 0 ) );
     if ( type != typeMap.end() ) {
@@ -387,7 +374,7 @@ TreeBuilder::buildAttribute( xmlNode * node ) {
   }
 
   // Get the attribute center
-  XPathQuery centerQuery( mDocument, node, "@Center" );
+  XPathQuery centerQuery( mDoc->get(), node, "@Center" );
   if ( centerQuery.size() > 0 ) {
     CenterMap::const_iterator center = centerMap.find( centerQuery.textValue( 0 ) );
     if ( center != centerMap.end() ) {
@@ -401,7 +388,7 @@ TreeBuilder::buildAttribute( xmlNode * node ) {
   }
 
   // Create the attribute data items.
-  XPathQuery dataQuery( mDocument, node, "DataItem" );
+  XPathQuery dataQuery( mDoc->get(), node, "DataItem" );
   if ( dataQuery.size() == 0 ) {
     XDM_THROW( xdmFormat::ReadError( "XDMF Attribute contains no data." ) );
   }
@@ -417,7 +404,7 @@ TreeBuilder::buildUniformGrid( xmlNode * node ) {
   xdm::RefPtr< xdmGrid::UniformGrid > result( new xdmGrid::UniformGrid );
 
   // Get the topology.
-  XPathQuery topologyQuery( mDocument, node, "Topology" );
+  XPathQuery topologyQuery( mDoc->get(), node, "Topology" );
   if ( topologyQuery.size() == 0 ) {
     XDM_THROW( xdmFormat::ReadError( "XDMF Grid contains no Topology" ) );
   }
@@ -427,7 +414,7 @@ TreeBuilder::buildUniformGrid( xmlNode * node ) {
   result->setTopology( buildTopology( topologyQuery.node( 0 ) ) );
 
   // Get the geometry.
-  XPathQuery geometryQuery( mDocument, node, "Geometry" );
+  XPathQuery geometryQuery( mDoc->get(), node, "Geometry" );
   if ( geometryQuery.size() == 0 ) {
     XDM_THROW( xdmFormat::ReadError( "XDMF Grid contains no geometry." ) );
   }
@@ -437,7 +424,7 @@ TreeBuilder::buildUniformGrid( xmlNode * node ) {
   result->setGeometry( buildGeometry( geometryQuery.node( 0 ) ) );
 
   // Read all the attributes.
-  XPathQuery attributeQuery( mDocument, node, "Attribute" );
+  XPathQuery attributeQuery( mDoc->get(), node, "Attribute" );
   for ( size_t i = 0; i < attributeQuery.size(); i++ ) {
     result->addAttribute( buildAttribute( attributeQuery.node( i ) ) );
   }
@@ -449,7 +436,7 @@ TreeBuilder::buildUniformGrid( xmlNode * node ) {
 xdm::RefPtr< xdmGrid::Grid > TreeBuilder::buildGrid( xmlNode * node ) {
   xdm::RefPtr< xdmGrid::Grid > result;
   // Determine the grid type.
-  XPathQuery typeQuery( mDocument, node, "@GridType" );
+  XPathQuery typeQuery( mDoc->get(), node, "@GridType" );
   if ( typeQuery.size() > 0 ) {
     std::string gridType = typeQuery.textValue( 0 );
     if ( gridType == "Uniform" ) {
@@ -465,7 +452,7 @@ xdm::RefPtr< xdmGrid::Grid > TreeBuilder::buildGrid( xmlNode * node ) {
   }
 
   // Check for a Time child for the grid.
-  XPathQuery timeQuery( mDocument, node, "Time" );
+  XPathQuery timeQuery( mDoc->get(), node, "Time" );
   if ( timeQuery.size() > 0 ) {
     result->setTime( buildTime( timeQuery.node( 0 ) ) );
   }
@@ -480,7 +467,7 @@ TreeBuilder::buildSpatialCollectionGrid( xmlNode * node ) {
   xdm::RefPtr< xdmGrid::CollectionGrid > result(
     new xdmGrid::CollectionGrid( xdmGrid::CollectionGrid::kSpatial ) );
   // Find all grid children of the node.
-  XPathQuery childGridQuery( mDocument, node, "Grid" );
+  XPathQuery childGridQuery( mDoc->get(), node, "Grid" );
   for ( size_t i = 0; i < childGridQuery.size(); i++ ) {
     result->appendChild( buildGrid( childGridQuery.node( i ) ) );
   }
@@ -489,138 +476,9 @@ TreeBuilder::buildSpatialCollectionGrid( xmlNode * node ) {
 
 //------------------------------------------------------------------------------
 xdm::RefPtr< xdmGrid::Time > TreeBuilder::buildTime( xmlNode * node ) {
-
-  xdm::RefPtr< xdmGrid::Time > result( new xdmGrid::Time );
-
-  XPathQuery typeQuery( mDocument, node, "@TimeType" );
-  std::string timeType = (typeQuery.size() > 0)?typeQuery.textValue(0):"Single";
-
-  if ( timeType == "Single" ) {
-    XPathQuery valueQuery( mDocument, node, "@Value" );
-    if ( valueQuery.size() == 0 ) {
-      XDM_THROW( xdmFormat::ReadError(
-        "Single XDMF grid time specified with no Value" ) );
-    }
-    std::stringstream ss( valueQuery.textValue( 0 ) );
-    double value;
-    ss >> value;
-    if ( ss.bad() ) {
-      XDM_THROW( xdmFormat::ReadError( "Unable to read XDMF Time Value." ) );
-    }
-    result->setValue( value );
-  } else if ( timeType == "List" ) {
-    XPathQuery valuesQuery( mDocument, node, "DataItem" );
-    if ( valuesQuery.size() == 0 ) {
-      XDM_THROW( xdmFormat::ReadError( "No values found for XDMF Time." ) );
-    }
-
-    // Read the uniform data item containing the values.
-    xdm::RefPtr< xdm::UniformDataItem > data =
-      buildUniformDataItem( valuesQuery.node( 0 ) );
-    xdm::RefPtr< xdm::TypedStructuredArray< double > > array =
-      data->typedArray< double >();
-    std::vector< double > values( array->size() );
-    std::copy( array->begin(), array->end(), values.begin() );
-    result->setValues( values );
-  } else {
-    XDM_THROW( xdmFormat::ReadError( "Unrecognized XDMF Time type." ) );
-  }
+  std::string path = generateXPathExpr( mDoc->get(), node, mSeriesGrids->at( 0 ) );
+  xdm::RefPtr< Time > result( new Time( mDoc, mSeriesGrids, path ) );
   return result;
-}
-
-void TreeBuilder::configureStructuredTopology(
-  xdmGrid::StructuredTopology& topology,
-  xmlNode * content ) {
-  // Get the attribute that specifies the shape of the structured topology
-  XPathQuery shapeQuery( mDocument, content, "@Dimensions|@NumberOfElements" );
-  if ( shapeQuery.size() > 0 ) {
-    xdm::DataShape<> topologyShape = xdm::makeShape(shapeQuery.textValue(0));
-    // XDMF Specifies topology in ZYX order, which is the opposite of the
-    // geometry ordering. Reverse the shape to follow the XDM convention of
-    // XYZ ordering and match the grid geometry specification.
-    topologyShape.reverseDimensionOrder();
-    topology.setShape( topologyShape );
-  } else {
-    XDM_THROW( xdmFormat::ReadError(
-      "No dimensions specified for XDMF structured topology" ) );
-  }
-}
-
-void TreeBuilder::configureUniformDataItem(
-  xdm::UniformDataItem& item,
-  xmlNode * node ) {
-
-  // Get the number type from the NumberType attribute.
-  XPathQuery typeQuery( mDocument, node, "@NumberType" );
-  std::string typeString;
-  if ( typeQuery.size() > 0 ) {
-    typeString = typeQuery.textValue( 0 );
-  } else {
-    typeString = "Float";
-  }
-  XPathQuery precisionQuery( mDocument, node, "@Precision" );
-  size_t precision;
-  if ( precisionQuery.size() > 0 ) {
-    precision = precisionQuery.getValue( 0, 4 );
-  } else {
-    precision = 4;
-  }
-  xdm::primitiveType::Value dataType = type( typeString, precision );
-  item.setDataType( dataType );
-
-  // Get the shape from the Dimensions attribute.
-  XPathQuery dimensionsQuery( mDocument, node, "@Dimensions" );
-  if ( dimensionsQuery.size() == 0 ) {
-    XDM_THROW( xdmFormat::ReadError( "No dimensions for a UniformDataItem." ) );
-  }
-  item.setDataspace( xdm::makeShape( dimensionsQuery.textValue( 0 ) ) );
-
-  // Get the format string for the dataset.
-  XPathQuery formatQuery( mDocument, node, "@Format" );
-  std::string format( "HDF" );
-  if ( formatQuery.size() > 0 ) {
-    format = formatQuery.textValue( 0 );
-  }
-
-  // Build the dataset.
-  if ( format == "HDF" ) {
-    xdm::RefPtr< xdmHdf::HdfDataset > dataset;
-    if ( item.dataset() ) {
-      dataset = xdm::dynamic_pointer_cast< xdmHdf::HdfDataset >( item.dataset() );
-    } else {
-      dataset = new xdmHdf::HdfDataset;
-    }
-    XPathQuery datasetInfoQuery( mDocument, node, "text()" );
-    if ( datasetInfoQuery.size() == 0 ) {
-      XDM_THROW( "No information about requested HDF dataset." );
-    }
-    std::string datasetInfo = datasetInfoQuery.textValue( 0 );
-    std::string fileString;
-    xdmHdf::GroupPath groupPath;
-    std::string datasetString;
-    if ( xdmHdf::parseDatasetInfo( datasetInfo, fileString, groupPath, datasetString ) )
-    {
-      dataset->setFile( fileString );
-      dataset->setGroupPath( groupPath );
-      dataset->setDataset( datasetString );
-      item.setDataset( dataset );
-    } else {
-      XDM_THROW( xdmFormat::ReadError( "Invalid HDF dataset specification" ) );
-    }
-  } else {
-    XDM_THROW( xdmFormat::ReadError(
-      "Only HDF datasets are supported." ) );
-  }
-
-  // Give the item an array to hold the data from the dataset should it be
-  // loaded into memory.
-  if ( !item.data() ) {
-    xdm::RefPtr< xdm::StructuredArray > array(
-      xdm::makeVectorStructuredArray( dataType ) );
-    xdm::RefPtr< xdm::ArrayAdapter > adapter( new xdm::ArrayAdapter( array ) );
-    adapter->setIsMemoryResident( false );
-    item.setData( adapter );
-  }
 }
 
 } // namespace impl

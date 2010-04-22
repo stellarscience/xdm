@@ -18,38 +18,35 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //------------------------------------------------------------------------------
-#ifndef xdmf_XmfReader_hpp
-#define xdmf_XmfReader_hpp
+#ifndef xdmf_impl_Time_hpp
+#define xdmf_impl_Time_hpp
 
-#include <xdmFormat/Reader.hpp>
+#include <xdmf/impl/Input.hpp>
 
-#include <xdmf/NamespaceMacro.hpp>
+#include <xdmGrid/Time.hpp>
 
-#include <memory>
-#include <sstream>
+namespace xdmf {
+namespace impl {
 
-XDMF_NAMESPACE_BEGIN
-
-class XmfReader : public xdmFormat::Reader {
+/// XDMF implementation of Time to handle time stepping.
+class Time :
+  public xdmGrid::Time,
+  public Input {
 public:
-  XmfReader();
-  virtual ~XmfReader();
+  Time(
+    xdm::RefPtr< XmlDocumentManager > doc,
+    xdm::RefPtr< SharedNodeVector > stepNodes,
+    const std::string& xpathExpr );
+  virtual ~Time();
 
-  virtual xdmFormat::ReadResult readItem(
-    const xdm::FileSystemPath& path );
+  virtual void read( xmlNode * node, TreeBuilder& builder );
 
-  virtual bool update(
-    xdm::RefPtr< xdm::Item > item,
-    const xdm::FileSystemPath& path,
-    std::size_t timeStep = 0 );
+protected:
+  virtual void updateState( std::size_t seriesIndex );
 
-private:
-  // This class uses a private implementation to keep LibXml2 out of the
-  // header.
-  class Private;
-  std::auto_ptr< Private > mImp;
 };
 
-XDMF_NAMESPACE_END
+} // namespace impl
+} // namespace xdmf
 
-#endif // xdmf_XmfReader_hpp
+#endif // xdmf_impl_Time_hpp

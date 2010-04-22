@@ -19,7 +19,7 @@
 //
 //------------------------------------------------------------------------------
 #ifndef xdmf_impl_TreeBuilder_hpp
-#define xdmf_impl_TreeBuildter_hpp
+#define xdmf_impl_TreeBuilder_hpp
 
 #include <xdmf/impl/XPathQuery.hpp>
 
@@ -50,21 +50,8 @@ class UniformGrid;
 namespace xdmf {
 namespace impl {
 
-/// A list of XML nodes.
-typedef std::vector< xmlNode * > NodeList;
-
-template< typename ItemT >
-class InputItem : public ItemT {
-public:
-  InputItem() : ItemT() {}
-  virtual ~InputItem() {}
-
-  void setXPathExpr( const std::string& xpathExpr ) { mXPathExpr = xpathExpr; }
-  const std::string& xpathExpr() const { return mXPathExpr; }
-
-private:
-  std::string mXPathExpr;
-};
+class SharedNodeVector;
+class XmlDocumentManager;
 
 /// Class to construct an XDM tree given an XML node that points to the root
 /// of an XDMF grid for a single time step.
@@ -73,7 +60,9 @@ public:
   
   /// Construct with the given node representing the root of the time step grid
   /// in the XML document.
-  TreeBuilder( xmlNode * gridRoot );
+  TreeBuilder(
+    xdm::RefPtr< XmlDocumentManager > doc,
+    xdm::RefPtr< SharedNodeVector > seriesGrids );
   virtual ~TreeBuilder();
 
   /// Build the tree from the document.
@@ -107,16 +96,12 @@ public:
   xdm::RefPtr< xdmGrid::Time > buildTime( xmlNode * node );
   //@}
 
-  /// Configure a StructuredTopology given an XML node with XDMF Topology content.
-  void configureStructuredTopology( xdmGrid::StructuredTopology& t, xmlNode * content );
-
-  /// Configure a UniformDataItem given an XML node with XDMF UniformDataItem content.
-  void configureUniformDataItem( xdm::UniformDataItem& item, xmlNode * content );
-
 private:
-  xmlNode * mGridRoot;
-  xmlDoc * mDocument;
-  xmlXPathContextPtr mXPathContext;
+  TreeBuilder( const TreeBuilder& );
+  TreeBuilder& operator=( const TreeBuilder& );
+
+  xdm::RefPtr< XmlDocumentManager > mDoc;
+  xdm::RefPtr< SharedNodeVector > mSeriesGrids;
 };
 
 } // namespace impl

@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE( openContext ) {
   XmlOutputStream test( result );
   test.openContext( obj );
   
-  char const * const answer = "<obj>\n";
+  char const * const answer = "<?xml version='1.0'?>\n<obj>\n";
   BOOST_CHECK_EQUAL( answer, result.str() );
 }
 
@@ -51,6 +51,7 @@ BOOST_AUTO_TEST_CASE( writeSingleObject ) {
   test.writeObject( obj );
 
   char const * const answer =
+    "<?xml version='1.0'?>\n"
     "<obj>\n"
     "</obj>\n";
   BOOST_CHECK_EQUAL( answer, result.str() );
@@ -66,6 +67,7 @@ BOOST_AUTO_TEST_CASE( writeStreamingObject ) {
   test.writeObject( chi );
 
   char const * const answer_incomplete = 
+    "<?xml version='1.0'?>\n"
     "<obj>\n"
     "  <chi>\n"
     "  </chi>\n";
@@ -74,6 +76,7 @@ BOOST_AUTO_TEST_CASE( writeStreamingObject ) {
   test.closeCurrentContext();
 
   char const * const answer_complete =
+    "<?xml version='1.0'?>\n"
     "<obj>\n"
     "  <chi>\n"
     "  </chi>\n"
@@ -90,6 +93,7 @@ BOOST_AUTO_TEST_CASE( closeCurrentContext ) {
   test.closeCurrentContext();
 
   char const * const answer = 
+    "<?xml version='1.0'?>\n"
     "<obj>\n"
     "</obj>\n";
   BOOST_CHECK_EQUAL( answer, result.str() );

@@ -50,6 +50,10 @@ private:
   // the reference count is mutable so that reference counted pointers to
   // constant objects can exist.
   mutable int mReferenceCount;
+
+  // Referenced objects are non-copyable.
+  ReferencedObject( const ReferencedObject& );
+  ReferencedObject& operator=( const ReferencedObject& );
 };
 
 XDM_NAMESPACE_END

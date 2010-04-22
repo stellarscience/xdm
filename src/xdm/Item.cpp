@@ -62,6 +62,10 @@ void Item::setUpdateCallback( RefPtr< BasicItemUpdateCallback > callback ) {
   mUpdateCallback = callback;
 }
 
+void Item::updateState( std::size_t seriesIndex ) {
+  // do nothing
+}
+
 void Item::writeMetadata( XmlMetadataWrapper& xml ) {
   xml.setTag( className() );
   if ( !mName.empty() ) {

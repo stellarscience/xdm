@@ -19,6 +19,8 @@ underlying data model. The API is divided into components, each with a limited
 scope and well defined interface:
 
 - xdm: Core object model and general interface definitions.
+- xdmFormat: Interfaces and utility classes for defining new format readers and
+writers.
 - xdmGrid: Classes for defining structured and unstructured grids and
 defining attribute values over them.
 - xdmHdf: HDF5 dataset implementation and related utilities.

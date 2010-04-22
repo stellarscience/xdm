@@ -3,11 +3,13 @@ project( xdmFormat )
 set( ${PROJECT_NAME}_HEADERS 
     NamespaceMacro.hpp
     Reader.hpp
+    ReadResult.hpp
     Writer.hpp
 )
 
 set( ${PROJECT_NAME}_SOURCES
     Reader.cpp
+    ReadResult.cpp
     Writer.cpp
 )
 

@@ -18,38 +18,50 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //------------------------------------------------------------------------------
-#ifndef xdmf_XmfReader_hpp
-#define xdmf_XmfReader_hpp
+#ifndef xdmf_impl_NodeList_hpp
+#define xdmf_impl_NodeList_hpp
 
-#include <xdmFormat/Reader.hpp>
+#include <xdm/ReferencedObject.hpp>
+#include <xdm/RefPtr.hpp>
 
-#include <xdmf/NamespaceMacro.hpp>
+#include <libxml/tree.h>
 
-#include <memory>
-#include <sstream>
+#include <vector>
 
-XDMF_NAMESPACE_BEGIN
+namespace xdmf {
+namespace impl {
 
-class XmfReader : public xdmFormat::Reader {
+/// A reference counted std vector of xmlNodes.
+class SharedNodeVector :
+  public xdm::ReferencedObject,
+  private std::vector< xmlNode * >
+{
+  typedef std::vector< xmlNode * > VectorBase;
 public:
-  XmfReader();
-  virtual ~XmfReader();
+  SharedNodeVector() : VectorBase() {}
+  virtual ~SharedNodeVector() {}
 
-  virtual xdmFormat::ReadResult readItem(
-    const xdm::FileSystemPath& path );
-
-  virtual bool update(
-    xdm::RefPtr< xdm::Item > item,
-    const xdm::FileSystemPath& path,
-    std::size_t timeStep = 0 );
-
-private:
-  // This class uses a private implementation to keep LibXml2 out of the
-  // header.
-  class Private;
-  std::auto_ptr< Private > mImp;
+  using VectorBase::push_back;
+  using VectorBase::operator[];
+  using VectorBase::size;
+  using VectorBase::at;
 };
 
-XDMF_NAMESPACE_END
+/// A reference counted RAII class for an XML document.
+class XmlDocumentManager : public xdm::ReferencedObject {
+public:
+  XmlDocumentManager( xmlDoc * document ) : mDocument( document ) {}
+  virtual ~XmlDocumentManager() {
+    xmlFreeDoc( mDocument );
+  }
 
-#endif // xdmf_XmfReader_hpp
+  xmlDoc * get() { return mDocument; }
+
+private:
+  xmlDoc * mDocument;
+};
+
+} // namespace impl
+} // namespace xdmf
+
+#endif // xdmf_impl_NodeList_hpp

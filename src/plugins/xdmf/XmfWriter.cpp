@@ -36,61 +36,53 @@
 
 XDMF_NAMESPACE_BEGIN
 
-namespace {
-
-void writeItemImpl(
-  xdm::RefPtr< xdm::Item > item,
-  const xdm::FileSystemPath& path ) {
-
-  // Attach an HDF dataset to UniformDataItems that don't yet have one.
-  xdmHdf::AttachHdfDatasetOperation attachDatasets( path.pathString() + ".h5", "unnamed_data" );
-  item->accept( attachDatasets );
-
-  xdm::RefPtr< xdm::XmlObject > xdmfRoot( new xdm::XmlObject( "Xdmf" ) );
-  xdmfRoot->appendAttribute( "Version", "2.1" );
-
-  xdm::RefPtr< xdm::XmlObject > domain( new xdm::XmlObject( "Domain" ) );
-  xdmfRoot->appendChild( domain );
-
-  xdm::CollectMetadataOperation metadata;
-  item->accept( metadata );
-  domain->appendChild( metadata.result() );
-
-  std::ofstream file( path.pathString().c_str() );
-  file << "<?xml version='1.0'?>" << std::endl;
-  xdm::XmlOutputStream xmlStream( file );
-  xmlStream.writeObject( xdmfRoot );
-  xmlStream.closeStream();
-
-  xdm::SerializeDataOperation serialize( xdm::Dataset::kCreate );
-  item->accept( serialize );
-}
-
-} // namespace
-
 XmfWriter::XmfWriter() :
   xdmFormat::Writer(),
-  mWriters() {
+  mSeries(),
+  mIsOpen( false ) {
 }
 
 XmfWriter::~XmfWriter() {
-  for ( FileMap::iterator file = mWriters.begin(); file != mWriters.end(); ++file ) {
-    file->second->close();
+  if ( mSeries && mIsOpen ) {
+    close();
   }
 }
 
-void XmfWriter::writeItem(
-  xdm::RefPtr< xdm::Item > item,
-  const xdm::FileSystemPath& path ) {
-  writeItemImpl( item, path );
+void XmfWriter::open(
+  const xdm::FileSystemPath& path,
+  xdm::Dataset::InitializeMode mode ) {
+  mCurrentFilePath = path;
+  mSeries = new TemporalCollection( path.pathString(), mode );
+  mSeries->open();
+  mIsOpen = true;
 }
 
-bool XmfWriter::update(
-  xdm::RefPtr<xdm::Item> item,
-  const xdm::FileSystemPath &path,
-  std::size_t timeStep ) {
-  writeItemImpl( item, path );
-  return true;
+void XmfWriter::write( xdm::RefPtr< xdm::Item > item, std::size_t seriesIndex ) {
+  using xdm::RefPtr;
+  using xdmGrid::Grid;
+
+  if ( !mSeries ) {
+    XDM_THROW( xdmFormat::WriteError( "XDMF Series has not been opened." ) );
+  }
+
+  RefPtr< Grid > grid = xdm::dynamic_pointer_cast< Grid >( item );
+  if ( !grid )  {
+    XDM_THROW( xdmFormat::WriteError( "The XDMF plugin can write only grids." ) );
+  }
+
+  // Attach datasets to items that do not yet have them.
+  xdmHdf::AttachHdfDatasetOperation attach( mCurrentFilePath.pathString() + ".h5", true );
+  grid->accept( attach );
+
+  mSeries->updateGrid( grid, seriesIndex );
+  mSeries->writeGridMetadata( grid );
+  mSeries->writeGridData( grid );
+}
+
+void XmfWriter::close() {
+  mIsOpen = false;
+  mSeries->close();
+  mSeries.reset();
 }
 
 XDMF_NAMESPACE_END

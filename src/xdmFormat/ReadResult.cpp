@@ -18,50 +18,31 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.       
 //                                                                             
 //------------------------------------------------------------------------------
-#include <xdm/UpdateVisitor.hpp>
+#include <xdmFormat/ReadResult.hpp>
 
-#include <xdm/Dataset.hpp>
-#include <xdm/UniformDataItem.hpp>
+#include <xdm/Item.hpp>
 
-XDM_NAMESPACE_BEGIN
+XDM_FORMAT_NAMESPACE_BEGIN
 
-UpdateVisitor::UpdateVisitor( std::size_t seriesIndex ) :
-  mSeriesIndex( seriesIndex ) {
+ReadResult::ReadResult() :
+  mItem(),
+  mSeriesSteps( 5 ) {
 }
 
-UpdateVisitor::~UpdateVisitor() {
+ReadResult::ReadResult( xdm::RefPtr< xdm::Item > item, size_t seriesSteps ) :
+  mItem( item ),
+  mSeriesSteps( seriesSteps ) {
 }
 
-void UpdateVisitor::apply( Item& item ) {
-  // Tell the Item to update its internal state.
-  item.updateState( mSeriesIndex );
-
-  // Call an application defined callback if it exists.
-  if ( RefPtr< BasicItemUpdateCallback > callback = item.updateCallback() ) {
-    callback->update( item, mSeriesIndex );
-  }
-
-  // Continue with this Item's
-  traverse( item );
+ReadResult::~ReadResult() {
 }
 
-void UpdateVisitor::apply( UniformDataItem& item ) {
-  // Call the Item's own update callback.
-  apply( static_cast< Item& >( item ) );
-
-  // If the Item has been assigned a dataset, call its callback too.
-  RefPtr< Dataset > itemDataset = item.dataset();
-  if ( itemDataset ) {
-    itemDataset->update( mSeriesIndex );
-  }
-
-  traverse( item );
+xdm::RefPtr< xdm::Item > ReadResult::item() const {
+  return mItem;
 }
 
-void updateToIndex( Item& item, std::size_t seriesIndex ) {
-  UpdateVisitor v( seriesIndex );
-  item.accept( v );
+size_t ReadResult::seriesSteps() const {
+  return mSeriesSteps;
 }
 
-XDM_NAMESPACE_END
-
+XDM_FORMAT_NAMESPACE_END

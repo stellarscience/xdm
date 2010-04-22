@@ -18,38 +18,43 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //------------------------------------------------------------------------------
-#ifndef xdmf_XmfReader_hpp
-#define xdmf_XmfReader_hpp
+#include <xdmf/impl/Input.hpp>
 
-#include <xdmFormat/Reader.hpp>
+#include <xdmf/impl/TreeBuilder.hpp>
+#include <xdmf/impl/XmlDocumentManager.hpp>
 
-#include <xdmf/NamespaceMacro.hpp>
+#include <xdmFormat/IoExcept.hpp>
 
-#include <memory>
-#include <sstream>
+#include <xdm/ThrowMacro.hpp>
 
-XDMF_NAMESPACE_BEGIN
+namespace xdmf {
+namespace impl {
 
-class XmfReader : public xdmFormat::Reader {
-public:
-  XmfReader();
-  virtual ~XmfReader();
+Input::Input(
+ xdm::RefPtr< XmlDocumentManager > doc,
+ xdm::RefPtr< SharedNodeVector > stepNodes,
+ const std::string& xpathExpr ) :
+  mDocument( doc ),
+  mNodes( stepNodes ),
+  mXPathExpr( xpathExpr ) {
+}
 
-  virtual xdmFormat::ReadResult readItem(
-    const xdm::FileSystemPath& path );
+Input::~Input() {
+}
 
-  virtual bool update(
-    xdm::RefPtr< xdm::Item > item,
-    const xdm::FileSystemPath& path,
-    std::size_t timeStep = 0 );
+xmlNode * Input::findNode( std::size_t index ) {
+  xmlNode * gridNode = nodes()->at( index );
+  xmlDoc * doc = document()->get();
 
-private:
-  // This class uses a private implementation to keep LibXml2 out of the
-  // header.
-  class Private;
-  std::auto_ptr< Private > mImp;
-};
+  // Find the new XML node within the requested grid context.
+  XPathQuery nodeQuery( doc, gridNode, xpathExpr() );
+  if ( nodeQuery.size() == 0 ) {
+    std::ostringstream ss;
+    ss << "XDMF object not found at series index " << index;
+    XDM_THROW( xdmFormat::ReadError( ss.str() ) );
+  }
+  return nodeQuery.node( 0 );
+}
 
-XDMF_NAMESPACE_END
-
-#endif // xdmf_XmfReader_hpp
+}
+}

@@ -18,50 +18,41 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.       
 //                                                                             
 //------------------------------------------------------------------------------
-#include <xdm/UpdateVisitor.hpp>
+#ifndef xdmFormat_ReadResult_hpp
+#define xdmFormat_ReadResult_hpp
 
-#include <xdm/Dataset.hpp>
-#include <xdm/UniformDataItem.hpp>
+#include <xdm/RefPtr.hpp>
 
-XDM_NAMESPACE_BEGIN
+#include <utility>
 
-UpdateVisitor::UpdateVisitor( std::size_t seriesIndex ) :
-  mSeriesIndex( seriesIndex ) {
+#include <xdmFormat/NamespaceMacro.hpp>
+
+namespace xdm {
+class Item;
 }
 
-UpdateVisitor::~UpdateVisitor() {
-}
+XDM_FORMAT_NAMESPACE_BEGIN
 
-void UpdateVisitor::apply( Item& item ) {
-  // Tell the Item to update its internal state.
-  item.updateState( mSeriesIndex );
+/// Data class to hold the result of reading a file containing one or more
+/// series steps.
+class ReadResult {
+public:
+  /// Constructor initializes with empty results.
+  ReadResult();
+  /// Constructor takes a RefPtr to the read item and the number of steps read.
+  ReadResult( xdm::RefPtr< xdm::Item > item, size_t seriesSteps );
+  ~ReadResult();
 
-  // Call an application defined callback if it exists.
-  if ( RefPtr< BasicItemUpdateCallback > callback = item.updateCallback() ) {
-    callback->update( item, mSeriesIndex );
-  }
+  /// Get the resulting item.
+  xdm::RefPtr< xdm::Item > item() const;
+  /// Get the number of steps that were read in.
+  size_t seriesSteps() const;
 
-  // Continue with this Item's
-  traverse( item );
-}
+private:
+  xdm::RefPtr< xdm::Item > mItem;
+  size_t mSeriesSteps;
+};
 
-void UpdateVisitor::apply( UniformDataItem& item ) {
-  // Call the Item's own update callback.
-  apply( static_cast< Item& >( item ) );
+XDM_FORMAT_NAMESPACE_END
 
-  // If the Item has been assigned a dataset, call its callback too.
-  RefPtr< Dataset > itemDataset = item.dataset();
-  if ( itemDataset ) {
-    itemDataset->update( mSeriesIndex );
-  }
-
-  traverse( item );
-}
-
-void updateToIndex( Item& item, std::size_t seriesIndex ) {
-  UpdateVisitor v( seriesIndex );
-  item.accept( v );
-}
-
-XDM_NAMESPACE_END
-
+#endif // xdmFormat_ReadResult_hpp
