@@ -28,6 +28,7 @@
 #include <xdmGrid/MultiArrayGeometry.hpp>
 #include <xdmGrid/UniformGrid.hpp>
 #include <xdmGrid/UnstructuredTopology.hpp>
+#include <xdmGrid/ElementTopology.hpp>
 
 #include <xdm/test/TestHelpers.hpp>
 
@@ -56,27 +57,32 @@ BOOST_AUTO_TEST_CASE( elementAccessSingleNodeArray ) {
     cube.connectivityArray(), cube.numberOfElements() * 4, xdm::primitiveType::kLongUnsignedInt );
   t->setConnectivity( elementList );
   t->setNumberOfElements( 5 );
-  t->setElementType( xdmGrid::ElementType::Tetra );
+  t->setElementTopology( xdmGrid::elementFactory( xdmGrid::ElementShape::Tetrahedron, 1 ) );
 
   xdmGrid::UniformGrid grid;
   grid.setGeometry( g );
   grid.setTopology( t );
 
   // Check 2nd node of 2nd element.
-  xdmGrid::ConstElement element1 = grid.element( 1 );
-  BOOST_CHECK_EQUAL( 1., element1.node( 1 )[0] );
-  BOOST_CHECK_EQUAL( 0., element1.node( 1 )[1] );
-  BOOST_CHECK_EQUAL( 1., element1.node( 1 )[2] );
+  {
+    xdmGrid::Element element = grid.element( 1 );
+    BOOST_CHECK_EQUAL( 1., element.node( 1 )[0] );
+    BOOST_CHECK_EQUAL( 0., element.node( 1 )[1] );
+    BOOST_CHECK_EQUAL( 1., element.node( 1 )[2] );
+  }
 
   // Change a node's location and check back in the geometry to see if it changed.
-  xdmGrid::Element element3 = grid.element( 3 );
-  xdmGrid::Node node3 = element3.node( 2 );
-  node3[0] = 0.1;
-  node3[1] = 1.1;
-  node3[2] = 0.9;
-  BOOST_CHECK_CLOSE( 0.1, g->node( 7 )[0], 1.e-8 );
-  BOOST_CHECK_CLOSE( 1.1, g->node( 7 )[1], 1.e-8 );
-  BOOST_CHECK_CLOSE( 0.9, g->node( 7 )[2], 1.e-8 );
+  {
+    xdmGrid::Element element = grid.element( 3 );
+    std::size_t nodeIndex = element.nodeIndexInGeometry( 2 );
+    xdmGrid::Node node = g->node( nodeIndex );
+    node[0] = 0.1;
+    node[1] = 1.1;
+    node[2] = 0.9;
+    BOOST_CHECK_CLOSE( 0.1, g->node( 7 )[0], 1.e-8 );
+    BOOST_CHECK_CLOSE( 1.1, g->node( 7 )[1], 1.e-8 );
+    BOOST_CHECK_CLOSE( 0.9, g->node( 7 )[2], 1.e-8 );
+  }
 }
 
 BOOST_AUTO_TEST_CASE( elementAccessMultiNodeArray ) {
@@ -97,28 +103,32 @@ BOOST_AUTO_TEST_CASE( elementAccessMultiNodeArray ) {
     cube.connectivityArray(), cube.numberOfElements() * 4, xdm::primitiveType::kLongUnsignedInt );
   t->setConnectivity( elementList );
   t->setNumberOfElements( 5 );
-  t->setElementType( xdmGrid::ElementType::Tetra );
+  t->setElementTopology( xdmGrid::elementFactory( xdmGrid::ElementShape::Tetrahedron, 1 ) );
 
   xdmGrid::UniformGrid grid;
   grid.setGeometry( g );
   grid.setTopology( t );
 
   // Check 2nd node of 2nd element.
-  xdmGrid::ConstElement element1 = grid.element( 1 );
-  BOOST_CHECK_EQUAL( 1., element1.node( 1 )[0] );
-  BOOST_CHECK_EQUAL( 0., element1.node( 1 )[1] );
-  BOOST_CHECK_EQUAL( 1., element1.node( 1 )[2] );
+  {
+    xdmGrid::Element element = grid.element( 1 );
+    BOOST_CHECK_EQUAL( 1., element.node( 1 )[0] );
+    BOOST_CHECK_EQUAL( 0., element.node( 1 )[1] );
+    BOOST_CHECK_EQUAL( 1., element.node( 1 )[2] );
+  }
 
   // Change a node's location and check back in the geometry to see if it changed.
-  xdmGrid::Element element3 = grid.element( 3 );
-  xdmGrid::Node node3 = element3.node( 2 );
-  node3[0] = 0.1;
-  node3[1] = 1.1;
-  node3[2] = 0.9;
-  BOOST_CHECK_CLOSE( 0.1, g->node( 7 )[0], 1.e-8 );
-  BOOST_CHECK_CLOSE( 1.1, g->node( 7 )[1], 1.e-8 );
-  BOOST_CHECK_CLOSE( 0.9, g->node( 7 )[2], 1.e-8 );
+  {
+    xdmGrid::Element element = grid.element( 3 );
+    std::size_t nodeIndex = element.nodeIndexInGeometry( 2 );
+    xdmGrid::Node node = g->node( nodeIndex );
+    node[0] = 0.1;
+    node[1] = 1.1;
+    node[2] = 0.9;
+    BOOST_CHECK_CLOSE( 0.1, g->node( 7 )[0], 1.e-8 );
+    BOOST_CHECK_CLOSE( 1.1, g->node( 7 )[1], 1.e-8 );
+    BOOST_CHECK_CLOSE( 0.9, g->node( 7 )[2], 1.e-8 );
+  }
 }
 
 } // namespace
-

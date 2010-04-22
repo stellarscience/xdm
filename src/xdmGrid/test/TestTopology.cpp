@@ -22,26 +22,30 @@
 #include <boost/test/unit_test.hpp>
 
 #include <xdmGrid/Topology.hpp>
+#include <xdmGrid/ElementTopology.hpp>
 
 namespace {
 
 class ConcreteTopology : public xdmGrid::Topology {
 public:
-  ConcreteTopology() : mElementType( xdmGrid::ElementType::Default ) {}
+  ConcreteTopology() : mElementTopology(
+    xdmGrid::elementFactory( xdmGrid::ElementShape::Hexahedron, 1 ) ) {
+  }
 
   virtual xdmGrid::NodeOrderingConvention::Type nodeOrdering() const {
     return xdmGrid::NodeOrderingConvention::ExodusII;
   }
 
-  virtual const xdmGrid::ElementType::Type& elementType( std::size_t elementIndex ) const {
-    return mElementType;
+  virtual xdm::RefPtr< const xdmGrid::ElementTopology > elementTopology(
+    const std::size_t& elementIndex ) const {
+    return mElementTopology;
   }
 
   virtual xdm::RefPtr< xdm::VectorRefImp< std::size_t > > createVectorImp() {
     return xdm::RefPtr< xdm::VectorRefImp< std::size_t > >( NULL );
   }
 private:
-  xdmGrid::ElementType::Type mElementType;
+  xdm::RefPtr< const xdmGrid::ElementTopology > mElementTopology;
 };
 
 BOOST_AUTO_TEST_CASE( writeMetadata ) {

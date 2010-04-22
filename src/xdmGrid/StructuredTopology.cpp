@@ -1,6 +1,6 @@
 //==============================================================================
 // This software developed by Stellar Science Ltd Co and the U.S. Government.
-// Copyright (C) 2009 Stellar Science. Government-purpose rights granted.
+// Copyright (C) 2009-2010 Stellar Science. Government-purpose rights granted.
 //
 // This file is part of XDM
 //
@@ -34,7 +34,7 @@ XDM_GRID_NAMESPACE_BEGIN
 StructuredTopology::StructuredTopology() :
   Topology(),
   mShape(),
-  mElementType( ElementType::Default ) {
+  mElementTopology() {
 }
 
 StructuredTopology::~StructuredTopology() {
@@ -51,10 +51,10 @@ void StructuredTopology::setShape( const xdm::DataShape<>& shape ) {
   std::size_t rank = mShape.rank();
   switch( rank ) {
     case 2:
-      mElementType = ElementType::Quad;
+      mElementTopology = elementFactory( ElementShape::Quadrilateral, 1 );
       break;
     case 3:
-      mElementType = ElementType::Hex;
+      mElementTopology = elementFactory( ElementShape::Hexahedron, 1 );
       break;
     default:
       std::stringstream ss;
@@ -68,8 +68,10 @@ const xdm::DataShape<>& StructuredTopology::shape() const {
   return mShape;
 }
 
-const ElementType::Type& StructuredTopology::elementType( std::size_t /* elementIndex */ ) const {
-  return mElementType;
+xdm::RefPtr< const ElementTopology > StructuredTopology::elementTopology(
+  const std::size_t& /* elementIndex */ ) const {
+
+  return mElementTopology;
 }
 
 void StructuredTopology::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
@@ -140,7 +142,7 @@ xdm::RefPtr< xdm::VectorRefImp< std::size_t > > StructuredTopology::createVector
   }
 
   return xdm::RefPtr< xdm::VectorRefImp< std::size_t > >(
-    new xdm::SingleArrayOfVectorsImp< std::size_t >( &mNodes[0], mElementType.nodesPerElement() ) );
+    new xdm::SingleArrayOfVectorsImp< std::size_t >( &mNodes[0], mElementTopology->numberOfNodes() ) );
 }
 
 XDM_GRID_NAMESPACE_END

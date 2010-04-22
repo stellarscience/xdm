@@ -22,7 +22,7 @@
 #define xdmGrid_UnstructuredTopology_hpp
 
 #include <xdmGrid/Topology.hpp>
-#include <xdmGrid/UnstructuredTopologyConventions.hpp>
+#include <xdmGrid/ElementTopology.hpp>
 
 #include <xdm/RefPtr.hpp>
 #include <xdm/UniformDataItem.hpp>
@@ -41,11 +41,12 @@ public:
   XDM_META_ITEM( UnstructuredTopology );
 
   /// Set the type of the Elements.
-  void setElementType( const ElementType::Type& type );
+  void setElementTopology( xdm::RefPtr< const ElementTopology > topo );
 
   /// Get the type of the Elements. For now, this ignores the elementIndex and assumes all
   /// Elements are of the same type.
-  virtual const ElementType::Type& elementType( std::size_t elementIndex ) const;
+  virtual xdm::RefPtr< const ElementTopology > elementTopology(
+    const std::size_t& elementIndex ) const;
 
   /// Set the node ordering convention for the shape of the Elements. For example,
   /// Exodus II orders the nodes of a linear tetrahedron differently than some
@@ -68,7 +69,7 @@ protected:
 
 private:
   xdm::RefPtr< xdm::UniformDataItem > mConnectivity;
-  ElementType::Type mElementType;
+  xdm::RefPtr< const ElementTopology > mElementTopology;
   NodeOrderingConvention::Type mOrdering;
 };
 

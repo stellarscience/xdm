@@ -1,6 +1,6 @@
 //==============================================================================
 // This software developed by Stellar Science Ltd Co and the U.S. Government.
-// Copyright (C) 2010 Stellar Science. Government-purpose rights granted.
+// Copyright (C) 2009-2010 Stellar Science. Government-purpose rights granted.
 //
 // This file is part of XDM
 //
@@ -28,6 +28,7 @@
 #include <xdmGrid/ReferencingGrid.hpp>
 #include <xdmGrid/UniformGrid.hpp>
 #include <xdmGrid/UnstructuredTopology.hpp>
+#include <xdmGrid/ElementTopology.hpp>
 
 #include <xdm/test/TestHelpers.hpp>
 
@@ -67,7 +68,7 @@ BOOST_AUTO_TEST_CASE( indirectElementAccess ) {
     cube.connectivityArray(), cube.numberOfElements() * 4, xdm::primitiveType::kLongUnsignedInt );
   t0->setConnectivity( elementList0 );
   t0->setNumberOfElements( 5 );
-  t0->setElementType( xdmGrid::ElementType::Tetra );
+  t0->setElementTopology( xdmGrid::elementFactory( xdmGrid::ElementShape::Tetrahedron, 1 ) );
   xdm::RefPtr< xdmGrid::UniformGrid > grid0( new xdmGrid::UniformGrid );
   grid0->setGeometry( g );
   grid0->setTopology( t0 );
@@ -81,7 +82,7 @@ BOOST_AUTO_TEST_CASE( indirectElementAccess ) {
     connectivity1, 8, xdm::primitiveType::kLongUnsignedInt );
   t1->setConnectivity( elementList1 );
   t1->setNumberOfElements( 2 );
-  t1->setElementType( xdmGrid::ElementType::Tetra );
+  t1->setElementTopology( xdmGrid::elementFactory( xdmGrid::ElementShape::Tetrahedron, 1 ) );
   xdm::RefPtr< xdmGrid::UniformGrid > grid1( new xdmGrid::UniformGrid );
   grid1->setGeometry( g );
   grid1->setTopology( t1 );
@@ -95,7 +96,7 @@ BOOST_AUTO_TEST_CASE( indirectElementAccess ) {
     connectivity2, 8, xdm::primitiveType::kLongUnsignedInt );
   t2->setConnectivity( elementList2 );
   t2->setNumberOfElements( 2 );
-  t2->setElementType( xdmGrid::ElementType::Tetra );
+  t2->setElementTopology( xdmGrid::elementFactory( xdmGrid::ElementShape::Tetrahedron, 1 ) );
   xdm::RefPtr< xdmGrid::UniformGrid > grid2( new xdmGrid::UniformGrid );
   grid2->setGeometry( g );
   grid2->setTopology( t2 );
@@ -108,7 +109,7 @@ BOOST_AUTO_TEST_CASE( indirectElementAccess ) {
     connectivity3, 4, xdm::primitiveType::kLongUnsignedInt );
   t3->setConnectivity( elementList3 );
   t3->setNumberOfElements( 1 );
-  t3->setElementType( xdmGrid::ElementType::Tetra );
+  t3->setElementTopology( xdmGrid::elementFactory( xdmGrid::ElementShape::Tetrahedron, 1 ) );
   xdm::RefPtr< xdmGrid::UniformGrid > grid3( new xdmGrid::UniformGrid );
   grid3->setGeometry( g );
   grid3->setTopology( t3 );
@@ -133,8 +134,8 @@ BOOST_AUTO_TEST_CASE( indirectElementAccess ) {
   std::size_t elementMap[] = { 0, 4, 3, 2, 1 };
   BOOST_CHECK_EQUAL( refGrid1.numberOfElements(), 5 );
   for ( std::size_t elementIndex = 0; elementIndex < 5; ++elementIndex ) {
-    xdmGrid::ConstElement elementOrig = grid0->element( elementMap[ elementIndex ] );
-    xdmGrid::ConstElement elementRef = refGrid1.element( elementIndex );
+    xdmGrid::Element elementOrig = grid0->element( elementMap[ elementIndex ] );
+    xdmGrid::Element elementRef = refGrid1.element( elementIndex );
     for ( std::size_t nodeIndex = 0; nodeIndex < 4; ++nodeIndex ) {
       for ( std::size_t dim = 0; dim < 3; ++dim ) {
         double refValue = elementRef.node( nodeIndex )[ dim ];
@@ -153,8 +154,8 @@ BOOST_AUTO_TEST_CASE( indirectElementAccess ) {
   refGrid2.appendReferenceGrid( grid3 );
   BOOST_CHECK_EQUAL( refGrid2.numberOfElements(), 5 );
   for ( std::size_t elementIndex = 0; elementIndex < 5; ++elementIndex ) {
-    xdmGrid::ConstElement elementOrig = grid0->element( elementMap[ elementIndex ] );
-    xdmGrid::ConstElement elementRef = refGrid2.element( elementIndex );
+    xdmGrid::Element elementOrig = grid0->element( elementMap[ elementIndex ] );
+    xdmGrid::Element elementRef = refGrid2.element( elementIndex );
     for ( std::size_t nodeIndex = 0; nodeIndex < 4; ++nodeIndex ) {
       for ( std::size_t dim = 0; dim < 3; ++dim ) {
         double refValue = elementRef.node( nodeIndex )[ dim ];
@@ -169,8 +170,8 @@ BOOST_AUTO_TEST_CASE( indirectElementAccess ) {
   refGrid3.appendReferenceGrid( grid0 );
   BOOST_CHECK_EQUAL( refGrid3.numberOfElements(), 5 );
   for ( std::size_t elementIndex = 0; elementIndex < 5; ++elementIndex ) {
-    xdmGrid::ConstElement elementOrig = grid0->element( elementIndex );
-    xdmGrid::ConstElement elementRef = refGrid3.element( elementIndex );
+    xdmGrid::Element elementOrig = grid0->element( elementIndex );
+    xdmGrid::Element elementRef = refGrid3.element( elementIndex );
     for ( std::size_t nodeIndex = 0; nodeIndex < 4; ++nodeIndex ) {
       for ( std::size_t dim = 0; dim < 3; ++dim ) {
         double refValue = elementRef.node( nodeIndex )[ dim ];

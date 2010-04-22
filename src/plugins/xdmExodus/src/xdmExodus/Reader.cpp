@@ -301,7 +301,7 @@ xdm::RefPtr< xdm::Item > ExodusReader::readItem( const xdm::FileSystemPath& path
   xdm::RefPtr< xdmGrid::UnstructuredTopology > nodeTopo( new xdmGrid::UnstructuredTopology );
   nodeTopo->setConnectivity( nodeConn );
   nodeTopo->setNumberOfElements( geom->numberOfNodes() );
-  nodeTopo->setElementType( xdmGrid::ElementType::Polyvertex );
+//  nodeTopo->setElementType( xdmGrid::ElementType::Polyvertex );
   globalNodeSet->setGeometry( geom );
   globalNodeSet->setTopology( nodeTopo );
 

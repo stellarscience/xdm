@@ -26,7 +26,7 @@
 #include <xdmGrid/Geometry.hpp>
 #include <xdmGrid/Time.hpp>
 #include <xdmGrid/Topology.hpp>
-#include <xdmGrid/UnstructuredTopologyConventions.hpp>
+#include <xdmGrid/ElementTopology.hpp>
 
 #include <xdm/FileSystem.hpp>
 #include <xdm/Item.hpp>

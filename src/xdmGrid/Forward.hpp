@@ -26,11 +26,11 @@
 XDM_GRID_NAMESPACE_BEGIN
 
 class Attribute;
-class ConstElement;
 class CollectionGrid;
 class Domain;
 class Element;
-class ElementSharedImp;
+class ElementTopology;
+class ElementSharedConnectivityLookup;
 class Geometry;
 class Grid;
 class InterlacedGeometry;

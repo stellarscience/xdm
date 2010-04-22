@@ -19,13 +19,14 @@
 //
 //------------------------------------------------------------------------------
 #include <xdmGrid/Polyvertex.hpp>
+#include <xdmGrid/ElementTopology.hpp>
 
 XDM_GRID_NAMESPACE_BEGIN
 
 Polyvertex::Polyvertex() :
   UnstructuredTopology(),
   mNumberOfPoints() {
-  UnstructuredTopology::setElementType( ElementType::Polyvertex );
+  UnstructuredTopology::setElementTopology( elementFactory( ElementShape::Vertex, 0 ) );
 }
 
 Polyvertex::~Polyvertex() {

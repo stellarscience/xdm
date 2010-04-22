@@ -23,6 +23,7 @@
 #include <xdmGrid/Element.hpp>
 #include <xdmGrid/Topology.hpp>
 
+#include <xdm/DataShape.hpp>
 #include <xdm/ItemVisitor.hpp>
 #include <xdm/ThrowMacro.hpp>
 #include <xdm/UniformDataItem.hpp>
@@ -31,121 +32,63 @@
 #include <stdexcept>
 #include <utility>
 
-namespace {
+XDM_GRID_NAMESPACE_BEGIN
 
 // A helper class for accessing Elements via indirection into UniformGrids.
-class MultiReferenceElementImp : public xdmGrid::ElementSharedImp {
+class ReferencingGrid::MultiReferenceElementImp : public xdmGrid::ElementSharedConnectivityLookup {
 public:
-  MultiReferenceElementImp(
-    std::vector< xdm::RefPtr< xdmGrid::UniformGrid > >& grids,
-    std::vector< xdm::RefPtr< xdm::UniformDataItem > >& arrays ) :
-      mGrids( grids ), mArrays( arrays ), mElementOffsets() {
+  MultiReferenceElementImp( ReferencingGrid& grid ) : mGrid( grid ) {
   }
 
-  virtual xdmGrid::ConstNode node( std::size_t elementIndex, std::size_t nodeIndex ) const {
-    std::pair< xdmGrid::UniformGrid*, std::size_t > found = findGrid( elementIndex );
-    return found.first->geometry()->node(
-      found.first->topology()->elementConnections( found.second )[ nodeIndex ] );
+  virtual std::size_t at( const std::size_t& elementIndex, const std::size_t& nodeIndex ) const {
+    std::pair< UniformGrid*, std::size_t > found = mGrid.findGrid( elementIndex );
+    return found.first->topology()->elementConnections( found.second )[ nodeIndex ];
   }
 
-  virtual xdmGrid::ElementType::Type elementType( std::size_t elementIndex ) const {
-    std::pair< xdmGrid::UniformGrid*, std::size_t > found = findGrid( elementIndex );
-    return found.first->topology()->elementType( found.second );
+  virtual const Geometry& geometry( const std::size_t& elementIndex ) const {
+    std::pair< UniformGrid*, std::size_t > found = mGrid.findGrid( elementIndex );
+    return *found.first->geometry();
   }
 
 private:
-  std::pair< xdmGrid::UniformGrid*, std::size_t > findGrid( std::size_t elementIndex ) const {
-    if ( mElementOffsets.size() != mGrids.size() ) {
-      computeOffsets();
-    }
-    std::vector< std::size_t >::const_iterator found =
-      std::upper_bound( mElementOffsets.begin(), mElementOffsets.end(), elementIndex );
-    assert( found != mElementOffsets.end() );
-    std::size_t gridIndex = found - mElementOffsets.begin();
-    std::size_t offsetIndex = elementIndex;
-    if ( gridIndex > 0 ) {
-      offsetIndex -= *(--found);
-    }
-    if ( mArrays[ gridIndex ].valid() ) {
-      return std::make_pair(
-        mGrids[ gridIndex ].get(),
-        (*mArrays[ gridIndex ]->typedArray< std::size_t >())[ offsetIndex ] );
-    } else {
-      // If the array pointer is null, then we are using the complete grid.
-      return std::make_pair(
-        mGrids[ gridIndex ].get(),
-        offsetIndex );
-    }
-  }
-
-  void computeOffsets() const {
-    assert( mGrids.size() == mArrays.size() );
-
-    mElementOffsets.clear();
-    for ( std::size_t arrayIndex = 0; arrayIndex < mArrays.size(); ++arrayIndex ) {
-      if ( mArrays[ arrayIndex ].valid() ) {
-        mElementOffsets.push_back( mArrays[ arrayIndex ]->dataspace()[0] );
-      } else {
-        // Special treatment if the pointer is null: this means that the whole
-        // grid is being used.
-        mElementOffsets.push_back( mGrids[ arrayIndex ]->topology()->numberOfElements() );
-      }
-      if ( arrayIndex > 0 ) {
-        mElementOffsets[ arrayIndex ] += mElementOffsets[ arrayIndex - 1 ];
-      }
-    }
-  }
-
-  std::vector< xdm::RefPtr< xdmGrid::UniformGrid > >& mGrids;
-  std::vector< xdm::RefPtr< xdm::UniformDataItem > >& mArrays;
-  mutable std::vector< std::size_t > mElementOffsets;
+  ReferencingGrid& mGrid;
 };
 
-} // anon namespace
-
-XDM_GRID_NAMESPACE_BEGIN
-
 ReferencingGrid::ReferencingGrid() {
-  setElementSharedImp( xdm::makeRefPtr(
-    new MultiReferenceElementImp(
-      xdm::ObjectCompositionMixin< UniformGrid >::allChildren(),
-      xdm::ObjectCompositionMixin< xdm::UniformDataItem >::allChildren() ) ) );
+  setElementSharedImp( xdm::makeRefPtr( new MultiReferenceElementImp( *this ) ) );
 }
 
 ReferencingGrid::~ReferencingGrid() {
 }
 
 std::size_t ReferencingGrid::numberOfElements() const {
-  std::size_t numberOfDataItems =
-    xdm::ObjectCompositionMixin< xdm::UniformDataItem >::numberOfChildren();
-  assert( numberOfDataItems ==
-    xdm::ObjectCompositionMixin< xdmGrid::UniformGrid >::numberOfChildren() );
 
   std::size_t elementCount = 0;
-  for ( std::size_t i = 0; i < numberOfDataItems; ++i )     {
-    xdm::RefPtr< const xdm::UniformDataItem > array = xdm::child< xdm::UniformDataItem >( *this, i );
-    if ( array.valid() ) {
-      elementCount += array->typedArray< std::size_t >()->size();
+  for ( std::size_t i = 0; i < mArrays.size(); ++i ) {
+    if ( mArrays[i] ) {
+      elementCount += mArrays[i]->dataspace()[0];
     } else {
       // If the array does not exist, then we assume that the whole grid is being used.
-      xdm::RefPtr< const xdmGrid::UniformGrid > grid = xdm::child< xdmGrid::UniformGrid >( *this, i );
-      elementCount += grid->topology()->numberOfElements();
+      elementCount += mGrids[i]->topology()->numberOfElements();
     }
   }
   return elementCount;
 }
 
 void ReferencingGrid::setNumberOfReferencedGrids( const std::size_t n ) {
-  xdm::ObjectCompositionMixin< UniformGrid >::setNumberOfChildren( n );
-  xdm::ObjectCompositionMixin< xdm::UniformDataItem >::setNumberOfChildren( n );
+  mGrids.resize( n );
+  mArrays.resize( n );
 }
 
 void ReferencingGrid::appendReferenceGrid(
   xdm::RefPtr< UniformGrid > grid,
   xdm::RefPtr< xdm::UniformDataItem > elementIndices ) {
 
-  xdm::appendChild< UniformGrid >( *this, grid );
-  xdm::appendChild< xdm::UniformDataItem >( *this, elementIndices );
+  // A grid should NEVER reference itself.
+  assert( grid.get() != this );
+
+  mGrids.push_back( grid );
+  mArrays.push_back( elementIndices );
 }
 
 void ReferencingGrid::setReferenceGrid(
@@ -153,10 +96,20 @@ void ReferencingGrid::setReferenceGrid(
   xdm::RefPtr< UniformGrid > grid,
   xdm::RefPtr< xdm::UniformDataItem > elementIndices ) {
 
-  assert( gridIndex < xdm::ObjectCompositionMixin< UniformGrid >::numberOfChildren() );
+  // A grid should NEVER reference itself.
+  assert( grid.get() != this );
 
-  xdm::setChild< UniformGrid >( *this, gridIndex, grid );
-  xdm::setChild< xdm::UniformDataItem >( *this, gridIndex, elementIndices );
+  assert( gridIndex < mGrids.size() );
+
+  mGrids[ gridIndex ] = grid;
+  mArrays[ gridIndex ] = elementIndices;
+}
+
+xdm::RefPtr< const ElementTopology > ReferencingGrid::elementTopology(
+  const std::size_t& elementIndex ) const {
+
+  std::pair< UniformGrid*, std::size_t > found = findGrid( elementIndex );
+  return found.first->elementTopology( found.second );
 }
 
 void ReferencingGrid::traverse( xdm::ItemVisitor& iv ) {
@@ -164,10 +117,7 @@ void ReferencingGrid::traverse( xdm::ItemVisitor& iv ) {
 
   // The visitor does not get applied to the grid children because ReferencingGrid
   // does not own them. However, it does own the index data sets.
-  std::for_each(
-    xdm::begin< xdm::UniformDataItem >( *this ),
-    xdm::end< xdm::UniformDataItem >( *this ),
-    xdm::ApplyVisitor( iv ) );
+  std::for_each( mArrays.begin(), mArrays.end(), xdm::ApplyVisitor( iv ) );
 }
 
 void ReferencingGrid::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
@@ -175,6 +125,50 @@ void ReferencingGrid::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
 
   // write grid type
   xml.setAttribute( "GridType", "Referencing" );
+}
+
+std::pair< UniformGrid*, std::size_t >
+ReferencingGrid::findGrid( const std::size_t& elementIndex ) const {
+
+  if ( mElementOffsets.size() != mGrids.size() ) {
+    const_cast< ReferencingGrid& >( *this ).updateOffsets();
+  }
+
+  std::vector< std::size_t >::const_iterator found =
+    std::upper_bound( mElementOffsets.begin(), mElementOffsets.end(), elementIndex );
+  assert( found != mElementOffsets.end() );
+  std::size_t gridIndex = found - mElementOffsets.begin();
+  std::size_t offsetIndex = elementIndex;
+  if ( gridIndex > 0 ) {
+    offsetIndex -= *(--found);
+  }
+  if ( mArrays[ gridIndex ].valid() ) {
+    return std::make_pair(
+      mGrids[ gridIndex ].get(),
+      mArrays[ gridIndex ]->atIndex< std::size_t >( offsetIndex ) );
+  } else {
+    // If the array pointer is null, then we are using the complete grid.
+    return std::make_pair(
+      mGrids[ gridIndex ].get(),
+      offsetIndex );
+  }
+}
+
+void ReferencingGrid::updateOffsets() {
+
+  mElementOffsets.clear();
+  for ( std::size_t arrayIndex = 0; arrayIndex < mArrays.size(); ++arrayIndex ) {
+    if ( mArrays[ arrayIndex ].valid() ) {
+      mElementOffsets.push_back( mArrays[ arrayIndex ]->dataspace()[0] );
+    } else {
+      // Special treatment if the pointer is null: this means that the whole
+      // grid is being used.
+      mElementOffsets.push_back( mGrids[ arrayIndex ]->topology()->numberOfElements() );
+    }
+    if ( arrayIndex > 0 ) {
+      mElementOffsets[ arrayIndex ] += mElementOffsets[ arrayIndex - 1 ];
+    }
+  }
 }
 
 XDM_GRID_NAMESPACE_END

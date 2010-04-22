@@ -29,10 +29,7 @@
 
 XDM_GRID_NAMESPACE_BEGIN
 
-class ReferencingGrid :
-  public UniformGrid,
-  public xdm::ObjectCompositionMixin< UniformGrid >,
-  public xdm::ObjectCompositionMixin< xdm::UniformDataItem > {
+class ReferencingGrid : public UniformGrid {
 public:
   ReferencingGrid();
   virtual ~ReferencingGrid();
@@ -72,6 +69,10 @@ public:
     xdm::RefPtr< UniformGrid > grid,
     xdm::RefPtr< xdm::UniformDataItem > elementIndices = xdm::RefPtr< xdm::UniformDataItem >() );
 
+  /// Get the ElementTopology for a particular element.
+  virtual xdm::RefPtr< const ElementTopology > elementTopology(
+    const std::size_t& elementIndex ) const;
+
   /// Redefinition of visitor traversal from xdm::Item.
   virtual void traverse( xdm::ItemVisitor& iv );
 
@@ -86,6 +87,16 @@ private:
   void setTopology( xdm::RefPtr< Topology > topo );
   xdm::RefPtr< Topology > topology();
   xdm::RefPtr< const Topology > topology() const;
+
+  std::vector< xdm::RefPtr< xdmGrid::UniformGrid > > mGrids;
+  std::vector< xdm::RefPtr< xdm::UniformDataItem > > mArrays;
+  std::vector< std::size_t > mElementOffsets;
+
+  class MultiReferenceElementImp;
+  friend class MultiReferenceElementImp;
+
+  std::pair< UniformGrid*, std::size_t > findGrid( const std::size_t& elementIndex ) const;
+  void updateOffsets();
 };
 
 XDM_GRID_NAMESPACE_END

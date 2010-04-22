@@ -22,6 +22,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include <xdmGrid/UnstructuredTopology.hpp>
+#include <xdmGrid/ElementTopology.hpp>
 
 #include <xdm/test/TestHelpers.hpp>
 
@@ -30,7 +31,7 @@ BOOST_AUTO_TEST_CASE( writeMetadata ) {
   xdm::XmlMetadataWrapper xml( xdm::makeRefPtr( new xdm::XmlObject ) );
 
   t.setNumberOfElements( 42 );
-  t.setElementType( xdmGrid::ElementType::Tetra );
+  t.setElementTopology( xdmGrid::elementFactory( xdmGrid::ElementShape::Tetrahedron, 1 ) );
 
   t.writeMetadata( xml );
 

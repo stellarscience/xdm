@@ -24,58 +24,58 @@
 
 XDM_GRID_NAMESPACE_BEGIN
 
-//-------------------Element-------------------------------------------------------
-Element::Element( xdm::RefPtr< ElementSharedImp > imp, std::size_t elementIndex ) :
-  ElementBase( imp, elementIndex ) {
-}
-
-Element::Element( const Element& copyMe ) :
-  ElementBase( copyMe ) {
-}
-
-Node Element::node( std::size_t nodeIndex ) {
-  return static_cast< const ElementBase& >( *this ).node( nodeIndex ).removeConstness();
-}
-
-//-------------------ConstElement--------------------------------------------------
-ConstElement::ConstElement( xdm::RefPtr< ElementSharedImp > imp, std::size_t elementIndex ) :
-  ElementBase( imp, elementIndex ) {
-}
-
-ConstElement::ConstElement( const Element& copyMe ) :
-  ElementBase( copyMe ) {
-}
-
-ConstElement::ConstElement( const ConstElement& copyMe ) :
-  ElementBase( copyMe ) {
-}
-
-Element ConstElement::removeConstness() const {
-  Element ret( xdm::RefPtr< ElementSharedImp >(), 0 );
-  copyReference( *this, ret );
-  return ret;
-}
-
-//-------------------ElementBase---------------------------------------------------
-ElementBase::ElementBase( xdm::RefPtr< ElementSharedImp > imp, std::size_t elementIndex ) :
-  mImp( imp ), mIndex( elementIndex ) {
-}
-
-ConstNode ElementBase::node( std::size_t nodeIndex ) const {
-  return mImp->node( mIndex, nodeIndex );
-}
-
-ElementType::Type ElementBase::elementType() const {
-  return mImp->elementType( mIndex );
-}
-
-ElementBase::ElementBase( const ElementBase& copyMe ) :
-  mImp( copyMe.mImp ), mIndex( copyMe.mIndex ) {
-}
-
-void ElementBase::copyReference( const ElementBase& source, ElementBase& dest ) {
-  dest.mImp = source.mImp;
-  dest.mIndex = source.mIndex;
-}
+////-------------------Element-------------------------------------------------------
+//Element::Element( xdm::RefPtr< ElementSharedImp > imp, std::size_t elementIndex ) :
+//  ElementBase( imp, elementIndex ) {
+//}
+//
+//Element::Element( const Element& copyMe ) :
+//  ElementBase( copyMe ) {
+//}
+//
+//Node Element::node( std::size_t nodeIndex ) {
+//  return static_cast< const ElementBase& >( *this ).node( nodeIndex ).removeConstness();
+//}
+//
+////-------------------ConstElement--------------------------------------------------
+//ConstElement::ConstElement( xdm::RefPtr< ElementSharedImp > imp, std::size_t elementIndex ) :
+//  ElementBase( imp, elementIndex ) {
+//}
+//
+//ConstElement::ConstElement( const Element& copyMe ) :
+//  ElementBase( copyMe ) {
+//}
+//
+//ConstElement::ConstElement( const ConstElement& copyMe ) :
+//  ElementBase( copyMe ) {
+//}
+//
+//Element ConstElement::removeConstness() const {
+//  Element ret( xdm::RefPtr< ElementSharedImp >(), 0 );
+//  copyReference( *this, ret );
+//  return ret;
+//}
+//
+////-------------------ElementBase---------------------------------------------------
+//ElementBase::ElementBase( xdm::RefPtr< ElementSharedImp > imp, std::size_t elementIndex ) :
+//  mImp( imp ), mIndex( elementIndex ) {
+//}
+//
+//ConstNode ElementBase::node( std::size_t nodeIndex ) const {
+//  return mImp->node( mIndex, nodeIndex );
+//}
+//
+//ElementType::Type ElementBase::elementType() const {
+//  return mImp->elementType( mIndex );
+//}
+//
+//ElementBase::ElementBase( const ElementBase& copyMe ) :
+//  mImp( copyMe.mImp ), mIndex( copyMe.mIndex ) {
+//}
+//
+//void ElementBase::copyReference( const ElementBase& source, ElementBase& dest ) {
+//  dest.mImp = source.mImp;
+//  dest.mIndex = source.mIndex;
+//}
 
 XDM_GRID_NAMESPACE_END

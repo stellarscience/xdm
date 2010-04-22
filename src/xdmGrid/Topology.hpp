@@ -21,7 +21,7 @@
 #ifndef xdmGrid_Topology_hpp
 #define xdmGrid_Topology_hpp
 
-#include <xdmGrid/UnstructuredTopologyConventions.hpp>
+#include <xdmGrid/ElementTopology.hpp>
 
 #include <xdm/DataItem.hpp>
 #include <xdm/Item.hpp>
@@ -61,7 +61,8 @@ public:
   ConstElementConnectivity elementConnections( std::size_t elementIndex ) const;
 
   /// Get the type of a particular Element.
-  virtual const ElementType::Type& elementType( std::size_t elementIndex ) const = 0;
+  virtual xdm::RefPtr< const ElementTopology > elementTopology(
+    const std::size_t& elementIndex ) const = 0;
 
   XDM_META_ITEM( Topology );
 

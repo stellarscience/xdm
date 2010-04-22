@@ -1,6 +1,6 @@
 //==============================================================================
 // This software developed by Stellar Science Ltd Co and the U.S. Government.
-// Copyright (C) 2009 Stellar Science. Government-purpose rights granted.
+// Copyright (C) 2009-2010 Stellar Science. Government-purpose rights granted.
 //
 // This file is part of XDM
 //
@@ -22,7 +22,7 @@
 #define xdmGrid_StructuredTopology_hpp
 
 #include <xdmGrid/Topology.hpp>
-#include <xdmGrid/UnstructuredTopologyConventions.hpp>
+#include <xdmGrid/ElementTopology.hpp>
 
 #include <xdm/DataShape.hpp>
 
@@ -54,7 +54,8 @@ public:
 
   /// Get the type of a particular element. For structured meshes this always returns
   /// a quad or hex.
-  virtual const ElementType::Type& elementType( std::size_t elementIndex ) const;
+  virtual xdm::RefPtr< const ElementTopology > elementTopology(
+    const std::size_t& elementIndex ) const;
 
   virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
 
@@ -64,7 +65,7 @@ protected:
 private:
   std::vector< std::size_t > mNodes;
   xdm::DataShape<> mShape;
-  ElementType::Type mElementType;
+  xdm::RefPtr< const ElementTopology > mElementTopology;
 };
 
 XDM_GRID_NAMESPACE_END

@@ -22,52 +22,26 @@
 
 #include <sstream>
 
-//namespace {
-//
-//class TrivialElementRefImpl : public xdmGrid::ElementSharedImp {
-//public:
-//  TrivialElementRefImpl(
-//    const xdmGrid::ElementType::Type& type,
-//    xdm::RefPtr< xdmGrid::Geometry > geometry,
-//    std::size_t* nodeIndexArray ) :
-//    mType( type ), mGeometry( geometry ), mNodeIds( nodeIndexArray ) {
-//  }
-//
-//  virtual xdmGrid::ConstNode node( std::size_t elementIndex, std::size_t nodeIndex ) const {
-//    std::size_t nodeID = mNodeIds[ elementIndex * mType.nodesPerElement() + nodeIndex ];
-//    return mGeometry->node( nodeID );
-//  }
-//
-//  virtual xdmGrid::ElementType::Type ElementType( std::size_t elementIndex ) const {
-//    return mType;
-//  }
-//
-//private:
-//  xdmGrid::ElementType::Type mType;
-//  xdm::RefPtr< xdmGrid::Geometry > mGeometry;
-//  std::size_t* mNodeIds;
-//};
-//
-//} // anon namespace
-
 XDM_GRID_NAMESPACE_BEGIN
 
 UnstructuredTopology::UnstructuredTopology() :
   Topology(),
   mConnectivity(),
-  mElementType( ElementType::Default ),
+  mElementTopology(),
   mOrdering() {
 }
 
 UnstructuredTopology::~UnstructuredTopology() {
 }
 
-void UnstructuredTopology::setElementType( const ElementType::Type& type ) {
-  mElementType = type;
+void UnstructuredTopology::setElementTopology( xdm::RefPtr< const ElementTopology > topo ) {
+  mElementTopology = topo;
 }
 
-const ElementType::Type& UnstructuredTopology::elementType( std::size_t /* elementIndex */) const {
-  return mElementType;
+xdm::RefPtr< const ElementTopology > UnstructuredTopology::elementTopology(
+  const std::size_t& /* elementIndex */ ) const {
+
+  return mElementTopology;
 }
 
 void UnstructuredTopology::setNodeOrdering( const NodeOrderingConvention::Type& order )
@@ -97,16 +71,16 @@ void UnstructuredTopology::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
   xml.setAttribute( "NumberOfElements", numberOfElements() );
 
   // Write the Element type
-  xml.setAttribute( "ElementType", mElementType.shapeName() );
+  xml.setAttribute( "ElementType", mElementTopology->name() );
 
   // Write the nodes per Element
-  xml.setAttribute( "NodesPerElement", mElementType.nodesPerElement() );
+  xml.setAttribute( "NodesPerElement", mElementTopology->numberOfNodes() );
 }
 
 xdm::RefPtr< xdm::VectorRefImp< std::size_t > > UnstructuredTopology::createVectorImp() {
   return xdm::RefPtr< xdm::VectorRefImp< std::size_t > >(
     new xdm::SingleArrayOfVectorsImp< std::size_t >(
-        mConnectivity->typedArray< std::size_t >()->begin(), mElementType.nodesPerElement() ) );
+        mConnectivity->typedArray< std::size_t >()->begin(),mElementTopology->numberOfNodes() ) );
 }
 
 XDM_GRID_NAMESPACE_END

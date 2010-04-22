@@ -20,7 +20,7 @@
 //------------------------------------------------------------------------------
 
 #include <xdmGrid/UnstructuredTopology.hpp>
-#include <xdmGrid/UnstructuredTopologyConventions.hpp>
+#include <xdmGrid/ElementTopology.hpp>
 
 #include <xdm/ArrayAdapter.hpp>
 #include <xdm/RefPtr.hpp>

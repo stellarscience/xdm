@@ -39,7 +39,7 @@ private:
   size_t mNumberOfPoints;
 
   // Cannot change the type from Polyvertex.
-  void setElementType( const ElementType::Type& type );
+  void setElementTopology( xdm::RefPtr< const ElementTopology > topo );
 };
 
 XDM_GRID_NAMESPACE_END

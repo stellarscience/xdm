@@ -1,6 +1,6 @@
 //==============================================================================
 // This software developed by Stellar Science Ltd Co and the U.S. Government.
-// Copyright (C) 2009 Stellar Science. Government-purpose rights granted.
+// Copyright (C) 2009-2010 Stellar Science. Government-purpose rights granted.
 //
 // This file is part of XDM
 //
@@ -22,9 +22,10 @@
 
 #include <xdmGrid/Attribute.hpp>
 #include <xdmGrid/Element.hpp>
+#include <xdmGrid/Geometry.hpp>
 #include <xdmGrid/StructuredTopology.hpp>
 #include <xdmGrid/TensorProductGeometry.hpp>
-#include <xdmGrid/UnstructuredTopologyConventions.hpp>
+#include <xdmGrid/ElementTopology.hpp>
 
 #include <xdm/ItemVisitor.hpp>
 #include <xdm/RefPtr.hpp>
@@ -37,17 +38,17 @@
 namespace {
 
 // A helper class for accessing elements from the geometry and topology.
-class SimpleElementImp : public xdmGrid::ElementSharedImp {
+class SimpleElementImp : public xdmGrid::ElementSharedConnectivityLookup {
 public:
   SimpleElementImp( xdm::RefPtr< xdmGrid::Geometry > g, xdm::RefPtr< xdmGrid::Topology > t ) :
     mGeometry( g ), mTopology( t ) {}
 
-  virtual xdmGrid::ConstNode node( std::size_t elementIndex, std::size_t nodeIndex ) const {
-    return mGeometry->node( mTopology->elementConnections( elementIndex )[ nodeIndex ] );
+  virtual std::size_t at( const std::size_t& elementIndex, const std::size_t& nodeIndex ) const {
+    return mTopology->elementConnections( elementIndex )[ nodeIndex ];
   }
 
-  virtual xdmGrid::ElementType::Type elementType( std::size_t elementIndex ) const {
-    return mTopology->elementType( elementIndex );
+  virtual const xdmGrid::Geometry& geometry( const std::size_t& elementIndex ) const {
+    return *mGeometry;
   }
 
 private:
@@ -126,22 +127,19 @@ UniformGrid::attributeByName( const std::string& name ) {
   );
 }
 
-Element UniformGrid::element( std::size_t elementIndex )
+Element UniformGrid::element( const std::size_t& elementIndex ) const
 {
   if ( ! mElementImp ) {
-    setElementSharedImp( xdm::makeRefPtr( new SimpleElementImp( mGeometry, mTopology ) ) );
+    const_cast< UniformGrid& >( *this ).setElementSharedImp(
+      xdm::makeRefPtr( new SimpleElementImp( mGeometry, mTopology ) ) );
   }
-  return Element( mElementImp, elementIndex );
+  return Element( mElementImp, elementTopology( elementIndex ), elementIndex );
 }
 
-ConstElement UniformGrid::element( std::size_t elementIndex ) const
-{
-  if ( ! mElementImp ) {
-    UniformGrid& mutableThis = const_cast< UniformGrid& >( *this );
-    mutableThis.setElementSharedImp(
-      xdm::makeRefPtr( new SimpleElementImp( mutableThis.mGeometry, mutableThis.mTopology ) ) );
-  }
-  return ConstElement( mElementImp, elementIndex );
+xdm::RefPtr< const ElementTopology > UniformGrid::elementTopology(
+  const std::size_t& elementIndex ) const {
+
+  return mTopology->elementTopology( elementIndex );
 }
 
 Node UniformGrid::node( std::size_t nodeIndex ) {
@@ -170,7 +168,7 @@ void UniformGrid::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
   xml.setAttribute( "GridType", "Uniform" );
 }
 
-void UniformGrid::setElementSharedImp( xdm::RefPtr< ElementSharedImp > elementImp ) {
+void UniformGrid::setElementSharedImp( xdm::RefPtr< ElementSharedConnectivityLookup > elementImp ) {
   mElementImp = elementImp;
 }
 

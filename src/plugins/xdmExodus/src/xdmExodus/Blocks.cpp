@@ -26,7 +26,7 @@
 #include <xdmGrid/Attribute.hpp>
 #include <xdmGrid/Geometry.hpp>
 #include <xdmGrid/UnstructuredTopology.hpp>
-#include <xdmGrid/UnstructuredTopologyConventions.hpp>
+#include <xdmGrid/ElementTopology.hpp>
 
 #include <xdm/VectorStructuredArray.hpp>
 
@@ -180,7 +180,7 @@ void Block::readFromFile(
     new xdmGrid::UnstructuredTopology() );
   topo->setConnectivity( dataItem );
   topo->setNumberOfElements( numberOfEntries );
-  topo->setElementType( xdmGrid::exodusElementType( nodesPerEntry, entryType.string() ) );
+//  topo->setElementType( xdmGrid::exodusElementType( nodesPerEntry, entryType.string() ) );
   topo->setNodeOrdering( xdmGrid::NodeOrderingConvention::ExodusII );
   setTopology( topo );
 

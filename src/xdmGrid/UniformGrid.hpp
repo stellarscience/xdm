@@ -68,10 +68,12 @@ public:
   /// Get a const attribute by name.
   xdm::RefPtr< const Attribute > attributeByName( const std::string& name ) const;
 
-  /// Get an element by index.
-  Element element( std::size_t elementIndex );
-  /// Get a const element by index.
-  ConstElement element( std::size_t elementIndex ) const;
+  /// Get an element by index. All elements are const in that they only have const functions.
+  Element element( const std::size_t& elementIndex ) const;
+
+  /// Get the ElementTopology for a particular element.
+  virtual xdm::RefPtr< const ElementTopology > elementTopology(
+    const std::size_t& elementIndex ) const;
 
   /// Get a node by index. This does not take connectivity into consideration.
   /// This means that the input index is the index into the geometry directly,
@@ -91,12 +93,12 @@ public:
 protected:
   /// If a class inherits from this class, it can set the shared imp for ease
   /// of implementation.
-  void setElementSharedImp( xdm::RefPtr< ElementSharedImp > elementImp );
+  void setElementSharedImp( xdm::RefPtr< ElementSharedConnectivityLookup > elementImp );
 
 private:
   xdm::RefPtr< Geometry > mGeometry;
   xdm::RefPtr< Topology > mTopology;
-  xdm::RefPtr< ElementSharedImp > mElementImp;
+  xdm::RefPtr< ElementSharedConnectivityLookup > mElementImp;
 };
 
 /// Construct an attribute on a uniform grid with the given center.
