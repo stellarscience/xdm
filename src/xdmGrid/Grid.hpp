@@ -21,10 +21,16 @@
 #ifndef xdm_Grid_hpp
 #define xdm_Grid_hpp
 
-#include <xdmGrid/Time.hpp>
+#include <xdmGrid/Attribute.hpp>
+#include <xdmGrid/Forward.hpp>
 
+#include <xdm/Forward.hpp>
 #include <xdm/Item.hpp>
 #include <xdm/ItemVisitor.hpp>
+#include <xdm/PrimitiveType.hpp>
+
+#include <string>
+#include <vector>
 
 #include <xdmGrid/NamespaceMacro.hpp>
 
@@ -41,12 +47,43 @@ public:
   xdm::RefPtr< const Time > time() const;
   void setTime( xdm::RefPtr< Time > time );
 
+  /// Add an attribute definition to the grid.
+  void addAttribute( xdm::RefPtr< Attribute > attribute );
+  /// Get an attribute by its index.
+  xdm::RefPtr< Attribute > attributeByIndex( std::size_t index );
+  /// Get a const attribute by its index.
+  xdm::RefPtr< const Attribute > attributeByIndex( std::size_t index ) const;
+  /// Get an attribute by name.
+  xdm::RefPtr< Attribute > attributeByName( const std::string& name );
+  /// Get a const attribute by name.
+  xdm::RefPtr< const Attribute > attributeByName( const std::string& name ) const;
+
+  /// Get the number of attributes.
+  std::size_t numberOfAttributes() const;
+
+  /// Create an attribute with the proper dimensions. This will initialize an Attribute holding
+  /// onto a UniformDataItem that has the correct array shape. The attribute will be attached
+  /// to the grid. However, the UniformDataItem will not have any data (MemoryAdapter); that
+  /// is left up to the user to supply.
+  virtual xdm::RefPtr< xdmGrid::Attribute > createAttribute(
+    Attribute::Center center,
+    Attribute::Type type,
+    const std::string& name,
+    xdm::primitiveType::Value dataType ) = 0;
+
+  /// Get the total number of elements in this grid.
+  virtual std::size_t numberOfElements() const = 0;
+
+  /// Get an element by index. All elements are const in that they only have const functions.
+  virtual Element element( const std::size_t& elementIndex ) const = 0;
+
   virtual void traverse( xdm::ItemVisitor& iv );
 
   /// Write grid metadata.
   virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
 
 public:
+  std::vector< xdm::RefPtr< Attribute > > mAttributes;
   xdm::RefPtr< Time > mTime;
 };
 

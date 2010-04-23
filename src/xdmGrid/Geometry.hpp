@@ -21,8 +21,11 @@
 #ifndef xdmGrid_Geometry_hpp
 #define xdmGrid_Geometry_hpp
 
-#include <xdm/UniformDataItem.hpp>
+#include <xdmGrid/Forward.hpp>
+
+#include <xdm/Forward.hpp>
 #include <xdm/Item.hpp>
+#include <xdm/ItemVisitor.hpp>
 #include <xdm/ObjectCompositionMixin.hpp>
 #include <xdm/VectorRef.hpp>
 

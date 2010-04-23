@@ -20,6 +20,8 @@
 //------------------------------------------------------------------------------
 #include <xdmGrid/Geometry.hpp>
 
+#include <xdm/UniformDataItem.hpp>
+
 #include <algorithm>
 
 XDM_GRID_NAMESPACE_BEGIN

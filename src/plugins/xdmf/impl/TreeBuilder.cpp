@@ -41,6 +41,7 @@
 #include <xdmGrid/MultiArrayGeometry.hpp>
 #include <xdmGrid/RectilinearMesh.hpp>
 #include <xdmGrid/TensorProductGeometry.hpp>
+#include <xdmGrid/Time.hpp>
 #include <xdmGrid/Topology.hpp>
 #include <xdmGrid/UniformGrid.hpp>
 
@@ -469,7 +470,7 @@ TreeBuilder::buildSpatialCollectionGrid( xmlNode * node ) {
   // Find all grid children of the node.
   XPathQuery childGridQuery( mDoc->get(), node, "Grid" );
   for ( size_t i = 0; i < childGridQuery.size(); i++ ) {
-    result->appendChild( buildGrid( childGridQuery.node( i ) ) );
+    result->appendGrid( buildGrid( childGridQuery.node( i ) ) );
   }
   return result;
 }

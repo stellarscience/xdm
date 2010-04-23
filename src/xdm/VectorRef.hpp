@@ -268,7 +268,7 @@ const T& TensorProductArraysImp< T >::at( std::size_t baseIndex, std::size_t i )
   // the slowest varying dimension, y next, x fastest.
   std::size_t blockSize = 1;
   std::size_t location[ mSize ];
-  for ( int dimension = 0; dimension < mSize; ++dimension ) {
+  for ( std::size_t dimension = 0; dimension < mSize; ++dimension ) {
     location[ dimension ] = baseIndex / blockSize % mAxisSizes[ dimension ];
     blockSize *= mAxisSizes[ dimension ];
   }

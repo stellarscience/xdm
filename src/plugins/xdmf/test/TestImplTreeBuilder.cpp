@@ -37,6 +37,7 @@
 #include <xdmGrid/Attribute.hpp>
 #include <xdmGrid/StructuredTopology.hpp>
 #include <xdmGrid/TensorProductGeometry.hpp>
+#include <xdmGrid/Time.hpp>
 #include <xdmGrid/UniformGrid.hpp>
 
 #include <xdmHdf/HdfDataset.hpp>
@@ -260,7 +261,7 @@ BOOST_AUTO_TEST_CASE( buildStaticTree ) {
   }
 
   // Check the attributes.
-  BOOST_REQUIRE_EQUAL( grid->numberOfChildren(), 3 );
+  BOOST_REQUIRE_EQUAL( grid->numberOfAttributes(), 3 );
   char * names[3] = { "E", "B", "InternalCell" };
   const char * dataPaths[3] = {
     "Attribute[1]/DataItem[1]",
@@ -278,7 +279,7 @@ BOOST_AUTO_TEST_CASE( buildStaticTree ) {
     xdmGrid::Attribute::kElement,
   };
   for ( int i = 0; i < 3; i++ ) {
-    xdm::RefPtr< xdmGrid::Attribute > attr = grid->child( i );
+    xdm::RefPtr< xdmGrid::Attribute > attr = grid->attributeByIndex( i );
     BOOST_CHECK_EQUAL( attr->name(), names[i] );
     BOOST_CHECK_EQUAL( attr->dataType(), types[i] );
     BOOST_CHECK_EQUAL( attr->centering(), centers[i] );

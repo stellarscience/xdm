@@ -1,6 +1,6 @@
 //==============================================================================
 // This software developed by Stellar Science Ltd Co and the U.S. Government.
-// Copyright (C) 2009 Stellar Science. Government-purpose rights granted.
+// Copyright (C) 2009-2010 Stellar Science. Government-purpose rights granted.
 //
 // This file is part of XDM
 //
@@ -20,6 +20,7 @@
 //------------------------------------------------------------------------------
 #include <xdmGrid/TensorProductGeometry.hpp>
 
+#include <xdm/UniformDataItem.hpp>
 #include <xdm/VectorRef.hpp>
 
 #include <algorithm>
@@ -47,7 +48,7 @@ void TensorProductGeometry::setCoordinateValues(
 
   // We can automatically set the number of nodes after coordinate values have been specified
   // for all axes.
-  int dimensionCount =
+  std::size_t dimensionCount =
     std::count_if( begin(), end(), std::mem_fun_ref( &xdm::RefPtr< xdm::Item >::valid ) );
   if ( dimensionCount == dimension() ) {
     std::size_t nodeProduct = 1;
@@ -71,7 +72,7 @@ std::size_t TensorProductGeometry::numberOfCoordinates( const std::size_t& dim )
 void TensorProductGeometry::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
   Geometry::writeMetadata( xml );
 
-  unsigned int dim = dimension();
+  std::size_t dim = dimension();
   switch ( dim ) {
   case 1:
   case 2:
@@ -87,8 +88,8 @@ void TensorProductGeometry::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
 xdm::RefPtr< xdm::VectorRefImp< double > > TensorProductGeometry::createVectorImp()
 {
   std::vector< double* > coordinateArrays( dimension() );
-  std::vector< size_t > coordinateArraySizes( dimension() );
-  for ( size_t i = 0; i < dimension(); i++ ) {
+  std::vector< std::size_t > coordinateArraySizes( dimension() );
+  for ( std::size_t i = 0; i < dimension(); i++ ) {
     coordinateArrays[i] = child( i )->typedArray< double >()->begin();
     coordinateArraySizes[i] = child( i )->typedArray< double >()->size();
   }

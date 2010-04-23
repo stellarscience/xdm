@@ -1,6 +1,6 @@
 //==============================================================================
 // This software developed by Stellar Science Ltd Co and the U.S. Government.
-// Copyright (C) 2009 Stellar Science. Government-purpose rights granted.
+// Copyright (C) 2009-2010 Stellar Science. Government-purpose rights granted.
 //
 // This file is part of XDM
 //
@@ -108,12 +108,12 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
   globalFixture.waitAll();
 
   // split the particles roughly equally among the total number of processes
-  int particlesPerProcess = kParticleCount / globalFixture.processes();
-  int remainingParticles = kParticleCount % globalFixture.processes();
+  std::size_t particlesPerProcess = kParticleCount / globalFixture.processes();
+  std::size_t remainingParticles = kParticleCount % globalFixture.processes();
 
   // distribute the remainder among the first few processes
-  int localParticles = particlesPerProcess;
-  int localStartIndex = globalFixture.localRank() * particlesPerProcess;
+  std::size_t localParticles = particlesPerProcess;
+  std::size_t localStartIndex = globalFixture.localRank() * particlesPerProcess;
   if ( globalFixture.localRank() < remainingParticles ) {
     localParticles += 1;
     localStartIndex += globalFixture.localRank();
@@ -125,8 +125,8 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
   xdm::RefPtr< xdm::VectorStructuredArray< float > > mPositions(
     new xdm::VectorStructuredArray< float >( 3 * localParticles ) );
   // generate some initial values
-  for ( int i = 0; i < localParticles; i++ ) {
-    unsigned int globalIndex = localStartIndex + i;
+  for ( std::size_t i = 0; i < localParticles; i++ ) {
+    std::size_t globalIndex = localStartIndex + i;
     float theta = ( 6.28 / kParticleCount ) * ( globalIndex );
     (*mPositions)[3*i + 0] = std::cos( theta );
     (*mPositions)[3*i + 1] = 0.5f * std::sin( theta );
@@ -245,13 +245,13 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
   // evolve the particles
   float t = 0.0f;
   float dt = kEndTime / kSteps;
-  float cosDt = kEndTime;
-  for ( unsigned int step = 1; step < kSteps; step++ ) {
+  //float cosDt = kEndTime;
+  for ( std::size_t step = 1; step < kSteps; step++ ) {
     t += dt;
     grid->time()->setValue( t );
 
     // particle update loop
-    for ( unsigned int i = 0; i < localParticles; i++ ) {
+    for ( std::size_t i = 0; i < localParticles; i++ ) {
       evolve( &(*mPositions)[3*i], &(*mVelocities)[3*i], dt );
     }
 

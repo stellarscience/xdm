@@ -1,6 +1,6 @@
 //==============================================================================
 // This software developed by Stellar Science Ltd Co and the U.S. Government.
-// Copyright (C) 2010 Stellar Science. Government-purpose rights granted.
+// Copyright (C) 2009-2010 Stellar Science. Government-purpose rights granted.
 //
 // This file is part of XDM
 //
@@ -48,12 +48,12 @@ void MultiArrayGeometry::setCoordinateValues(
   // After all of the coord values are set, then we need to setup the vector
   // shared imp. Since the coord values can be set in any order, we need to
   // first check to see if all dimensions have been assigned coordinates.
-  int dimensionCount =
+  std::size_t dimensionCount =
     std::count_if( begin(), end(), std::mem_fun_ref( &xdm::RefPtr< xdm::Item >::valid ) );
   if ( dimensionCount == dimension() ) {
     std::vector< double* > xyzArrays;
     std::vector< std::size_t > sizes;
-    for ( int dim = 0; dim < dimension(); ++dim ) {
+    for ( std::size_t dim = 0; dim < dimension(); ++dim ) {
       xdm::RefPtr< xdm::UniformDataItem > dataItem = child( dim );
       xyzArrays.push_back( dataItem->typedArray< double >()->begin() );
       xdm::DataShape<>::size_type size = std::accumulate(
@@ -78,7 +78,7 @@ void MultiArrayGeometry::setCoordinateValues(
 void MultiArrayGeometry::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
   Geometry::writeMetadata( xml );
 
-  unsigned int dim = dimension();
+  std::size_t dim = dimension();
   switch ( dim ) {
   case 1:
     xml.setAttribute( "GeometryType", "X" );
@@ -98,7 +98,7 @@ void MultiArrayGeometry::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
 xdm::RefPtr< xdm::VectorRefImp< double > > MultiArrayGeometry::createVectorImp()
 {
   std::vector< double* > arrays( dimension() );
-  for ( int dim = 0; dim < dimension(); dim++ ) {
+  for ( std::size_t dim = 0; dim < dimension(); dim++ ) {
     arrays[dim] = child( dim )->typedArray< double >()->begin();
   }
   return xdm::RefPtr< xdm::VectorRefImp< double > >(

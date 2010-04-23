@@ -21,13 +21,11 @@
 #ifndef xdmGrid_UniformGrid_hpp
 #define xdmGrid_UniformGrid_hpp
 
-#include <xdmGrid/Attribute.hpp>
-#include <xdmGrid/Forward.hpp>
 #include <xdmGrid/Geometry.hpp>
+#include <xdmGrid/Forward.hpp>
 #include <xdmGrid/Grid.hpp>
 
 #include <xdm/Forward.hpp>
-#include <xdm/ObjectCompositionMixin.hpp>
 #include <xdm/PrimitiveType.hpp>
 
 #include <string>
@@ -40,9 +38,7 @@ XDM_GRID_NAMESPACE_BEGIN
 /// Grid type containing the actual geometry and topology for a grid.  This is a
 /// terminal grid node that contains the geometric and topological properties of
 /// a Grid along with any attributes defined on the grid.
-class UniformGrid :
-  public Grid,
-  public xdm::ObjectCompositionMixin< Attribute > {
+class UniformGrid : public Grid {
 public:
   UniformGrid();
   virtual ~UniformGrid();
@@ -57,23 +53,21 @@ public:
   xdm::RefPtr< Topology > topology();
   xdm::RefPtr< const Topology > topology() const;
 
-  /// Add an attribute definition to the grid.
-  void addAttribute( xdm::RefPtr< Attribute > attribute );
-  /// Get an attribute by its index.
-  xdm::RefPtr< Attribute > attributeByIndex( std::size_t index );
-  /// Get a const attribute by its index.
-  xdm::RefPtr< const Attribute > attributeByIndex( std::size_t index ) const;
-  /// Get an attribute by name.
-  xdm::RefPtr< Attribute > attributeByName( const std::string& name );
-  /// Get a const attribute by name.
-  xdm::RefPtr< const Attribute > attributeByName( const std::string& name ) const;
+  /// Create an attribute with the proper dimensions. This will initialize an Attribute holding
+  /// onto a UniformDataItem that has the correct array shape. The attribute will be attached
+  /// to the grid. However, the UniformDataItem will not have any data (MemoryAdapter); that
+  /// is left up to the user to supply.
+  virtual xdm::RefPtr< xdmGrid::Attribute > createAttribute(
+    Attribute::Center center,
+    Attribute::Type type,
+    const std::string& name,
+    xdm::primitiveType::Value dataType );
+
+  /// Get the total number of elements in this grid.
+  virtual std::size_t numberOfElements() const;
 
   /// Get an element by index. All elements are const in that they only have const functions.
-  Element element( const std::size_t& elementIndex ) const;
-
-  /// Get the ElementTopology for a particular element.
-  virtual xdm::RefPtr< const ElementTopology > elementTopology(
-    const std::size_t& elementIndex ) const;
+  virtual Element element( const std::size_t& elementIndex ) const;
 
   /// Get a node by index. This does not take connectivity into consideration.
   /// This means that the input index is the index into the geometry directly,
@@ -90,29 +84,11 @@ public:
   /// Redefinition of metadata from Grid.
   virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
 
-protected:
-  /// If a class inherits from this class, it can set the shared imp for ease
-  /// of implementation.
-  void setElementSharedImp( xdm::RefPtr< ElementSharedConnectivityLookup > elementImp );
-
 private:
   xdm::RefPtr< Geometry > mGeometry;
   xdm::RefPtr< Topology > mTopology;
   xdm::RefPtr< ElementSharedConnectivityLookup > mElementImp;
 };
-
-/// Construct an attribute on a uniform grid with the given center.
-///
-/// This non-member function will construct the attribute definition with a
-/// corresponding UniformDataItem to hold the attribute data.  The attribute is
-/// not automatically added to the grid, it is up to clients to do that.
-xdm::RefPtr< xdmGrid::Attribute >
-createAttribute(
-  xdm::RefPtr< const UniformGrid > grid,
-  Attribute::Center center,
-  Attribute::Type type,
-  const std::string& name,
-  xdm::primitiveType::Value dataType );
 
 XDM_GRID_NAMESPACE_END
 

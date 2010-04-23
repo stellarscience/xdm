@@ -1,6 +1,6 @@
 //==============================================================================
 // This software developed by Stellar Science Ltd Co and the U.S. Government.
-// Copyright (C) 2009 Stellar Science. Government-purpose rights granted.
+// Copyright (C) 2009-2010 Stellar Science. Government-purpose rights granted.
 //
 // This file is part of XDM
 //
@@ -77,7 +77,7 @@ constructFunctionGrid( const GridBounds& bounds, const std::string& hdfFile ) {
     // range.
     xdm::RefPtr< xdm::VectorStructuredArray< double > > values(
       new xdm::VectorStructuredArray< double >( bounds.size(i) + 1 ) );
-    for ( int j = 0; j < bounds.size(i); j++ ) {
+    for ( std::size_t j = 0; j < bounds.size(i); j++ ) {
       (*values)[j] = bounds.nodeCoordinate( i, j );
     }
     // fill the final point
@@ -91,13 +91,11 @@ constructFunctionGrid( const GridBounds& bounds, const std::string& hdfFile ) {
   }
 
   // construct an attribute to hold the function values
-  xdm::RefPtr< xdmGrid::Attribute > attribute = xdmGrid::createAttribute (
-    grid,
+  xdm::RefPtr< xdmGrid::Attribute > attribute = grid->createAttribute (
     xdmGrid::Attribute::kElement,
     xdmGrid::Attribute::kScalar,
     "FunctionValues",
     xdm::primitiveType::kDouble );
-  grid->appendChild( attribute );
   xdm::RefPtr< xdmHdf::HdfDataset > attributeDataset( new xdmHdf::HdfDataset );
   attributeDataset->setFile( hdfFile.c_str() );
   attributeDataset->setDataset( "FunctionValues" );

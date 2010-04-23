@@ -29,8 +29,8 @@
 
 #include <xdm/ItemVisitor.hpp>
 #include <xdm/RefPtr.hpp>
-#include <xdm/UniformDataItem.hpp>
 #include <xdm/ThrowMacro.hpp>
+#include <xdm/UniformDataItem.hpp>
 
 #include <algorithm>
 #include <stdexcept>
@@ -94,97 +94,15 @@ xdm::RefPtr< const Topology > UniformGrid::topology() const {
   return mTopology;
 }
 
-void UniformGrid::addAttribute( xdm::RefPtr< Attribute > attribute ) {
-  appendChild( attribute );
-}
-
-xdm::RefPtr< const Attribute > UniformGrid::attributeByIndex( std::size_t index ) const {
-  if ( index < numberOfChildren() ) {
-    return child( index );
-  } else {
-    return xdm::RefPtr< const Attribute >();
-  }
-}
-
-xdm::RefPtr< Attribute > UniformGrid::attributeByIndex( std::size_t index ) {
-  return xdm::const_pointer_cast< Attribute >(
-    static_cast< const UniformGrid& >(*this).attributeByIndex( index )
-  );
-}
-
-xdm::RefPtr< const Attribute >
-UniformGrid::attributeByName( const std::string& name ) const {
-  for ( int i = 0; i < numberOfChildren(); ++i ) {
-    if ( child( i )->name() == name ) return child( i );
-  }
-  return xdm::RefPtr< const Attribute >();
-}
-
-xdm::RefPtr< Attribute >
-UniformGrid::attributeByName( const std::string& name ) {
-  return xdm::const_pointer_cast< Attribute >(
-    static_cast< const UniformGrid& >(*this).attributeByName( name )
-  );
-}
-
-Element UniformGrid::element( const std::size_t& elementIndex ) const
-{
-  if ( ! mElementImp ) {
-    const_cast< UniformGrid& >( *this ).setElementSharedImp(
-      xdm::makeRefPtr( new SimpleElementImp( mGeometry, mTopology ) ) );
-  }
-  return Element( mElementImp, elementTopology( elementIndex ), elementIndex );
-}
-
-xdm::RefPtr< const ElementTopology > UniformGrid::elementTopology(
-  const std::size_t& elementIndex ) const {
-
-  return mTopology->elementTopology( elementIndex );
-}
-
-Node UniformGrid::node( std::size_t nodeIndex ) {
-  return mGeometry->node( nodeIndex );
-}
-
-ConstNode UniformGrid::node( std::size_t nodeIndex ) const {
-  return mGeometry->node( nodeIndex );
-}
-
-void UniformGrid::traverse( xdm::ItemVisitor& iv ) {
-  Grid::traverse( iv );
-  // apply the visitor to my internal geometry and topology items
-  mTopology->accept( iv );
-  mGeometry->accept( iv );
-  std::for_each(
-    xdm::begin< Attribute >( *this ),
-    xdm::end< Attribute >( *this ),
-    xdm::ApplyVisitor( iv ) );
-}
-
-void UniformGrid::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
-  Grid::writeMetadata( xml );
-
-  // write Uniform grid type
-  xml.setAttribute( "GridType", "Uniform" );
-}
-
-void UniformGrid::setElementSharedImp( xdm::RefPtr< ElementSharedConnectivityLookup > elementImp ) {
-  mElementImp = elementImp;
-}
-
-xdm::RefPtr< xdmGrid::Attribute >
-createAttribute(
-  xdm::RefPtr< const UniformGrid > grid,
+xdm::RefPtr< xdmGrid::Attribute > UniformGrid::createAttribute(
   Attribute::Center center,
   Attribute::Type type,
   const std::string& name,
-  xdm::primitiveType::Value dataType )
-{
+  xdm::primitiveType::Value dataType ) {
+
   xdm::RefPtr< Attribute > attribute( new Attribute( type, center ) );
   attribute->setName( name );
 
-  xdm::RefPtr< const Geometry > geometry = grid->geometry();
-  xdm::RefPtr< const Topology > topology = grid->topology();
   xdm::DataShape<> attributeSpace;
 
   // The shape of the attribute array depends on whether we are doing dimension-by-dimension
@@ -193,26 +111,30 @@ createAttribute(
   switch ( center ) {
     case Attribute::kNode: {
       xdm::RefPtr< const TensorProductGeometry > tpGeometry =
-        xdm::dynamic_pointer_cast< const TensorProductGeometry >( geometry );
+        xdm::dynamic_pointer_cast< const TensorProductGeometry >( mGeometry );
       if ( tpGeometry ) {
-        for ( std::size_t dim = 0; dim < geometry->dimension(); ++dim ) {
+        for ( std::size_t dim = 0; dim < mGeometry->dimension(); ++dim ) {
           attributeSpace.push_back( tpGeometry->numberOfCoordinates( dim ) );
         }
       } else {
-        attributeSpace.push_back( geometry->numberOfNodes() );
+        attributeSpace.push_back( mGeometry->numberOfNodes() );
       }
       break;
     }
     case Attribute::kElement: {
       xdm::RefPtr< const StructuredTopology > structTopology =
-        xdm::dynamic_pointer_cast< const StructuredTopology >( topology );
+        xdm::dynamic_pointer_cast< const StructuredTopology >( mTopology );
       if ( structTopology ) {
         attributeSpace = structTopology->shape();
       } else {
-        attributeSpace.push_back( topology->numberOfElements() );
+        attributeSpace.push_back( mTopology->numberOfElements() );
       }
       break;
     }
+    default:
+      XDM_THROW( std::logic_error(
+        "Only node- and element-centered attributes are currently supported." ) );
+      break;
   }
 
   // If the type is not a scalar, then add another dimension to the shape.
@@ -225,7 +147,7 @@ createAttribute(
       break;
     default:
       XDM_THROW( std::logic_error(
-        "Only scalar and vector attributes are currently supported" ) );
+        "Only scalar and vector attributes are currently supported." ) );
       break;
   }
 
@@ -234,7 +156,46 @@ createAttribute(
     new xdm::UniformDataItem( dataType, attributeSpace ) );
   attribute->setDataItem( attributeDataItem );
 
+  addAttribute( attribute );
+
   return attribute;
+}
+
+std::size_t UniformGrid::numberOfElements() const {
+  return mTopology->numberOfElements();
+}
+
+Element UniformGrid::element( const std::size_t& elementIndex ) const
+{
+  if ( ! mElementImp ) {
+    UniformGrid& mutableMe = const_cast< UniformGrid& >( *this );
+    mutableMe.mElementImp =
+      xdm::makeRefPtr( new SimpleElementImp( mutableMe.mGeometry, mutableMe.mTopology ) );
+  }
+  return Element( mElementImp, mTopology->elementTopology( elementIndex ), elementIndex );
+}
+
+Node UniformGrid::node( std::size_t nodeIndex ) {
+  return mGeometry->node( nodeIndex );
+}
+
+ConstNode UniformGrid::node( std::size_t nodeIndex ) const {
+  return mGeometry->node( nodeIndex );
+}
+
+void UniformGrid::traverse( xdm::ItemVisitor& iv ) {
+  Grid::traverse( iv );
+
+  // apply the visitor to my internal geometry and topology items
+  mTopology->accept( iv );
+  mGeometry->accept( iv );
+}
+
+void UniformGrid::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
+  Grid::writeMetadata( xml );
+
+  // write Uniform grid type
+  xml.setAttribute( "GridType", "Uniform" );
 }
 
 XDM_GRID_NAMESPACE_END

@@ -14,7 +14,6 @@ set( ${PROJECT_NAME}_HEADERS
     NamespaceMacro.hpp
     Polyvertex.hpp
     RectilinearMesh.hpp
-    ReferencingGrid.hpp
     StructuredTopology.hpp
     TensorProductGeometry.hpp
     Time.hpp
@@ -35,7 +34,6 @@ set( ${PROJECT_NAME}_SOURCES
     MultiArrayGeometry.cpp
     Polyvertex.cpp
     RectilinearMesh.cpp
-    ReferencingGrid.cpp
     StructuredTopology.cpp
     TensorProductGeometry.cpp
     Time.cpp

@@ -1,6 +1,6 @@
 //==============================================================================
 // This software developed by Stellar Science Ltd Co and the U.S. Government.
-// Copyright (C) 2009 Stellar Science. Government-purpose rights granted.
+// Copyright (C) 2009-2010 Stellar Science. Government-purpose rights granted.
 //
 // This file is part of XDM
 //
@@ -26,8 +26,8 @@ XDM_GRID_NAMESPACE_BEGIN
 
 Topology::Topology() :
   xdm::Item(),
-  mNumberOfElements( 0 ),
-  mSharedVectorImp() {
+  mSharedVectorImp(),
+  mNumberOfElements( 0 ) {
 }
 
 Topology::~Topology() {
