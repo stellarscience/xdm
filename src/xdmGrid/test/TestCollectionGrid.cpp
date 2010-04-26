@@ -44,6 +44,28 @@ struct Fixture {
     xml( xdm::makeRefPtr( new xdm::XmlObject ) ) {}
 };
 
+xdm::RefPtr< xdmGrid::UniformGrid > cubeGrid() {
+  CubeOfTets cube;
+
+  // Geometry
+  xdm::RefPtr< xdmGrid::InterlacedGeometry > g( new xdmGrid::InterlacedGeometry(3) );
+  xdm::RefPtr< xdm::UniformDataItem > nodeList = test::createUniformDataItem(
+    cube.nodeArray(), cube.numberOfNodes() * 3, xdm::primitiveType::kDouble );
+  g->setCoordinateValues( nodeList );
+
+  // Topology
+  xdm::RefPtr< xdmGrid::UnstructuredTopology > t0( new xdmGrid::UnstructuredTopology() );
+  xdm::RefPtr< xdm::UniformDataItem > elementList0 = test::createUniformDataItem(
+    cube.connectivityArray(), cube.numberOfElements() * 4, xdm::primitiveType::kLongUnsignedInt );
+  t0->setConnectivity( elementList0 );
+  t0->setNumberOfElements( 5 );
+  t0->setElementTopology( xdmGrid::elementFactory( xdmGrid::ElementShape::Tetrahedron, 1 ) );
+  xdm::RefPtr< xdmGrid::UniformGrid > grid( new xdmGrid::UniformGrid );
+  grid->setGeometry( g );
+  grid->setTopology( t0 );
+  return grid;
+}
+
 BOOST_AUTO_TEST_CASE( writeMetadataSpatial ) {
   Fixture test;
 
@@ -67,11 +89,6 @@ BOOST_AUTO_TEST_CASE( writeMetadataTemporal ) {
 }
 
 BOOST_AUTO_TEST_CASE( indirectElementAccess ) {
-  CubeOfTets cube;
-  xdm::RefPtr< xdmGrid::InterlacedGeometry > g( new xdmGrid::InterlacedGeometry(3) );
-  xdm::RefPtr< xdm::UniformDataItem > nodeList = test::createUniformDataItem(
-    cube.nodeArray(), cube.numberOfNodes() * 3, xdm::primitiveType::kDouble );
-  g->setCoordinateValues( nodeList );
 
   // There are 5 tetrahedra in the cube. This test will separate these into 3 topologies
   // as follows:
@@ -81,16 +98,8 @@ BOOST_AUTO_TEST_CASE( indirectElementAccess ) {
   //
   // For testing, we compare these to the values that come from the original cube.
 
-  // Original cube
-  xdm::RefPtr< xdmGrid::UnstructuredTopology > t0( new xdmGrid::UnstructuredTopology() );
-  xdm::RefPtr< xdm::UniformDataItem > elementList0 = test::createUniformDataItem(
-    cube.connectivityArray(), cube.numberOfElements() * 4, xdm::primitiveType::kLongUnsignedInt );
-  t0->setConnectivity( elementList0 );
-  t0->setNumberOfElements( 5 );
-  t0->setElementTopology( xdmGrid::elementFactory( xdmGrid::ElementShape::Tetrahedron, 1 ) );
-  xdm::RefPtr< xdmGrid::UniformGrid > grid0( new xdmGrid::UniformGrid );
-  grid0->setGeometry( g );
-  grid0->setTopology( t0 );
+  xdm::RefPtr< xdmGrid::UniformGrid > grid0 = cubeGrid();
+  CubeOfTets cube;
 
   // Topology 1
   xdm::RefPtr< xdmGrid::UnstructuredTopology > t1( new xdmGrid::UnstructuredTopology() );
@@ -103,7 +112,7 @@ BOOST_AUTO_TEST_CASE( indirectElementAccess ) {
   t1->setNumberOfElements( 2 );
   t1->setElementTopology( xdmGrid::elementFactory( xdmGrid::ElementShape::Tetrahedron, 1 ) );
   xdm::RefPtr< xdmGrid::UniformGrid > grid1( new xdmGrid::UniformGrid );
-  grid1->setGeometry( g );
+  grid1->setGeometry( grid0->geometry() );
   grid1->setTopology( t1 );
 
   // Topology 2
@@ -117,7 +126,7 @@ BOOST_AUTO_TEST_CASE( indirectElementAccess ) {
   t2->setNumberOfElements( 2 );
   t2->setElementTopology( xdmGrid::elementFactory( xdmGrid::ElementShape::Tetrahedron, 1 ) );
   xdm::RefPtr< xdmGrid::UniformGrid > grid2( new xdmGrid::UniformGrid );
-  grid2->setGeometry( g );
+  grid2->setGeometry( grid0->geometry() );
   grid2->setTopology( t2 );
 
   // Topology 3
@@ -130,7 +139,7 @@ BOOST_AUTO_TEST_CASE( indirectElementAccess ) {
   t3->setNumberOfElements( 1 );
   t3->setElementTopology( xdmGrid::elementFactory( xdmGrid::ElementShape::Tetrahedron, 1 ) );
   xdm::RefPtr< xdmGrid::UniformGrid > grid3( new xdmGrid::UniformGrid );
-  grid3->setGeometry( g );
+  grid3->setGeometry( grid0->geometry() );
   grid3->setTopology( t3 );
 
   // The referenced grid takes data items that list the element indices. We just take them in
@@ -200,6 +209,136 @@ BOOST_AUTO_TEST_CASE( indirectElementAccess ) {
     }
   }
 
+}
+
+BOOST_AUTO_TEST_CASE( faceAccess ) {
+
+  // A smaller, easier version of the above test. Added face access testing.
+
+  // There are 5 tetrahedra in the cube. This test will separate these into 3 topologies
+  // as follows:
+  //  1. Elements 0, 4
+  //  2. Elements 3, 2
+  //  4. Element 1
+  //
+  // For testing, we compare these to the values that come from the original cube.
+
+  xdm::RefPtr< xdmGrid::UniformGrid > grid0 = cubeGrid();
+
+  // The referenced grid takes data items that list the element indices. We just take them in
+  // order.
+  std::size_t elementOrdering1[] = { 0, 4 };
+  std::size_t elementOrdering2[] = { 3, 2 };
+  std::size_t elementOrdering3[] = { 1 };
+  xdm::RefPtr< xdm::UniformDataItem > elements1Item = test::createUniformDataItem(
+    elementOrdering1, 2, xdm::primitiveType::kLongUnsignedInt );
+  xdm::RefPtr< xdm::UniformDataItem > elements2Item = test::createUniformDataItem(
+    elementOrdering2, 2, xdm::primitiveType::kLongUnsignedInt );
+  xdm::RefPtr< xdm::UniformDataItem > elements3Item = test::createUniformDataItem(
+    elementOrdering3, 1, xdm::primitiveType::kLongUnsignedInt );
+
+  // Reference some faces on the elements in some arbitrary order.
+  std::size_t faceOrdering1[] = { 3, 2 };
+  std::size_t faceOrdering2[] = { 2, 1 };
+  std::size_t faceOrdering3[] = { 0 };
+  xdm::RefPtr< xdm::UniformDataItem > faces1 = test::createUniformDataItem(
+    faceOrdering1, 2, xdm::primitiveType::kLongUnsignedInt );
+  xdm::RefPtr< xdm::UniformDataItem > faces2 = test::createUniformDataItem(
+    faceOrdering2, 2, xdm::primitiveType::kLongUnsignedInt );
+  xdm::RefPtr< xdm::UniformDataItem > faces3 = test::createUniformDataItem(
+    faceOrdering3, 1, xdm::primitiveType::kLongUnsignedInt );
+
+  xdmGrid::CollectionGrid refGrid;
+  refGrid.appendGridFaces( grid0, elements1Item, faces1 );
+  refGrid.appendGridFaces( grid0, elements2Item, faces2 );
+  refGrid.appendGridFaces( grid0, elements3Item, faces3 );
+
+  // Check to see if the node values from the referenced grid match the original
+  // nodes.
+  std::size_t elementMap[] = { 0, 4, 3, 2, 1 };
+  std::size_t faceMap[] = { 3, 2, 2, 1, 0 };
+  BOOST_CHECK_EQUAL( refGrid.numberOfElements(), 5 );
+  for ( std::size_t elementIndex = 0; elementIndex < 5; ++elementIndex ) {
+    xdmGrid::Element faceOrig =
+      grid0->element( elementMap[ elementIndex ] ).face( faceMap[ elementIndex ] );
+    xdmGrid::Element faceRef = refGrid.element( elementIndex );
+    BOOST_REQUIRE_EQUAL( faceRef.numberOfNodes(), 3 );
+    BOOST_REQUIRE_EQUAL( faceOrig.numberOfNodes(), 3 );
+    BOOST_REQUIRE_EQUAL( faceRef.shape(), xdmGrid::ElementShape::Triangle );
+    BOOST_REQUIRE_EQUAL( faceOrig.shape(), xdmGrid::ElementShape::Triangle );
+    for ( std::size_t nodeIndex = 0; nodeIndex < 3; ++nodeIndex ) {
+      for ( std::size_t dim = 0; dim < 3; ++dim ) {
+        double refValue = faceRef.node( nodeIndex )[ dim ];
+        double origValue = faceOrig.node( nodeIndex )[ dim ];
+        BOOST_CHECK_EQUAL( origValue, refValue );
+      }
+    }
+  }
+}
+
+BOOST_AUTO_TEST_CASE( edgeAccess ) {
+
+  // A smaller, easier version of the above test. Added edge access testing.
+
+  // There are 5 tetrahedra in the cube. This test will separate these into 3 topologies
+  // as follows:
+  //  1. Elements 0, 4
+  //  2. Elements 3, 2
+  //  4. Element 1
+  //
+  // For testing, we compare these to the values that come from the original cube.
+
+  xdm::RefPtr< xdmGrid::UniformGrid > grid0 = cubeGrid();
+
+  // The referenced grid takes data items that list the element indices. We just take them in
+  // order.
+  std::size_t elementOrdering1[] = { 0, 4 };
+  std::size_t elementOrdering2[] = { 3, 2 };
+  std::size_t elementOrdering3[] = { 1 };
+  xdm::RefPtr< xdm::UniformDataItem > elements1Item = test::createUniformDataItem(
+    elementOrdering1, 2, xdm::primitiveType::kLongUnsignedInt );
+  xdm::RefPtr< xdm::UniformDataItem > elements2Item = test::createUniformDataItem(
+    elementOrdering2, 2, xdm::primitiveType::kLongUnsignedInt );
+  xdm::RefPtr< xdm::UniformDataItem > elements3Item = test::createUniformDataItem(
+    elementOrdering3, 1, xdm::primitiveType::kLongUnsignedInt );
+
+  // Reference some edges on the elements in some arbitrary order.
+  std::size_t edgeOrdering1[] = { 5, 3 };
+  std::size_t edgeOrdering2[] = { 4, 1 };
+  std::size_t edgeOrdering3[] = { 0 };
+  xdm::RefPtr< xdm::UniformDataItem > edges1 = test::createUniformDataItem(
+    edgeOrdering1, 2, xdm::primitiveType::kLongUnsignedInt );
+  xdm::RefPtr< xdm::UniformDataItem > edges2 = test::createUniformDataItem(
+    edgeOrdering2, 2, xdm::primitiveType::kLongUnsignedInt );
+  xdm::RefPtr< xdm::UniformDataItem > edges3 = test::createUniformDataItem(
+    edgeOrdering3, 1, xdm::primitiveType::kLongUnsignedInt );
+
+  xdmGrid::CollectionGrid refGrid;
+  refGrid.appendGridEdges( grid0, elements1Item, edges1 );
+  refGrid.appendGridEdges( grid0, elements2Item, edges2 );
+  refGrid.appendGridEdges( grid0, elements3Item, edges3 );
+
+  // Check to see if the node values from the referenced grid match the original
+  // nodes.
+  std::size_t elementMap[] = { 0, 4, 3, 2, 1 };
+  std::size_t edgeMap[] = { 5, 3, 4, 1, 0 };
+  BOOST_CHECK_EQUAL( refGrid.numberOfElements(), 5 );
+  for ( std::size_t elementIndex = 0; elementIndex < 5; ++elementIndex ) {
+    xdmGrid::Element edgeOrig =
+      grid0->element( elementMap[ elementIndex ] ).edge( edgeMap[ elementIndex ] );
+    xdmGrid::Element edgeRef = refGrid.element( elementIndex );
+    BOOST_REQUIRE_EQUAL( edgeRef.numberOfNodes(), 2 );
+    BOOST_REQUIRE_EQUAL( edgeOrig.numberOfNodes(), 2 );
+    BOOST_REQUIRE_EQUAL( edgeRef.shape(), xdmGrid::ElementShape::Curve );
+    BOOST_REQUIRE_EQUAL( edgeOrig.shape(), xdmGrid::ElementShape::Curve );
+    for ( std::size_t nodeIndex = 0; nodeIndex < 3; ++nodeIndex ) {
+      for ( std::size_t dim = 0; dim < 3; ++dim ) {
+        double refValue = edgeRef.node( nodeIndex )[ dim ];
+        double origValue = edgeOrig.node( nodeIndex )[ dim ];
+        BOOST_CHECK_EQUAL( origValue, refValue );
+      }
+    }
+  }
 }
 
 } // namespace

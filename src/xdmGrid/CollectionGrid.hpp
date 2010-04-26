@@ -53,14 +53,44 @@ public:
   void setType( CollectionType t );
   CollectionType type() const;
 
-  /// Append a referenced grid with the corresponding element indices.
+  /// Append a grid, referencing all of the elements in the grid.
+  /// @param grid The grid that will be referenced by this collection.
+  void appendGrid( xdm::RefPtr< Grid > grid );
+
+  /// Append a grid, referencing only a subset of the elements.
   /// @param grid The grid that will be referenced by this collection.
   /// @param elementIndices An integer array containing the element indices for the elements
-  ///        that are referenced in grid. If this array is omitted, then all
-  ///        elements in the corresponding grid will be referenced, in default order.
+  ///        that are referenced in grid. The indices should be unique so that each element
+  ///        is only referenced once.
   void appendGrid(
     xdm::RefPtr< Grid > grid,
-    xdm::RefPtr< xdm::UniformDataItem > elementIndices = xdm::RefPtr< xdm::UniformDataItem >() );
+    xdm::RefPtr< xdm::UniformDataItem > elementIndices );
+
+  /// Append a grid, referencing some of the faces on some of the elements.
+  /// @param grid The grid that will be referenced by this collection.
+  /// @param elementIndices An integer array containing the element indices for the elements
+  ///        that are referenced in grid. These indicies need not be unique because multiple
+  ///        faces from a single element may be referenced.
+  /// @param faceIndices An integer array containing the indices of the faces corresponding
+  ///        to the elements in elementIndices. The ordering of faces on elements is specified
+  ///        by the node ordering convention. @see xdmGrid::ElementTopology
+  void appendGridFaces(
+    xdm::RefPtr< Grid > grid,
+    xdm::RefPtr< xdm::UniformDataItem > elementIndices,
+    xdm::RefPtr< xdm::UniformDataItem > faceIndices );
+
+  /// Append a grid, referencing some of the edges on some of the elements.
+  /// @param grid The grid that will be referenced by this collection.
+  /// @param elementIndices An integer array containing the element indices for the elements
+  ///        that are referenced in grid. These indicies need not be unique because multiple
+  ///        edges from a single element may be referenced.
+  /// @param edgeIndices An integer array containing the indices of the edges corresponding
+  ///        to the elements in elementIndices. The ordering of edges on elements is specified
+  ///        by the node ordering convention. @see xdmGrid::ElementTopology
+  void appendGridEdges(
+    xdm::RefPtr< Grid > grid,
+    xdm::RefPtr< xdm::UniformDataItem > elementIndices,
+    xdm::RefPtr< xdm::UniformDataItem > edgeIndices );
 
   /// Create an attribute with the proper dimensions. This will initialize an Attribute holding
   /// onto a UniformDataItem that has the correct array shape. The attribute will be attached
@@ -68,7 +98,7 @@ public:
   /// is left up to the user to supply.
   /// @note Node-centered attributes are not allowed for a CollectionGrid because the collection
   ///       is a collection of elements rather than a collection of geometries.
-  virtual xdm::RefPtr< xdmGrid::Attribute > createAttribute(
+  virtual xdm::RefPtr< Attribute > createAttribute(
     Attribute::Center center,
     Attribute::Type type,
     const std::string& name,
@@ -90,12 +120,20 @@ public:
   virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
 
 private:
+  enum ReferenceType {
+    kElement,
+    kFace,
+    kEdge
+  };
+
   std::vector< xdm::RefPtr< xdmGrid::Grid > > mGrids;
-  std::vector< xdm::RefPtr< xdm::UniformDataItem > > mArrays;
+  std::vector< xdm::RefPtr< xdm::UniformDataItem > > mElementIndices;
+  std::vector< xdm::RefPtr< xdm::UniformDataItem > > mFaceEdgeIndices;
   std::vector< std::size_t > mElementOffsets;
+  std::vector< ReferenceType > mReferenceTypes;
   CollectionType mType;
 
-  std::pair< Grid*, std::size_t > findGrid( const std::size_t& elementIndex ) const;
+  std::pair< std::size_t, std::size_t > findGrid( const std::size_t& elementIndex ) const;
   void updateOffsets();
 };
 
