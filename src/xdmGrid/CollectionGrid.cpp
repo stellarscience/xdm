@@ -218,15 +218,23 @@ std::size_t CollectionGrid::numberOfElements() const {
 Element CollectionGrid::element( const std::size_t& elementIndex ) const
 {
   std::pair< std::size_t, std::size_t > found = findGrid( elementIndex );
+
+  // Special treatment for null element index list: assume we are referencing the whole
+  // grid.
+  std::size_t element = found.second;
+  if ( mElementIndices[ found.first ] ) {
+    element = mElementIndices[ found.first ]->atIndex< std::size_t >( found.second );
+  }
+
   switch( mReferenceTypes[ found.first ] ) {
   case kFace:
-    return mGrids[ found.first ]->element( found.second ).face(
+    return mGrids[ found.first ]->element( element ).face(
       mFaceEdgeIndices[ found.first ]->atIndex< std::size_t >( found.second ) );
   case kEdge:
-    return mGrids[ found.first ]->element( found.second ).edge(
+    return mGrids[ found.first ]->element( element ).edge(
       mFaceEdgeIndices[ found.first ]->atIndex< std::size_t >( found.second ) );
    default:
-    return mGrids[ found.first ]->element( found.second );
+    return mGrids[ found.first ]->element( element );
   }
 }
 
@@ -264,7 +272,7 @@ void CollectionGrid::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
   }
 }
 
-// Finds the grid index and element index.
+// Finds the grid index and element offset index.
 std::pair< std::size_t, std::size_t > CollectionGrid::findGrid( const std::size_t& elementIndex ) const {
 
   if ( mElementOffsets.size() != mGrids.size() ) {
@@ -279,16 +287,9 @@ std::pair< std::size_t, std::size_t > CollectionGrid::findGrid( const std::size_
   if ( gridIndex > 0 ) {
     offsetIndex -= *(--found);
   }
-  if ( mElementIndices[ gridIndex ] ) {
-    return std::make_pair(
-      gridIndex,
-      mElementIndices[ gridIndex ]->atIndex< std::size_t >( offsetIndex ) );
-  } else {
-    // If the array pointer is null, then we are using the complete grid.
-    return std::make_pair(
-      gridIndex,
-      offsetIndex );
-  }
+  return std::make_pair(
+    gridIndex,
+    offsetIndex );
 }
 
 void CollectionGrid::updateOffsets() {

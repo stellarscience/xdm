@@ -44,8 +44,7 @@ struct Fixture {
     xml( xdm::makeRefPtr( new xdm::XmlObject ) ) {}
 };
 
-xdm::RefPtr< xdmGrid::UniformGrid > cubeGrid() {
-  CubeOfTets cube;
+xdm::RefPtr< xdmGrid::UniformGrid > cubeGrid( CubeOfTets& cube ) {
 
   // Geometry
   xdm::RefPtr< xdmGrid::InterlacedGeometry > g( new xdmGrid::InterlacedGeometry(3) );
@@ -98,8 +97,8 @@ BOOST_AUTO_TEST_CASE( indirectElementAccess ) {
   //
   // For testing, we compare these to the values that come from the original cube.
 
-  xdm::RefPtr< xdmGrid::UniformGrid > grid0 = cubeGrid();
   CubeOfTets cube;
+  xdm::RefPtr< xdmGrid::UniformGrid > grid0 = cubeGrid( cube );
 
   // Topology 1
   xdm::RefPtr< xdmGrid::UnstructuredTopology > t1( new xdmGrid::UnstructuredTopology() );
@@ -223,7 +222,8 @@ BOOST_AUTO_TEST_CASE( faceAccess ) {
   //
   // For testing, we compare these to the values that come from the original cube.
 
-  xdm::RefPtr< xdmGrid::UniformGrid > grid0 = cubeGrid();
+  CubeOfTets cube;
+  xdm::RefPtr< xdmGrid::UniformGrid > grid0 = cubeGrid( cube );
 
   // The referenced grid takes data items that list the element indices. We just take them in
   // order.
@@ -288,7 +288,8 @@ BOOST_AUTO_TEST_CASE( edgeAccess ) {
   //
   // For testing, we compare these to the values that come from the original cube.
 
-  xdm::RefPtr< xdmGrid::UniformGrid > grid0 = cubeGrid();
+  CubeOfTets cube;
+  xdm::RefPtr< xdmGrid::UniformGrid > grid0 = cubeGrid( cube );
 
   // The referenced grid takes data items that list the element indices. We just take them in
   // order.
@@ -331,7 +332,7 @@ BOOST_AUTO_TEST_CASE( edgeAccess ) {
     BOOST_REQUIRE_EQUAL( edgeOrig.numberOfNodes(), 2 );
     BOOST_REQUIRE_EQUAL( edgeRef.shape(), xdmGrid::ElementShape::Curve );
     BOOST_REQUIRE_EQUAL( edgeOrig.shape(), xdmGrid::ElementShape::Curve );
-    for ( std::size_t nodeIndex = 0; nodeIndex < 3; ++nodeIndex ) {
+    for ( std::size_t nodeIndex = 0; nodeIndex < 2; ++nodeIndex ) {
       for ( std::size_t dim = 0; dim < 3; ++dim ) {
         double refValue = edgeRef.node( nodeIndex )[ dim ];
         double origValue = edgeOrig.node( nodeIndex )[ dim ];
