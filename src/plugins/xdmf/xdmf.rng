@@ -112,6 +112,7 @@
   <!-- XDMF Grid Specification -->
   <define name="grid">
     <element name="Grid">
+      <ref name="xdmf-base"/>
       <optional>
         <attribute name="GridType">
           <choice>
@@ -270,8 +271,8 @@
 
   <!-- XDMF Time Specification -->
   <define name="time">
-    <ref name="xdmf-base"/>
     <element name="Time">
+      <ref name="xdmf-base"/>
       <optional>
         <attribute name="TimeType">
           <choice>
