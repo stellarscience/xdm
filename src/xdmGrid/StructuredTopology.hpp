@@ -49,7 +49,15 @@ public:
   /// Set the shape defined by the elements in the topology.  This shape should
   /// correspond to the arrangement of elements in n-dimensional space.
   void setShape( const xdm::DataShape<>& shape );
-  /// Get the shape defined by the Elements in the topology.
+  /// Get the dimensions of the Elements in the StructuredTopology. For
+  /// example, in a 2D rectilinear mesh with 5x3 nodes, this would return a
+  /// shape of 4x2 since there would be one less element in each direction than
+  /// the number of nodes in that direction.
+  ///
+  /// Note: This is different than XDMF convention. XDMF stores structured
+  /// topology dimensions as node dimensions rather than element dimensions. It
+  /// is the author's belief that this is wrong for the API since topology
+  /// should have no knowledge of geometric mesh properties.
   const xdm::DataShape<>& shape() const;
 
   /// Get the type of a particular element. For structured meshes this always returns

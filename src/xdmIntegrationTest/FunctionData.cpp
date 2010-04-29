@@ -59,9 +59,9 @@ constructFunctionGrid( const GridBounds& bounds, const std::string& hdfFile ) {
   // Topology
   xdm::RefPtr< xdmGrid::RectilinearMesh > topology( new xdmGrid::RectilinearMesh );
   topology->setShape( xdm::makeShape(
-    bounds.size(2) + 1,
-    bounds.size(1) + 1,
-    bounds.size(0) + 1 ) );
+    bounds.size(0),
+    bounds.size(1),
+    bounds.size(2) ) );
   grid->setTopology( topology );
 
   // Geometry

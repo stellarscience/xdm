@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE( writeMetadata ) {
 
   BOOST_CHECK_EQUAL( "Topology", xml.tag() );
   BOOST_CHECK_EQUAL( "2DRectMesh", xml.attribute( "TopologyType" ) );
-  BOOST_CHECK_EQUAL( "2 2", xml.attribute( "Dimensions" ) );
+  BOOST_CHECK_EQUAL( "3 3", xml.attribute( "Dimensions" ) );
 }
 
 } // namespace 

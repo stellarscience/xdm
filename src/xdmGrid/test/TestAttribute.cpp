@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE( writeMetadata ) {
 
   BOOST_CHECK_EQUAL( "Attribute", xml.tag() );
   BOOST_CHECK_EQUAL( "Scalar", xml.attribute( "AttributeType" ) );
-  BOOST_CHECK_EQUAL( "Element", xml.attribute( "Center" ) );
+  BOOST_CHECK_EQUAL( "Cell", xml.attribute( "Center" ) );
 }
 
 

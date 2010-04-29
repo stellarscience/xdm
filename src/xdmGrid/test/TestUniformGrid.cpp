@@ -27,10 +27,14 @@
 #include <xdmGrid/ElementTopology.hpp>
 #include <xdmGrid/InterlacedGeometry.hpp>
 #include <xdmGrid/MultiArrayGeometry.hpp>
+#include <xdmGrid/StructuredTopology.hpp>
+#include <xdmGrid/TensorProductGeometry.hpp>
 #include <xdmGrid/UniformGrid.hpp>
 #include <xdmGrid/UnstructuredTopology.hpp>
 
 #include <xdm/test/TestHelpers.hpp>
+
+#include <xdm/ContiguousArray.hpp>
 
 namespace {
 
@@ -177,6 +181,52 @@ BOOST_AUTO_TEST_CASE( elementTopology ) {
     BOOST_CHECK_EQUAL( edge.nodeIndexInGeometry( 0 ), 5 );
     BOOST_CHECK_EQUAL( edge.nodeIndexInGeometry( 1 ), 7 );
   }
+}
+
+BOOST_AUTO_TEST_CASE( createAttribute ) {
+  std::vector< double > xvalues( 3 );
+  xvalues[0] = 0.0;
+  xvalues[1] = 1.0;
+  xvalues[2] = 2.0;
+
+  std::vector< double > yvalues( 2 );
+  yvalues[0] = 0.0;
+  yvalues[1] = 1.0;
+
+  xdmGrid::UniformGrid grid;
+
+  xdm::RefPtr< xdmGrid::TensorProductGeometry > g( new xdmGrid::TensorProductGeometry(2) );
+  g->setCoordinateValues( 
+    0, test::createUniformDataItem( &xvalues[0], 3, xdm::primitiveType::kDouble ) );
+  g->setCoordinateValues( 
+    1, test::createUniformDataItem( &yvalues[0], 2, xdm::primitiveType::kDouble ) );
+  grid.setGeometry( g );
+
+  xdm::RefPtr< xdmGrid::StructuredTopology > t( new xdmGrid::StructuredTopology );
+  t->setShape( xdm::makeShape( 2, 1 ) );
+  grid.setTopology( t );
+
+  xdm::RefPtr< xdmGrid::Attribute > nodeAttribute = grid.createAttribute( 
+    xdmGrid::Attribute::kNode, 
+    xdmGrid::Attribute::kVector,
+    "NodeAttribute",
+    xdm::primitiveType::kDouble );
+  BOOST_CHECK_EQUAL( nodeAttribute->name(), "NodeAttribute" );
+  BOOST_CHECK_EQUAL( nodeAttribute->centering(), xdmGrid::Attribute::kNode );
+  BOOST_CHECK_EQUAL( nodeAttribute->dataType(), xdmGrid::Attribute::kVector );
+  BOOST_CHECK_EQUAL( nodeAttribute->dataItem()->dataspace(), xdm::makeShape( 2, 3, 3 ) );
+  BOOST_CHECK_EQUAL( nodeAttribute->dataItem()->dataType(), xdm::primitiveType::kDouble );
+
+  xdm::RefPtr< xdmGrid::Attribute > elemAttribute = grid.createAttribute( 
+    xdmGrid::Attribute::kElement, 
+    xdmGrid::Attribute::kVector,
+    "ElemAttribute",
+    xdm::primitiveType::kDouble );
+  BOOST_CHECK_EQUAL( elemAttribute->name(), "ElemAttribute" );
+  BOOST_CHECK_EQUAL( elemAttribute->centering(), xdmGrid::Attribute::kElement );
+  BOOST_CHECK_EQUAL( elemAttribute->dataType(), xdmGrid::Attribute::kVector );
+  BOOST_CHECK_EQUAL( elemAttribute->dataItem()->dataspace(), xdm::makeShape( 1, 2, 3 ) );
+  BOOST_CHECK_EQUAL( elemAttribute->dataItem()->dataType(), xdm::primitiveType::kDouble );
 }
 
 } // namespace

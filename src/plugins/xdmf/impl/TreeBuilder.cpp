@@ -304,10 +304,16 @@ xdm::RefPtr< xdmGrid::Topology > TreeBuilder::buildTopology( xmlNode * node ) {
     XPathQuery shapeQuery( mDoc->get(), node, "@Dimensions|@NumberOfElements" );
     if ( shapeQuery.size() > 0 ) {
       xdm::DataShape<> topologyShape = xdm::makeShape(shapeQuery.textValue(0));
-      // XDMF Specifies topology in ZYX order, which is the opposite of the
-      // geometry ordering. Reverse the shape to follow the XDM convention of
-      // XYZ ordering and match the grid geometry specification.
+      // XDMF Specifies topology in as node dimensions in ZYX order. The XDM
+      // library convention is cell dimensions in XYZ order. So we reverse the
+      // order and subtract 1 from each dimension.
       topologyShape.reverseDimensionOrder();
+      for ( 
+        xdm::DataShape<>::DimensionIterator dim = topologyShape.begin(); 
+        dim != topologyShape.end();
+        ++dim ) {
+        *dim -= 1;
+      }
       structuredTopology->setShape( topologyShape );
     } else {
       XDM_THROW( xdmFormat::ReadError(

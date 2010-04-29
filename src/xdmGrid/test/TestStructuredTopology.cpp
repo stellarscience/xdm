@@ -38,7 +38,12 @@ BOOST_AUTO_TEST_CASE( writeMetadata ) {
   t.writeMetadata( xml );
 
   BOOST_CHECK_EQUAL( "Topology", xml.tag() );
-  BOOST_CHECK_EQUAL( "1 2 3", xml.attribute( "Dimensions" ) );
+  // The dimensions should be reversed because XDMF convention for topology
+  // shape is ZYX order but XDM convention is XYZ to match the order of the
+  // geometry node data.  Also XDMF uses node dimensions in the topology
+  // specification, so each is one more than the element dimensions specified
+  // in the xdmGrid::StructuredTopology.
+  BOOST_CHECK_EQUAL( "4 3 2", xml.attribute( "Dimensions" ) );
 }
 
 } // namespace 

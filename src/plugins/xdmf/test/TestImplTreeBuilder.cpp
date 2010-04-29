@@ -195,7 +195,7 @@ BOOST_AUTO_TEST_CASE( buildStructuredTopology ) {
     = xdm::dynamic_pointer_cast< xdmGrid::StructuredTopology >( result );
   BOOST_REQUIRE( structured );
 
-  BOOST_CHECK_EQUAL( structured->shape(), xdm::makeShape( 3, 3, 3) );
+  BOOST_CHECK_EQUAL( structured->shape(), xdm::makeShape( 2, 2, 2) );
 
 }
 
@@ -234,7 +234,7 @@ BOOST_AUTO_TEST_CASE( buildStaticTree ) {
   // the topology shape should be the reverse of the shape specified in the xmf
   // file since XDMF stores the topology information in ZYX order, but the XDM
   // api chooses the XYZ convention for consistency.
-  BOOST_CHECK_EQUAL( structured->shape(), xdm::makeShape( 129, 129, 383 ) );
+  BOOST_CHECK_EQUAL( structured->shape(), xdm::makeShape( 128, 128, 382 ) );
 
   // Check the geometry.
   xdm::RefPtr< xdmGrid::Geometry > geometry = grid->geometry();

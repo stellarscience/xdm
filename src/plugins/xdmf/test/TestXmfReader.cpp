@@ -66,9 +66,8 @@ xdm::RefPtr< xdmGrid::UniformGrid > build2DGrid() {
 
   // Topology
   {
-    // FIXME: Dimensions below are y-x order.
-    xdm::RefPtr< xdmGrid::RectilinearMesh > topology( new xdmGrid::RectilinearMesh );
-    topology->setShape( xdm::makeShape( kMeshSize[1], kMeshSize[0] ) );
+     xdm::RefPtr< xdmGrid::RectilinearMesh > topology( new xdmGrid::RectilinearMesh );
+    topology->setShape( xdm::makeShape( kMeshSize[0]-1, kMeshSize[1]-1 ) );
     grid->setTopology( topology );
   }
 
@@ -188,7 +187,7 @@ BOOST_AUTO_TEST_CASE( grid2DRoundtrip ) {
   xdm::RefPtr< xdmGrid::StructuredTopology > topology =
     xdm::dynamic_pointer_cast< xdmGrid::StructuredTopology >( grid->topology() );
   BOOST_REQUIRE( topology );
-  BOOST_CHECK_EQUAL( topology->shape(), xdm::makeShape( kMeshSize[0], kMeshSize[1] ) );
+  BOOST_CHECK_EQUAL( topology->shape(), xdm::makeShape( kMeshSize[0]-1, kMeshSize[1]-1 ) );
 
   BOOST_CHECK_EQUAL( grid->geometry()->dimension(), 2 );
   BOOST_CHECK_EQUAL( grid->geometry()->numberOfNodes(), kMeshSize[0] * kMeshSize[1] );

@@ -108,6 +108,15 @@ xdm::RefPtr< xdmGrid::Attribute > UniformGrid::createAttribute(
   // The shape of the attribute array depends on whether we are doing dimension-by-dimension
   // access, as in structured meshes, or node-by-node and element-by-element access, as in
   // unstructured meshes.
+  //
+  // In addition, for structured meshes the dimensions of the attribute array
+  // should be reversed from the geometry or topology dimensions. So if the
+  // geometry is LxMxN, the shape of a node centered attribute should be
+  // NxMxL. Similarly, if the topology dimensions are LxMxN, then the shape of
+  // an element centered attribute should be (N-1)x(M-1)x(L-1). This is because
+  // XDM convention is to have X vary fastest when indexing the nodes or cells
+  // in *any* grid (structured or unstructured) linearly (i.e. using a single
+  // integer index).
   switch ( center ) {
     case Attribute::kNode: {
       xdm::RefPtr< const TensorProductGeometry > tpGeometry =
@@ -116,6 +125,8 @@ xdm::RefPtr< xdmGrid::Attribute > UniformGrid::createAttribute(
         for ( std::size_t dim = 0; dim < mGeometry->dimension(); ++dim ) {
           attributeSpace.push_back( tpGeometry->numberOfCoordinates( dim ) );
         }
+        // Reverse the dimension order.
+        attributeSpace.reverseDimensionOrder();
       } else {
         attributeSpace.push_back( mGeometry->numberOfNodes() );
       }
@@ -126,6 +137,8 @@ xdm::RefPtr< xdmGrid::Attribute > UniformGrid::createAttribute(
         xdm::dynamic_pointer_cast< const StructuredTopology >( mTopology );
       if ( structTopology ) {
         attributeSpace = structTopology->shape();
+        // Reverse the dimensions.
+        attributeSpace.reverseDimensionOrder();
       } else {
         attributeSpace.push_back( mTopology->numberOfElements() );
       }

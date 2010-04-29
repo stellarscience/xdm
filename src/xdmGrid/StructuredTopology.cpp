@@ -77,13 +77,23 @@ xdm::RefPtr< const ElementTopology > StructuredTopology::elementTopology(
 void StructuredTopology::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
   Topology::writeMetadata( xml );
 
+  // Reverse the shape to be consistent with the XDMF specification.
+  xdm::DataShape<> shape = mShape;
+  shape.reverseDimensionOrder();
+  // Add 1 to each dimension to be XDMF compliant: XDMF uses the node
+  // dimensions when specifying the topology dimensions for a structured
+  // topology.
+  for ( xdm::DataShape<>::DimensionIterator dim = shape.begin(); dim != shape.end(); ++dim ) {
+    *dim += 1;
+  }
+
   // write the shape of the topology
   std::stringstream ss;
-  ss << mShape;
+  ss << shape;
   xml.setAttribute( "Dimensions", ss.str() );
 
 
-  unsigned int rank = shape().rank();
+  unsigned int rank = shape.rank();
   switch ( rank ) {
   case 2:
     xml.setAttribute( "TopologyType", "2DRectMesh" );
