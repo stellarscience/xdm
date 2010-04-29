@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE( writeDataset1D ) {
 
   std::vector< int > processData( processSlab.count(0) );
 
-  for ( int i = 0; i < processData.size(); i++ ) {
+  for ( size_t i = 0; i < processData.size(); i++ ) {
     processData[i] = processSlab.start(0) + i;
   }
   xdm::RefPtr< xdm::StructuredArray > processArray( 

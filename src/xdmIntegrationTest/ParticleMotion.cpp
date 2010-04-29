@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
   // distribute the remainder among the first few processes
   std::size_t localParticles = particlesPerProcess;
   std::size_t localStartIndex = globalFixture.localRank() * particlesPerProcess;
-  if ( globalFixture.localRank() < remainingParticles ) {
+  if ( static_cast< size_t >(globalFixture.localRank()) < remainingParticles ) {
     localParticles += 1;
     localStartIndex += globalFixture.localRank();
   } else {

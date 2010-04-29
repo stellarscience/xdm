@@ -118,7 +118,7 @@ BinaryIStream& operator>>( BinaryIStream& istr, DataSelectionInputProxy& v ) {
 //------------------------------------------------------------------------------
 BinaryIStream& operator>>( BinaryIStream& istr, std::string& v ) {
   int c;
-  while( c = istr.get() ) {
+  while( ( c = istr.get() ) ) {
     v.push_back( c );
   }
   return istr;

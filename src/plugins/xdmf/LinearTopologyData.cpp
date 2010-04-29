@@ -49,7 +49,7 @@ xdm::RefPtr< const xdm::StructuredArray > LinearTopologyData::array() const {
       size_t oldSize = mArrayValues->size();
       size_t newSize = mTopology->numberOfElements();
       mutableMe.mArrayValues->resize( newSize );
-      for ( int i = oldSize; i < newSize; i++ ) {
+      for ( size_t i = oldSize; i < newSize; i++ ) {
         (*mutableMe.mArrayValues)[i] = i;
       }
     }

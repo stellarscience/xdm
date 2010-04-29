@@ -36,7 +36,7 @@ namespace {
 
 // RAII object to manage HDF5 type identifiers.
 struct TypeReleaseFunctor {
-  htri_t operator()( hid_t typeId ) {
+  void operator()( hid_t typeId ) {
     H5Tclose( typeId );
   }
 };
@@ -44,7 +44,7 @@ typedef ResourceIdentifier< TypeReleaseFunctor > TypeIdentifier;
 
 // RAII object to manage HDF5 property list identifiers.
 struct PListReleaseFunctor {
-  htri_t operator()( hid_t propertyId ) {
+  void operator()( hid_t propertyId ) {
     if ( propertyId != H5P_DEFAULT ) {
       H5Pclose( propertyId );
     }
