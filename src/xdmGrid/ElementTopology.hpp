@@ -52,6 +52,15 @@ namespace ElementShape {
   };
 }
 
+namespace ElementDimension {
+  enum Type {
+    Point,
+    Curve,
+    Surface,
+    Volume
+  };
+}
+
 class ElementTopology : public xdm::ReferencedObject {
 public:
   inline ElementShape::Type shape() const { return mShape; }
@@ -128,6 +137,8 @@ xdm::RefPtr< const ElementTopology > wedgeFactory(
 xdm::RefPtr< const ElementTopology > hexahedronFactory(
   const std::size_t& order,
   std::string name = "" );
+
+ElementDimension::Type elementDimension( const ElementShape::Type& shape );
 
 ///// Get the ElementTopology that corresponds to an Exodus shape string.
 //xdm::RefPtr< const ElementTopology > exodusElementType(
