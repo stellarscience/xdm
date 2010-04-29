@@ -58,6 +58,15 @@ public:
     mVector() {
   }
 
+  /// Constructor initializes the internal storage vector by making a copy of
+  /// the input vector.
+  VectorStructuredArray( const std::vector< T >& data ) :
+    TypedStructuredArray< T >(),
+    mVector( data ) {
+    TypedStructuredArray< T >::setData( &mVector[0] );
+    TypedStructuredArray< T >::setSize( mVector.size() );
+  }
+
   /// Constructor takes a size and optional initialization value for all
   /// elements. If no initialization is specified, it is filled with a
   /// defaultly constructed value.
