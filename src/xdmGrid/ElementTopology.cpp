@@ -25,6 +25,8 @@
 #include <sstream>
 #include <stdexcept>
 
+#include <xdm/ThrowMacro.hpp>
+
 XDM_GRID_NAMESPACE_BEGIN
 
 namespace {
@@ -251,7 +253,7 @@ xdm::RefPtr< const ElementTopology > curveFactory(
   std::string name ) {
 
   if ( order < 1 || order > 2 ) {
-    throw std::domain_error( "The order is not 1 or 2." );
+    XDM_THROW( std::domain_error( "The order is not 1 or 2." ) );
   }
 
   std::vector< xdm::RefPtr< const ElementTopology > > faces;
@@ -276,7 +278,7 @@ xdm::RefPtr< const ElementTopology > triangleFactory(
   std::string name ) {
 
   if ( order < 1 || order > 2 ) {
-    throw std::domain_error( "The order is not 1 or 2." );
+    XDM_THROW( std::domain_error( "The order is not 1 or 2." ) );
   }
 
   if ( name.size() == 0 ) {
@@ -317,7 +319,7 @@ xdm::RefPtr< const ElementTopology > quadrilateralFactory(
   std::string name ) {
 
   if ( order < 1 || order > 2 ) {
-    throw std::domain_error( "The order is not 1 or 2." );
+    XDM_THROW( std::domain_error( "The order is not 1 or 2." ) );
   }
 
   if ( name.size() == 0 ) {
@@ -360,7 +362,7 @@ xdm::RefPtr< const ElementTopology > tetrahedronFactory(
   std::string name ) {
 
   if ( order < 1 || order > 2 ) {
-    throw std::domain_error( "The order is not 1 or 2." );
+    XDM_THROW( std::domain_error( "The order is not 1 or 2." ) );
   }
 
   if ( name.size() == 0 ) {
@@ -415,7 +417,7 @@ xdm::RefPtr< const ElementTopology > pyramidFactory(
   std::string name ) {
 
   if ( order < 1 || order > 2 ) {
-    throw std::domain_error( "The order is not 1 or 2." );
+    XDM_THROW( std::domain_error( "The order is not 1 or 2." ) );
   }
 
   if ( name.size() == 0 ) {
@@ -476,7 +478,7 @@ xdm::RefPtr< const ElementTopology > wedgeFactory(
   std::string name ) {
 
   if ( order < 1 || order > 2 ) {
-    throw std::domain_error( "The order is not 1 or 2." );
+    XDM_THROW( std::domain_error( "The order is not 1 or 2." ) );
   }
 
   if ( name.size() == 0 ) {
@@ -539,7 +541,7 @@ xdm::RefPtr< const ElementTopology > hexahedronFactory(
   std::string name ) {
 
   if ( order < 1 || order > 2 ) {
-    throw std::domain_error( "The order is not 1 or 2." );
+    XDM_THROW( std::domain_error( "The order is not 1 or 2." ) );
   }
 
   if ( name.size() == 0 ) {
@@ -603,6 +605,25 @@ xdm::RefPtr< const ElementTopology > hexahedronFactory(
     nodes,
     ElementShape::Hexahedron,
     name ) );
+}
+
+ElementDimension::Type elementDimension( const ElementShape::Type& shape ) {
+  switch ( shape ) {
+  case ElementShape::Vertex:
+    return ElementDimension::Point;
+  case ElementShape::Curve:
+    return ElementDimension::Curve;
+  case ElementShape::Triangle:
+  case ElementShape::Quadrilateral:
+    return ElementDimension::Surface;
+  case ElementShape::Tetrahedron:
+  case ElementShape::Pyramid:
+  case ElementShape::Wedge:
+  case ElementShape::Hexahedron:
+    return ElementDimension::Volume;
+  default:
+    XDM_THROW( std::invalid_argument( "Unknown shape." ) );
+  }
 }
 
 //ElementType::Type exodusElementType( std::size_t nodesPerElement, const std::string& elementName ) {
