@@ -144,5 +144,48 @@ BOOST_AUTO_TEST_CASE( compression ) {
   BOOST_CHECK_LT( compressedSize, uncompressedSize / 2 );
 }
 
+BOOST_AUTO_TEST_CASE( typeConversion ) {
+  // Make sure a dataset written out as one type can be read in as another.
+  char const * const kFile = "typeConversion.h5";
+  const size_t kLength = 1;
+
+  xdm::remove( xdm::FileSystemPath( kFile ) );
+
+  // Write out floats.
+  {
+    xdm::VectorStructuredArray< float > floatData( kLength );
+    std::fill( floatData.begin(), floatData.end(), 42.0f );
+    xdmHdf::HdfDataset dataset;
+    dataset.setFile( kFile );
+    dataset.setDataset( "Data" );
+    dataset.initialize( 
+      xdm::primitiveType::kFloat,
+      xdm::makeShape( kLength ),
+      xdm::Dataset::kCreate );
+    dataset.serialize( &floatData, xdm::DataSelectionMap() );
+    dataset.finalize();
+  }
+
+  // Read in doubles.
+  {
+    xdm::VectorStructuredArray< double > doubleData( kLength );
+    xdmHdf::HdfDataset dataset;
+    dataset.setFile( kFile );
+    dataset.setDataset( "Data" );
+    dataset.initialize(
+      xdm::primitiveType::kFloat,
+      xdm::makeShape( kLength ),
+      xdm::Dataset::kRead );
+    dataset.deserialize( &doubleData, xdm::DataSelectionMap() );
+    dataset.finalize();
+
+    BOOST_CHECK_EQUAL( doubleData.dataType(), xdm::primitiveType::kDouble );
+
+    const double answer = 42.0; // double precision.
+    double result = doubleData[0];
+    BOOST_CHECK_EQUAL( result, answer );
+  }
+}
+
 } // namespace
 

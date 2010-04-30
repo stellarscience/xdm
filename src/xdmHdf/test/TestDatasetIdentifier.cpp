@@ -68,17 +68,3 @@ BOOST_AUTO_TEST_CASE( spaceMismatchThrows ) {
     xdm::DataspaceMismatch );
   H5Sclose( badSpace );
 }
-
-BOOST_AUTO_TEST_CASE( typeMismatchThrows ) {
-  // check for exception when type doesn't match
-  Fixture test;
-  xdmHdf::DatasetParameters params;
-  params.parent = test.fileIdentifier;
-  params.name = kDatasetName;
-  params.type = H5T_NATIVE_INT;
-  params.dataspace = test.spaceIdentifier;
-  params.mode = xdm::Dataset::kRead;
-  BOOST_CHECK_THROW(
-    xdmHdf::createDatasetIdentifier( params ),
-    xdm::DatatypeMismatch );
-}

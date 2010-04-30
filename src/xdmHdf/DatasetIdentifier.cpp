@@ -93,14 +93,6 @@ xdm::RefPtr< DatasetIdentifier > openExistingDataset(
       parameterShape ) );
   }
 
-  // make sure the type on disk and the requested type match
-  xdm::RefPtr< TypeIdentifier > datasetType(
-      new TypeIdentifier( H5Dget_type( datasetId->get() ) ) );
-  htri_t equalTypes = H5Tequal( parameters.type, datasetType->get() );
-  if ( equalTypes <= 0 ) {
-    XDM_THROW( xdm::DatatypeMismatch( parameters.name ) );
-  }
-
   // return the existing dataset
   return datasetId;
 }
