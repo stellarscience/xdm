@@ -96,6 +96,9 @@ public:
   xdm::RefPtr< xdmGrid::Time > buildTime( xmlNode * node );
   //@}
 
+  /// Once an Item is constructed, read base class information.
+  void readItem( xdm::RefPtr< xdm::Item > item, xmlNode * node );
+
 private:
   TreeBuilder( const TreeBuilder& );
   TreeBuilder& operator=( const TreeBuilder& );

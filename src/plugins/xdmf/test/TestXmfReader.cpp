@@ -58,6 +58,7 @@ static const double kRange[2][2] = { {0.0, 360.0}, {-90.0, 90.0} };
 
 xdm::RefPtr< xdmGrid::UniformGrid > build2DGrid() {
   xdm::RefPtr< xdmGrid::UniformGrid > grid( new xdmGrid::UniformGrid );
+  grid->setName( "FunctionEvaluationGrid" );
 
   // Time
   {
@@ -179,6 +180,7 @@ BOOST_AUTO_TEST_CASE( grid2DRoundtrip ) {
   BOOST_CHECK_EQUAL( result.seriesSteps(), 1 ); // one timestep in that file
   xdm::RefPtr< xdm::Item > item = result.item();
   BOOST_REQUIRE( item );
+  BOOST_CHECK_EQUAL( item->name(), "FunctionEvaluationGrid" );
 
   xdm::RefPtr< xdmGrid::UniformGrid > grid =
     xdm::dynamic_pointer_cast< xdmGrid::UniformGrid >( item );
