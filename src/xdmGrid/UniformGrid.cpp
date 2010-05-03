@@ -169,6 +169,8 @@ xdm::RefPtr< xdmGrid::Attribute > UniformGrid::createAttribute(
     new xdm::UniformDataItem( dataType, attributeSpace ) );
   attribute->setDataItem( attributeDataItem );
 
+  addAttribute( attribute );
+
   return attribute;
 }
 

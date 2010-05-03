@@ -197,6 +197,8 @@ xdm::RefPtr< Attribute > CollectionGrid::createAttribute(
   attribute->setName( name );
   attribute->setDataItem( attributeDataItem );
 
+  addAttribute( attribute );
+
   return attribute;
 }
 
