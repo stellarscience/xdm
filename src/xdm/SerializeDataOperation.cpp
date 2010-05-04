@@ -33,6 +33,12 @@ SerializeDataOperation::~SerializeDataOperation() {
 
 void SerializeDataOperation::apply( UniformDataItem& udi ) {
   if ( udi.serializationRequired() ) {
+    if ( !udi.data()->isMemoryResident() ) {
+      udi.initializeDataset( Dataset::kRead );
+      udi.deserializeData();
+      udi.finalizeDataset();
+      udi.data()->setNeedsUpdate( true );
+    }
     udi.initializeDataset( mMode );
     udi.serializeData();
     udi.finalizeDataset();

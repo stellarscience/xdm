@@ -263,3 +263,30 @@ BOOST_AUTO_TEST_CASE( temporalCollectionRoundtrip ) {
   BOOST_CHECK_EQUAL( g->time()->value(), 2.0 );
   BOOST_CHECK_EQUAL( data->atLocation< double >( 2, 5 ), 2.0 );
 }
+
+BOOST_AUTO_TEST_CASE( readThenWrite ) {
+  char const * const kReadFileName = "readThenWriteInput.xmf";
+  char const * const kReadFileData = "readThenWriteInput.xmf.h5";
+  char const * const kWriteFileName = "readThenWriteOutput.xmf";
+  char const * const kWriteFileData = "readThenWriteOutput.xmf.h5";
+
+  xdm::remove( xdm::FileSystemPath( kReadFileName ) );
+  xdm::remove( xdm::FileSystemPath( kReadFileData ) );
+  xdm::remove( xdm::FileSystemPath( kWriteFileName ) );
+  xdm::remove( xdm::FileSystemPath( kWriteFileData ) );
+
+  // write the test file.
+  write2DGrid( xdm::FileSystemPath( kReadFileName ) );
+
+  // read the test file.
+  xdmf::XmfReader reader;
+  xdmFormat::ReadResult readResult = reader.readItem( 
+    xdm::FileSystemPath( kReadFileName ) );
+  BOOST_REQUIRE( readResult.item() );
+
+  // write it again.
+  xdmf::XmfWriter writer;
+  writer.open( xdm::FileSystemPath( kWriteFileName ), xdm::Dataset::kCreate );
+  writer.write( readResult.item(), 0 );
+  writer.close();
+}
