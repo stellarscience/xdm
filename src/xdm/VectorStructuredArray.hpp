@@ -60,6 +60,17 @@ public:
 
   /// Constructor initializes the internal storage vector by making a copy of
   /// the input vector.
+  template< typename U >
+  VectorStructuredArray( const std::vector< U >& data ) :
+    TypedStructuredArray< T >(),
+    mVector( data.size() ) {
+    TypedStructuredArray< T >::setData( &mVector[0] );
+    TypedStructuredArray< T >::setSize( mVector.size() );
+    std::copy( data.begin(), data.end(), mVector.begin() );
+  }
+
+  /// Specialization for when the vector to copy from is of the same type as
+  /// this object.
   VectorStructuredArray( const std::vector< T >& data ) :
     TypedStructuredArray< T >(),
     mVector( data ) {
