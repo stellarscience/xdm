@@ -51,6 +51,7 @@ TemporalCollection::~TemporalCollection()
 void TemporalCollection::open() 
 {
   mFileStream.open( mFilename.c_str(), std::ios::out );
+  mFileStream << "<?xml version='1.0'?>\n";
 
   xdm::RefPtr< xdmGrid::Domain > domain( new xdmGrid::Domain );
   xdm::RefPtr< xdmGrid::CollectionGrid > temporalCollection(

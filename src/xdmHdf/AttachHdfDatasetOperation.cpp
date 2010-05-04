@@ -43,6 +43,16 @@ class GroupDatasetForSeriesIndex :
   }
 };
 
+void spacesToUnderscores( std::string& s ) {
+  using std::string;
+  static const char * kSpace = " ";
+  std::size_t current = 0;
+  while( ( current = s.find_first_of( kSpace, current ) ) != string::npos ) {
+    s[current] = '_';
+  }
+}
+    
+
 } // namespace anon
 
 AttachHdfDatasetOperation::AttachHdfDatasetOperation( 
@@ -52,8 +62,10 @@ AttachHdfDatasetOperation::AttachHdfDatasetOperation(
   mGroupBySeriesIndex( groupBySeriesIndex ),
   mCurrentPath() {
   if ( mGroupBySeriesIndex ) {
-    // put a place holder in for the series index top level group.
-    mCurrentPath.push_back( "seriesIndex" );
+    // Put a top level name in for data that is valid for all steps. If grouping
+    // by series index has been requested, this name will be replaced by the
+    // step index later. 
+    mCurrentPath.push_back( "All" );
   }
 }
 
@@ -61,12 +73,14 @@ AttachHdfDatasetOperation::~AttachHdfDatasetOperation() {
 }
 
 void AttachHdfDatasetOperation::apply( xdm::Item& item ) {
-  const std::string& name = item.name();
+  std::string name = item.name();
   if ( name.empty() ) {
-    mCurrentPath.push_back( item.className() );
-  } else {
-    mCurrentPath.push_back( name );
+    name = item.className();
   }
+
+  spacesToUnderscores( name );
+
+  mCurrentPath.push_back( name );
 
   traverse( item );
 
@@ -90,6 +104,8 @@ void AttachHdfDatasetOperation::apply( xdm::UniformDataItem& item ) {
     name = ss.str();
   }
 
+  spacesToUnderscores( name );
+
   // The item has no dataset, build an HDF dataset for the current group path.
   xdm::RefPtr< xdmHdf::HdfDataset > dataset( new xdmHdf::HdfDataset );
   dataset->setFile( mFileName ),
@@ -98,7 +114,7 @@ void AttachHdfDatasetOperation::apply( xdm::UniformDataItem& item ) {
   item.setDataset( dataset );
 
   // If requested, group the datasets by series index.
-  if ( mGroupBySeriesIndex ) {
+  if ( mGroupBySeriesIndex && item.data()->isDynamic() ) {
     dataset->setUpdateCallback( xdm::makeRefPtr( new GroupDatasetForSeriesIndex ) );
   }
 }

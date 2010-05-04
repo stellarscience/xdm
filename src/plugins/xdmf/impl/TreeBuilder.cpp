@@ -28,8 +28,10 @@
 #include <xdmf/impl/UniformDataItem.hpp>
 
 #include <xdm/Algorithm.hpp>
+#include <xdm/ArrayAdapter.hpp>
 #include <xdm/DataShape.hpp>
 #include <xdm/Item.hpp>
+#include <xdm/VectorStructuredArray.hpp>
 
 #include <xdmFormat/IoExcept.hpp>
 
@@ -96,6 +98,18 @@ std::string generateXPathExpr(
   return makeXPathQuery( path );
 }
 
+// Make sure a UniformDataItem read has double precision type.
+void forceDouble( xdm::RefPtr< xdm::UniformDataItem > item ) {
+  if ( item->dataType() != xdm::primitiveType::kDouble ) {
+    item->setDataType( xdm::primitiveType::kDouble );
+    xdm::RefPtr< xdm::StructuredArray > array(
+      xdm::makeVectorStructuredArray( xdm::primitiveType::kDouble ) );
+    xdm::RefPtr< xdm::ArrayAdapter > adapter( new xdm::ArrayAdapter( array ) );
+    adapter->setIsMemoryResident( false );
+    item->setData( adapter );
+  }
+}
+
 } // namespace
 
 // -----------------------------------------------------------------------------
@@ -129,6 +143,7 @@ TreeBuilder::buildUniformDataItem( xmlNode * node ) {
     mSeriesGrids,
     path ) );
   result->read( node, *this );
+  readItem( result, node );
   return result;
 }
 
@@ -168,42 +183,58 @@ xdm::RefPtr< xdmGrid::Geometry > TreeBuilder::buildGeometry( xmlNode * node ) {
   }
   size_t dataItemCount = dataQuery.size();
 
+  // Build the specific Geometry subclass and assign the coordinate values
+  // accordingly.  All coordinate values are turned into doubles as we do
+  // this. This is because XDM assumes we use double precision floating point
+  // values for Geometry coordinate value specifications. It is enough to set
+  // this here because the HDF library will convert from the type that is
+  // actually in the dataset referenced by the uniform DataItem when the data
+  // is loaded later.
+  xdm::RefPtr< xdmGrid::Geometry > result;
   if ( geometryType == INTERLACED_3D ) {
     xdm::RefPtr< xdmGrid::InterlacedGeometry > g(
       new xdmGrid::InterlacedGeometry( 3 ) );
-    g->setCoordinateValues( buildUniformDataItem( dataQuery.node( 0 ) ) );
-    return g;
+    xdm::RefPtr< xdm::UniformDataItem > data = buildUniformDataItem( dataQuery.node( 0 ) );
+    forceDouble( data );
+    g->setCoordinateValues( data );
+    result = g;
   } else if ( geometryType == INTERLACED_2D ) {
     xdm::RefPtr< xdmGrid::InterlacedGeometry > g(
       new xdmGrid::InterlacedGeometry( 2 ) );
-    g->setCoordinateValues( buildUniformDataItem( dataQuery.node( 0 ) ) );
-    return g;
+    xdm::RefPtr< xdm::UniformDataItem > data = buildUniformDataItem( dataQuery.node( 0 ) );
+    forceDouble( data );
+    g->setCoordinateValues( data );
+    result = g;
   } else if ( geometryType == MULTI_ARRAY ) {
     xdm::RefPtr< xdmGrid::MultiArrayGeometry > g(
       new xdmGrid::MultiArrayGeometry );
     // dimension is implicit from the number of DataItems under the Geometry
     g->setDimension( dataItemCount );
     for ( size_t i = 0; i < dataItemCount; ++i ) {
-      g->setCoordinateValues( i, buildUniformDataItem( dataQuery.node( i ) ) );
+      xdm::RefPtr< xdm::UniformDataItem > data = buildUniformDataItem( dataQuery.node( i ) );
+      forceDouble( data );
+      g->setCoordinateValues( i, data );
     }
-    return g;
+    result = g;
   } else if ( geometryType == TENSOR_PRODUCT ) {
     xdm::RefPtr< xdmGrid::TensorProductGeometry > g(
       new xdmGrid::TensorProductGeometry );
     // dimension is implicit from the number of DataItems under the Geometry
     g->setDimension( dataItemCount );
     for ( size_t i = 0; i < dataItemCount; ++i ) {
-      g->setCoordinateValues( i, buildUniformDataItem( dataQuery.node( i ) ) );
+      xdm::RefPtr< xdm::UniformDataItem > data = buildUniformDataItem( dataQuery.node( i ) );
+      forceDouble( data );
+      g->setCoordinateValues( i, data );
     }
-    return g;
+    result = g;
   } else if ( geometryType == ORIGIN_OFFSET ) {
     XDM_THROW( xdmFormat::ReadError( "Origin offset geometry not yet supported." ) );
   } else {
     XDM_THROW( xdmFormat::ReadError( "Unregognized XDMF GeometryType." ) );
   }
 
-  // The if block above didn't return, return an empty pointer.
-  return xdm::RefPtr< xdmGrid::Geometry >();
+  readItem( result, node );
+  return result;
 }
 
 //------------------------------------------------------------------------------
@@ -328,6 +359,7 @@ xdm::RefPtr< xdmGrid::Topology > TreeBuilder::buildTopology( xmlNode * node ) {
     result->appendChild( buildUniformDataItem( connectivityQuery.node( i ) ) );
   }
 
+  readItem( result, node );
   return result;
 }
 
@@ -401,6 +433,7 @@ TreeBuilder::buildAttribute( xmlNode * node ) {
   }
   result->setDataItem( buildUniformDataItem( dataQuery.node( 0 ) ) );
 
+  readItem( result, node );
   return result;
 }
 
@@ -436,6 +469,7 @@ TreeBuilder::buildUniformGrid( xmlNode * node ) {
     result->addAttribute( buildAttribute( attributeQuery.node( i ) ) );
   }
 
+  readItem( result, node );
   return result;
 }
 
@@ -464,6 +498,7 @@ xdm::RefPtr< xdmGrid::Grid > TreeBuilder::buildGrid( xmlNode * node ) {
     result->setTime( buildTime( timeQuery.node( 0 ) ) );
   }
 
+  readItem( result, node );
   return result;
 }
 
@@ -478,6 +513,8 @@ TreeBuilder::buildSpatialCollectionGrid( xmlNode * node ) {
   for ( size_t i = 0; i < childGridQuery.size(); i++ ) {
     result->appendGrid( buildGrid( childGridQuery.node( i ) ) );
   }
+
+  readItem( result, node );
   return result;
 }
 
@@ -485,8 +522,18 @@ TreeBuilder::buildSpatialCollectionGrid( xmlNode * node ) {
 xdm::RefPtr< xdmGrid::Time > TreeBuilder::buildTime( xmlNode * node ) {
   std::string path = generateXPathExpr( mDoc->get(), node, mSeriesGrids->at( 0 ) );
   xdm::RefPtr< Time > result( new Time( mDoc, mSeriesGrids, path ) );
+  readItem( result, node );
   return result;
+}
+
+//------------------------------------------------------------------------------
+void TreeBuilder::readItem( xdm::RefPtr< xdm::Item > item, xmlNode * node ) {
+  XPathQuery nameQuery( mDoc->get(), node, "@Name" );
+  if ( nameQuery.size() > 0 ) {
+    item->setName( nameQuery.textValue( 0 ) );
+  }
 }
 
 } // namespace impl
 } // namespace xdmf
+

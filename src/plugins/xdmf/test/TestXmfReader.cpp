@@ -58,6 +58,7 @@ static const double kRange[2][2] = { {0.0, 360.0}, {-90.0, 90.0} };
 
 xdm::RefPtr< xdmGrid::UniformGrid > build2DGrid() {
   xdm::RefPtr< xdmGrid::UniformGrid > grid( new xdmGrid::UniformGrid );
+  grid->setName( "FunctionEvaluationGrid" );
 
   // Time
   {
@@ -72,16 +73,18 @@ xdm::RefPtr< xdmGrid::UniformGrid > build2DGrid() {
   }
 
   // Geometry
-  xdm::RefPtr< xdm::VectorStructuredArray< double > > meshValues[2];
+  xdm::RefPtr< xdm::VectorStructuredArray< float > > meshValues[2];
   {
     xdm::RefPtr< xdmGrid::TensorProductGeometry > geometry(
       new xdmGrid::TensorProductGeometry( 2 ) );
     for ( int i = 0; i < 2; i++ ) {
+      // Build the Geometry data as single precision to force an up conversion
+      // upon read.
       xdm::RefPtr< xdm::UniformDataItem > dataItem( new xdm::UniformDataItem );
-      dataItem->setDataType( xdm::primitiveType::kDouble );
+      dataItem->setDataType( xdm::primitiveType::kFloat );
       dataItem->setDataspace( xdm::makeShape( kMeshSize[i] ) );
       meshValues[i] = xdm::makeRefPtr(
-        new xdm::VectorStructuredArray< double >( kMeshSize[i] ) );
+        new xdm::VectorStructuredArray< float >( kMeshSize[i] ) );
       for ( int j = 0; j < kMeshSize[i]; j++ ) {
         (*meshValues[i])[j] = kRange[i][0] + j * ( (kRange[i][1] - kRange[i][0]) / kMeshSize[i] );
       }
@@ -179,6 +182,7 @@ BOOST_AUTO_TEST_CASE( grid2DRoundtrip ) {
   BOOST_CHECK_EQUAL( result.seriesSteps(), 1 ); // one timestep in that file
   xdm::RefPtr< xdm::Item > item = result.item();
   BOOST_REQUIRE( item );
+  BOOST_CHECK_EQUAL( item->name(), "FunctionEvaluationGrid" );
 
   xdm::RefPtr< xdmGrid::UniformGrid > grid =
     xdm::dynamic_pointer_cast< xdmGrid::UniformGrid >( item );
