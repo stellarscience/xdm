@@ -35,6 +35,16 @@
 
 XDM_GRID_NAMESPACE_BEGIN
 
+// Code Review 05-24/2010
+//
+// As a user of this class, I had the thought we might want to add something
+// like UniformStructuredGrid, which uses covariant return types to return
+// concrete Geometry and Topology objects, instead of their base class 
+// pointers.  The reason is I found myself needing a dynamic cast to recover
+// the static type of the Geometry and Topology I originally put in.  For
+// the most commonly used combinations of Geometry and Topology sub-types, 
+// it seems like a welcome addition to the interface.
+
 /// Grid type containing the actual geometry and topology for a grid.  This is a
 /// terminal grid node that contains the geometric and topological properties of
 /// a Grid along with any attributes defined on the grid.

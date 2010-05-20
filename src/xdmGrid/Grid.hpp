@@ -36,6 +36,17 @@
 
 XDM_GRID_NAMESPACE_BEGIN
 
+// Code Review 05-24/2010
+//
+// Curtis: Is it necessary for all value passing to occur through xdm::RefPtr,
+// or can we be returning by reference in many (or most) cases?
+//
+// Curtis: Did you consider providing documentation on what this class is 
+// intended to do?  Or maybe just a URL to external docs would be nice.  The
+// main reason I ask this is, based on my limited usage of XDM so far, I don't
+// understand why Grid has both attributes and elements, and when to use one
+// instead of the other.
+
 class Grid : public xdm::Item {
 public:
   Grid();
