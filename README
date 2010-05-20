@@ -47,11 +47,20 @@ CMAKE_INSTALL_PREFIX : (Path) choose a different install path. Default is
 BUILD_TESTING        : (True/False) Enable the library unit tests. Default is 
                        True.
 
+XDM_HDF              : (True/False) Build the HDF5 dataset access library.
+
 XDM_COMMUNICATION    : (True/False) Enable the communication library for MPI
                        enabled datasets.  Default is false.
 
 BUILD_SHARED_LIBS    : (True/False) Build shared libraries instead of static
                        libraries.
+
+XDMF_PLUGIN          : (True/False) Build the plugin for reading and writing
+                       files in the XDMF data format.
+
+EXODUS_PLUGIN        : (True/False) Build the plugin for reading and writing 
+                       ExodusII meshes.
+
 
 Documentation
 -------------
