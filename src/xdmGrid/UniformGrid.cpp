@@ -94,6 +94,14 @@ xdm::RefPtr< const Topology > UniformGrid::topology() const {
   return mTopology;
 }
 
+// Code Review Matter (open): Cruly brace placement
+// Did you consider placing the function body opening curly brace on its own line?
+// For short methods (like above) it is often acceptable to place the opening curly
+// brace on the same line as the method defintion. However, for longer method, and
+// expecially methods with a list of arguments (like below), placing the curly brace on
+// the line following the defintion better separates the definition form the code that follows.
+// -- Todd on 21 May 2010
+
 xdm::RefPtr< xdmGrid::Attribute > UniformGrid::createAttribute(
   Attribute::Center center,
   Attribute::Type type,
