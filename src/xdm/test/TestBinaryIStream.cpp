@@ -40,10 +40,19 @@ public:
   }
 };
 
+// Workaround Run-Time Check Failure #3 from VC8.
+template< typename Type > Type make() {
+  union Workaround {
+    Type type;
+    double double_;
+  };
+  return Workaround().type;
+}
+
 template< typename T > void writeValue() {
   Fixture< T > test;
 
-  T result;
+  T result = make< T >();
   // make sure result isn't the default object
   result = !result;
 

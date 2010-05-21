@@ -64,7 +64,7 @@ public:
 
     if ( loadCount ) {
       // there is more data to load
-      std::copy( &mData[mLocation], &mData[mLocation + loadCount], eback() );
+      std::copy( &mData[mLocation], &mData[mLocation] + loadCount, eback() );
       mLocation += loadCount;
       return true;
     }
