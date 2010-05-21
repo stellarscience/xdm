@@ -101,6 +101,8 @@ xdm::RefPtr< const Topology > UniformGrid::topology() const {
 // expecially methods with a list of arguments (like below), placing the curly brace on
 // the line following the defintion better separates the definition form the code that follows.
 // -- Todd on 21 May 2010
+// I believe our format standards specify K&R style (open bracket on next line).
+// -- Dave Harden on 21 May 2010
 
 xdm::RefPtr< xdmGrid::Attribute > UniformGrid::createAttribute(
   Attribute::Center center,
