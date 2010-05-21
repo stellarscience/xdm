@@ -30,6 +30,12 @@
 
 XDM_GRID_NAMESPACE_BEGIN
 
+// Code Review Matter (open): Terminology
+// Because the term CollectionGrid comes from the XDMF spec and is a little
+// ambiguous without the documentation (at least to me). Would it make sense
+// to mention that in the documentation?
+// -- K. R. Walker on 2010-05-21
+
 /// Grid type that contains other Grids.  The collection can be spatial or
 /// temporal, that is a collection of multiple grids in different locations, or
 /// a collection of grids representing the simulation at different points in
@@ -37,6 +43,11 @@ XDM_GRID_NAMESPACE_BEGIN
 class CollectionGrid : public Grid {
 public:
 
+  // Code Review Matter (open): nested enumeration
+  // Did you consider moving enumerations outside of the classes to remove
+  // any need for a full #include when only a forward declaration is needed?
+  // -- K. R. Walker on 2010-05-21
+  
   /// Enumeration of collection type.  Spatial or temporal.
   enum CollectionType {
     kSpatial = 0,
@@ -48,15 +59,30 @@ public:
 
   XDM_META_ITEM( CollectionGrid );
 
+  // Code Review Matter (open): locked type
+  // If this grid is set up as kSpatial and has data added, would the following
+  // methods make it possible to make a nonsensical object?
+  // In other words, what are the invariants of objects of this class?
+  // -- K. R. Walker on 2010-05-21
+  
   /// Set the collection type for this grid to spatial or temporal.
   /// @see CollectionType
   void setType( CollectionType t );
   CollectionType type() const;
 
+  // Code Review Matter (open): duplicates?
+  // Can a grid be added to the collection more than once?
+  // -- K. R. Walker on 2010-05-21
+  
   /// Append a grid, referencing all of the elements in the grid.
   /// @param grid The grid that will be referenced by this collection.
   void appendGrid( xdm::RefPtr< Grid > grid );
 
+  // Code Review Matter (open): should => must?
+  // What is the behavior when the indicies are not unique?
+  // Is this a precondition that, when violated, invokes undefined behavior?
+  // -- K. R. Walker on 2010-05-21
+  
   /// Append a grid, referencing only a subset of the elements.
   /// @param grid The grid that will be referenced by this collection.
   /// @param elementIndices An integer array containing the element indices for the elements
@@ -92,6 +118,13 @@ public:
     xdm::RefPtr< xdm::UniformDataItem > elementIndices,
     xdm::RefPtr< xdm::UniformDataItem > edgeIndices );
 
+  // Code Review Matter (open): center != Attribute::Center::kNode
+  // Should this be documented as a @pre condition?
+  // What happens if this is violated since it is a change in behavior
+  // from the base class? Null Attribute? How might a client determine why
+  // an attribue wasn't created when working with the base class interface?
+  // -- K. R. Walker on 2010-05-21
+  
   /// Create an attribute with the proper dimensions. This will initialize an Attribute holding
   /// onto a UniformDataItem that has the correct array shape. The attribute will be attached
   /// to the grid. However, the UniformDataItem will not have any data (MemoryAdapter); that
@@ -126,6 +159,15 @@ private:
     kEdge
   };
 
+  // Code Review Matter (open): member documentation
+  // Could these members be documented so a maintenance programmer would
+  // have a smaller barrier to entry?
+  // -- K. R. Walker on 2010-05-21
+  
+  // Code Review Matter (open): parallel vectors
+  // Are these vectors parallel? (v1[2] corresponds to v3[2])
+  // -- K. R. Walker on 2010-05-21
+  
   std::vector< xdm::RefPtr< xdmGrid::Grid > > mGrids;
   std::vector< xdm::RefPtr< xdm::UniformDataItem > > mElementIndices;
   std::vector< xdm::RefPtr< xdm::UniformDataItem > > mFaceEdgeIndices;

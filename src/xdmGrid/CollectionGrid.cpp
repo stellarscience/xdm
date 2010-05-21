@@ -74,6 +74,10 @@ void CollectionGrid::appendGrid(
   xdm::RefPtr< Grid > grid,
   xdm::RefPtr< xdm::UniformDataItem > elementIndices ) {
 
+  // Code Review Matter (open): assert vs exception
+  // Did you consider throwing an exception instead of asserting?
+  // -- K. R. Walker on 2010-05-21
+  
   assert( elementIndices );
   if ( elementIndices->dataspace().rank() != 1 ) {
     XDM_THROW( std::invalid_argument( "The rank of the element indices array is not 1." ) );
@@ -95,6 +99,12 @@ void CollectionGrid::appendGridFaces(
   xdm::RefPtr< xdm::UniformDataItem > elementIndices,
   xdm::RefPtr< xdm::UniformDataItem > faceIndices ) {
 
+  // Code Review Matter (open): single-condition assert
+  // Did you consider assert( elementIndices ); assert( faceIndices ); so that
+  // at debug-time, the stringified assertion message will contain information
+  // about specifically which assertion failed?
+  // -- K. R. Walker on 2010-05-21
+  
   assert( elementIndices && faceIndices );
   if ( elementIndices->dataspace().rank() != 1 ) {
     XDM_THROW( std::invalid_argument( "The rank of the element indices array is not 1." ) );
@@ -286,7 +296,7 @@ std::pair< std::size_t, std::size_t > CollectionGrid::findGrid( const std::size_
   // supplied to this method? Would an exception be more appropriate?
   // Even if triggering this event were only possible via a programming error, wouldn't
   // an exectption and smoother application shutdown be destired over an assert crash?
-  // -- Todd on 21 May 2010
+  // -- Todd on 2010-05-21
   assert( found != mElementOffsets.end() );
   std::size_t gridIndex = found - mElementOffsets.begin();
   std::size_t offsetIndex = elementIndex;
@@ -302,7 +312,7 @@ void CollectionGrid::updateOffsets()
 {
   // Code Review Matter (open): Code comments
   // I don't quite follow the logic of this method, could it use more comments?
-  // -- Todd on 21 May 2010
+  // -- Todd on 2010-05-21
 
   mElementOffsets.clear();
   for ( std::size_t arrayIndex = 0; arrayIndex < mElementIndices.size(); ++arrayIndex ) {

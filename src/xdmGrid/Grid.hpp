@@ -26,8 +26,8 @@
 
 #include <xdm/Forward.hpp>
 #include <xdm/Item.hpp>
-// Code Review Matter (open): Foward declaration
-// ItemVisitor does not seem to be used. Would a foraward declaration be sufficient?
+// Code Review Matter (open): Forward declaration
+// ItemVisitor does not seem to be used. Would a forward declaration be sufficient?
 // -- Todd on 21 May 2010
 #include <xdm/ItemVisitor.hpp>
 #include <xdm/PrimitiveType.hpp>
@@ -49,20 +49,22 @@
 // If the library must support platforms that don't support namespaces, and since this could
 // possibley pollute the global namesapce with names that are likely to conflict (like Item),
 // did you consider using a library prefixes instead (XdmItem)?
-// -- Todd on 21 May 2010
+// -- Todd on 2010-05-21
 
 XDM_GRID_NAMESPACE_BEGIN
 
-// Code Review 05-24/2010
-//
-// Curtis: Is it necessary for all value passing to occur through xdm::RefPtr,
+// Code Review Matter (open): xdm::RefPtr usage
+// Is it necessary for all value passing to occur through xdm::RefPtr,
 // or can we be returning by reference in many (or most) cases?
-//
-// Curtis: Did you consider providing documentation on what this class is 
+// -- Curtis Cooper on 2010-05-20
+
+// Code Review Matter (open): documentation
+// Did you consider providing documentation on what this class is 
 // intended to do?  Or maybe just a URL to external docs would be nice.  The
 // main reason I ask this is, based on my limited usage of XDM so far, I don't
 // understand why Grid has both attributes and elements, and when to use one
 // instead of the other.
+// -- Curtis Cooper on 2010-05-20
 
 class Grid : public xdm::Item {
 public:
@@ -72,25 +74,25 @@ public:
   XDM_META_ITEM( Grid );
 
   // Code Review Matter (open): Returning by value
-  // Did you consider returning by "const xdm::RefPtr< type >&" this would still result
-  // in a copy if the cleint code was not change, but may be a good standard practice
-  // to avoid unnesisary copies.
-  // -- Todd on 21 May 2010
+  // Did you consider returning by "const xdm::RefPtr< Type >&"? This would still result
+  // in a copy if the client code was not changed, but may be good practice
+  // to avoid unnecessary copies.
+  // -- Todd on 2010-05-21
 
   // Code Review Matter (open): Access to private data
-  // Is there ever at time (pun intended) when it is appropriate for a client to
+  // Is there ever a time (pun intended) when it is appropriate for a client to
   // have direct access to this member data?
   // Did you consider only providing const access and the setter?
-  // -- Todd on 21 May 2010
+  // -- Todd on 2010-05-21
 
   xdm::RefPtr< Time > time();
   xdm::RefPtr< const Time > time() const;
   void setTime( xdm::RefPtr< Time > time );
 
   // Code Review Matter (open): Passing by value
-  // Did you consider passing by const "const xdm::RefPtr< type >&" this would eliminate
-  // one unnessiary copy opeartion.
-  // -- Todd on 21 May 2010
+  // Did you consider passing by "const xdm::RefPtr< Type >&"?
+  // This would eliminate one unnecessary copy operation.
+  // -- Todd on 2010-05-21
 
   /// Add an attribute definition to the grid.
   void addAttribute( xdm::RefPtr< Attribute > attribute );
@@ -106,6 +108,16 @@ public:
   /// Get the number of attributes.
   std::size_t numberOfAttributes() const;
 
+  // Code Review Matter (open): Forward Attribute
+  // If the Attribute::Center and Attribute::Type enums were moved out of
+  // class Attribute, would it be possible to forward class Attribute?
+  // -- K. R. Walker on 2010-05-21
+
+  // Code Review Matter (open): xdm::primitiveType::Value
+  // Would xdm::LanguagePrimitive::Type be a more descriptive name that might
+  // more closely follow the coding standards?
+  // -- K. R. Walker on 2010-05-21
+  
   /// Create an attribute with the proper dimensions. This will initialize an Attribute holding
   /// onto a UniformDataItem that has the correct array shape. The attribute will be attached
   /// to the grid. However, the UniformDataItem will not have any data (MemoryAdapter); that

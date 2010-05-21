@@ -37,6 +37,9 @@
 
 namespace {
 
+// Code Review Matter (open): g and t
+// -- K. R. Walker on 2010-05-21
+
 // A helper class for accessing elements from the geometry and topology.
 class SimpleElementImp : public xdmGrid::ElementSharedConnectivityLookup {
 public:
@@ -100,9 +103,9 @@ xdm::RefPtr< const Topology > UniformGrid::topology() const {
 // brace on the same line as the method defintion. However, for longer method, and
 // expecially methods with a list of arguments (like below), placing the curly brace on
 // the line following the defintion better separates the definition form the code that follows.
-// -- Todd on 21 May 2010
+// -- Todd on 2010-05-21
 // I believe our format standards specify K&R style (open bracket on next line).
-// -- Dave Harden on 21 May 2010
+// -- Dave Harden on 2010-05-21
 
 xdm::RefPtr< xdmGrid::Attribute > UniformGrid::createAttribute(
   Attribute::Center center,
@@ -160,6 +163,10 @@ xdm::RefPtr< xdmGrid::Attribute > UniformGrid::createAttribute(
       break;
   }
 
+  // Code Review Matter (open): 3-vector?
+  // Are all Attribute::kVectors 3-vectors? Is this a magic number?
+  // -- K. R. Walker on 2010-05-21
+  
   // If the type is not a scalar, then add another dimension to the shape.
   switch( type ) {
     case Attribute::kScalar:
@@ -190,6 +197,17 @@ std::size_t UniformGrid::numberOfElements() const {
 
 Element UniformGrid::element( const std::size_t& elementIndex ) const
 {
+  // Code Review Matter (open): invoking undefined behavior?
+  // If this object had been explicitly declared as const, the casting-away
+  // of const below invokes undefined behavior.
+  //
+  // "If the object really is constant, the compiler may have put it in ROM 
+  // or write-protected memory. Trying to modify such an object may lead to 
+  // a program crash." -- <https://www.securecoding.cert.org/confluence/display/cplusplus/EXP35-CPP.+Do+not+cast+away+a+const+qualification>
+  //
+  // If this can never happen, it would be nice to have it documented here
+  // clearly why it can never happen.
+  // -- K. R. Walker on 2010-05-21
   if ( ! mElementImp ) {
     UniformGrid& mutableMe = const_cast< UniformGrid& >( *this );
     mutableMe.mElementImp =

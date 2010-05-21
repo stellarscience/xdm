@@ -21,6 +21,10 @@
 #ifndef xdmGrid_UniformGrid_hpp
 #define xdmGrid_UniformGrid_hpp
 
+// Code Review Matter (open): Forward declarations
+// Geometry appears to be only used in name, could it be forward declared?
+// -- K. R. Walker on 2010-05-21
+
 #include <xdmGrid/Geometry.hpp>
 #include <xdmGrid/Forward.hpp>
 #include <xdmGrid/Grid.hpp>
@@ -35,8 +39,7 @@
 
 XDM_GRID_NAMESPACE_BEGIN
 
-// Code Review 05-24/2010
-//
+// Code Review Matter (open): UniformStructuredGrid
 // As a user of this class, I had the thought we might want to add something
 // like UniformStructuredGrid, which uses covariant return types to return
 // concrete Geometry and Topology objects, instead of their base class 
@@ -44,6 +47,11 @@ XDM_GRID_NAMESPACE_BEGIN
 // the static type of the Geometry and Topology I originally put in.  For
 // the most commonly used combinations of Geometry and Topology sub-types, 
 // it seems like a welcome addition to the interface.
+// -- Curtis Cooper on 2010-05-20
+// One wouldn't be able to use xdm::RefPtr as part of the covariant return,
+// so one would have to use the intrusive property of ReferencedObject
+// to recover the RefPtr.
+// -- K. R. Walker on 2010-05-21
 
 /// Grid type containing the actual geometry and topology for a grid.  This is a
 /// terminal grid node that contains the geometric and topological properties of
@@ -55,6 +63,9 @@ public:
 
   XDM_META_ITEM( UniformGrid );
 
+  // Code Review Matter (open): geo and topo
+  // -- K. R. Walker on 2010-05-21
+  
   void setGeometry( xdm::RefPtr< Geometry > geo );
   xdm::RefPtr< Geometry > geometry();
   xdm::RefPtr< const Geometry > geometry() const;
