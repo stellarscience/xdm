@@ -35,7 +35,39 @@ XDM_NAMESPACE_BEGIN
 template< typename T > class VectorRef;
 template< typename T > class ConstVectorRef;
 template< typename T > class VectorRefImp;
-template< typename T > class VectorBase;
+
+/// VectorBase is the base class for VectorRef and ConstVectorRef. It only allows const access.
+template< typename T >
+class VectorBase {
+public:
+  /// @param imp The Impementation instance that will be used for this vector.
+  /// @param index The index of this particular vector in the underlying collection of vectors.
+  VectorBase( RefPtr< VectorRefImp< T > > imp, std::size_t index ) :
+    mImp( imp ), mIndex( index ) {}
+
+  const T& operator[]( std::size_t i ) const {
+    return mImp->at( mIndex, i );
+  }
+
+  /// @returns The number of elements in the vector.
+  std::size_t size() const {
+    return mImp->size();
+  }
+
+protected:
+  /// Derived class can construct from a base class reference.
+  VectorBase( const VectorBase< T >& other ) :
+    mImp( other.mImp ), mIndex( other.mIndex ) {}
+
+  static void copyReference( const VectorBase< T >& source, VectorBase< T >& dest ) {
+    dest.mImp = source.mImp;
+    dest.mIndex = source.mIndex;
+  }
+
+private:
+  RefPtr< VectorRefImp< T > > mImp;
+  std::size_t mIndex;
+};
 
 /// A VectorRef is a thin object that refers to a set of data and provides vector-like
 /// data access semantics with operator[]. It provides a vector-like "view" of a set of
@@ -111,39 +143,6 @@ private:
   // Assignment of a ConstVectorRef is not allowed.
   ConstVectorRef< T >& operator=( const ConstVectorRef< T >& other );
   ConstVectorRef< T >& operator=( const VectorRef< T >& other );
-};
-
-/// VectorBase is the base class for VectorRef and ConstVectorRef. It only allows const access.
-template< typename T >
-class VectorBase {
-public:
-  /// @param imp The Impementation instance that will be used for this vector.
-  /// @param index The index of this particular vector in the underlying collection of vectors.
-  VectorBase( RefPtr< VectorRefImp< T > > imp, std::size_t index ) :
-    mImp( imp ), mIndex( index ) {}
-
-  const T& operator[]( std::size_t i ) const {
-    return mImp->at( mIndex, i );
-  }
-
-  /// @returns The number of elements in the vector.
-  std::size_t size() const {
-    return mImp->size();
-  }
-
-protected:
-  /// Derived class can construct from a base class reference.
-  VectorBase( const VectorBase< T >& other ) :
-    mImp( other.mImp ), mIndex( other.mIndex ) {}
-
-  static void copyReference( const VectorBase< T >& source, VectorBase< T >& dest ) {
-    dest.mImp = source.mImp;
-    dest.mIndex = source.mIndex;
-  }
-
-private:
-  RefPtr< VectorRefImp< T > > mImp;
-  std::size_t mIndex;
 };
 
 /// The base Impementation class held by VectorRefs.
@@ -267,7 +266,7 @@ const T& TensorProductArraysImp< T >::at( std::size_t baseIndex, std::size_t i )
   // stick with it. Following XDMF, let's say z is always considered to be
   // the slowest varying dimension, y next, x fastest.
   std::size_t blockSize = 1;
-  std::size_t location[ mSize ];
+  std::vector< std::size_t > location( mSize );
   for ( std::size_t dimension = 0; dimension < mSize; ++dimension ) {
     location[ dimension ] = baseIndex / blockSize % mAxisSizes[ dimension ];
     blockSize *= mAxisSizes[ dimension ];
