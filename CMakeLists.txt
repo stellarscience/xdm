@@ -30,9 +30,11 @@ if( BUILD_TESTING )
   find_package( Boost REQUIRED COMPONENTS unit_test_framework )
 endif()
 
-if ( NOT CMAKE_BUILD_TYPE )
-  message( STATUS "No build type specified -- default is Release" )
-  set( CMAKE_BUILD_TYPE Release CACHE STRING "Default build type" FORCE )
+if ( NOT CMAKE_CONFIGURATION_TYPES )
+  if ( NOT CMAKE_BUILD_TYPE )
+    message( STATUS "No build type specified -- default is Release" )
+    set( CMAKE_BUILD_TYPE Release CACHE STRING "Default build type" FORCE )
+  endif()
 endif()
 
 # Set the compiler flags required for a coverage build
