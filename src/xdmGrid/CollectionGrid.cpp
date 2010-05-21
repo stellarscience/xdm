@@ -281,6 +281,12 @@ std::pair< std::size_t, std::size_t > CollectionGrid::findGrid( const std::size_
 
   std::vector< std::size_t >::const_iterator found =
     std::upper_bound( mElementOffsets.begin(), mElementOffsets.end(), elementIndex );
+  // Code Review Matter (open): assert vs exception
+  // Is it possible for a data driven process to cause an invalid elementIndex to be
+  // supplied to this method? Would an exception be more appropriate?
+  // Even if triggering this event were only possible via a programming error, wouldn't
+  // an exectption and smoother application shutdown be destired over an assert crash?
+  // -- Todd on 21 May 2010
   assert( found != mElementOffsets.end() );
   std::size_t gridIndex = found - mElementOffsets.begin();
   std::size_t offsetIndex = elementIndex;
@@ -292,7 +298,11 @@ std::pair< std::size_t, std::size_t > CollectionGrid::findGrid( const std::size_
     offsetIndex );
 }
 
-void CollectionGrid::updateOffsets() {
+void CollectionGrid::updateOffsets()
+{
+  // Code Review Matter (open): Code comments
+  // I don't quite follow the logic of this method, could it use more comments?
+  // -- Todd on 21 May 2010
 
   mElementOffsets.clear();
   for ( std::size_t arrayIndex = 0; arrayIndex < mElementIndices.size(); ++arrayIndex ) {
