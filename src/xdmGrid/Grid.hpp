@@ -94,6 +94,15 @@ public:
   // This would eliminate one unnecessary copy operation.
   // -- Todd on 2010-05-21
 
+  // Code Review Matter (open): Setters
+  // Attributes are added then accessed by index,
+  // which is determined by add order. Who keeps track of 
+  // indexing? Is there any use for a setAttribute( attribute, index )
+  // function to overwire current entries? Current implementation
+  // is geared towards static grids. Any plans for dynamic grids in
+  // the future?
+  // Brian on 2010-05-23
+
   /// Add an attribute definition to the grid.
   void addAttribute( xdm::RefPtr< Attribute > attribute );
   /// Get an attribute by its index.
