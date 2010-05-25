@@ -28,7 +28,7 @@
 #include <algorithm>
 #include <sstream>
 
-XDM_HDF_NAMESPACE_BEGIN
+namespace xdmHdf {
 
 namespace {
 
@@ -119,5 +119,5 @@ void AttachHdfDatasetOperation::apply( xdm::UniformDataItem& item ) {
   }
 }
 
-XDM_HDF_NAMESPACE_END
+} // namespace xdmHdf
 

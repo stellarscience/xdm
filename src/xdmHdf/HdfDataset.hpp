@@ -27,9 +27,9 @@
 #include <memory>
 #include <string>
 
-#include <xdmHdf/NamespaceMacro.hpp>
 
-XDM_HDF_NAMESPACE_BEGIN
+
+namespace xdmHdf {
 
 /// Path of groups identifying a location in the HDF file.
 typedef std::deque< std::string > GroupPath;
@@ -157,7 +157,7 @@ bool parseDatasetInfo(
   GroupPath& outPath,
   std::string& outDataset );
 
-XDM_HDF_NAMESPACE_END
+} // namespace xdmHdf
 
 #endif // xdmHdf_HdfDataset_hpp
 

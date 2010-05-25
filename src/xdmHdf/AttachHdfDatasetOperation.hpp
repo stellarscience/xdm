@@ -28,9 +28,9 @@
 #include <string>
 #include <vector>
 
-#include <xdmHdf/NamespaceMacro.hpp>
 
-XDM_HDF_NAMESPACE_BEGIN
+
+namespace xdmHdf {
 
 /// Operation on the XDM tree to attach an HDF dataset to all UniformDataItems.
 /// Applying this visitor to an XDM tree will force all UniformDataItems to
@@ -65,6 +65,6 @@ private:
   GroupPath mCurrentPath;
 };
 
-XDM_HDF_NAMESPACE_END
+} // namespace xdmHdf
 
 #endif // xdmHdf_AttachHdfDatasetOperation_hpp

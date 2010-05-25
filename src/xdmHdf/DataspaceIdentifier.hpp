@@ -30,9 +30,9 @@
 
 #include <string>
 
-#include <xdmHdf/NamespaceMacro.hpp>
 
-XDM_HDF_NAMESPACE_BEGIN
+
+namespace xdmHdf {
 
 class DataspaceReleaseFunctor {
 public:
@@ -48,7 +48,7 @@ typedef ResourceIdentifier< DataspaceReleaseFunctor > DataspaceIdentifier;
 xdm::RefPtr< DataspaceIdentifier > createDataspaceIdentifier(
   const xdm::DataShape<>& shape );
 
-XDM_HDF_NAMESPACE_END
+} // namespace xdmHdf
 
 #endif // xdmHdf_DataspaceIdentifier_hpp
 

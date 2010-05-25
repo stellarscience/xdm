@@ -30,7 +30,7 @@
 #include <functional>
 #include <stdexcept>
 
-XDM_HDF_NAMESPACE_BEGIN
+namespace xdmHdf {
 
 namespace {
 
@@ -193,5 +193,5 @@ xdm::RefPtr< DatasetIdentifier > createDatasetIdentifier(
 
 }
 
-XDM_HDF_NAMESPACE_END
+} // namespace xdmHdf
 

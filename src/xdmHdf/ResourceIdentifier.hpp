@@ -25,9 +25,9 @@
 
 #include <hdf5.h>
 
-#include <xdmHdf/NamespaceMacro.hpp>
 
-XDM_HDF_NAMESPACE_BEGIN
+
+namespace xdmHdf {
 
 /// Reference counted class to manage HDF resources.  When the final reference
 /// is destroyed, the resource is released according to the policy specified by
@@ -80,7 +80,7 @@ public:
   }
 };
 
-XDM_HDF_NAMESPACE_END
+} // namespace xdmHdf
 
 #endif // xdmHdf_ResourceIdentifier_hpp
 

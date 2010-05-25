@@ -29,7 +29,7 @@
 
 #include <cassert>
 
-XDM_HDF_NAMESPACE_BEGIN
+namespace xdmHdf {
 
 std::vector< const hsize_t* > SelectionVisitor::sPointerBuffer;
 
@@ -92,5 +92,5 @@ void SelectionVisitor::apply( const xdm::HyperslabDataSelection& selection ) {
     NULL );
 }
 
-XDM_HDF_NAMESPACE_END
+} // namespace xdmHdf
 

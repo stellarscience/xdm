@@ -29,9 +29,9 @@
 #include <map>
 #include <string>
 
-#include <xdmHdf/NamespaceMacro.hpp>
 
-XDM_HDF_NAMESPACE_BEGIN
+
+namespace xdmHdf {
 
 /// Singleton registry to hold references to an HDF file identifier.  According
 /// to the HDF documentation, a single application should open a file only once.
@@ -62,7 +62,7 @@ private:
   IdentifierMapping mIdentifierMapping;
 };
 
-XDM_HDF_NAMESPACE_END
+} // namespace xdmHdf
 
 #endif // xdmHdf_FileIdentifierRegistry_hpp
 

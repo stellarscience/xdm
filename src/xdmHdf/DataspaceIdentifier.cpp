@@ -20,7 +20,7 @@
 //------------------------------------------------------------------------------
 #include <xdmHdf/DataspaceIdentifier.hpp>
 
-XDM_HDF_NAMESPACE_BEGIN
+namespace xdmHdf {
 
 xdm::RefPtr< DataspaceIdentifier > createDataspaceIdentifier(
   const xdm::DataShape<>& shape ) {
@@ -33,5 +33,5 @@ xdm::RefPtr< DataspaceIdentifier > createDataspaceIdentifier(
     new DataspaceIdentifier( identifier ) );
 }
 
-XDM_HDF_NAMESPACE_END
+} // namespace xdmHdf
 

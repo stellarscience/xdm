@@ -20,7 +20,7 @@
 //------------------------------------------------------------------------------
 #include <xdmHdf/GroupIdentifier.hpp>
 
-XDM_HDF_NAMESPACE_BEGIN
+namespace xdmHdf {
 
 xdm::RefPtr< GroupIdentifier > createGroupIdentifier(
   hid_t parent, const std::string& name ) {
@@ -41,5 +41,5 @@ xdm::RefPtr< GroupIdentifier > createGroupIdentifier(
   return xdm::RefPtr< GroupIdentifier >( new GroupIdentifier( groupId ) );
 }
 
-XDM_HDF_NAMESPACE_END
+} // namespace xdmHdf
 

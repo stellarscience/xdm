@@ -23,12 +23,12 @@
 
 #include <hdf5.h>
 
-XDM_HDF_NAMESPACE_BEGIN
+namespace xdmHdf {
 
 xdm::RefPtr< FileIdentifier >
 createFileIdentifier( const std::string& filename ) {
   return FileIdentifierRegistry::instance()->findOrCreateIdentifier( filename );
 }
 
-XDM_HDF_NAMESPACE_END
+} // namespace xdmHdf
 

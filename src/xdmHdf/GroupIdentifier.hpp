@@ -29,9 +29,9 @@
 
 #include <string>
 
-#include <xdmHdf/NamespaceMacro.hpp>
 
-XDM_HDF_NAMESPACE_BEGIN
+
+namespace xdmHdf {
 
 class GroupReleaseFunctor {
 public:
@@ -45,7 +45,7 @@ typedef ResourceIdentifier< GroupReleaseFunctor > GroupIdentifier;
 xdm::RefPtr< GroupIdentifier > createGroupIdentifier( 
   hid_t parent, const std::string& name );
 
-XDM_HDF_NAMESPACE_END
+} // namespace xdmHdf
 
 #endif // xdmHdf_GroupIdentifier_hpp
 

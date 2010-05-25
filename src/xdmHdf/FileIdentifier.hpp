@@ -29,9 +29,9 @@
 
 #include <string>
 
-#include <xdmHdf/NamespaceMacro.hpp>
 
-XDM_HDF_NAMESPACE_BEGIN
+
+namespace xdmHdf {
 
 class FileIdentifierReleaseFunctor {
 public:
@@ -46,7 +46,7 @@ typedef ResourceIdentifier< FileIdentifierReleaseFunctor > FileIdentifier;
 xdm::RefPtr< FileIdentifier > 
 createFileIdentifier( const std::string& filename );
 
-XDM_HDF_NAMESPACE_END
+} // namespace xdmHdf
 
 #endif // xdmHdf_FileIdentifier_hpp
 

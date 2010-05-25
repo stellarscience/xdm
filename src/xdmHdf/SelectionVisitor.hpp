@@ -27,7 +27,7 @@
 
 #include <vector>
 
-#include <xdmHdf/NamespaceMacro.hpp>
+
 
 namespace xdm {
   class AllDataSelection;
@@ -35,7 +35,7 @@ namespace xdm {
   class HyperslabDataSelection;
 } // namespace xdm
 
-XDM_HDF_NAMESPACE_BEGIN
+namespace xdmHdf {
 
 class SelectionVisitor : public xdm::DataSelectionVisitor {
 private:
@@ -62,7 +62,7 @@ public:
   virtual void apply( const xdm::HyperslabDataSelection& selection );
 };
 
-XDM_HDF_NAMESPACE_END
+} // namespace xdmHdf
 
 #endif // xdmHdf_SelectionVisitor_hpp
 

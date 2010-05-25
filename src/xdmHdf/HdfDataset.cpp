@@ -40,7 +40,7 @@
 
 #include <hdf5.h>
 
-XDM_HDF_NAMESPACE_BEGIN
+namespace xdmHdf {
 
 namespace {
 
@@ -391,5 +391,5 @@ bool parseDatasetInfo(
   return true;
 }
 
-XDM_HDF_NAMESPACE_END
+} // namespace xdmHdf
 

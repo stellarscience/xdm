@@ -28,7 +28,7 @@
 
 #include <sys/stat.h>
 
-XDM_HDF_NAMESPACE_BEGIN
+namespace xdmHdf {
 
 xdm::RefPtr< FileIdentifierRegistry > FileIdentifierRegistry::sInstance;
 
@@ -84,5 +84,5 @@ void FileIdentifierRegistry::closeAllIdentifiers() {
   mIdentifierMapping.clear();
 }
 
-XDM_HDF_NAMESPACE_END
+} // namespace xdmHdf
 
