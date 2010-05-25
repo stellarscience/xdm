@@ -27,9 +27,9 @@
 
 #include <map>
 
-#include <xdmf/NamespaceMacro.hpp>
 
-XDMF_NAMESPACE_BEGIN
+
+namespace xdmf {
 
 /// Implementation of xdmFormat::Writer for writing XDMF files.
 class XmfWriter : public xdmFormat::Writer {
@@ -49,6 +49,6 @@ private:
   xdm::FileSystemPath mCurrentFilePath;
 };
 
-XDMF_NAMESPACE_END
+} // namespace xdmf
 
 #endif // xdmf_XmfWriter_hpp

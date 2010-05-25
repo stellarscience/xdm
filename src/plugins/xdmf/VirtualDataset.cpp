@@ -38,7 +38,7 @@
 #include <fstream>
 #include <sstream>
 
-XDMF_NAMESPACE_BEGIN
+namespace xdmf {
 
 VirtualDataset::VirtualDataset( 
   const std::string& metadataBaseName,
@@ -102,5 +102,5 @@ void VirtualDataset::close()
 {
 }
 
-XDMF_NAMESPACE_END
+} // namespace xdmf
 

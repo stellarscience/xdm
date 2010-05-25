@@ -32,7 +32,7 @@
 #include <xdmGrid/Domain.hpp>
 #include <xdmGrid/CollectionGrid.hpp>
 
-XDMF_NAMESPACE_BEGIN
+namespace xdmf {
 
 TemporalCollection::TemporalCollection( 
   const std::string& metadataFile,
@@ -91,5 +91,5 @@ void TemporalCollection::close()
   mXmlStream.closeStream();
 }
 
-XDMF_NAMESPACE_END
+} // namespace xdmf
 

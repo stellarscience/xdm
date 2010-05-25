@@ -34,7 +34,7 @@
 
 #include <stdexcept>
 
-XDMF_NAMESPACE_BEGIN
+namespace xdmf {
 
 XmfWriter::XmfWriter() :
   xdmFormat::Writer(),
@@ -85,4 +85,4 @@ void XmfWriter::close() {
   mSeries.reset();
 }
 
-XDMF_NAMESPACE_END
+} // namespace xdmf

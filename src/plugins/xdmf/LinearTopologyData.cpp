@@ -27,7 +27,7 @@
 #include <xdm/UniformDataItem.hpp>
 #include <xdm/VectorStructuredArray.hpp>
 
-XDMF_NAMESPACE_BEGIN
+namespace xdmf {
 
 LinearTopologyData::LinearTopologyData( xdm::RefPtr< xdmGrid::Polyvertex > topology ):
   MemoryAdapter( true ),
@@ -77,4 +77,4 @@ xdm::RefPtr< xdm::UniformDataItem > createLinearTopologyUniformDataItem(
   return result;
 }
 
-XDMF_NAMESPACE_END
+} // namespace xdmf

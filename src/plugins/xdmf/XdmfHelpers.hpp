@@ -25,19 +25,19 @@
 
 #include <string>
 
-#include <xdmf/NamespaceMacro.hpp>
+
 
 namespace xdm {
   class XmlObject;
 } // namespace xdm
 
-XDMF_NAMESPACE_BEGIN
+namespace xdmf {
 
 /// Create the root XDMF xml object that must be the root of any XDMF tree.
 xdm::RefPtr< xdm::XmlObject > createXdmfRoot( 
   const std::string& version = "2.1" );
 
-XDMF_NAMESPACE_END
+} // namespace xdmf
 
 #endif // xdmf_XdmfHelpers_hpp
 

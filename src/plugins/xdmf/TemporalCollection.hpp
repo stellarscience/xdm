@@ -28,9 +28,9 @@
 #include <fstream>
 #include <string>
 
-#include <xdmf/NamespaceMacro.hpp>
 
-XDMF_NAMESPACE_BEGIN
+
+namespace xdmf {
 
 /// Time series output that writes all grids as a temporal collection within a
 /// single XDMF file.
@@ -54,7 +54,7 @@ private:
   xdm::XmlOutputStream mXmlStream;
 };
 
-XDMF_NAMESPACE_END
+} // namespace xdmf
 
 #endif // xdmf_TemporalCollectionTimeSeries_hpp
 

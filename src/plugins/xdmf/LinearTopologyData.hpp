@@ -24,7 +24,7 @@
 #include <xdm/MemoryAdapter.hpp>
 #include <xdm/RefPtr.hpp>
 
-#include <xdmf/NamespaceMacro.hpp>
+
 
 namespace xdm {
   class UniformDataItem;
@@ -35,7 +35,7 @@ namespace xdmGrid {
   class Polyvertex;
 }
 
-XDMF_NAMESPACE_BEGIN
+namespace xdmf {
 
 /// MemoryAdapter that generates a list of unsigned integers up to the size of
 /// the referenced Polyvertex Topology. This is useful if the XDMF output will
@@ -72,6 +72,6 @@ xdm::RefPtr< xdm::UniformDataItem >
 createLinearTopologyUniformDataItem(
   xdm::RefPtr< xdmGrid::Polyvertex > topology );
 
-XDMF_NAMESPACE_END
+} // namespace xdmf
 
 #endif // xdmf_LinearTopologyData_hpp

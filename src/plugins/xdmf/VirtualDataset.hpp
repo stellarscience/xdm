@@ -25,9 +25,9 @@
 
 #include <string>
 
-#include <xdmf/NamespaceMacro.hpp>
 
-XDMF_NAMESPACE_BEGIN
+
+namespace xdmf {
 
 /// Time series output target that writes one complete file per timestep. The
 /// name VirtualDataset is derived from what the VisIt visualization application
@@ -54,7 +54,7 @@ private:
   unsigned int mTimeStep;
 };
 
-XDMF_NAMESPACE_END
+} // namespace xdmf
 
 #endif // xdmf_VirtualDatasetTimeSeries_hpp
 

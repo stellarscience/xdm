@@ -24,17 +24,5 @@
 /// Plugin namespace for XDMF reader and writer.
 namespace xdmf { }
 
-#ifndef SWIG
-# define XDMF_NAMESPACE_BEGIN namespace xdmf {
-#else
-# define XDMF_NAMESPACE_BEGIN
-#endif
-
-#ifndef SWIG
-# define XDMF_NAMESPACE_END }
-#else
-# define XDMF_NAMESPACE_END
-#endif
-
 #endif // xdmf_NamespaceMacro_hpp
 

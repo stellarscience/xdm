@@ -26,7 +26,7 @@
 
 #include <cstdarg>
 
-XDMF_NAMESPACE_BEGIN
+namespace xdmf {
 
 namespace {
 
@@ -194,4 +194,4 @@ bool XmfReader::update(
   }
 }
 
-XDMF_NAMESPACE_END
+} // namespace xdmf

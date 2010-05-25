@@ -22,7 +22,7 @@
 
 #include <xdm/XmlObject.hpp>
 
-XDMF_NAMESPACE_BEGIN
+namespace xdmf {
 
 xdm::RefPtr< xdm::XmlObject > createXdmfRoot( const std::string& version ) {
   xdm::RefPtr< xdm::XmlObject > xdmf( new xdm::XmlObject( "Xdmf" ) );
@@ -30,5 +30,5 @@ xdm::RefPtr< xdm::XmlObject > createXdmfRoot( const std::string& version ) {
   return xdmf;
 }
 
-XDMF_NAMESPACE_END
+} // namespace xdmf
 

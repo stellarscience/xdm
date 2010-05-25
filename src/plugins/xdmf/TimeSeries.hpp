@@ -27,9 +27,9 @@
 
 #include <xdmGrid/Grid.hpp>
 
-#include <xdmf/NamespaceMacro.hpp>
 
-XDMF_NAMESPACE_BEGIN
+
+namespace xdmf {
 
 /// Interface that inheritors should reimplement in order to write time
 /// series grid information.
@@ -74,7 +74,7 @@ inline void writeTimestepGrid(
 }
   
 
-XDMF_NAMESPACE_END
+} // namespace xdmf
 
 #endif // xdmf_TimeSeries_hpp
 

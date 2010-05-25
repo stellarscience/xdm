@@ -23,12 +23,12 @@
 
 #include <xdmFormat/Reader.hpp>
 
-#include <xdmf/NamespaceMacro.hpp>
+
 
 #include <memory>
 #include <sstream>
 
-XDMF_NAMESPACE_BEGIN
+namespace xdmf {
 
 class XmfReader : public xdmFormat::Reader {
 public:
@@ -50,6 +50,6 @@ private:
   std::auto_ptr< Private > mImp;
 };
 
-XDMF_NAMESPACE_END
+} // namespace xdmf
 
 #endif // xdmf_XmfReader_hpp
