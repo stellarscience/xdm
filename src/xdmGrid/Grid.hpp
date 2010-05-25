@@ -26,10 +26,7 @@
 
 #include <xdm/Forward.hpp>
 #include <xdm/Item.hpp>
-// Code Review Matter (open): Forward declaration
-// ItemVisitor does not seem to be used. Would a forward declaration be sufficient?
-// -- Todd on 21 May 2010
-#include <xdm/ItemVisitor.hpp>
+#include <xdm/ItemVisitor.hpp> // ItemVisitor is used in the XDM_META_ITEM macro.
 #include <xdm/PrimitiveType.hpp>
 
 #include <string>
@@ -59,7 +56,7 @@ XDM_GRID_NAMESPACE_BEGIN
 // -- Curtis Cooper on 2010-05-20
 
 // Code Review Matter (open): documentation
-// Did you consider providing documentation on what this class is 
+// Did you consider providing documentation on what this class is
 // intended to do?  Or maybe just a URL to external docs would be nice.  The
 // main reason I ask this is, based on my limited usage of XDM so far, I don't
 // understand why Grid has both attributes and elements, and when to use one
@@ -96,7 +93,7 @@ public:
 
   // Code Review Matter (open): Setters
   // Attributes are added then accessed by index,
-  // which is determined by add order. Who keeps track of 
+  // which is determined by add order. Who keeps track of
   // indexing? Is there any use for a setAttribute( attribute, index )
   // function to overwire current entries? Current implementation
   // is geared towards static grids. Any plans for dynamic grids in
@@ -126,7 +123,7 @@ public:
   // Would xdm::LanguagePrimitive::Type be a more descriptive name that might
   // more closely follow the coding standards?
   // -- K. R. Walker on 2010-05-21
-  
+
   /// Create an attribute with the proper dimensions. This will initialize an Attribute holding
   /// onto a UniformDataItem that has the correct array shape. The attribute will be attached
   /// to the grid. However, the UniformDataItem will not have any data (MemoryAdapter); that

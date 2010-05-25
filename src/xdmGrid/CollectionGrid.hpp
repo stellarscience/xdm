@@ -30,16 +30,12 @@
 
 XDM_GRID_NAMESPACE_BEGIN
 
-// Code Review Matter (open): Terminology
-// Because the term CollectionGrid comes from the XDMF spec and is a little
-// ambiguous without the documentation (at least to me). Would it make sense
-// to mention that in the documentation?
-// -- K. R. Walker on 2010-05-21
-
-/// Grid type that contains other Grids.  The collection can be spatial or
-/// temporal, that is a collection of multiple grids in different locations, or
-/// a collection of grids representing the simulation at different points in
-/// time.
+/// A grid type that contains other Grids. The CollectionGrid refers to specific
+/// subsets of elements in other grids while retaining the Grid interface for
+/// accessing elements as if they are part of a single, uniform grid. This grid
+/// can also refer to subsets of faces or edges that lie on elements in other
+/// grids. Thus, the CollectionGrid is a superset of the XDMF concept of a
+/// CollectionGrid.
 class CollectionGrid : public Grid {
 public:
 
@@ -47,7 +43,7 @@ public:
   // Did you consider moving enumerations outside of the classes to remove
   // any need for a full #include when only a forward declaration is needed?
   // -- K. R. Walker on 2010-05-21
-  
+
   /// Enumeration of collection type.  Spatial or temporal.
   enum CollectionType {
     kSpatial = 0,
@@ -64,7 +60,7 @@ public:
   // methods make it possible to make a nonsensical object?
   // In other words, what are the invariants of objects of this class?
   // -- K. R. Walker on 2010-05-21
-  
+
   /// Set the collection type for this grid to spatial or temporal.
   /// @see CollectionType
   void setType( CollectionType t );
@@ -73,7 +69,7 @@ public:
   // Code Review Matter (open): duplicates?
   // Can a grid be added to the collection more than once?
   // -- K. R. Walker on 2010-05-21
-  
+
   /// Append a grid, referencing all of the elements in the grid.
   /// @param grid The grid that will be referenced by this collection.
   void appendGrid( xdm::RefPtr< Grid > grid );
@@ -82,7 +78,7 @@ public:
   // What is the behavior when the indicies are not unique?
   // Is this a precondition that, when violated, invokes undefined behavior?
   // -- K. R. Walker on 2010-05-21
-  
+
   /// Append a grid, referencing only a subset of the elements.
   /// @param grid The grid that will be referenced by this collection.
   /// @param elementIndices An integer array containing the element indices for the elements
@@ -124,7 +120,7 @@ public:
   // from the base class? Null Attribute? How might a client determine why
   // an attribue wasn't created when working with the base class interface?
   // -- K. R. Walker on 2010-05-21
-  
+
   /// Create an attribute with the proper dimensions. This will initialize an Attribute holding
   /// onto a UniformDataItem that has the correct array shape. The attribute will be attached
   /// to the grid. However, the UniformDataItem will not have any data (MemoryAdapter); that
@@ -159,24 +155,44 @@ private:
     kEdge
   };
 
-  // Code Review Matter (open): member documentation
-  // Could these members be documented so a maintenance programmer would
-  // have a smaller barrier to entry?
-  // -- K. R. Walker on 2010-05-21
-  
-  // Code Review Matter (open): parallel vectors
-  // Are these vectors parallel? (v1[2] corresponds to v3[2])
-  // -- K. R. Walker on 2010-05-21
-  
+  // The following vectors are parallel vectors. For each grid that is referenced by this
+  // collection, there will be corresponding entries in mGrids, mElementIndices,
+  // mFaceEdgeIndices, mElementOffsets, and mReferenceTypes.
+
+  // The grids whose elements are referenced by this collection.
   std::vector< xdm::RefPtr< xdmGrid::Grid > > mGrids;
+
+  // For each grid in mGrid, we need to store a list of element indices for the subset of
+  // elements that will be used from that grid, e.g. if we want elements 2, 4, and 6 from
+  // the 2nd grid, then mElementIndices[1] == { 2, 4, 6 }
   std::vector< xdm::RefPtr< xdm::UniformDataItem > > mElementIndices;
+
+  // If the corresponding grid in mGrid is being used to reference lower-dimensional portions
+  // of elements, then we store those indices here, e.g. if we want faces on the 2nd grid, and
+  // those faces are faces 1, 2, and 3 on elements 2, 2, and 4, then we have:
+  //   mElementIndices[1] == { 2, 2, 4 }
+  //   mFaceEdgeIndices[1] == { 1, 2, 3 }
   std::vector< xdm::RefPtr< xdm::UniformDataItem > > mFaceEdgeIndices;
-  std::vector< std::size_t > mElementOffsets;
+
+  // For fast lookup of elements, we store the cumulative element index for each grid. For
+  // example, if we want 3 elements from the 1st grid, 5 elements from the 2nd grid, and
+  // 2 elements from the 3rd grid, then we have:
+  //   mElementOffsets == { 3, 8, 10 }
+  mutable std::vector< std::size_t > mElementOffsets;
+
+  // For each grid in mGrids, mReferenceTypes indicates whether we are accessing elements,
+  // faces, or edges on the elements in that grid. This allows the use of heterogeneous
+  // grids in a collection, e.g. we can add a grid of triangles while referencing the
+  // triangles directly as elements and then also add a grid of tetrahedra while referencing
+  // faces on the tets (which are triangles); thus, the collection grid always refers to
+  // triangles.
   std::vector< ReferenceType > mReferenceTypes;
+
+  // This is going away, right Will?
   CollectionType mType;
 
   std::pair< std::size_t, std::size_t > findGrid( const std::size_t& elementIndex ) const;
-  void updateOffsets();
+  void updateOffsets() const;
 };
 
 XDM_GRID_NAMESPACE_END
