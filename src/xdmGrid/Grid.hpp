@@ -32,36 +32,7 @@
 #include <string>
 #include <vector>
 
-
-
-// Code Review Matter (open): Optional namespace
-// It appears that namespaces are optional in the XDM code base; however, the code
-// uses them explicitly in many places.
-// Did you concider adding macros for when the name space is required rather than
-// only where it wraps code? For example:
-//
-// #define XDM_NS xdm::
-// class Grid : public XDM_NS Item { // I am not positive that would even work.
-//
-// If the library must support platforms that don't support namespaces, and since this could
-// possibley pollute the global namesapce with names that are likely to conflict (like Item),
-// did you consider using a library prefixes instead (XdmItem)?
-// -- Todd on 2010-05-21
-
 namespace xdmGrid {
-
-// Code Review Matter (open): xdm::RefPtr usage
-// Is it necessary for all value passing to occur through xdm::RefPtr,
-// or can we be returning by reference in many (or most) cases?
-// -- Curtis Cooper on 2010-05-20
-
-// Code Review Matter (open): documentation
-// Did you consider providing documentation on what this class is
-// intended to do?  Or maybe just a URL to external docs would be nice.  The
-// main reason I ask this is, based on my limited usage of XDM so far, I don't
-// understand why Grid has both attributes and elements, and when to use one
-// instead of the other.
-// -- Curtis Cooper on 2010-05-20
 
 /// @brief Base class for all Items representing grid data.
 ///
@@ -103,21 +74,23 @@ public:
   // This would eliminate one unnecessary copy operation.
   // -- Todd on 2010-05-21
 
-  // Code Review Matter (open): Setters
-  // Attributes are added then accessed by index,
-  // which is determined by add order. Who keeps track of
-  // indexing? Is there any use for a setAttribute( attribute, index )
-  // function to overwire current entries? Current implementation
-  // is geared towards static grids. Any plans for dynamic grids in
-  // the future?
-  // Brian on 2010-05-23
-
   /// Add an attribute definition to the grid.
   void addAttribute( xdm::RefPtr< Attribute > attribute );
-  /// Get an attribute by its index.
-  xdm::RefPtr< Attribute > attributeByIndex( std::size_t index );
-  /// Get a const attribute by its index.
-  xdm::RefPtr< const Attribute > attributeByIndex( std::size_t index ) const;
+ 
+  /// Iterator to access attributes.
+  typedef std::vector< xdm::RefPtr< Attribute > >::iterator AttributeIterator;
+  /// Const Iterator to access attributes.
+  typedef std::vector< xdm::RefPtr< Attribute > >::const_iterator ConstAttributeIterator;
+
+  /// Get an iterator pointing to the beginning of the Grid attributes.
+  AttributeIterator beginAttributes();
+  /// Get a constant iterator pointing to the beginning of the Grid attributes.
+  ConstAttributeIterator beginAttributes() const;
+  /// Get an iterator pointing to the end of the Grid attributes;
+  AttributeIterator endAttributes();
+  /// Get a const iterator pointing to the end of the Grid attributes.
+  ConstAttributeIterator endAttributes() const;
+
   /// Get an attribute by name.
   xdm::RefPtr< Attribute > attributeByName( const std::string& name );
   /// Get a const attribute by name.

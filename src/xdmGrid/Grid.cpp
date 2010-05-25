@@ -50,18 +50,20 @@ void Grid::addAttribute( xdm::RefPtr< Attribute > attribute ) {
   mAttributes.push_back( attribute );
 }
 
-xdm::RefPtr< const Attribute > Grid::attributeByIndex( std::size_t index ) const {
-  if ( index < mAttributes.size() ) {
-    return mAttributes[ index ];
-  } else {
-    return xdm::RefPtr< const Attribute >();
-  }
+Grid::AttributeIterator Grid::beginAttributes() {
+  return mAttributes.begin();
 }
 
-xdm::RefPtr< Attribute > Grid::attributeByIndex( std::size_t index ) {
-  return xdm::const_pointer_cast< Attribute >(
-    static_cast< const Grid& >(*this).attributeByIndex( index )
-  );
+Grid::ConstAttributeIterator Grid::beginAttributes() const {
+  return mAttributes.begin();
+}
+
+Grid::AttributeIterator Grid::endAttributes() {
+  return mAttributes.end();
+}
+
+Grid::ConstAttributeIterator Grid::endAttributes() const {
+  return mAttributes.end();
 }
 
 xdm::RefPtr< const Attribute > Grid::attributeByName( const std::string& name ) const {

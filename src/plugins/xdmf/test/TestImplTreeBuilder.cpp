@@ -278,12 +278,13 @@ BOOST_AUTO_TEST_CASE( buildStaticTree ) {
     xdmGrid::Attribute::kElement,
     xdmGrid::Attribute::kElement,
   };
-  for ( int i = 0; i < 3; i++ ) {
-    xdm::RefPtr< xdmGrid::Attribute > attr = grid->attributeByIndex( i );
-    BOOST_CHECK_EQUAL( attr->name(), names[i] );
-    BOOST_CHECK_EQUAL( attr->dataType(), types[i] );
-    BOOST_CHECK_EQUAL( attr->centering(), centers[i] );
-    xdm::RefPtr< xdm::UniformDataItem > attrData = attr->dataItem();
+  for ( xdmGrid::Grid::ConstAttributeIterator attr = grid->beginAttributes();
+    attr != grid->endAttributes(); ++attr ) {
+    int i = attr - grid->beginAttributes();
+    BOOST_CHECK_EQUAL( (*attr)->name(), names[i] );
+    BOOST_CHECK_EQUAL( (*attr)->dataType(), types[i] );
+    BOOST_CHECK_EQUAL( (*attr)->centering(), centers[i] );
+    xdm::RefPtr< xdm::UniformDataItem > attrData = (*attr)->dataItem();
     BOOST_REQUIRE( attrData );
     xdm::RefPtr< InputUDI > inputItem =
       xdm::dynamic_pointer_cast< InputUDI >( attrData );
