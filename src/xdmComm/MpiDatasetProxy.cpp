@@ -37,7 +37,7 @@
 #include <xdm/StructuredArray.hpp>
 #include <xdm/VectorStructuredArray.hpp>
 
-XDM_COMM_NAMESPACE_BEGIN
+namespace xdmComm {
 
 namespace {
 
@@ -177,5 +177,5 @@ void MpiDatasetProxy::finalizeImplementation() {
   }
 }
 
-XDM_COMM_NAMESPACE_END
+} // namespace xdmComm
 

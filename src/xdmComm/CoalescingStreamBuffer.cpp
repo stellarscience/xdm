@@ -21,7 +21,7 @@
 #include <xdmComm/CoalescingStreamBuffer.hpp>
 #include <xdmComm/MpiMessageTag.hpp>
 
-XDM_COMM_NAMESPACE_BEGIN
+namespace xdmComm {
 
 CoalescingStreamBuffer::CoalescingStreamBuffer(
   size_t bufSize,
@@ -121,5 +121,5 @@ int CoalescingStreamBuffer::uflow() {
   return eof();
 }
 
-XDM_COMM_NAMESPACE_END
+} // namespace xdmComm
 

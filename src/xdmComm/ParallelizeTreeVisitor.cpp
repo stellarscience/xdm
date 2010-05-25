@@ -27,7 +27,7 @@
 
 #include <mpi.h>
 
-XDM_COMM_NAMESPACE_BEGIN
+namespace xdmComm {
 
 ParallelizeTreeVisitor::ParallelizeTreeVisitor( size_t bufferSize ) :
   mBufferSize( bufferSize ) {
@@ -43,5 +43,5 @@ void ParallelizeTreeVisitor::apply( xdm::UniformDataItem& item ) {
   item.setDataset( proxy );
 }
 
-XDM_COMM_NAMESPACE_END
+} // namespace xdmComm
 

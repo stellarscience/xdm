@@ -29,9 +29,9 @@
 
 #include <memory>
 
-#include <xdmComm/NamespaceMacro.hpp>
 
-XDM_COMM_NAMESPACE_BEGIN
+
+namespace xdmComm {
 
 /// Proxy object to represent a collection of items in a distributed
 /// environment. This is a proxy class that wraps around any xdm Item that may
@@ -73,6 +73,6 @@ private:
   std::auto_ptr< xdmComm::CoalescingStreamBuffer > mCommBuffer;
 };
 
-XDM_COMM_NAMESPACE_END
+} // namespace xdmComm
 
 #endif // xdmComm_DistributedItemCollectionProxy_hpp

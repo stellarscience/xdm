@@ -28,7 +28,7 @@
 #include <memory>
 #include <vector>
 
-#include <xdmComm/NamespaceMacro.hpp>
+
 
 // Code Review Matter (open): Merging forward declarations
 // Did you consider merging these forward declarations since they are in the same namespace? 
@@ -42,7 +42,7 @@ namespace xdm {
   class StructuredArray;
 }
 
-XDM_COMM_NAMESPACE_BEGIN
+namespace xdmComm {
 
 class CoalescingStreamBuffer;
 
@@ -111,7 +111,7 @@ private:
   xdm::RefPtr< xdm::ByteArray > mArrayBuffer;
 };
 
-XDM_COMM_NAMESPACE_END
+} // namespace xdmComm
 
 #endif // xdmComm_MpiDatasetProxy_hpp
 

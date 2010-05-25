@@ -29,7 +29,7 @@
 #include <xdm/ItemVisitor.hpp>
 #include <xdm/UniformDataItem.hpp>
 
-XDM_COMM_NAMESPACE_BEGIN
+namespace xdmComm {
 
 namespace {
 
@@ -141,4 +141,4 @@ void DistributedItemCollectionProxy::writeMetadata(
   mItem->writeMetadata( metadata );
 }
 
-XDM_COMM_NAMESPACE_END
+} // namespace xdmComm

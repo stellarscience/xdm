@@ -21,9 +21,9 @@
 #ifndef xdmComm_MpiMessageTag_hpp
 #define xdmComm_MpiMessageTag_hpp
 
-#include <xdmComm/NamespaceMacro.hpp>
 
-XDM_COMM_NAMESPACE_BEGIN
+
+namespace xdmComm {
 
 /// Class containing an enumeration to guarantee unique message tags within the
 /// library.  NOTE: These message tags are guaranteed to be unique *within* the
@@ -38,7 +38,7 @@ public:
   };
 };
 
-XDM_COMM_NAMESPACE_END
+} // namespace xdmComm
 
 #endif // xdmComm_MpiMessageTag_hpp
 

@@ -31,7 +31,7 @@
 
 #include <climits>
 
-XDM_COMM_NAMESPACE_BEGIN
+namespace xdmComm {
 
 namespace {
   // SelectionVisitor that turns the different selection types into coordinate
@@ -191,4 +191,4 @@ void RankOrderedDistributedDataset::serializeImplementation(
   xdm::ProxyDataset::serializeImplementation( data, newSelectionMap );
 }
 
-XDM_COMM_NAMESPACE_END
+} // namespace xdmComm

@@ -23,9 +23,9 @@
 
 #include <mpi.h>
 
-#include <xdmComm/NamespaceMacro.hpp>
 
-XDM_COMM_NAMESPACE_BEGIN
+
+namespace xdmComm {
 
 /// Provides an exception safe MPI_Barrier upon exit of the current scope.
 /// This class provides safety from deadlock when a barrier is required at
@@ -41,6 +41,6 @@ private:
   MPI_Comm mCommunicator;
 };
 
-XDM_COMM_NAMESPACE_END
+} // namespace xdmComm
 
 #endif // xdmComm_BarrierOnExit_hpp

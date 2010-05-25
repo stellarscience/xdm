@@ -23,9 +23,9 @@
 
 #include <xdm/ItemVisitor.hpp>
 
-#include <xdmComm/NamespaceMacro.hpp>
 
-XDM_COMM_NAMESPACE_BEGIN
+
+namespace xdmComm {
 
 /// Tree operation that replaces any datasets held by a UniformDataItem with an
 /// MpiDatasetProxy to handle communication between processes.
@@ -40,7 +40,7 @@ public:
   virtual void apply( xdm::UniformDataItem& item );
 };
 
-XDM_COMM_NAMESPACE_END
+} // namespace xdmComm
 
 #endif // xdmComm_ParallelizeTreeVisitor_hpp
 

@@ -25,9 +25,9 @@
 
 #include <mpi.h>
 
-#include <xdmComm/NamespaceMacro.hpp>
 
-XDM_COMM_NAMESPACE_BEGIN
+
+namespace xdmComm {
 
 /// Stream buffer implementation that synchronizes data between processes in a
 /// given communicator.  Processes with rank > 0 in the input communicator will
@@ -94,7 +94,7 @@ protected:
   virtual int uflow();
 };
 
-XDM_COMM_NAMESPACE_END
+} // namespace xdmComm
 
 #endif // xdmComm_CoalescingStreamBuffer_hpp
 

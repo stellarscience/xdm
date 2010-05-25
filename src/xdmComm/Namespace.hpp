@@ -26,17 +26,5 @@
 /// between processes in an parallel, distributed memory environment.
 namespace xdmComm { }
 
-#ifndef SWIG
-# define XDM_COMM_NAMESPACE_BEGIN namespace xdmComm {
-#else
-# define XDM_COMM_NAMESPACE_BEGIN
-#endif
-
-#ifndef SWIG
-# define XDM_COMM_NAMESPACE_END }
-#else
-# define XDM_COMM_NAMESPACE_END
-#endif
-
 #endif // xdmComm_NamespaceMacro_hpp
 

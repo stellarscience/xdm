@@ -25,9 +25,9 @@
 
 #include <mpi.h>
 
-#include <xdmComm/NamespaceMacro.hpp>
 
-XDM_COMM_NAMESPACE_BEGIN
+
+namespace xdmComm {
 
 /// Dataset proxy that arranges dataset write requests from multiple processes
 /// in order of rank within a given communicator. That is, the size of the
@@ -74,6 +74,6 @@ private:
   xdm::DataShape<> mDataShape;
 };
 
-XDM_COMM_NAMESPACE_END
+} // namespace xdmComm
 
 #endif // xdmComm_RankOrderedDistributedDataset_hpp
