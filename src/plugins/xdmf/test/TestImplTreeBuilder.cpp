@@ -221,7 +221,7 @@ BOOST_AUTO_TEST_CASE( buildStaticTree ) {
   BOOST_REQUIRE( grid );
 
   // Check the time.
-  xdm::RefPtr< xdmGrid::Time > time = grid->time();
+  xdm::RefPtr< const xdmGrid::Time > time = grid->time();
   BOOST_REQUIRE( time );
   BOOST_CHECK_EQUAL( time->value(), 0.0 );
 

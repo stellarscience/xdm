@@ -132,6 +132,7 @@ void write2DGrid( const xdm::FileSystemPath& path ) {
 // Write time dependent data.
 void writeTimeGrid( const xdm::FileSystemPath& path ) {
   xdm::RefPtr< xdmGrid::UniformGrid > grid = build2DGrid();
+  xdm::RefPtr< xdmGrid::Time > time = xdm::const_pointer_cast< xdmGrid::Time >( grid->time() );
 
   xdmf::XmfWriter writer;
   writer.open( path, xdm::Dataset::kCreate );
@@ -139,7 +140,7 @@ void writeTimeGrid( const xdm::FileSystemPath& path ) {
   xdm::RefPtr< xdm::UniformDataItem > data = attr->dataItem();
   xdm::RefPtr< xdm::TypedStructuredArray< double > > array = data->typedArray<double>();
   for ( int step = 0; step < 5; ++step ) {
-    grid->time()->setValue( static_cast< double >( step ) );
+    time->setValue( static_cast< double >( step ) );
     std::fill( array->begin(), array->end(), timeFunction( step ) );
     writer.write( grid, step );
   }

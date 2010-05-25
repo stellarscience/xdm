@@ -141,7 +141,8 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
 
   // build the dynamic grid tree
   xdm::RefPtr< xdmGrid::UniformGrid > grid( new xdmGrid::UniformGrid() );
-  grid->setTime( xdm::makeRefPtr( new xdmGrid::Time ) );
+  xdm::RefPtr< xdmGrid::Time > time( new xdmGrid::Time );
+  grid->setTime( time );
 
   // topology is polyvertex
   xdm::RefPtr< xdmGrid::Polyvertex > topology( new xdmGrid::Polyvertex() );
@@ -248,7 +249,7 @@ BOOST_AUTO_TEST_CASE( writeResult ) {
   //float cosDt = kEndTime;
   for ( std::size_t step = 1; step < kSteps; step++ ) {
     t += dt;
-    grid->time()->setValue( t );
+    time->setValue( t );
 
     // particle update loop
     for ( std::size_t i = 0; i < localParticles; i++ ) {

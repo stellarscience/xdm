@@ -34,10 +34,6 @@ Grid::Grid() :
 Grid::~Grid() {
 }
 
-xdm::RefPtr< Time > Grid::time() {
-  return mTime;
-}
-
 xdm::RefPtr< const Time > Grid::time() const {
   return mTime;
 }

@@ -59,14 +59,11 @@ public:
   // to avoid unnecessary copies.
   // -- Todd on 2010-05-21
 
-  // Code Review Matter (open): Access to private data
-  // Is there ever a time (pun intended) when it is appropriate for a client to
-  // have direct access to this member data?
-  // Did you consider only providing const access and the setter?
-  // -- Todd on 2010-05-21
-
-  xdm::RefPtr< Time > time();
+  /// Get the const Time object used to specify the time at which the grid is
+  /// valid.
   xdm::RefPtr< const Time > time() const;
+  /// Set the (possibly shared) time object used to specify the time at which
+  /// the grid is valid.
   void setTime( xdm::RefPtr< Time > time );
 
   // Code Review Matter (open): Passing by value
