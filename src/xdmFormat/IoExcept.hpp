@@ -24,9 +24,9 @@
 #include <sstream>
 #include <stdexcept>
 
-#include <xdmFormat/NamespaceMacro.hpp>
 
-XDM_FORMAT_NAMESPACE_BEGIN
+
+namespace xdmFormat {
 
 /// Exception to be thrown when an error occurs while reading an input file.
 class ReadError : public std::runtime_error {
@@ -82,6 +82,6 @@ public:
   int column() const { return mColumn; }
 };
 
-XDM_FORMAT_NAMESPACE_END
+} // namespace xdmFormat
 
 #endif // xdmFormat_IoExcept_hpp

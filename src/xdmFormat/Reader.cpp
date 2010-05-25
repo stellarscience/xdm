@@ -1,6 +1,6 @@
 #include <xdmFormat/Reader.hpp>
 
-XDM_FORMAT_NAMESPACE_BEGIN
+namespace xdmFormat {
 
 Reader::Reader() {
 }
@@ -8,4 +8,4 @@ Reader::Reader() {
 Reader::~Reader() {
 }
 
-XDM_FORMAT_NAMESPACE_END
+} // namespace xdmFormat

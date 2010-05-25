@@ -12,9 +12,9 @@
 #include <xdm/Forward.hpp>
 #include <xdm/ReferencedObject.hpp>
 
-#include <xdmFormat/NamespaceMacro.hpp>
 
-XDM_FORMAT_NAMESPACE_BEGIN
+
+namespace xdmFormat {
 
 /// Interface for types that read items from files. Implement this interface to
 /// read a tree of items from a file.
@@ -44,6 +44,6 @@ public:
 
 };
 
-XDM_FORMAT_NAMESPACE_END
+} // namespace xdmFormat
 
 #endif // xdmFormat_Reader_hpp

@@ -4,7 +4,7 @@
 //-----------------------------------------------------------------------------
 #include <xdmFormat/Writer.hpp>
 
-XDM_FORMAT_NAMESPACE_BEGIN
+namespace xdmFormat {
 
 Writer::Writer() {
 }
@@ -12,4 +12,4 @@ Writer::Writer() {
 Writer::~Writer() {
 }
 
-XDM_FORMAT_NAMESPACE_END
+} // namespace xdmFormat

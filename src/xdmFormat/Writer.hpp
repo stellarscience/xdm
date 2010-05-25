@@ -12,9 +12,9 @@
 #include <xdm/Forward.hpp>
 #include <xdm/ReferencedObject.hpp>
 
-#include <xdmFormat/NamespaceMacro.hpp>
 
-XDM_FORMAT_NAMESPACE_BEGIN
+
+namespace xdmFormat {
 
 /// Interface for streaming a series of data to one or more files. Inheritors
 /// should implement this interface to stream a data series to a file.
@@ -43,6 +43,6 @@ public:
 
 };
 
-XDM_FORMAT_NAMESPACE_END
+} // namespace xdmFormat
 
 #endif // xdmFormat_Writer_hpp

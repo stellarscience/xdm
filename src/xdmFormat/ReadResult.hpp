@@ -25,13 +25,13 @@
 
 #include <utility>
 
-#include <xdmFormat/NamespaceMacro.hpp>
+
 
 namespace xdm {
 class Item;
 }
 
-XDM_FORMAT_NAMESPACE_BEGIN
+namespace xdmFormat {
 
 /// Data class to hold the result of reading a file containing one or more
 /// series steps.
@@ -53,6 +53,6 @@ private:
   size_t mSeriesSteps;
 };
 
-XDM_FORMAT_NAMESPACE_END
+} // namespace xdmFormat
 
 #endif // xdmFormat_ReadResult_hpp

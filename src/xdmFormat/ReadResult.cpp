@@ -22,7 +22,7 @@
 
 #include <xdm/Item.hpp>
 
-XDM_FORMAT_NAMESPACE_BEGIN
+namespace xdmFormat {
 
 ReadResult::ReadResult() :
   mItem(),
@@ -45,4 +45,4 @@ size_t ReadResult::seriesSteps() const {
   return mSeriesSteps;
 }
 
-XDM_FORMAT_NAMESPACE_END
+} // namespace xdmFormat
