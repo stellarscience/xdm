@@ -74,15 +74,12 @@ void CollectionGrid::appendGrid(
   xdm::RefPtr< Grid > grid,
   xdm::RefPtr< xdm::UniformDataItem > elementIndices ) {
 
-  // Code Review Matter (open): assert vs exception
-  // Did you consider throwing an exception instead of asserting?
-  // -- K. R. Walker on 2010-05-21
-  
-  assert( elementIndices );
+  if ( ! elementIndices ) {
+    XDM_THROW( std::invalid_argument( "elementIndices is NULL." ) );
+  }
   if ( elementIndices->dataspace().rank() != 1 ) {
     XDM_THROW( std::invalid_argument( "The rank of the element indices array is not 1." ) );
   }
-
   if ( grid.get() == this ) {
     XDM_THROW( std::invalid_argument(
       "A CollectionGrid attempted to add itself to its own collection." ) );
@@ -99,13 +96,12 @@ void CollectionGrid::appendGridFaces(
   xdm::RefPtr< xdm::UniformDataItem > elementIndices,
   xdm::RefPtr< xdm::UniformDataItem > faceIndices ) {
 
-  // Code Review Matter (open): single-condition assert
-  // Did you consider assert( elementIndices ); assert( faceIndices ); so that
-  // at debug-time, the stringified assertion message will contain information
-  // about specifically which assertion failed?
-  // -- K. R. Walker on 2010-05-21
-  
-  assert( elementIndices && faceIndices );
+  if ( ! elementIndices ) {
+    XDM_THROW( std::invalid_argument( "elementIndices is NULL." ) );
+  }
+  if ( ! faceIndices ) {
+    XDM_THROW( std::invalid_argument( "faceIndices is NULL." ) );
+  }
   if ( elementIndices->dataspace().rank() != 1 ) {
     XDM_THROW( std::invalid_argument( "The rank of the element indices array is not 1." ) );
   }
@@ -116,7 +112,6 @@ void CollectionGrid::appendGridFaces(
     XDM_THROW( std::invalid_argument( "The number of face indices does not match the number"
       " of element indices." ) );
   }
-
   if ( grid.get() == this ) {
     XDM_THROW( std::invalid_argument(
       "A CollectionGrid attempted to add itself to its own collection." ) );
@@ -213,16 +208,10 @@ xdm::RefPtr< Attribute > CollectionGrid::createAttribute(
 }
 
 std::size_t CollectionGrid::numberOfElements() const {
-  std::size_t elementCount = 0;
-  for ( std::size_t i = 0; i < mElementIndices.size(); ++i ) {
-    if ( mElementIndices[i] ) {
-      elementCount += mElementIndices[i]->dataspace()[0];
-    } else {
-      // If the array does not exist, then we assume that the whole grid is being used.
-      elementCount += mGrids[i]->numberOfElements();
-    }
+  if ( mElementOffsets.size() != mGrids.size() ) {
+    updateOffsets();
   }
-  return elementCount;
+  return mElementOffsets.back();
 }
 
 Element CollectionGrid::element( const std::size_t& elementIndex ) const
@@ -286,7 +275,7 @@ void CollectionGrid::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
 std::pair< std::size_t, std::size_t > CollectionGrid::findGrid( const std::size_t& elementIndex ) const {
 
   if ( mElementOffsets.size() != mGrids.size() ) {
-    const_cast< CollectionGrid& >( *this ).updateOffsets();
+    updateOffsets();
   }
 
   std::vector< std::size_t >::const_iterator found =
@@ -297,6 +286,12 @@ std::pair< std::size_t, std::size_t > CollectionGrid::findGrid( const std::size_
   // Even if triggering this event were only possible via a programming error, wouldn't
   // an exectption and smoother application shutdown be destired over an assert crash?
   // -- Todd on 2010-05-21
+  // Answer:
+  // This code is potentially performance-critical, and thus an exception could be too
+  // expensive. In addition, the assert checks for a condition than can only be caused
+  // by faulty code in this class implementation or by an elementIndex that is too large.
+  // This is akin to overstepping an array bound, which is traditionally caught only
+  // in debug builds with an assert.
   assert( found != mElementOffsets.end() );
   std::size_t gridIndex = found - mElementOffsets.begin();
   std::size_t offsetIndex = elementIndex;
@@ -308,21 +303,29 @@ std::pair< std::size_t, std::size_t > CollectionGrid::findGrid( const std::size_
     offsetIndex );
 }
 
-void CollectionGrid::updateOffsets()
-{
-  // Code Review Matter (open): Code comments
-  // I don't quite follow the logic of this method, could it use more comments?
-  // -- Todd on 2010-05-21
+void CollectionGrid::updateOffsets() const {
+
+  // This routine updates mElementOffsets to coincide with whatever grids are currently
+  // being referenced by the collection. This is a cumulative index, so we are basically
+  // just adding the number of elements we want from each grid to the previous index.
+  // However, there are a few conditional branches because 1) a null entry in
+  // mElementIndices means we use the whole grid (every element will become part of the
+  // CollectionGrid) and 2) the first grid does not have a previous grid.
 
   mElementOffsets.clear();
   for ( std::size_t arrayIndex = 0; arrayIndex < mElementIndices.size(); ++arrayIndex ) {
     if ( mElementIndices[ arrayIndex ] ) {
+      // First get the number of elements that will be referenced from the grid.
       mElementOffsets.push_back( mElementIndices[ arrayIndex ]->dataspace()[0] );
     } else {
       // Special treatment if the pointer is null: this means that the whole
-      // grid is being used.
+      // grid is being used. Thus, we add every element from that grid.
       mElementOffsets.push_back( mGrids[ arrayIndex ]->numberOfElements() );
     }
+
+    // The entry in mElementOffsets is the cumulative size of the CollectionGrid, so
+    // for every entry other than the first entry, we need to add the sum of all of
+    // the elements in previous grids.
     if ( arrayIndex > 0 ) {
       mElementOffsets[ arrayIndex ] += mElementOffsets[ arrayIndex - 1 ];
     }
