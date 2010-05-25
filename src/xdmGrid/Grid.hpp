@@ -63,6 +63,18 @@ namespace xdmGrid {
 // instead of the other.
 // -- Curtis Cooper on 2010-05-20
 
+/// @brief Base class for all Items representing grid data.
+///
+/// A Grid is a collection of Elements, Nodes, and Attributes representing
+/// quantities on those elements or nodes. An Element is a region in space, a
+/// node is a vertex on the boundary of an Element, and an Attribute is some
+/// quantity (vector or scalar) defined on either the elements or nodes of the
+/// Grid. For example, in a thermal simulation using a tetrahedral mesh, the
+/// Elements are the tetrahedra, the Nodes are the vertices of the Tetrahedra,
+/// and an Attribute is temperature.
+///
+/// @see Element
+/// @see Attribute
 class Grid : public xdm::Item {
 public:
   Grid();
