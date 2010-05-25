@@ -24,7 +24,7 @@
 
 #include <xdm/ThrowMacro.hpp>
 
-XDM_GRID_NAMESPACE_BEGIN
+namespace xdmGrid {
 
 RectilinearMesh::RectilinearMesh() :
   StructuredTopology() {
@@ -38,5 +38,5 @@ void RectilinearMesh::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
 }
 
 
-XDM_GRID_NAMESPACE_END
+} // namespace xdmGrid
 

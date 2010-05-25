@@ -28,9 +28,9 @@
 
 #include <vector>
 
-#include <xdmGrid/NamespaceMacro.hpp>
 
-XDM_GRID_NAMESPACE_BEGIN
+
+namespace xdmGrid {
 
 /// Grid topology for which connectivity is implicit.  Namely, node i is
 /// connected to node i+1.  Examples of structured topologies are grid
@@ -76,7 +76,7 @@ private:
   xdm::RefPtr< const ElementTopology > mElementTopology;
 };
 
-XDM_GRID_NAMESPACE_END
+} // namespace xdmGrid
 
 #endif // xdmGrid_StructuredTopology_hpp
 

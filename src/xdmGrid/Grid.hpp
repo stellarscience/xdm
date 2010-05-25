@@ -35,7 +35,7 @@
 #include <string>
 #include <vector>
 
-#include <xdmGrid/NamespaceMacro.hpp>
+
 
 // Code Review Matter (open): Optional namespace
 // It appears that namespaces are optional in the XDM code base; however, the code
@@ -51,7 +51,7 @@
 // did you consider using a library prefixes instead (XdmItem)?
 // -- Todd on 2010-05-21
 
-XDM_GRID_NAMESPACE_BEGIN
+namespace xdmGrid {
 
 // Code Review Matter (open): xdm::RefPtr usage
 // Is it necessary for all value passing to occur through xdm::RefPtr,
@@ -153,7 +153,7 @@ public:
   xdm::RefPtr< Time > mTime;
 };
 
-XDM_GRID_NAMESPACE_END
+} // namespace xdmGrid
 
 #endif // xdm_Grid_hpp
 

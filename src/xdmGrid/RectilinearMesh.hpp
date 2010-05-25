@@ -23,9 +23,9 @@
 
 #include <xdmGrid/StructuredTopology.hpp>
 
-#include <xdmGrid/NamespaceMacro.hpp>
 
-XDM_GRID_NAMESPACE_BEGIN
+
+namespace xdmGrid {
 
 /// Mesh in which axes are mutually orthogonal with variable spacing between
 /// nodes.
@@ -39,6 +39,6 @@ public:
   virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
 };
 
-XDM_GRID_NAMESPACE_END
+} // namespace xdmGrid
 
 #endif // xdmGrid_RectilinearMesh_hpp

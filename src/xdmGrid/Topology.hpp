@@ -29,9 +29,9 @@
 #include <xdm/ObjectCompositionMixin.hpp>
 #include <xdm/VectorRef.hpp>
 
-#include <xdmGrid/NamespaceMacro.hpp>
 
-XDM_GRID_NAMESPACE_BEGIN
+
+namespace xdmGrid {
 
 typedef xdm::VectorRef< std::size_t > ElementConnectivity;
 typedef xdm::ConstVectorRef< std::size_t > ConstElementConnectivity;
@@ -81,7 +81,7 @@ private:
   std::size_t mNumberOfElements;
 };
 
-XDM_GRID_NAMESPACE_END
+} // namespace xdmGrid
 
 #endif // xdmGrid_Topology_hpp
 

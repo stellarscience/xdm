@@ -22,7 +22,7 @@
 
 #include <algorithm>
 
-XDM_GRID_NAMESPACE_BEGIN
+namespace xdmGrid {
 
 Topology::Topology() :
   xdm::Item(),
@@ -58,4 +58,4 @@ void Topology::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
   xml.setTag( "Topology" );
 }
 
-XDM_GRID_NAMESPACE_END
+} // namespace xdmGrid

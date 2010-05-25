@@ -35,9 +35,9 @@
 #include <string>
 #include <vector>
 
-#include <xdmGrid/NamespaceMacro.hpp>
 
-XDM_GRID_NAMESPACE_BEGIN
+
+namespace xdmGrid {
 
 // Code Review Matter (open): UniformStructuredGrid
 // As a user of this class, I had the thought we might want to add something
@@ -111,7 +111,7 @@ private:
   xdm::RefPtr< ElementSharedConnectivityLookup > mElementImp;
 };
 
-XDM_GRID_NAMESPACE_END
+} // namespace xdmGrid
 
 #endif // xdmGrid_UniformGrid_hpp
 

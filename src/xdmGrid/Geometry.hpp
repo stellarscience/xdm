@@ -29,9 +29,9 @@
 #include <xdm/ObjectCompositionMixin.hpp>
 #include <xdm/VectorRef.hpp>
 
-#include <xdmGrid/NamespaceMacro.hpp>
 
-XDM_GRID_NAMESPACE_BEGIN
+
+namespace xdmGrid {
 
 typedef xdm::VectorRef< double > Node;
 typedef xdm::ConstVectorRef< double > ConstNode;
@@ -93,7 +93,7 @@ private:
   xdm::RefPtr< xdm::VectorRefImp< double > > mSharedVectorImp;
 };
 
-XDM_GRID_NAMESPACE_END
+} // namespace xdmGrid
 
 #endif // xdmGrid_Geometry_hpp
 

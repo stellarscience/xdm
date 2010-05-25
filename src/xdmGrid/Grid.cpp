@@ -23,7 +23,7 @@
 
 #include <algorithm>
 
-XDM_GRID_NAMESPACE_BEGIN
+namespace xdmGrid {
 
 Grid::Grid() :
   xdm::Item(),
@@ -95,5 +95,5 @@ void Grid::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
   xml.setTag( "Grid" );
 }
 
-XDM_GRID_NAMESPACE_END
+} // namespace xdmGrid
 

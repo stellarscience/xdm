@@ -18,8 +18,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.       
 //                                                                             
 //------------------------------------------------------------------------------
-#ifndef xdmGrid_NamespaceMacro_hpp
-#define xdmGrid_NamespaceMacro_hpp
+#ifndef xdmGrid_Namespace_hpp
+#define xdmGrid_Namespace_hpp
 
 /// Components for declaring grid objects. This library contains objects that
 /// define structured and unstructured grids and provides the capacity to define
@@ -28,17 +28,5 @@
 /// and unstructured topology definitions are defined here.
 namespace xdmGrid { }
 
-#ifndef SWIG
-# define XDM_GRID_NAMESPACE_BEGIN namespace xdmGrid {
-#else
-# define XDM_GRID_NAMESPACE_BEGIN
-#endif
-
-#ifndef SWIG
-# define XDM_GRID_NAMESPACE_END }
-#else
-# define XDM_GRID_NAMESPACE_END
-#endif
-
-#endif // xdmGrid_NamespaceMacro_hpp
+#endif // xdmGrid_Namespace_hpp
 

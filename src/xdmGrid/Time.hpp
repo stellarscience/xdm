@@ -25,9 +25,9 @@
 
 #include <vector>
 
-#include <xdmGrid/NamespaceMacro.hpp>
 
-XDM_GRID_NAMESPACE_BEGIN
+
+namespace xdmGrid {
 
 class Time : public xdm::Item {
 public:
@@ -49,7 +49,7 @@ private:
   std::vector< double > mValues;
 };
 
-XDM_GRID_NAMESPACE_END
+} // namespace xdmGrid
 
 #endif // xdmGrid_Time_hpp
 

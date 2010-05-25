@@ -28,7 +28,7 @@
 
 #include <xdm/ThrowMacro.hpp>
 
-XDM_GRID_NAMESPACE_BEGIN
+namespace xdmGrid {
 
 MultiArrayGeometry::MultiArrayGeometry( unsigned int dimension ) :
   Geometry( dimension ) {
@@ -109,5 +109,5 @@ void MultiArrayGeometry::updateDimension() {
   setNumberOfChildren( dimension() );
 }
 
-XDM_GRID_NAMESPACE_END
+} // namespace xdmGrid
 

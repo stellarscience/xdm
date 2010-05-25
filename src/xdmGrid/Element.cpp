@@ -20,8 +20,8 @@
 //------------------------------------------------------------------------------
 #include <xdmGrid/Element.hpp>
 
-#include <xdmGrid/NamespaceMacro.hpp>
 
-XDM_GRID_NAMESPACE_BEGIN
 
-XDM_GRID_NAMESPACE_END
+namespace xdmGrid {
+
+} // namespace xdmGrid

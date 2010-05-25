@@ -21,7 +21,7 @@
 #include <xdmGrid/Polyvertex.hpp>
 #include <xdmGrid/ElementTopology.hpp>
 
-XDM_GRID_NAMESPACE_BEGIN
+namespace xdmGrid {
 
 Polyvertex::Polyvertex() :
   UnstructuredTopology(),
@@ -38,4 +38,4 @@ void Polyvertex::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
   xml.setAttribute( "TopologyType", "Polyvertex" );
 }
 
-XDM_GRID_NAMESPACE_END
+} // namespace xdmGrid

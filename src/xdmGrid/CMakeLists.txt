@@ -11,7 +11,7 @@ set( ${PROJECT_NAME}_HEADERS
     Grid.hpp
     InterlacedGeometry.hpp
     MultiArrayGeometry.hpp
-    NamespaceMacro.hpp
+    Namespace.hpp
     Polyvertex.hpp
     RectilinearMesh.hpp
     StructuredTopology.hpp

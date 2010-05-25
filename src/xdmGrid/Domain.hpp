@@ -27,9 +27,9 @@
 #include <xdm/Item.hpp>
 #include <xdm/ObjectCompositionMixin.hpp>
 
-#include <xdmGrid/NamespaceMacro.hpp>
 
-XDM_GRID_NAMESPACE_BEGIN
+
+namespace xdmGrid {
 
 class Domain : 
   public xdm::Item,
@@ -49,7 +49,7 @@ public:
   virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
 };
 
-XDM_GRID_NAMESPACE_END
+} // namespace xdmGrid
 
 #endif // xdmGrid_Domain_hpp
 

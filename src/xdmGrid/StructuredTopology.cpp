@@ -29,7 +29,7 @@
 
 #include <xdm/ThrowMacro.hpp>
 
-XDM_GRID_NAMESPACE_BEGIN
+namespace xdmGrid {
 
 StructuredTopology::StructuredTopology() :
   Topology(),
@@ -155,5 +155,5 @@ xdm::RefPtr< xdm::VectorRefImp< std::size_t > > StructuredTopology::createVector
     new xdm::SingleArrayOfVectorsImp< std::size_t >( &mNodes[0], mElementTopology->numberOfNodes() ) );
 }
 
-XDM_GRID_NAMESPACE_END
+} // namespace xdmGrid
 

@@ -22,7 +22,7 @@
 
 #include <algorithm>
 
-XDM_GRID_NAMESPACE_BEGIN
+namespace xdmGrid {
 
 void Domain::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
   xdm::Item::writeMetadata( xml );
@@ -41,5 +41,5 @@ void Domain::traverse( xdm::ItemVisitor& iv ) {
     xdm::ApplyVisitor( iv ) );
 }
 
-XDM_GRID_NAMESPACE_END
+} // namespace xdmGrid
 

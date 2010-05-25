@@ -27,9 +27,9 @@
 #include <xdm/RefPtr.hpp>
 #include <xdm/UniformDataItem.hpp>
 
-#include <xdmGrid/NamespaceMacro.hpp>
 
-XDM_GRID_NAMESPACE_BEGIN
+
+namespace xdmGrid {
 
 /// Base class for all unstructured topologies. If the connectivity is different
 /// from the standard, an order may be specified.
@@ -73,7 +73,7 @@ private:
   NodeOrderingConvention::Type mOrdering;
 };
 
-XDM_GRID_NAMESPACE_END
+} // namespace xdmGrid
 
 #endif // xdmGrid_UnstructuredTopology_hpp
 

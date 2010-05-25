@@ -26,9 +26,9 @@
 #include <xdm/ItemVisitor.hpp>
 #include <xdm/RefPtr.hpp>
 
-#include <xdmGrid/NamespaceMacro.hpp>
 
-XDM_GRID_NAMESPACE_BEGIN
+
+namespace xdmGrid {
 
 class Attribute : public xdm::Item {
 public:
@@ -83,7 +83,7 @@ private:
   xdm::RefPtr< xdm::UniformDataItem > mDataItem;
 };
 
-XDM_GRID_NAMESPACE_END
+} // namespace xdmGrid
 
 #endif // xdmGrid_Attribute_hpp
 

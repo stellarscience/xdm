@@ -30,7 +30,7 @@ set( ${PROJECT_NAME}_HEADERS
     Item.hpp
     ItemVisitor.hpp
     MemoryAdapter.hpp
-	  NamespaceMacro.hpp
+	  Namespace.hpp
 	  ObjectCompositionMixin.hpp
     PrimitiveType.hpp
     ProxyDataset.hpp

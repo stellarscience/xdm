@@ -21,7 +21,7 @@
 #ifndef xdmGrid_ElementTopology_hpp
 #define xdmGrid_ElementTopology_hpp
 
-#include <xdmGrid/NamespaceMacro.hpp>
+
 
 #include <xdm/Forward.hpp>
 #include <xdm/ReferencedObject.hpp>
@@ -31,7 +31,7 @@
 #include <string>
 #include <vector>
 
-XDM_GRID_NAMESPACE_BEGIN
+namespace xdmGrid {
 
 namespace NodeOrderingConvention {
   enum Type {
@@ -148,7 +148,7 @@ ElementDimension::Type elementDimension( const ElementShape::Type& shape );
 ///// Get the Exodus shape string the corresponds to an elementClass.
 //std::string exodusShapeString( const ElementType::Type& element );
 
-XDM_GRID_NAMESPACE_END
+} // namespace xdmGrid
 
 #endif // xdmGrid_ElementTopology_hpp
 

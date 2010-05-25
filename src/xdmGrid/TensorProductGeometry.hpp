@@ -26,9 +26,9 @@
 #include <xdm/VectorRef.hpp>
 #include <xdm/RefPtr.hpp>
 
-#include <xdmGrid/NamespaceMacro.hpp>
 
-XDM_GRID_NAMESPACE_BEGIN
+
+namespace xdmGrid {
 
 /// Geometric description of geometry values by taking the tensor product of
 /// n arrays, where n is the dimension of the space.  That is, given n sets of
@@ -65,7 +65,7 @@ protected:
 
 };
 
-XDM_GRID_NAMESPACE_END
+} // namespace xdmGrid
 
 #endif // xdmGrid_TensorProductGeometry_hpp
 

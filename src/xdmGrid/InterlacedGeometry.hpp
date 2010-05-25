@@ -27,9 +27,9 @@
 #include <xdm/VectorRef.hpp>
 #include <xdm/RefPtr.hpp>
 
-#include <xdmGrid/NamespaceMacro.hpp>
 
-XDM_GRID_NAMESPACE_BEGIN
+
+namespace xdmGrid {
 
 /// Geometric description of the nodes in a mesh represented by an array with
 /// interlaced point coordinates.  That is, when the space is of dimension N
@@ -61,7 +61,7 @@ protected:
 
 };
 
-XDM_GRID_NAMESPACE_END
+} // namespace xdmGrid
 
 #endif // xdmGrid_InterlacedGeometry_hpp
 

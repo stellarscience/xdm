@@ -30,7 +30,7 @@
 
 #include <xdm/ThrowMacro.hpp>
 
-XDM_GRID_NAMESPACE_BEGIN
+namespace xdmGrid {
 
 TensorProductGeometry::TensorProductGeometry( unsigned int dimension ) :
   Geometry( dimension ) {
@@ -102,5 +102,5 @@ void TensorProductGeometry::updateDimension() {
   setNumberOfChildren( dimension() );
 }
 
-XDM_GRID_NAMESPACE_END
+} // namespace xdmGrid
 

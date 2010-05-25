@@ -26,9 +26,9 @@
 #include <xdm/Forward.hpp>
 #include <xdm/UniformDataItem.hpp>
 
-#include <xdmGrid/NamespaceMacro.hpp>
 
-XDM_GRID_NAMESPACE_BEGIN
+
+namespace xdmGrid {
 
 // Code Review Matter (open): Terminology
 // Because the term CollectionGrid comes from the XDMF spec and is a little
@@ -179,7 +179,7 @@ private:
   void updateOffsets();
 };
 
-XDM_GRID_NAMESPACE_END
+} // namespace xdmGrid
 
 #endif // xdmGrid_CollectionGrid_hpp
 

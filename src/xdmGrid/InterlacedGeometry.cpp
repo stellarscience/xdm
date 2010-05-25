@@ -27,7 +27,7 @@
 
 #include <xdm/ThrowMacro.hpp>
 
-XDM_GRID_NAMESPACE_BEGIN
+namespace xdmGrid {
 
 InterlacedGeometry::InterlacedGeometry( unsigned int dimension ) :
   Geometry( dimension ) {
@@ -77,5 +77,5 @@ void InterlacedGeometry::updateDimension() {
   // do nothing.
 }
 
-XDM_GRID_NAMESPACE_END
+} // namespace xdmGrid
 

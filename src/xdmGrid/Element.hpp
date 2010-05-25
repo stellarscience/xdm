@@ -29,9 +29,9 @@
 
 #include <vector>
 
-#include <xdmGrid/NamespaceMacro.hpp>
 
-XDM_GRID_NAMESPACE_BEGIN
+
+namespace xdmGrid {
 
 /// A shared lookup class for Elements. Elements refer connectivity and geometry queries to this
 /// shared class.
@@ -119,6 +119,6 @@ private:
   std::size_t mIndex;
 };
 
-XDM_GRID_NAMESPACE_END
+} // namespace xdmGrid
 
 #endif // xdm_Element_hpp

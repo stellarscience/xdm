@@ -24,7 +24,7 @@
 
 #include <algorithm>
 
-XDM_GRID_NAMESPACE_BEGIN
+namespace xdmGrid {
 
 Geometry::Geometry() :
   mNumberOfNodes( 0 ),
@@ -86,5 +86,5 @@ void Geometry::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
   xml.setTag( "Geometry" );
 }
 
-XDM_GRID_NAMESPACE_END
+} // namespace xdmGrid
 

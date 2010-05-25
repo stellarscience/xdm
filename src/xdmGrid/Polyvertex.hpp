@@ -23,9 +23,9 @@
 
 #include <xdmGrid/UnstructuredTopology.hpp>
 
-#include <xdmGrid/NamespaceMacro.hpp>
 
-XDM_GRID_NAMESPACE_BEGIN
+
+namespace xdmGrid {
 
 class Polyvertex : public xdmGrid::UnstructuredTopology {
 public:
@@ -42,6 +42,6 @@ private:
   void setElementTopology( xdm::RefPtr< const ElementTopology > topo );
 };
 
-XDM_GRID_NAMESPACE_END
+} // namespace xdmGrid
 
 #endif // xdmGrid_Polyvertex_hpp

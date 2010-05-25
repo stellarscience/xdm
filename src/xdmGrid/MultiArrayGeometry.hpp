@@ -27,9 +27,9 @@
 #include <xdm/VectorRef.hpp>
 #include <xdm/RefPtr.hpp>
 
-#include <xdmGrid/NamespaceMacro.hpp>
 
-XDM_GRID_NAMESPACE_BEGIN
+
+namespace xdmGrid {
 
 /// Geometric description of the nodes in a mesh represented by a set of
 /// arrays each containing point coordinates for one dimension. That is,
@@ -66,7 +66,7 @@ protected:
 
 };
 
-XDM_GRID_NAMESPACE_END
+} // namespace xdmGrid
 
 #endif // xdmGrid_MultiArrayGeometry_hpp
 

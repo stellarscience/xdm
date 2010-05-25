@@ -61,7 +61,7 @@ private:
 
 } // anon namespace
 
-XDM_GRID_NAMESPACE_BEGIN
+namespace xdmGrid {
 
 UniformGrid::UniformGrid() :
   Grid(),
@@ -239,5 +239,5 @@ void UniformGrid::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
   xml.setAttribute( "GridType", "Uniform" );
 }
 
-XDM_GRID_NAMESPACE_END
+} // namespace xdmGrid
 

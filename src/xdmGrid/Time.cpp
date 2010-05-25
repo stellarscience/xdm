@@ -20,7 +20,7 @@
 //------------------------------------------------------------------------------
 #include <xdmGrid/Time.hpp>
 
-XDM_GRID_NAMESPACE_BEGIN
+namespace xdmGrid {
 
 Time::Time( double value ) :
   mValues( 1, value ) {
@@ -56,5 +56,5 @@ void Time::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
   xml.setAttribute( "Value", mValues[0] );
 }
 
-XDM_GRID_NAMESPACE_END
+} // namespace xdmGrid
 

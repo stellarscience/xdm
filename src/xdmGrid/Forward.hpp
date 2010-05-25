@@ -21,9 +21,9 @@
 #ifndef xdmGrid_Forward_hpp
 #define xdmGrid_Forward_hpp
 
-#include <xdmGrid/NamespaceMacro.hpp>
 
-XDM_GRID_NAMESPACE_BEGIN
+
+namespace xdmGrid {
 
 class Attribute;
 class CollectionGrid;
@@ -42,7 +42,7 @@ class Topology;
 class UniformGrid;
 class UnstructuredTopology;
 
-XDM_GRID_NAMESPACE_END
+} // namespace xdmGrid
 
 #endif // xdmGrid_Forward_hpp
 

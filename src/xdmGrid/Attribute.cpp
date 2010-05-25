@@ -26,7 +26,7 @@
 #include <map>
 #include <string>
 
-XDM_GRID_NAMESPACE_BEGIN
+namespace xdmGrid {
 
 namespace {
   struct AttributeTypeMapping :
@@ -105,5 +105,5 @@ void Attribute::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
   xml.setAttribute( "Center", sAttributeCenterMapping[ mCenter] );
 }
 
-XDM_GRID_NAMESPACE_END
+} // namespace xdmGrid
 

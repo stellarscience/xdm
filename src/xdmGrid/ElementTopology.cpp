@@ -27,7 +27,7 @@
 
 #include <xdm/ThrowMacro.hpp>
 
-XDM_GRID_NAMESPACE_BEGIN
+namespace xdmGrid {
 
 namespace {
 
@@ -699,4 +699,4 @@ ElementDimension::Type elementDimension( const ElementShape::Type& shape ) {
 //  throw std::runtime_error( ss.str() );
 //}
 
-XDM_GRID_NAMESPACE_END
+} // namespace xdmGrid

@@ -22,7 +22,7 @@
 
 #include <sstream>
 
-XDM_GRID_NAMESPACE_BEGIN
+namespace xdmGrid {
 
 UnstructuredTopology::UnstructuredTopology() :
   Topology(),
@@ -83,5 +83,5 @@ xdm::RefPtr< xdm::VectorRefImp< std::size_t > > UnstructuredTopology::createVect
         mConnectivity->typedArray< std::size_t >()->begin(),mElementTopology->numberOfNodes() ) );
 }
 
-XDM_GRID_NAMESPACE_END
+} // namespace xdmGrid
 

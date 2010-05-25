@@ -34,7 +34,7 @@
 
 #include <xdm/ThrowMacro.hpp>
 
-XDM_GRID_NAMESPACE_BEGIN
+namespace xdmGrid {
 
 CollectionGrid::CollectionGrid( CollectionType type ) :
   Grid(),
@@ -329,5 +329,5 @@ void CollectionGrid::updateOffsets()
   }
 }
 
-XDM_GRID_NAMESPACE_END
+} // namespace xdmGrid
 
