@@ -23,9 +23,9 @@
 
 #include <iostream>
 
-#include <xdm/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+
+namespace xdm {
 
 /// Smart pointer implementation to manage ReferencedObject types. This class
 /// manages an intrusive reference count for objects it points to. It expects
@@ -220,7 +220,7 @@ std::ostream& operator<<( std::ostream& ostr, const RefPtr< T >& p ) {
   return ostr;
 }
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_RefPtr_hpp
 

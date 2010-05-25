@@ -21,9 +21,9 @@
 #ifndef xdm_Forward_hpp
 #define xdm_Forward_hpp
 
-#include <xdm/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+
+namespace xdm {
 
 class AllDataSelection;
 class ArrayAdapter;
@@ -64,7 +64,7 @@ class XmlObject;
 class XmlOutputStream;
 class XmlTextContent;
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_Forward_hpp
 

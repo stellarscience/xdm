@@ -30,9 +30,9 @@
 #include <stdexcept>
 #include <string>
 
-#include <xdm/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+
+namespace xdm {
 
 // forward declarations of classes the visitor will operate on
 class CompositeDataItem;
@@ -99,7 +99,7 @@ private:
   ItemVisitor& mIV;
 };
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_ItemVisitor_hpp
 

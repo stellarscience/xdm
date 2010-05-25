@@ -27,7 +27,7 @@
 #include <algorithm>
 #include <numeric>
 
-XDM_NAMESPACE_BEGIN
+namespace xdm {
 
 ArrayAdapter::ArrayAdapter( RefPtr< StructuredArray > array, bool isDynamic ) :
   MemoryAdapter( isDynamic ),
@@ -72,5 +72,5 @@ void ArrayAdapter::readImplementation( Dataset* dataset ) {
   dataset->deserialize( mArray.get(), mSelectionMap );
 }
 
-XDM_NAMESPACE_END
+} // namespace xdm
 

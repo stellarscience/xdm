@@ -29,9 +29,9 @@
 
 #include <cassert>
 
-#include <xdm/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+
+namespace xdm {
 
 /// This abstract class defines an extension to the StructuredArray interface
 /// to access typed array data within a StructuredArray. This allows clients
@@ -162,6 +162,6 @@ private:
   size_t mSize;
 };
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_TypedStructuredArray_hpp

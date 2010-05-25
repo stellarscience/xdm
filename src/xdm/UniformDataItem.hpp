@@ -32,9 +32,9 @@
 
 #include <cassert>
 
-#include <xdm/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+
+namespace xdm {
 
 /// Base class for errors signalling problems when accessing data in memory or
 /// on disk.
@@ -300,7 +300,7 @@ T& UniformDataItem::atLocation(
   );
 }
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_UniformDataItem_hpp
 

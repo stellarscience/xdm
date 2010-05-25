@@ -23,9 +23,9 @@
 
 #include <xdm/DataSelection.hpp>
 
-#include <xdm/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+
+namespace xdm {
 
 /// Class holds the coordinate values for a coordinate selection in a
 /// two-dimensional array.
@@ -96,7 +96,7 @@ private:
   CoordinateArray<> mCoordinates;
 };
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_CoordinateDataSelection_hpp
 

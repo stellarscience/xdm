@@ -25,7 +25,7 @@
 
 #include <cstdlib>
 
-XDM_NAMESPACE_BEGIN
+namespace xdm {
 
 FileSystemPath::FileSystemPath() :
   mPathString()
@@ -86,5 +86,5 @@ bool remove( const FileSystemPath& path )
   return ( ::remove( path.pathString().c_str() ) == 0 );
 }
 
-XDM_NAMESPACE_END
+} // namespace xdm
 

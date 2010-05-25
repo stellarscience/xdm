@@ -25,9 +25,9 @@
 #include <stdexcept>
 #include <string>
 
-#include <xdm/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+
+namespace xdm {
 
 /// Base class for Xml related exceptions.
 class XmlError : public std::runtime_error {
@@ -90,6 +90,6 @@ public:
     AttributeError( tag, attribute, "has incorrect type" ) {}
 };
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_XmlExcept_hpp

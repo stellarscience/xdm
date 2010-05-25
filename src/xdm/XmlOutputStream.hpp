@@ -26,9 +26,9 @@
 #include <ostream>
 #include <stack>
 
-#include <xdm/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+
+namespace xdm {
 
 class XmlObject;
 
@@ -62,7 +62,7 @@ private:
   std::stack< RefPtr< XmlObject > > mContextStack;
 };
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_XmlOutputStream_hpp
 

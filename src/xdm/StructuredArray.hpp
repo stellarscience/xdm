@@ -27,13 +27,13 @@
 #include <xdm/RefPtr.hpp>
 #include <xdm/SelectableDataMixin.hpp>
 
-#include <xdm/NamespaceMacro.hpp>
+
 
 #include <sstream>
 #include <stdexcept>
 #include <vector>
 
-XDM_NAMESPACE_BEGIN
+namespace xdm {
 
 /// Exception signalling that there is not enough memory to hold data with the
 /// given size.
@@ -110,7 +110,7 @@ public:
 
 };
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_StructuredArray_hpp
 

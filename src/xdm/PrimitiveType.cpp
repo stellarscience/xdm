@@ -22,7 +22,7 @@
 
 #include <map>
 
-XDM_NAMESPACE_BEGIN
+namespace xdm {
 
 size_t typeSize( primitiveType::Value type ) {
   static size_t sizes[] = {
@@ -40,5 +40,5 @@ size_t typeSize( primitiveType::Value type ) {
   return sizes[type];
 }
 
-XDM_NAMESPACE_END
+} // namespace xdm
 

@@ -28,9 +28,9 @@
 
 #include <cassert>
 
-#include <xdm/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+
+namespace xdm {
 
 template< typename T > class VectorRef;
 template< typename T > class ConstVectorRef;
@@ -279,6 +279,6 @@ std::size_t TensorProductArraysImp< T >::size() const {
   return mSize;
 }
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_VectorRef_hpp

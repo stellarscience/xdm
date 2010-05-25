@@ -26,7 +26,7 @@ namespace {
   }
 } // namespace anon
 
-XDM_NAMESPACE_BEGIN
+namespace xdm {
 
 ReferencedObject::ReferencedObject() :
   mReferenceCount( 0 ) {
@@ -55,5 +55,5 @@ int ReferencedObject::referenceCount() const {
   return mReferenceCount;
 }
 
-XDM_NAMESPACE_END
+} // namespace xdm
 

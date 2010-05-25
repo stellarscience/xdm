@@ -25,9 +25,9 @@
 #include <xdm/XmlObject.hpp>
 #include <xdm/XmlTextContent.hpp>
 
-#include <xdm/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+
+namespace xdm {
 
 /// Wrapper to expose only the metadata portion of the XmlObject interface.
 /// This allows us to control access to the children of an XmlObject, which we
@@ -58,7 +58,7 @@ public:
   }
 };
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_XmlMetadataWrapper_hpp
 

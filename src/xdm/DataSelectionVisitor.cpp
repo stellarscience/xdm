@@ -24,7 +24,7 @@
 #include <xdm/CoordinateDataSelection.hpp>
 #include <xdm/HyperslabDataSelection.hpp>
 
-XDM_NAMESPACE_BEGIN
+namespace xdm {
 
 DataSelectionVisitor::DataSelectionVisitor() {
 }
@@ -48,5 +48,5 @@ void DataSelectionVisitor::apply( const CoordinateDataSelection& selection ) {
   apply( static_cast< const DataSelection& >( selection ) );
 }
 
-XDM_NAMESPACE_END
+} // namespace xdm
 

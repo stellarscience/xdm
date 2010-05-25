@@ -25,9 +25,9 @@
 #include <string>
 #include <vector>
 
-#include <xdm/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+
+namespace xdm {
 
 /// Binary predicate that returns true if two dereferenced values are equal.
 template< typename T >
@@ -160,6 +160,6 @@ inline void toUpper( std::string& s ) {
   }
 }
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_Algorithm_hpp

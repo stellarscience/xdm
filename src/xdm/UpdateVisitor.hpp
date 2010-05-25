@@ -23,9 +23,9 @@
 
 #include <xdm/ItemVisitor.hpp>
 
-#include <xdm/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+
+namespace xdm {
 
 /// Visitor class that traverses the tree invoking all series update behaviors
 /// provided by Item subclasses and application defined
@@ -53,7 +53,7 @@ private:
 /// @param seriesIndex The index in the series to update the data to.
 void updateToIndex( Item& item, std::size_t seriesIndex );
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_UpdateVisitor_hpp
 

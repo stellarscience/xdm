@@ -23,9 +23,9 @@
 
 #include <xdm/RefPtr.hpp>
 
-#include <xdm/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+
+namespace xdm {
 
 class DataSelection;
 
@@ -51,6 +51,6 @@ public:
   void setRange( RefPtr< DataSelection > range );
 };
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_DataSelectionMap_hpp

@@ -24,9 +24,9 @@
 #include <xdm/Dataset.hpp>
 #include <xdm/ItemVisitor.hpp>
 
-#include <xdm/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+
+namespace xdm {
 
 class UniformDataItem;
 
@@ -47,7 +47,7 @@ private:
   Dataset::InitializeMode mMode;
 };
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_SerializeDataOperation_hpp
 

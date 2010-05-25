@@ -23,9 +23,9 @@
 
 #include <xdm/BinaryIosBase.hpp>
 
-#include <xdm/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+
+namespace xdm {
 
 /// Stream class for reading binary object representations from a
 /// BinaryStreamBuffer.
@@ -65,7 +65,7 @@ public:
 
 BinaryIStream& operator>>( BinaryIStream& ostr, char& c );
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_BinaryIStream_hpp
 

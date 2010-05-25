@@ -24,7 +24,7 @@
 
 #include <cassert>
 
-XDM_NAMESPACE_BEGIN
+namespace xdm {
 
 CompositeDataItem::CompositeDataItem() :
   DataItem(),
@@ -50,5 +50,5 @@ void CompositeDataItem::writeMetadata( XmlMetadataWrapper& xml ) {
   xml.setAttribute( "ItemType", "Tree" );
 }
 
-XDM_NAMESPACE_END
+} // namespace xdm
 

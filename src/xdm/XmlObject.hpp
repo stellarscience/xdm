@@ -32,10 +32,10 @@
 #include <string>
 #include <vector>
 
-#include <xdm/NamespaceMacro.hpp>
+
 #include <xdm/ThrowMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+namespace xdm {
 
 /// Interface for constructing XML data.  This class exposes simple methods for
 /// constructing an XML tree on the fly. It is designed so that the XML output
@@ -183,7 +183,7 @@ bool operator==( const XmlObject& lhs, const XmlObject& rhs );
 /// in the same way or in a different order.
 bool operator!=( const XmlObject& lhs, const XmlObject& rhs );
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_XmlObject_hpp
 

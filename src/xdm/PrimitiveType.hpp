@@ -23,9 +23,9 @@
 
 #include <map>
 
-#include <xdm/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+
+namespace xdm {
 
 namespace primitiveType {
   /// Enumeration of type names.
@@ -75,7 +75,7 @@ XDM_PRIMITIVE_TYPE_DEFINE_INFO( double, primitiveType::kDouble )
 
 #undef XDM_PRIMITIVE_TYPE_DEFINE_INFO
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_PrimitiveType_hpp
 

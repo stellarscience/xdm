@@ -25,7 +25,7 @@
 #include <xdm/DataSelectionVisitor.hpp>
 #include <xdm/HyperSlab.hpp>
 
-XDM_NAMESPACE_BEGIN
+namespace xdm {
 
 /// DataSelection consisting sampling data with a given start, stride, and
 /// count.
@@ -60,7 +60,7 @@ inline bool operator==(
   return ( lhs.hyperslab() == rhs.hyperslab() );
 }
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_HyperslabDataSelection_hpp
 

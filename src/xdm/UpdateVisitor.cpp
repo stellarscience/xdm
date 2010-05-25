@@ -23,7 +23,7 @@
 #include <xdm/Dataset.hpp>
 #include <xdm/UniformDataItem.hpp>
 
-XDM_NAMESPACE_BEGIN
+namespace xdm {
 
 UpdateVisitor::UpdateVisitor( std::size_t seriesIndex ) :
   mSeriesIndex( seriesIndex ) {
@@ -63,5 +63,5 @@ void updateToIndex( Item& item, std::size_t seriesIndex ) {
   item.accept( v );
 }
 
-XDM_NAMESPACE_END
+} // namespace xdm
 

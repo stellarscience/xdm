@@ -24,9 +24,9 @@
 #include <xdm/BinaryIStream.hpp>
 #include <xdm/BinaryOStream.hpp>
 
-#include <xdm/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+
+namespace xdm {
 
 /// Stream for reading and writing objects to a BinaryStreamBuffer.
 class BinaryIOStream : 
@@ -37,7 +37,7 @@ public:
   virtual ~BinaryIOStream();
 };
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_BinaryIOStream_hpp
 

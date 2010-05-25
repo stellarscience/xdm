@@ -38,10 +38,10 @@
 #include <string>
 #include <utility>
 
-#include <xdm/NamespaceMacro.hpp>
+
 #include <xdm/ThrowMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+namespace xdm {
 
 class NullPointerException : public std::runtime_error {
   NullPointerException() : std::runtime_error( "Null pointer exception" ) {}
@@ -120,7 +120,7 @@ struct InputObject {
   }
 };
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_BinaryStreamOperations_hpp
 

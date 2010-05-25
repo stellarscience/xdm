@@ -23,9 +23,9 @@
 
 #include <xdm/TypedStructuredArray.hpp>
 
-#include <xdm/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+
+namespace xdm {
 
 /// Wrapper class to provide access to a contiguous, dynamically allocated array
 /// as a TypedStructuredArray. This class does not take ownership of the array.
@@ -101,6 +101,6 @@ createStructuredArray( T* data, size_t size ) {
   return makeRefPtr( new ContiguousArray< T >( data, size ) );
 }
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_ContiguousArray_hpp

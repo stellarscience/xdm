@@ -23,9 +23,9 @@
 
 #include <xdm/BinaryIosBase.hpp>
 
-#include <xdm/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+
+namespace xdm {
 
 /// Stream class for writing object binary representations to a
 /// BinaryStreamBuffer.
@@ -72,7 +72,7 @@ BinaryOStream& operator<<( BinaryOStream& ostr, unsigned char c );
 /// Stream manipulator that flushes the stream.
 inline BinaryOStream& flush( BinaryOStream& ostr ) { return ostr.flush(); }
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_BinaryOStream_hpp
 

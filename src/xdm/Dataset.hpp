@@ -37,10 +37,10 @@
 
 #include <stdexcept>
 
-#include <xdm/NamespaceMacro.hpp>
+
 #include <xdm/ThrowMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+namespace xdm {
 
 class Dataset;
 
@@ -309,7 +309,7 @@ private:
   DataShape<> mShape;
 };
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_Dataset_hpp
 

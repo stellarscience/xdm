@@ -22,7 +22,7 @@
 
 #include <xdm/Dataset.hpp>
 
-XDM_NAMESPACE_BEGIN
+namespace xdm {
 
 MemoryAdapter::MemoryAdapter( bool isDynamic ) :
   ReferencedObject(),
@@ -89,5 +89,5 @@ RefPtr< StructuredArray > MemoryAdapter::array() {
   );
 }
 
-XDM_NAMESPACE_END
+} // namespace xdm
 

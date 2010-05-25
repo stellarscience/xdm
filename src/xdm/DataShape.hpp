@@ -29,9 +29,9 @@
 #include <string>
 #include <vector>
 
-#include <xdm/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+
+namespace xdm {
 
 /// Provides information regarding rank and dimensions for data.  This class is
 /// templated on the size type of the rank and dimensions of the data to provide
@@ -238,7 +238,7 @@ std::ostream& operator<<( std::ostream& ostr, const DataShape< T >& shape ) {
   return ostr;
 }
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_DataShape_hpp
 

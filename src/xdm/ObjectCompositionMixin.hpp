@@ -28,9 +28,9 @@
 
 #include <cassert>
 
-#include <xdm/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+
+namespace xdm {
 
 /// Mixin that provides ReferencedObject composition through inheritance.
 ///
@@ -214,6 +214,6 @@ RefPtr< const T > back( const ObjectCompositionMixin< T >& obj ) {
   return obj.back();
 }
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_ObjectCompositionMixin_hpp

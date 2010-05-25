@@ -23,9 +23,9 @@
 
 #include <xdm/ReferencedObject.hpp>
 
-#include <xdm/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+
+namespace xdm {
 
 class DataSelectionVisitor;
 
@@ -56,7 +56,7 @@ public:
   virtual void accept( DataSelectionVisitor& v ) const;
 };
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_DataSelection_hpp
 

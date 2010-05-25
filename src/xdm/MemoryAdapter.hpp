@@ -24,9 +24,9 @@
 #include <xdm/ReferencedObject.hpp>
 #include <xdm/StructuredArray.hpp>
 
-#include <xdm/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+
+namespace xdm {
 
 class Dataset;
 
@@ -94,7 +94,7 @@ private:
   bool mIsMemoryResident;
 };
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_MemoryAdapter_hpp
 

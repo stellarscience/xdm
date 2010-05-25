@@ -27,7 +27,7 @@
 
 #include <xdm/ThrowMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+namespace xdm {
 
 namespace {
 
@@ -206,5 +206,5 @@ RefPtr< StructuredArray > UniformDataItem::array() {
   );
 }
 
-XDM_NAMESPACE_END
+} // namespace xdm
 

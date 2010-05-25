@@ -24,9 +24,9 @@
 #include <stdexcept>
 #include <string>
 
-#include <xdm/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+
+namespace xdm {
 
 /// Base class for dataset related exceptions.
 class DatasetError : public std::runtime_error {
@@ -131,6 +131,6 @@ public:
   size_t arraySize() const { return mArraySize; }
 };
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_DatasetExcept_hpp

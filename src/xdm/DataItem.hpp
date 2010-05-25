@@ -25,9 +25,9 @@
 #include <xdm/ItemVisitor.hpp>
 #include <xdm/PrimitiveType.hpp>
 
-#include <xdm/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+
+namespace xdm {
 
 /// A DataItem is a class that holds large datasets.
 class DataItem : public Item {
@@ -40,7 +40,7 @@ public:
   virtual void writeMetadata( XmlMetadataWrapper& xml );
 };
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_DataItem_hpp
 

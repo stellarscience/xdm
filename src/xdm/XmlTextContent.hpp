@@ -24,9 +24,9 @@
 #include <xdm/RefPtr.hpp>
 #include <xdm/XmlObject.hpp>
 
-#include <xdm/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+
+namespace xdm {
 
 /// Wrapper object that exposes only the text content of an XmlObject.
 class XmlTextContent {
@@ -53,7 +53,7 @@ public:
   RefPtr< XmlObject > completeObject() { return mXml; }
 };
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_XmlTextContent_hpp
 

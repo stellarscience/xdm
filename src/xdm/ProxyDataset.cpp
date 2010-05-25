@@ -20,7 +20,7 @@
 //------------------------------------------------------------------------------
 #include <xdm/ProxyDataset.hpp>
 
-XDM_NAMESPACE_BEGIN
+namespace xdm {
 
 ProxyDataset::ProxyDataset( RefPtr< Dataset > dataset ) : mDataset( dataset ) {
 }
@@ -72,4 +72,4 @@ void ProxyDataset::finalizeImplementation() {
   mDataset->finalize();
 }
 
-XDM_NAMESPACE_END
+} // namespace xdm

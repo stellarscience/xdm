@@ -22,7 +22,7 @@
 
 #include <xdm/UniformDataItem.hpp>
 
-XDM_NAMESPACE_BEGIN
+namespace xdm {
 
 SerializeDataOperation::SerializeDataOperation( const Dataset::InitializeMode& mode ) :
   mMode( mode ) {
@@ -45,5 +45,5 @@ void SerializeDataOperation::apply( UniformDataItem& udi ) {
   }
 }
 
-XDM_NAMESPACE_END
+} // namespace xdm
 

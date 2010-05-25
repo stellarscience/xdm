@@ -22,7 +22,7 @@
 
 #include <xdm/DataSelectionVisitor.hpp>
 
-XDM_NAMESPACE_BEGIN
+namespace xdm {
 
 CoordinateDataSelection::CoordinateDataSelection() {
 }
@@ -48,5 +48,5 @@ void CoordinateDataSelection::accept( DataSelectionVisitor& v ) const {
   v.apply( *this );
 }
 
-XDM_NAMESPACE_END
+} // namespace xdm
 

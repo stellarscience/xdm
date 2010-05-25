@@ -26,7 +26,7 @@
 
 #include <xdm/ThrowMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+namespace xdm {
 
 ItemVisitor::ItemVisitor() {
 }
@@ -62,5 +62,5 @@ void ItemVisitor::reset() {
   // no-op
 }
 
-XDM_NAMESPACE_END
+} // namespace xdm
 

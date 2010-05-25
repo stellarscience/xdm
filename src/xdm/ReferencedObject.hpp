@@ -23,9 +23,9 @@
 
 #include <cstdlib>
 
-#include <xdm/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+
+namespace xdm {
 
 /// Base class for all reference counted objects. Operations that affect only
 /// the reference count for subclasses of ReferencedObject are considered to
@@ -56,7 +56,7 @@ private:
   ReferencedObject& operator=( const ReferencedObject& );
 };
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_ReferencedObject_hpp
 

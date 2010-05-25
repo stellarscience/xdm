@@ -24,9 +24,9 @@
 #include <xdm/DataSelection.hpp>
 #include <xdm/DataSelectionVisitor.hpp>
 
-#include <xdm/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+
+namespace xdm {
 
 /// DataSelection that simply selects all data.
 class AllDataSelection : public DataSelection {
@@ -42,7 +42,7 @@ inline bool operator==(
   return true;
 }
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_AllDataSelection_hpp
 

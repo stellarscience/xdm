@@ -23,9 +23,9 @@
 
 #include <string>
 
-#include <xdm/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+
+namespace xdm {
 
 /// Representation of a file path on disk.
 class FileSystemPath
@@ -58,7 +58,7 @@ size_t size( const FileSystemPath& path );
 /// @return True if deleted, false otherwise.
 bool remove( const FileSystemPath& path );
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_FileSystem_hpp
 

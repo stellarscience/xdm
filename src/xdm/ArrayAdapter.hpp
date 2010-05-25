@@ -25,9 +25,9 @@
 #include <xdm/RefPtr.hpp>
 #include <xdm/MemoryAdapter.hpp>
 
-#include <xdm/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+
+namespace xdm {
 
 class Dataset;
 class StructuredArray;
@@ -54,7 +54,7 @@ private:
   DataSelectionMap mSelectionMap;
 };
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_ArrayAdapter_hpp
 

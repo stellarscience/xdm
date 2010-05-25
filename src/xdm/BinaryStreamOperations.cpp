@@ -28,7 +28,7 @@
 #include <memory>
 #include <stdexcept>
 
-XDM_NAMESPACE_BEGIN
+namespace xdm {
 
 namespace {
 
@@ -304,5 +304,5 @@ BinaryOStream& operator<<( BinaryOStream& ostr, const xdm::XmlObject& v ) {
   return ostr;
 }
 
-XDM_NAMESPACE_END
+} // namespace xdm
 

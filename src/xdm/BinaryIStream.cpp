@@ -22,7 +22,7 @@
 
 #include <memory>
 
-XDM_NAMESPACE_BEGIN
+namespace xdm {
 
 namespace {
 
@@ -104,5 +104,5 @@ BinaryIStream& operator>>( BinaryIStream& ostr, char& c ) {
   return ostr.get( c );
 }
 
-XDM_NAMESPACE_END
+} // namespace xdm
 

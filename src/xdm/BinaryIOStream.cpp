@@ -20,7 +20,7 @@
 //------------------------------------------------------------------------------
 #include <xdm/BinaryIOStream.hpp>
 
-XDM_NAMESPACE_BEGIN
+namespace xdm {
 
 BinaryIOStream::BinaryIOStream( BinaryStreamBuffer* buf ) :
   BinaryIosBase( buf ),
@@ -31,5 +31,5 @@ BinaryIOStream::BinaryIOStream( BinaryStreamBuffer* buf ) :
 BinaryIOStream::~BinaryIOStream() {
 }
 
-XDM_NAMESPACE_END
+} // namespace xdm
 

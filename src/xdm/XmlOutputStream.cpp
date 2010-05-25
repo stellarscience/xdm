@@ -26,7 +26,7 @@
 
 #include <cassert>
 
-XDM_NAMESPACE_BEGIN
+namespace xdm {
 
 namespace {
 
@@ -99,5 +99,5 @@ void XmlOutputStream::closeStream() {
   }
 }
 
-XDM_NAMESPACE_END
+} // namespace xdm
 

@@ -23,11 +23,11 @@
 
 #include <xdm/ItemVisitor.hpp>
 
-#include <xdm/NamespaceMacro.hpp>
+
 
 #include <stack>
 
-XDM_NAMESPACE_BEGIN
+namespace xdm {
 
 class XmlObject;
 
@@ -71,7 +71,7 @@ private:
   };
 };
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_CollectMetadataOperation_hpp
 

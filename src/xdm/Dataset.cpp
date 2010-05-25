@@ -20,7 +20,7 @@
 //------------------------------------------------------------------------------
 #include <xdm/Dataset.hpp>
 
-XDM_NAMESPACE_BEGIN
+namespace xdm {
 
 Dataset::Dataset() :
   mUpdateCallback(),
@@ -87,5 +87,5 @@ void Dataset::finalize() {
   mShape = DataShape<>();
 }
 
-XDM_NAMESPACE_END
+} // namespace xdm
 

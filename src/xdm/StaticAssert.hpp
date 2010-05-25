@@ -21,16 +21,16 @@
 #ifndef xdm_StaticAssert_hpp
 #define xdm_StaticAssert_hpp
 
-#include <xdm/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+
+namespace xdm {
 
 namespace detail {
   template< bool B > struct StaticAssertion;
   template<> struct StaticAssertion< true > {};
 } // namespace detail
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #define XDM_PP_JOIN(a, b) XDM_PP_JOIN_IMPL(a, b)
 #define XDM_PP_JOIN_IMPL(a, b) a ## b

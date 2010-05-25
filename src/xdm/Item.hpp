@@ -30,7 +30,7 @@
 #include <typeinfo>
 #include <utility>
 
-#include <xdm/NamespaceMacro.hpp>
+
 
 /// Macro to assist classes in defining boilerplate functions that are
 /// helpful when subclassing Item.  This macro will provide the correct
@@ -39,7 +39,7 @@
   virtual const char* className() const { return #name; } \
   virtual void accept( xdm::ItemVisitor& iv ) { iv.apply( *this ); }
 
-XDM_NAMESPACE_BEGIN
+namespace xdm {
 
 class Item;
 class ItemVisitor;
@@ -141,7 +141,7 @@ private:
   RefPtr< BasicItemUpdateCallback > mUpdateCallback;
 };
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_Item_hpp
 

@@ -22,7 +22,7 @@
 
 #include <xdm/ItemVisitor.hpp>
 
-XDM_NAMESPACE_BEGIN
+namespace xdm {
 
 Item::Item() {
 }
@@ -73,5 +73,5 @@ void Item::writeMetadata( XmlMetadataWrapper& xml ) {
   }
 }
 
-XDM_NAMESPACE_END
+} // namespace xdm
 

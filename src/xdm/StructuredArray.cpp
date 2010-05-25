@@ -23,7 +23,7 @@
 #include <numeric>
 #include <vector>
 
-XDM_NAMESPACE_BEGIN
+namespace xdm {
 
 StructuredArray::StructuredArray() {
 }
@@ -35,5 +35,5 @@ size_t StructuredArray::memorySize() const {
   return elementSize() * size();
 }
 
-XDM_NAMESPACE_END
+} // namespace xdm
 

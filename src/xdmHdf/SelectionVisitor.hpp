@@ -28,13 +28,12 @@
 #include <vector>
 
 #include <xdmHdf/NamespaceMacro.hpp>
-#include <xdm/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+namespace xdm {
   class AllDataSelection;
   class CoordinateDataSelection;
   class HyperslabDataSelection;
-XDM_NAMESPACE_END
+} // namespace xdm
 
 XDM_HDF_NAMESPACE_BEGIN
 

@@ -18,8 +18,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.       
 //                                                                             
 //------------------------------------------------------------------------------
-#ifndef xdm_NamespaceMacro_hpp
-#define xdm_NamespaceMacro_hpp
+#ifndef xdm_Namespace_hpp
+#define xdm_Namespace_hpp
 
 /// Core object model and data interfaces. The xdm namespace contains the
 /// definitions of the core xdm data model and interfaces for the data
@@ -33,17 +33,5 @@ namespace xdm {
   namespace primitiveType { }
 }
 
-#ifndef SWIG
-# define XDM_NAMESPACE_BEGIN namespace xdm {
-#else
-# define XDM_NAMESPACE_BEGIN
-#endif
-
-#ifndef SWIG
-# define XDM_NAMESPACE_END }
-#else
-# define XDM_NAMESPACE_END
-#endif
-
-#endif // xdm_NamespaceMacro_hpp
+#endif // xdm_Namespace_hpp
 

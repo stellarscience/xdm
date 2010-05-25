@@ -23,7 +23,7 @@
 #include <xdm/AllDataSelection.hpp>
 #include <xdm/DataSelection.hpp>
 
-XDM_NAMESPACE_BEGIN
+namespace xdm {
 
 DataSelectionMap::DataSelectionMap() :
   mDomain( new AllDataSelection ),
@@ -56,5 +56,5 @@ void DataSelectionMap::setRange( RefPtr< DataSelection > range ) {
   mRange = range;
 }
 
-XDM_NAMESPACE_END
+} // namespace xdm
 

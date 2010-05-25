@@ -24,7 +24,7 @@
 
 #include <xdm/ThrowMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+namespace xdm {
 
 BasicBinaryStreamBuffer::BasicBinaryStreamBuffer() :
   std::basic_streambuf< char >()
@@ -191,4 +191,4 @@ int BasicBinaryStreamBuffer::overflow( int )
   return BasicBinaryStreamBuffer::eof();
 }
 
-XDM_NAMESPACE_END
+} // namespace xdm

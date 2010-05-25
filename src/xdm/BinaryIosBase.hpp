@@ -23,9 +23,9 @@
 
 #include <xdm/BinaryStreamBuffer.hpp>
 
-#include <xdm/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+
+namespace xdm {
 
 /// Base class that manages access to an underlying stream buffer for streaming
 /// input and output of binary serialized objects.
@@ -58,7 +58,7 @@ public:
 
 typedef BasicBinaryIosBase< BinaryStreamBuffer > BinaryIosBase;
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_BinaryIosBase_hpp
 

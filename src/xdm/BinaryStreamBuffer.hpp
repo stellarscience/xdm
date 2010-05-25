@@ -27,9 +27,9 @@
 #include <streambuf>
 #include <vector>
 
-#include <xdm/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+
+namespace xdm {
 
 /// Exception signalling a buffer overrun error when filling a
 /// BinaryStreamBuffer. A BinaryStreamBuffer does not fill and output as a
@@ -168,7 +168,7 @@ private:
   std::vector< char > mBuffer;
 };
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_BinaryStreamBuffer_hpp
 

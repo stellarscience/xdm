@@ -26,11 +26,10 @@
 #include <string>
 
 #include <xdmf/NamespaceMacro.hpp>
-#include <xdm/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+namespace xdm {
   class XmlObject;
-XDM_NAMESPACE_END
+} // namespace xdm
 
 XDMF_NAMESPACE_BEGIN
 

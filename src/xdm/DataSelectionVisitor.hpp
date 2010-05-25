@@ -25,9 +25,9 @@
 #include <xdm/ReferencedObject.hpp>
 #include <xdm/RefPtr.hpp>
 
-#include <xdm/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+
+namespace xdm {
 
 class AllDataSelection;
 class CoordinateDataSelection;
@@ -46,7 +46,7 @@ public:
 
 };
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_DataSelectionVisitor_hpp
 

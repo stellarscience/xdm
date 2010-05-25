@@ -28,7 +28,7 @@
 
 #include <xdm/ThrowMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+namespace xdm {
 
 namespace {
 
@@ -222,5 +222,5 @@ bool operator!=( const XmlObject& lhs, const XmlObject& rhs ) {
   return !( lhs == rhs );
 }
 
-XDM_NAMESPACE_END
+} // namespace xdm
 

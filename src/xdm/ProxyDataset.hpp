@@ -24,9 +24,9 @@
 #include <xdm/Dataset.hpp>
 #include <xdm/RefPtr.hpp>
 
-#include <xdm/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+
+namespace xdm {
 
 /// Dataset that has a Dataset and is a Dataset. Useful for Dataset subclasses
 /// that need to redefine subsets of generic Dataset behavior while remaining
@@ -76,6 +76,6 @@ private:
   RefPtr< Dataset > mDataset;
 };
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_ProxyDataset_hpp

@@ -28,9 +28,9 @@
 #include <stdexcept>
 #include <vector>
 
-#include <xdm/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+
+namespace xdm {
 
 /// StructuredArray that represents it's data internally as an array of bytes.
 /// The array elements are stored internally as an array of bytes, however
@@ -91,6 +91,6 @@ public:
 
 };
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_ByteArray_hpp

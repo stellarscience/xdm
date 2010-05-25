@@ -26,10 +26,10 @@
 #include <stdexcept>
 #include <vector>
 
-#include <xdm/NamespaceMacro.hpp>
+
 #include <xdm/ThrowMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+namespace xdm {
 
 /// StructuredArray that manages its own storage with a standard vector. The
 /// lifetime of the data is tied to the lifetime of the StructuredArray.
@@ -131,7 +131,7 @@ makeVectorStructuredArray( primitiveType::Value type ) {
   }
 }
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_VectorStructuredArray_hpp
 

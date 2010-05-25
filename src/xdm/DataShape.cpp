@@ -27,7 +27,7 @@
 #include <sstream>
 #include <stdexcept>
 
-XDM_NAMESPACE_BEGIN
+namespace xdm {
 
 DataShape<> makeShape( const std::string& dimensions ) {
   typedef DataShape<>::size_type SizeType;
@@ -94,5 +94,5 @@ DataShape<> makeContraction( const DataShape<>& space, DataShape<>::size_type n 
   return result;
 }
 
-XDM_NAMESPACE_END
+} // namespace xdm
 

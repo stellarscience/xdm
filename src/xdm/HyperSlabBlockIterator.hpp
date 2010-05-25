@@ -29,9 +29,9 @@
 
 #include <cassert>
 
-#include <xdm/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+
+namespace xdm {
 
 namespace detail {
   template< typename T > struct Minimum {
@@ -201,7 +201,7 @@ public:
   }
 };
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_HyperSlabBlockIterator_hpp
 

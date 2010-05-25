@@ -23,7 +23,7 @@
 #include <xdm/AllDataSelection.hpp>
 #include <xdm/DataSelection.hpp>
 
-XDM_NAMESPACE_BEGIN
+namespace xdm {
 
 RefPtr< AllDataSelection > SelectableDataMixin::sAllSelection(
   new AllDataSelection );
@@ -51,5 +51,5 @@ void SelectableDataMixin::selectAll() {
   mSelection = sAllSelection;
 }
 
-XDM_NAMESPACE_END
+} // namespace xdm
 

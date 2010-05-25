@@ -20,7 +20,7 @@
 //------------------------------------------------------------------------------
 #include <xdm/DataItem.hpp>
 
-XDM_NAMESPACE_BEGIN
+namespace xdm {
 
 DataItem::DataItem() {
 }
@@ -33,5 +33,5 @@ void DataItem::writeMetadata( XmlMetadataWrapper& xml ) {
   xml.setTag( "DataItem" );
 }
 
-XDM_NAMESPACE_END
+} // namespace xdm
 

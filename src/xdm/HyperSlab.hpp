@@ -23,14 +23,14 @@
 
 #include <xdm/DataShape.hpp>
 
-#include <xdm/NamespaceMacro.hpp>
+
 
 #include <iterator>
 #include <ostream>
 
 #include <cstdlib>
 
-XDM_NAMESPACE_BEGIN
+namespace xdm {
 
 /// Sampled subset of a dataset.  The data is indexed by a start, stride, and
 /// count in each dimension.  This class is templated on it's size type to
@@ -220,7 +220,7 @@ std::ostream& operator<<( std::ostream& ostr, const HyperSlab<T>& slab ) {
   return ostr;
 }
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_HyperSlab_hpp
 

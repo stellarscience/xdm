@@ -23,7 +23,7 @@
 #include <xdm/BinaryStreamOperations.hpp>
 #include <xdm/XmlObject.hpp>
 
-XDM_NAMESPACE_BEGIN
+namespace xdm {
 
 CollectMetadataOperation::ContextManager::ContextManager( 
   CollectMetadataOperation& op, 
@@ -95,5 +95,5 @@ RefPtr< XmlObject > CollectMetadataOperation::result() {
   return mResult;
 }
 
-XDM_NAMESPACE_END
+} // namespace xdm
 

@@ -21,7 +21,7 @@
 #ifndef xdmComm_MpiMessageTag_hpp
 #define xdmComm_MpiMessageTag_hpp
 
-#include <xdm/NamespaceMacro.hpp>
+#include <xdmComm/NamespaceMacro.hpp>
 
 XDM_COMM_NAMESPACE_BEGIN
 

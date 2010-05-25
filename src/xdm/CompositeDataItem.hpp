@@ -27,9 +27,9 @@
 
 #include <vector>
 
-#include <xdm/NamespaceMacro.hpp>
 
-XDM_NAMESPACE_BEGIN
+
+namespace xdm {
 
 /// Class that groups multiple Data nodes together.  CompositeDataItem is a Data
 /// type that can hold child Data types.  It is used to construct a large
@@ -54,7 +54,7 @@ public:
   virtual void writeMetadata( XmlMetadataWrapper& xml );
 };
 
-XDM_NAMESPACE_END
+} // namespace xdm
 
 #endif // xdm_CompositeDataItem_hpp
 
