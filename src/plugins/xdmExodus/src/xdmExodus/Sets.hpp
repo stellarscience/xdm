@@ -25,9 +25,9 @@
 
 #include <xdmGrid/ReferencingGrid.hpp>
 
-#include <xdmExodus/NamespaceMacro.hpp>
 
-XDM_EXODUS_NAMESPACE_BEGIN
+
+namespace xdmExodus {
 
 /// An Exodus set is an integer array of offsets into internal element, face, edge, or node
 /// IDs. Note that these are *internal* IDs, which can only be determined by reading the
@@ -91,7 +91,7 @@ protected:
 
 xdm::RefPtr< Set > setFactory( int exodusObjectType );
 
-XDM_EXODUS_NAMESPACE_END
+} // namespace xdmExodus
 
 #endif // xdmExodus_Sets_hpp
 

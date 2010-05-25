@@ -30,9 +30,9 @@
 
 #include <xdm/VectorStructuredArray.hpp>
 
-#include <xdmExodus/NamespaceMacro.hpp>
 
-XDM_EXODUS_NAMESPACE_BEGIN
+
+namespace xdmExodus {
 
 std::size_t Block::entryGlobalOffset() const {
   return mOffset;
@@ -257,5 +257,5 @@ xdm::RefPtr< Block > blockFactory( int exodusObjectType ) {
 }
 
 
-XDM_EXODUS_NAMESPACE_END
+} // namespace xdmExodus
 

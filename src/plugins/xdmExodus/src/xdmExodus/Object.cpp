@@ -25,7 +25,7 @@
 
 #include <xdm/RefPtr.hpp>
 
-XDM_EXODUS_NAMESPACE_BEGIN
+namespace xdmExodus {
 
 class Variable;
 
@@ -80,4 +80,4 @@ void Object::writeTimeStep( int exodusFileId, std::size_t timeStep ) {
   }
 }
 
-XDM_EXODUS_NAMESPACE_END
+} // namespace xdmExodus

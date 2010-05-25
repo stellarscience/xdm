@@ -39,7 +39,7 @@
 #include <string>
 #include <vector>
 
-XDM_EXODUS_NAMESPACE_BEGIN
+namespace xdmExodus {
 
 namespace {
 
@@ -471,5 +471,5 @@ bool ExodusReader::update(
 }
 
 
-XDM_EXODUS_NAMESPACE_END
+} // namespace xdmExodus
 

@@ -23,9 +23,9 @@
 
 #include <xdmExodus/Object.hpp>
 
-#include <xdmExodus/NamespaceMacro.hpp>
 
-XDM_EXODUS_NAMESPACE_BEGIN
+
+namespace xdmExodus {
 
 /// An Exodus map is not really an object, but it inherits from Object to grab some of
 /// the Exodus type lookup functionality.
@@ -53,7 +53,7 @@ protected:
   virtual int exodusObjectTypeIndex() const { return 11; }
 };
 
-XDM_EXODUS_NAMESPACE_END
+} // namespace xdmExodus
 
 #endif // xdmExodus_Maps_hpp
 

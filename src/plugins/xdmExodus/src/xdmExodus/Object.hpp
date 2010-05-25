@@ -25,9 +25,9 @@
 
 #include <vector>
 
-#include <xdmExodus/NamespaceMacro.hpp>
 
-XDM_EXODUS_NAMESPACE_BEGIN
+
+namespace xdmExodus {
 
 class ExodusString;
 class Variable;
@@ -79,7 +79,7 @@ private:
   int mId;
 };
 
-XDM_EXODUS_NAMESPACE_END
+} // namespace xdmExodus
 
 #endif // xdmExodus_Object_hpp
 

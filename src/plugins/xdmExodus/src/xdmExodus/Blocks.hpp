@@ -29,9 +29,9 @@
 
 #include <string>
 
-#include <xdmExodus/NamespaceMacro.hpp>
 
-XDM_EXODUS_NAMESPACE_BEGIN
+
+namespace xdmExodus {
 
 class Variable;
 
@@ -90,7 +90,7 @@ protected:
 /// Returns the Block class that corresponds to an Exodus block type.
 xdm::RefPtr< Block > blockFactory( int exodusObjectType );
 
-XDM_EXODUS_NAMESPACE_END
+} // namespace xdmExodus
 
 #endif // xdmExodus_Blocks_hpp
 

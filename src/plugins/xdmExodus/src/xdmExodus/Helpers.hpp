@@ -42,7 +42,7 @@
     throw std::runtime_error( (#errorString) ); \
   }
 
-XDM_EXODUS_NAMESPACE_BEGIN
+namespace xdmExodus {
 
 /// String type for working with Exodus char*.
 struct ExodusString {
@@ -164,5 +164,5 @@ xdm::RefPtr< xdm::UniformDataItem > makeDataItem(
   dataItem->setData( xdm::makeRefPtr( new xdm::ArrayAdapter( vector ) ) );
 }
 
-XDM_EXODUS_NAMESPACE_END
+} // namespace xdmExodus
 

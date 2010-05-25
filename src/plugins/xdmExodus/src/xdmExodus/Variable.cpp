@@ -25,9 +25,9 @@
 #include <xdm/VectorStructuredArray.hpp>
 #include <xdm/UniformDataItem.hpp>
 
-#include <xdmExodus/NamespaceMacro.hpp>
 
-XDM_EXODUS_NAMESPACE_BEGIN
+
+namespace xdmExodus {
 
 Variable::Variable(
   int exodusObjectType,
@@ -79,4 +79,4 @@ int Variable::id() const {
   return mVariableIndex;
 }
 
-XDM_EXODUS_NAMESPACE_END
+} // namespace xdmExodus

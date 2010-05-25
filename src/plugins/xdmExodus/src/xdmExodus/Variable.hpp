@@ -29,9 +29,9 @@ XDM_NAMESPACE_BEGIN
 template< typename T > class VectorStructuredArray;
 XDM_NAMESPACE_END
 
-#include <xdmExodus/NamespaceMacro.hpp>
 
-XDM_EXODUS_NAMESPACE_BEGIN
+
+namespace xdmExodus {
 
 class Variable : public xdmGrid::Attribute {
 public:
@@ -53,7 +53,7 @@ private:
   int mObjectId;
 };
 
-XDM_EXODUS_NAMESPACE_END
+} // namespace xdmExodus
 
 #endif // xdmExodus_Variable_hpp
 

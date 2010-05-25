@@ -23,9 +23,9 @@
 
 #include <xdmFormat/Reader.hpp>
 
-#include <xdmExodus/NamespaceMacro.hpp>
 
-XDM_EXODUS_NAMESPACE_BEGIN
+
+namespace xdmExodus {
 
 /// Class for reading an ExodusII file. Uses the ExodusII library functions to read
 /// an unstructured grid from an ExodusII file complete with nodes and element blocks
@@ -81,6 +81,6 @@ public:
 
 };
 
-XDM_EXODUS_NAMESPACE_END
+} // namespace xdmExodus
 
 #endif // xdmExodus_Reader_hpp

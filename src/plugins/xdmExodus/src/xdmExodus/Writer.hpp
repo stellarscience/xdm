@@ -23,9 +23,9 @@
 
 #include <xdmFormat/Writer.hpp>
 
-#include <xdmExodus/NamespaceMacro.hpp>
 
-XDM_EXODUS_NAMESPACE_BEGIN
+
+namespace xdmExodus {
 
 /// Class for writing an ExodusII file. Uses the ExodusII library functions to write
 /// an unstructured grid to an ExodusII file complete with nodes and blocks for now.
@@ -48,7 +48,7 @@ public:
 
 };
 
-XDM_EXODUS_NAMESPACE_END
+} // namespace xdmExodus
 
 #endif // xdmExodus_Writer_hpp
 

@@ -22,7 +22,7 @@
 #include <xdmExodus/Helpers.hpp>
 #include <xdmExodus/Variable.hpp>
 
-XDM_EXODUS_NAMESPACE_BEGIN
+namespace xdmExodus {
 
 std::size_t Set::numberOfEntries() const {
   return numberOfElements();
@@ -69,4 +69,4 @@ xdm::RefPtr< Set > setFactory( int exodusObjectType ) {
   return xdm::RefPtr< Set >( NULL );
 }
 
-XDM_EXODUS_NAMESPACE_END
+} // namespace xdmExodus

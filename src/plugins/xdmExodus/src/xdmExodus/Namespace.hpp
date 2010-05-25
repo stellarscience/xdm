@@ -21,19 +21,8 @@
 #ifndef xdmExodus_NamespaceMacro_hpp
 #define xdmExodus_NamespaceMacro_hpp
 
+/// Plugin implementation for working with the Exodus II mesh file format.
 namespace xdmExodus { }
-
-#ifndef SWIG
-# define XDM_EXODUS_NAMESPACE_BEGIN namespace xdmExodus {
-#else
-# define XDM_EXODUS_NAMESPACE_BEGIN
-#endif
-
-#ifndef SWIG
-# define XDM_EXODUS_NAMESPACE_END }
-#else
-# define XDM_EXODUS_NAMESPACE_END
-#endif
 
 #endif // xdmExodus_NamespaceMacro_hpp
 
