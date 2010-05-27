@@ -35,7 +35,7 @@ add_dependencies( xdmf_rng_header copy_xdmf.rng )
 # Build the plugin
 set( ${PROJECT_NAME}_HEADERS
   LinearTopologyData.hpp
-  NamespaceMacro.hpp
+  Namespace.hpp
   TemporalCollection.hpp
   TimeSeries.hpp
   VirtualDataset.hpp

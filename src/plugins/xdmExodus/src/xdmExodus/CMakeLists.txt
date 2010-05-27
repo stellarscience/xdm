@@ -12,7 +12,7 @@ set( ${PROJECT_NAME}_HEADERS
     Sets.hpp
     Variable.hpp
     Writer.hpp
-    NamespaceMacro.hpp
+    Namespace.hpp
 )
 
 set( ${PROJECT_NAME}_SOURCES

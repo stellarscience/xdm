@@ -7,7 +7,7 @@ set( ${PROJECT_NAME}_HEADERS
     CoalescingStreamBuffer.hpp
     DistributedItemCollectionProxy.hpp
     MpiDatasetProxy.hpp
-    NamespaceMacro.hpp
+    Namespace.hpp
     ParallelizeTreeVisitor.hpp
     RankOrderedDistributedDataset.hpp
 )

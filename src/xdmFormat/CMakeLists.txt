@@ -1,7 +1,7 @@
 project( xdmFormat )
 
 set( ${PROJECT_NAME}_HEADERS 
-    NamespaceMacro.hpp
+    Namespace.hpp
     Reader.hpp
     ReadResult.hpp
     Writer.hpp
