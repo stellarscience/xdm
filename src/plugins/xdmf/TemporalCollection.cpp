@@ -34,6 +34,25 @@
 
 namespace xdmf {
 
+namespace {
+
+xdm::RefPtr< xdm::XmlObject > openTemporalCollection() 
+{
+  xdm::RefPtr< xdm::XmlObject > xdmf = createXdmfRoot();
+
+  xdm::RefPtr< xdm::XmlObject > domain( new xdm::XmlObject( "Domain" ) );
+  xdmf->appendChild( domain );
+
+  xdm::RefPtr< xdm::XmlObject > grid( new xdm::XmlObject ( "Grid" ) );
+  grid->appendAttribute( "GridType", "Collection" );
+  grid->appendAttribute( "CollectionType", "Temporal" );
+  domain->appendChild( grid );
+
+  return xdmf;
+}
+
+} // namespace
+
 TemporalCollection::TemporalCollection( 
   const std::string& metadataFile,
   xdm::Dataset::InitializeMode mode ) :
@@ -52,17 +71,7 @@ void TemporalCollection::open()
 {
   mFileStream.open( mFilename.c_str(), std::ios::out );
   mFileStream << "<?xml version='1.0'?>\n";
-
-  xdm::RefPtr< xdmGrid::Domain > domain( new xdmGrid::Domain );
-  xdm::RefPtr< xdmGrid::CollectionGrid > temporalCollection(
-    new xdmGrid::CollectionGrid( xdmGrid::CollectionGrid::kTemporal ) );
-  domain->addGrid( temporalCollection );
-
-  // open a context within the xml stream to begin the temporal collection
-  xdm::CollectMetadataOperation collect;
-  domain->accept( collect );
-  xdm::RefPtr< xdm::XmlObject > xdmf = xdmf::createXdmfRoot();
-  xdmf->appendChild( collect.result() );
+  xdm::RefPtr< xdm::XmlObject > xdmf = openTemporalCollection();
   mXmlStream.openContext( xdmf );
 }
 

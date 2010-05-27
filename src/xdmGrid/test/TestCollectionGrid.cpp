@@ -68,23 +68,11 @@ xdm::RefPtr< xdmGrid::UniformGrid > cubeGrid( CubeOfTets& cube ) {
 BOOST_AUTO_TEST_CASE( writeMetadataSpatial ) {
   Fixture test;
 
-  test.grid->setType( xdmGrid::CollectionGrid::kSpatial );
   test.grid->writeMetadata( test.xml );
 
   BOOST_CHECK_EQUAL( "Grid", test.xml.tag() );
   BOOST_CHECK_EQUAL( "Collection", test.xml.attribute( "GridType" ) );
   BOOST_CHECK_EQUAL( "Spatial", test.xml.attribute( "CollectionType" ) );
-}
-
-BOOST_AUTO_TEST_CASE( writeMetadataTemporal ) {
-  Fixture test;
-
-  test.grid->setType( xdmGrid::CollectionGrid::kTemporal );
-  test.grid->writeMetadata( test.xml );
-
-  BOOST_CHECK_EQUAL( "Grid", test.xml.tag() );
-  BOOST_CHECK_EQUAL( "Collection", test.xml.attribute( "GridType" ) );
-  BOOST_CHECK_EQUAL( "Temporal", test.xml.attribute( "CollectionType" ) );
 }
 
 BOOST_AUTO_TEST_CASE( indirectElementAccess ) {

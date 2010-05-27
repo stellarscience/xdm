@@ -39,32 +39,10 @@ namespace xdmGrid {
 class CollectionGrid : public Grid {
 public:
 
-  // Code Review Matter (open): nested enumeration
-  // Did you consider moving enumerations outside of the classes to remove
-  // any need for a full #include when only a forward declaration is needed?
-  // -- K. R. Walker on 2010-05-21
-
-  /// Enumeration of collection type.  Spatial or temporal.
-  enum CollectionType {
-    kSpatial = 0,
-    kTemporal
-  };
-
-  explicit CollectionGrid( CollectionType type = kSpatial );
+  explicit CollectionGrid();
   virtual ~CollectionGrid();
 
   XDM_META_ITEM( CollectionGrid );
-
-  // Code Review Matter (open): locked type
-  // If this grid is set up as kSpatial and has data added, would the following
-  // methods make it possible to make a nonsensical object?
-  // In other words, what are the invariants of objects of this class?
-  // -- K. R. Walker on 2010-05-21
-
-  /// Set the collection type for this grid to spatial or temporal.
-  /// @see CollectionType
-  void setType( CollectionType t );
-  CollectionType type() const;
 
   // Code Review Matter (open): duplicates?
   // Can a grid be added to the collection more than once?
@@ -187,9 +165,6 @@ private:
   // faces on the tets (which are triangles); thus, the collection grid always refers to
   // triangles.
   std::vector< ReferenceType > mReferenceTypes;
-
-  // This is going away, right Will?
-  CollectionType mType;
 
   std::pair< std::size_t, std::size_t > findGrid( const std::size_t& elementIndex ) const;
   void updateOffsets() const;

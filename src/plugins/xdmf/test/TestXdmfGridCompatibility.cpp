@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE( staticGrid ) {
   // build the topology for the grid.
   xdm::RefPtr< xdmGrid::RectilinearMesh > topology(
     new xdmGrid::RectilinearMesh );
-  topology->setShape( xdm::makeShape("10 10 10") );
+  topology->setShape( xdm::makeShape("9 9 9") );
   grid->setTopology( topology );
 
   // build the geometry for the grid.
@@ -197,7 +197,7 @@ BOOST_AUTO_TEST_CASE( timeSeries ) {
 
   xdm::RefPtr< xdmGrid::RectilinearMesh > sharedTopology(
     new xdmGrid::RectilinearMesh );
-  sharedTopology->setShape( xdm::makeShape( 10, 10, 10 ) );
+  sharedTopology->setShape( xdm::makeShape( 9, 9, 9 ) );
 
   double timeval = 0.0;
   for ( unsigned int step = 0; step <= 500; ++step ) {

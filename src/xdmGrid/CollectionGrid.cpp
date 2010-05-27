@@ -36,25 +36,16 @@
 
 namespace xdmGrid {
 
-CollectionGrid::CollectionGrid( CollectionType type ) :
+CollectionGrid::CollectionGrid() :
   Grid(),
   mGrids(),
   mElementIndices(),
   mFaceEdgeIndices(),
   mElementOffsets(),
-  mReferenceTypes(),
-  mType( type ) {
+  mReferenceTypes() {
 }
 
 CollectionGrid::~CollectionGrid() {
-}
-
-void CollectionGrid::setType( CollectionType t ) {
-  mType = t;
-}
-
-CollectionGrid::CollectionType CollectionGrid::type() const {
-  return mType;
 }
 
 void CollectionGrid::appendGrid( xdm::RefPtr< Grid > grid ) {
@@ -256,19 +247,7 @@ void CollectionGrid::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
 
   // write the grid type as a collection
   xml.setAttribute( "GridType", "Collection" );
-
-  // write the type of collection.
-  switch ( mType ) {
-  case kSpatial:
-    xml.setAttribute( "CollectionType", "Spatial" );
-    break;
-  case kTemporal:
-    xml.setAttribute( "CollectionType", "Temporal" );
-    break;
-  default:
-    XDM_THROW( std::invalid_argument( "Unrecognized Grid type" ) );
-    break;
-  }
+  xml.setAttribute( "CollectionType", "Spatial" );
 }
 
 // Finds the grid index and element offset index.

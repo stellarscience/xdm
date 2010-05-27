@@ -506,8 +506,7 @@ xdm::RefPtr< xdmGrid::Grid > TreeBuilder::buildGrid( xmlNode * node ) {
 xdm::RefPtr< xdmGrid::CollectionGrid >
 TreeBuilder::buildSpatialCollectionGrid( xmlNode * node ) {
 
-  xdm::RefPtr< xdmGrid::CollectionGrid > result(
-    new xdmGrid::CollectionGrid( xdmGrid::CollectionGrid::kSpatial ) );
+  xdm::RefPtr< xdmGrid::CollectionGrid > result( new xdmGrid::CollectionGrid );
   // Find all grid children of the node.
   XPathQuery childGridQuery( mDoc->get(), node, "Grid" );
   for ( size_t i = 0; i < childGridQuery.size(); i++ ) {
