@@ -197,21 +197,8 @@ std::size_t UniformGrid::numberOfElements() const {
 
 Element UniformGrid::element( const std::size_t& elementIndex ) const
 {
-  // Code Review Matter (open): invoking undefined behavior?
-  // If this object had been explicitly declared as const, the casting-away
-  // of const below invokes undefined behavior.
-  //
-  // "If the object really is constant, the compiler may have put it in ROM 
-  // or write-protected memory. Trying to modify such an object may lead to 
-  // a program crash." -- <https://www.securecoding.cert.org/confluence/display/cplusplus/EXP35-CPP.+Do+not+cast+away+a+const+qualification>
-  //
-  // If this can never happen, it would be nice to have it documented here
-  // clearly why it can never happen.
-  // -- K. R. Walker on 2010-05-21
   if ( ! mElementImp ) {
-    UniformGrid& mutableMe = const_cast< UniformGrid& >( *this );
-    mutableMe.mElementImp =
-      xdm::makeRefPtr( new SimpleElementImp( mutableMe.mGeometry, mutableMe.mTopology ) );
+    mElementImp = new SimpleElementImp( mGeometry, mTopology );
   }
   return Element( mElementImp, mTopology->elementTopology( elementIndex ), elementIndex );
 }

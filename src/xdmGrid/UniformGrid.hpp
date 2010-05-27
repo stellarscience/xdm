@@ -104,7 +104,7 @@ public:
 private:
   xdm::RefPtr< Geometry > mGeometry;
   xdm::RefPtr< Topology > mTopology;
-  xdm::RefPtr< ElementSharedConnectivityLookup > mElementImp;
+  mutable xdm::RefPtr< ElementSharedConnectivityLookup > mElementImp;
 };
 
 } // namespace xdmGrid
