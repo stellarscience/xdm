@@ -31,8 +31,66 @@
 
 namespace xdmGrid {
 
+StructuredTopologyVectorRefImpFactory::StructuredTopologyVectorRefImpFactory(
+  StructuredTopology& topology ) :
+  mTopology( topology ) 
+{
+}
+
+StructuredTopologyVectorRefImpFactory::~StructuredTopologyVectorRefImpFactory()
+{
+}
+
+xdm::RefPtr< xdm::VectorRefImp< std::size_t > > 
+StructuredTopologyVectorRefImpFactory::createVectorRefImp()
+{
+  mTopology.mNodes.clear();
+  switch( mTopology.mShape.rank() ) {
+    case 2:
+      for ( std::size_t y = 0; y < mTopology.mShape[1]; ++y ) {
+        for ( std::size_t x = 0; x < mTopology.mShape[0]; ++x ) {
+          std::size_t xNodes = mTopology.mShape[0] + 1;
+          mTopology.mNodes.push_back( ( x + 0 ) + ( y + 0 ) * xNodes );
+          mTopology.mNodes.push_back( ( x + 1 ) + ( y + 0 ) * xNodes );
+          mTopology.mNodes.push_back( ( x + 1 ) + ( y + 1 ) * xNodes );
+          mTopology.mNodes.push_back( ( x + 0 ) + ( y + 1 ) * xNodes );
+        }
+      }
+      break;
+    case 3:
+      for ( std::size_t z = 0; z < mTopology.mShape[2]; ++z ) {
+        for ( std::size_t y = 0; y < mTopology.mShape[1]; ++y ) {
+          for ( std::size_t x = 0; x < mTopology.mShape[0]; ++x ) {
+            std::size_t xNodes = mTopology.mShape[0] + 1;
+            std::size_t yNodes = mTopology.mShape[1] + 1;
+            mTopology.mNodes.push_back( ( x + 0 ) + ( y + 0 ) * xNodes + ( z + 0 ) * xNodes * yNodes );
+            mTopology.mNodes.push_back( ( x + 1 ) + ( y + 0 ) * xNodes + ( z + 0 ) * xNodes * yNodes );
+            mTopology.mNodes.push_back( ( x + 1 ) + ( y + 1 ) * xNodes + ( z + 0 ) * xNodes * yNodes );
+            mTopology.mNodes.push_back( ( x + 0 ) + ( y + 1 ) * xNodes + ( z + 0 ) * xNodes * yNodes );
+            mTopology.mNodes.push_back( ( x + 0 ) + ( y + 0 ) * xNodes + ( z + 1 ) * xNodes * yNodes );
+            mTopology.mNodes.push_back( ( x + 1 ) + ( y + 0 ) * xNodes + ( z + 1 ) * xNodes * yNodes );
+            mTopology.mNodes.push_back( ( x + 1 ) + ( y + 1 ) * xNodes + ( z + 1 ) * xNodes * yNodes );
+            mTopology.mNodes.push_back( ( x + 0 ) + ( y + 1 ) * xNodes + ( z + 1 ) * xNodes * yNodes );
+          }
+        }
+      }
+      break;
+    default:
+      std::stringstream ss;
+      ss << "The rank of the DataShape represents an unknown structured mesh topology (something"
+        " other than 2D or 3D). The rank was " << mTopology.mShape.rank();
+      XDM_THROW( std::runtime_error( ss.str() ) );
+  }
+
+  return xdm::RefPtr< xdm::VectorRefImp< std::size_t > >(
+    new xdm::SingleArrayOfVectorsImp< std::size_t >( 
+      &mTopology.mNodes[0], 
+      mTopology.mElementTopology->numberOfNodes() ) );
+}
+
+// -------------------------------------------------------------------------------------------------
 StructuredTopology::StructuredTopology() :
-  Topology(),
+  Topology( xdm::makeRefPtr( new StructuredTopologyVectorRefImpFactory( *this ) ) ),
   mShape(),
   mElementTopology() {
 }
@@ -110,49 +168,6 @@ void StructuredTopology::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
     }
     break;
   }
-}
-
-xdm::RefPtr< xdm::VectorRefImp< std::size_t > > StructuredTopology::createVectorImp() {
-  mNodes.clear();
-  switch( mShape.rank() ) {
-    case 2:
-      for ( std::size_t y = 0; y < mShape[1]; ++y ) {
-        for ( std::size_t x = 0; x < mShape[0]; ++x ) {
-          std::size_t xNodes = mShape[0] + 1;
-          mNodes.push_back( ( x + 0 ) + ( y + 0 ) * xNodes );
-          mNodes.push_back( ( x + 1 ) + ( y + 0 ) * xNodes );
-          mNodes.push_back( ( x + 1 ) + ( y + 1 ) * xNodes );
-          mNodes.push_back( ( x + 0 ) + ( y + 1 ) * xNodes );
-        }
-      }
-      break;
-    case 3:
-      for ( std::size_t z = 0; z < mShape[2]; ++z ) {
-        for ( std::size_t y = 0; y < mShape[1]; ++y ) {
-          for ( std::size_t x = 0; x < mShape[0]; ++x ) {
-            std::size_t xNodes = mShape[0] + 1;
-            std::size_t yNodes = mShape[1] + 1;
-            mNodes.push_back( ( x + 0 ) + ( y + 0 ) * xNodes + ( z + 0 ) * xNodes * yNodes );
-            mNodes.push_back( ( x + 1 ) + ( y + 0 ) * xNodes + ( z + 0 ) * xNodes * yNodes );
-            mNodes.push_back( ( x + 1 ) + ( y + 1 ) * xNodes + ( z + 0 ) * xNodes * yNodes );
-            mNodes.push_back( ( x + 0 ) + ( y + 1 ) * xNodes + ( z + 0 ) * xNodes * yNodes );
-            mNodes.push_back( ( x + 0 ) + ( y + 0 ) * xNodes + ( z + 1 ) * xNodes * yNodes );
-            mNodes.push_back( ( x + 1 ) + ( y + 0 ) * xNodes + ( z + 1 ) * xNodes * yNodes );
-            mNodes.push_back( ( x + 1 ) + ( y + 1 ) * xNodes + ( z + 1 ) * xNodes * yNodes );
-            mNodes.push_back( ( x + 0 ) + ( y + 1 ) * xNodes + ( z + 1 ) * xNodes * yNodes );
-          }
-        }
-      }
-      break;
-    default:
-      std::stringstream ss;
-      ss << "The rank of the DataShape represents an unknown structured mesh topology (something"
-        " other than 2D or 3D). The rank was " << mShape.rank();
-      XDM_THROW( std::runtime_error( ss.str() ) );
-  }
-
-  return xdm::RefPtr< xdm::VectorRefImp< std::size_t > >(
-    new xdm::SingleArrayOfVectorsImp< std::size_t >( &mNodes[0], mElementTopology->numberOfNodes() ) );
 }
 
 } // namespace xdmGrid

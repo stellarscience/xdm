@@ -32,6 +32,8 @@
 
 namespace xdmGrid {
 
+class StructuredTopologyVectorRefImpFactory;
+
 /// Grid topology for which connectivity is implicit.  Namely, node i is
 /// connected to node i+1.  Examples of structured topologies are grid
 /// topologies in two or three dimensions.
@@ -67,13 +69,25 @@ public:
 
   virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
 
-protected:
-  virtual xdm::RefPtr< xdm::VectorRefImp< std::size_t > > createVectorImp();
-
 private:
+  friend class StructuredTopologyVectorRefImpFactory;
   std::vector< std::size_t > mNodes;
   xdm::DataShape<> mShape;
   xdm::RefPtr< const ElementTopology > mElementTopology;
+};
+
+/// Implementation class to define the shared vector reference implementation for 
+/// StructuredTopology.
+class StructuredTopologyVectorRefImpFactory :
+  public xdm::VectorRefImpFactory< std::size_t >
+{
+public:
+  StructuredTopologyVectorRefImpFactory( StructuredTopology& topology );
+  virtual ~StructuredTopologyVectorRefImpFactory();
+  virtual xdm::RefPtr< xdm::VectorRefImp< std::size_t > > createVectorRefImp();
+
+private:
+  StructuredTopology& mTopology;
 };
 
 } // namespace xdmGrid

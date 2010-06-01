@@ -26,9 +26,19 @@
 
 namespace {
 
-class ConcreteTopology : public xdmGrid::Topology {
+class NullVectorRefImpFactory : public xdm::VectorRefImpFactory< std::size_t > {
 public:
-  ConcreteTopology() : mElementTopology(
+  xdm::RefPtr< xdm::VectorRefImp< std::size_t > > createVectorRefImp() {
+    return xdm::RefPtr< xdm::VectorRefImp< std::size_t > >();
+  }
+};
+
+class ConcreteTopology : 
+  public xdmGrid::Topology {
+public:
+  ConcreteTopology() : 
+    Topology( xdm::makeRefPtr( new NullVectorRefImpFactory ) ),
+    mElementTopology(
     xdmGrid::elementFactory( xdmGrid::ElementShape::Hexahedron, 1 ) ) {
   }
 
@@ -41,9 +51,6 @@ public:
     return mElementTopology;
   }
 
-  virtual xdm::RefPtr< xdm::VectorRefImp< std::size_t > > createVectorImp() {
-    return xdm::RefPtr< xdm::VectorRefImp< std::size_t > >( NULL );
-  }
 private:
   xdm::RefPtr< const xdmGrid::ElementTopology > mElementTopology;
 };

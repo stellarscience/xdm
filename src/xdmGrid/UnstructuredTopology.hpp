@@ -27,9 +27,9 @@
 #include <xdm/RefPtr.hpp>
 #include <xdm/UniformDataItem.hpp>
 
-
-
 namespace xdmGrid {
+
+class UnstructuredTopologyVectorRefImpFactory;
 
 /// Base class for all unstructured topologies. If the connectivity is different
 /// from the standard, an order may be specified.
@@ -64,13 +64,24 @@ public:
 
   virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
 
-protected:
-  virtual xdm::RefPtr< xdm::VectorRefImp< std::size_t > > createVectorImp();
-
 private:
+  friend class UnstructuredTopologyVectorRefImpFactory;
   xdm::RefPtr< xdm::UniformDataItem > mConnectivity;
   xdm::RefPtr< const ElementTopology > mElementTopology;
   NodeOrderingConvention::Type mOrdering;
+};
+
+/// Implementation class to define the shared vector reference implementation for unstructured
+/// topologies.
+class UnstructuredTopologyVectorRefImpFactory : 
+  public xdm::VectorRefImpFactory< std::size_t >
+{
+public:
+  UnstructuredTopologyVectorRefImpFactory( UnstructuredTopology& topology );
+  virtual ~UnstructuredTopologyVectorRefImpFactory();
+  virtual xdm::RefPtr< xdm::VectorRefImp< std::size_t > > createVectorRefImp();
+private:
+  UnstructuredTopology& mTopology;
 };
 
 } // namespace xdmGrid

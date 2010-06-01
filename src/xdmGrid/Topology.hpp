@@ -46,7 +46,8 @@ class Topology :
   public xdm::Item,
   public xdm::ObjectCompositionMixin< xdm::DataItem > {
 public:
-  Topology();
+  Topology( 
+    xdm::RefPtr< xdm::VectorRefImpFactory< std::size_t > > sharedVectorFactory );
   virtual ~Topology();
 
   /// Get the node odering for the shape of these Elements.
@@ -70,14 +71,9 @@ public:
 
   virtual void writeMetadata( xdm::XmlMetadataWrapper& xml );
 
-protected:
-  /// Construct the vector implementation for node IDs used by this topology.
-  /// Subclasses should override this method to return an appropriate VectorRefImp
-  /// for their internal Element representation.
-  virtual xdm::RefPtr< xdm::VectorRefImp< std::size_t > > createVectorImp() = 0;
-
 private:
-  xdm::RefPtr< xdm::VectorRefImp< std::size_t > > mSharedVectorImp;
+  mutable xdm::RefPtr< xdm::VectorRefImpFactory< std::size_t > > mSharedVectorFactory;
+  mutable xdm::RefPtr< xdm::VectorRefImp< std::size_t > > mSharedVectorImp;
   std::size_t mNumberOfElements;
 };
 

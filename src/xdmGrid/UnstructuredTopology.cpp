@@ -24,8 +24,28 @@
 
 namespace xdmGrid {
 
+UnstructuredTopologyVectorRefImpFactory::UnstructuredTopologyVectorRefImpFactory(
+  UnstructuredTopology& topology ) :
+  mTopology( topology )
+{
+}
+
+UnstructuredTopologyVectorRefImpFactory::~UnstructuredTopologyVectorRefImpFactory()
+{
+}
+
+xdm::RefPtr< xdm::VectorRefImp< std::size_t > > 
+UnstructuredTopologyVectorRefImpFactory::createVectorRefImp()
+{
+  return xdm::RefPtr< xdm::VectorRefImp< std::size_t > >(
+    new xdm::SingleArrayOfVectorsImp< std::size_t >(
+      mTopology.mConnectivity->typedArray< std::size_t >()->begin(),
+      mTopology.mElementTopology->numberOfNodes() ) );
+}
+
+//--------------------------------------------------------------------------------------------------
 UnstructuredTopology::UnstructuredTopology() :
-  Topology(),
+  Topology( xdm::makeRefPtr( new UnstructuredTopologyVectorRefImpFactory( *this ) ) ),
   mConnectivity(),
   mElementTopology(),
   mOrdering() {
@@ -75,12 +95,6 @@ void UnstructuredTopology::writeMetadata( xdm::XmlMetadataWrapper& xml ) {
 
   // Write the nodes per Element
   xml.setAttribute( "NodesPerElement", mElementTopology->numberOfNodes() );
-}
-
-xdm::RefPtr< xdm::VectorRefImp< std::size_t > > UnstructuredTopology::createVectorImp() {
-  return xdm::RefPtr< xdm::VectorRefImp< std::size_t > >(
-    new xdm::SingleArrayOfVectorsImp< std::size_t >(
-        mConnectivity->typedArray< std::size_t >()->begin(),mElementTopology->numberOfNodes() ) );
 }
 
 } // namespace xdmGrid

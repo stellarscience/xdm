@@ -24,8 +24,10 @@
 
 namespace xdmGrid {
 
-Topology::Topology() :
+Topology::Topology(
+  xdm::RefPtr< xdm::VectorRefImpFactory< std::size_t > > sharedVectorFactory ) :
   xdm::Item(),
+  mSharedVectorFactory( sharedVectorFactory ),
   mSharedVectorImp(),
   mNumberOfElements( 0 ) {
 }
@@ -43,8 +45,7 @@ std::size_t Topology::numberOfElements() const {
 
 ConstElementConnectivity Topology::elementConnections( std::size_t elementIndex ) const {
   if ( ! mSharedVectorImp ) {
-    Topology& mutableThis = const_cast< Topology& >( *this );
-    mutableThis.mSharedVectorImp = mutableThis.createVectorImp();
+    mSharedVectorImp = mSharedVectorFactory->createVectorRefImp();
   }
   return ConstElementConnectivity( mSharedVectorImp, elementIndex );
 }

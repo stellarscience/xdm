@@ -158,6 +158,14 @@ public:
   virtual std::size_t size() const = 0;
 };
 
+/// Factory interface for constructing VectorRefImp objects.
+template< typename T >
+class VectorRefImpFactory : public ReferencedObject {
+public:
+  /// @brief Create a VectorRefImp with the correct underlying type.
+  virtual RefPtr< VectorRefImp< T > > createVectorRefImp() = 0;
+};
+
 /// The Impementation for the trivial case where data is stored in a single array with the xyz
 /// index cycling faster than the vector index.
 /// Intrinsic state: single contiguous array of data.
