@@ -39,6 +39,7 @@
 #include <xdmGrid/TensorProductGeometry.hpp>
 #include <xdmGrid/Time.hpp>
 #include <xdmGrid/UniformGrid.hpp>
+#include <xdmGrid/UnstructuredTopology.hpp>
 
 #include <xdmHdf/HdfDataset.hpp>
 
@@ -197,6 +198,30 @@ BOOST_AUTO_TEST_CASE( buildStructuredTopology ) {
 
   BOOST_CHECK_EQUAL( structured->shape(), xdm::makeShape( 2, 2, 2) );
 
+}
+
+BOOST_AUTO_TEST_CASE( buildUnstructuredTopology ) {
+  const char * kXml = 
+    "<Topology TopologyType='Tetrahedron' NumberOfElements='6'/>";
+
+  RefPtr< XmlDocumentManager > document = loadXml( kXml );
+  RefPtr< SharedNodeVector > nodes( new SharedNodeVector );
+  nodes->push_back( xmlDocGetRootElement( document->get() ) );
+
+  xdmf::impl::TreeBuilder builder( document, nodes );
+  xdm::RefPtr< xdmGrid::Topology > result = builder.buildTopology( nodes->at(0) );
+
+  BOOST_REQUIRE( result );
+
+  xdm::RefPtr< xdmGrid::UnstructuredTopology > unstructured 
+    = xdm::dynamic_pointer_cast< xdmGrid::UnstructuredTopology >( result );
+  BOOST_REQUIRE( unstructured );
+
+  xdm::RefPtr< const xdmGrid::ElementTopology > elementTopology =
+    unstructured->elementTopology( 0 );
+  BOOST_CHECK_EQUAL( elementTopology->numberOfFaces(), 4 );
+  BOOST_CHECK_EQUAL( elementTopology->numberOfEdges(), 6 );
+  BOOST_CHECK_EQUAL( elementTopology->numberOfNodes(), 4 );
 }
 
 BOOST_AUTO_TEST_CASE( buildStaticTree ) {

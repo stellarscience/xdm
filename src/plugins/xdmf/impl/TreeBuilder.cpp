@@ -46,6 +46,7 @@
 #include <xdmGrid/Time.hpp>
 #include <xdmGrid/Topology.hpp>
 #include <xdmGrid/UniformGrid.hpp>
+#include <xdmGrid/UnstructuredTopology.hpp>
 
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
@@ -327,7 +328,86 @@ xdm::RefPtr< xdmGrid::Topology > TreeBuilder::buildTopology( xmlNode * node ) {
   xdm::RefPtr< xdmGrid::Topology > result;
   if ( topologyType <= MIXED ) {
     // Unstructured topologies.
-    XDM_THROW( xdmFormat::ReadError( "Unstructured XDMF topologies are unsupported." ) );
+    xdm::RefPtr< xdmGrid::UnstructuredTopology > unstructuredTopology(
+      new xdmGrid::UnstructuredTopology );
+    switch ( topologyType ) {
+    case POLYVERTEX:
+      unstructuredTopology->setElementTopology( xdmGrid::elementFactory( 
+        xdmGrid::ElementShape::Vertex, 1 ) );
+      break;
+    case POLYLINE:
+      unstructuredTopology->setElementTopology( xdmGrid::elementFactory( 
+        xdmGrid::ElementShape::Curve, 1 ) );
+      break;
+    case POLYGON:
+      unstructuredTopology->setElementTopology( xdmGrid::elementFactory( 
+        xdmGrid::ElementShape::Curve, 1 ) );
+      break;
+    case TRIANGLE:
+      unstructuredTopology->setElementTopology( xdmGrid::elementFactory( 
+        xdmGrid::ElementShape::Triangle, 1 ) );
+      break;
+    case QUADRILATERAL:
+      unstructuredTopology->setElementTopology( xdmGrid::elementFactory( 
+        xdmGrid::ElementShape::Quadrilateral, 1 ) );
+      break;
+    case TETRAHEDRON:
+      unstructuredTopology->setElementTopology( xdmGrid::elementFactory( 
+        xdmGrid::ElementShape::Tetrahedron, 1 ) );
+      break;
+    case PYRAMID:
+      unstructuredTopology->setElementTopology( xdmGrid::elementFactory( 
+        xdmGrid::ElementShape::Pyramid, 1 ) );
+      break;
+    case WEDGE:
+      unstructuredTopology->setElementTopology( xdmGrid::elementFactory( 
+        xdmGrid::ElementShape::Wedge, 1 ) );
+      break;
+    case HEXAHEDRON:
+      unstructuredTopology->setElementTopology( xdmGrid::elementFactory( 
+        xdmGrid::ElementShape::Hexahedron, 1 ) );
+      break;
+    case EDGE_3:
+      unstructuredTopology->setElementTopology( xdmGrid::elementFactory( 
+        xdmGrid::ElementShape::Curve, 2 ) );
+      break;
+    case TRIANGLE_6:
+      unstructuredTopology->setElementTopology( xdmGrid::elementFactory( 
+        xdmGrid::ElementShape::Triangle, 2 ) );
+      break;
+    case QUADRILATERAL_8:
+      unstructuredTopology->setElementTopology( xdmGrid::elementFactory( 
+        xdmGrid::ElementShape::Quadrilateral, 2 ) );
+      break;
+    case TETRAHEDRON_10:
+      unstructuredTopology->setElementTopology( xdmGrid::elementFactory( 
+        xdmGrid::ElementShape::Tetrahedron, 2 ) );
+      break;
+    case PYRAMID_13:
+      unstructuredTopology->setElementTopology( xdmGrid::elementFactory( 
+        xdmGrid::ElementShape::Pyramid, 2 ) );
+      break;
+    case WEDGE_15:
+      unstructuredTopology->setElementTopology( xdmGrid::elementFactory( 
+        xdmGrid::ElementShape::Wedge, 2 ) );
+      break;
+    case HEXAHEDRON_20:
+      unstructuredTopology->setElementTopology( xdmGrid::elementFactory( 
+        xdmGrid::ElementShape::Hexahedron, 2 ) );
+      break;
+    default:
+      XDM_THROW( 
+        xdmFormat::ReadError( "Unrecognized unstructured topology type." ) );
+    }
+
+    // Attach connectivity information specified in DataItem children.
+    XPathQuery connectivityQuery( mDoc->get(), node, "DataItem" );
+    for ( size_t i = 0; i < connectivityQuery.size(); i++ ) {
+      unstructuredTopology->setConnectivity( 
+        buildUniformDataItem( connectivityQuery.node( i ) ) );
+    }
+
+    result = unstructuredTopology;
   } else {
     xdm::RefPtr< xdmGrid::RectilinearMesh > structuredTopology(
       new xdmGrid::RectilinearMesh );
@@ -351,12 +431,6 @@ xdm::RefPtr< xdmGrid::Topology > TreeBuilder::buildTopology( xmlNode * node ) {
         "No dimensions specified for XDMF structured topology" ) );
     }
     result = structuredTopology;
-  }
-
-  // Attach connectivity information specified in DataItem children.
-  XPathQuery connectivityQuery( mDoc->get(), node, "DataItem" );
-  for ( size_t i = 0; i < connectivityQuery.size(); i++ ) {
-    result->appendChild( buildUniformDataItem( connectivityQuery.node( i ) ) );
   }
 
   readItem( result, node );
